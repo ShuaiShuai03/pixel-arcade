@@ -2,11 +2,25 @@
 
 At the user's direction, at most **three games** may be under development and acceptance testing at one time. Do not begin the next batch until all games in the active batch satisfy the gates below. The 100-game target includes Pixel Parkour. Roster themes are not work assignments.
 
+## Active batch 12
+
+| Game            | Implementation owner | Independent reviewer | Current state                     |
+| --------------- | -------------------- | -------------------- | --------------------------------- |
+| Magnet Marauder | `owner-magnet`       | pending              | No queued files; new module build |
+| Echo Hunter     | pending              | pending              | Queued                            |
+| Frost Forge     | pending              | pending              | Queued                            |
+
+Magnet Marauder development began after Dash Duelist was accepted, while Tether Twins and Vine Warden were still in acceptance, so no more than three games were in development or testing at once.
+
+## Completed batch 11
+
+Dash Duelist, Tether Twins, and Vine Warden passed initial development, independent review, and browser acceptance, bringing the accepted total to 33. All 152 focused tests, 27 shared regressions and four scoped catalog checks pass. All three were built new. Dash Duelist was played by a driver that reads only the prompt and the drawn canvas; Tether Twins and Vine Warden by following their prompts and markers. Browser play changed the design of two games: Vine Warden's lanes, third plot and cues, and Tether Twins' layout and copy. See the [batch 11 evidence](batch-11/ACCEPTANCE.md). Publication verification follows the final integration checks.
+
 ## Completed batch 10
 
-Burrow Rescue, Raft Rush, and Shield Sentinel passed initial development, independent review, and browser acceptance, bringing the accepted total to 30. All 118 focused tests, 27 shared regressions and four scoped catalog checks pass. All three were built new. Raft Rush was played by following only its prompt text; Shield Sentinel by a driver that reads only the prompt and the drawn canvas; Burrow Rescue by following its prompts on the visible mine map. See the [batch 10 evidence](batch-10/ACCEPTANCE.md). Publication verification follows the final integration checks.
+Burrow Rescue, Raft Rush, and Shield Sentinel passed initial development, independent review, and browser acceptance, bringing the accepted total to 30. All 118 focused tests, 27 shared regressions and four scoped catalog checks pass. All three were built new. Raft Rush was played by following only its prompt text; Shield Sentinel by a driver that reads only the prompt and the drawn canvas; Burrow Rescue by following its prompts on the visible mine map. See the [batch 10 evidence](batch-10/ACCEPTANCE.md). Commit `1c8efde` is live. All nine checked assets match, and the three published games accepted real input. See the [deployment receipt](batch-10/deployment.json).
 
-The next batch is Dash Duelist, Tether Twins, and Vine Warden. It remains queued until batch 10 publication is verified.
+The next batch is Dash Duelist, Tether Twins, and Vine Warden. It began after batch 10 passed integration and publication verification.
 
 ## Completed batch 9
 

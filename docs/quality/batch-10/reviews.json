@@ -118,7 +118,7 @@
           "tests/burrow-rescue.test.js": "20d1496412933b7d799d85e23a112ec69f8b35c05e5bb46d72b489ec845bad99"
         },
         "evidence": "39/39 tests; 100% line, 98.03% branch coverage. Invalid time inert; identical state at 30/60/120 Hz; collapse warning 3.84 s precedes damage at exactly the displayed time; rubble re-diggable, rock not; miners move orthogonally on open tiles, wake only adjacent, board only on the lift, score once; oxygen invariants held over 24 monitored bot runs; reviewer prompt-and-tiles policy won 144/144 across 0.15-0.6 s lag and 30/60/120 Hz without losing a life; about 37 test mutants written.",
-        "limitations": "A collapse can cut a player off; the only loss path is running out of air, which is explained. Module is about 1100 lines."
+        "limitations": "A collapse can cut a player off; the only loss path is running out of air, which is explained. Module is about 1100 lines. Reviewer residual notes for the final collection review: the opening banner can briefly cover the player while digging rows 1-2; a waiting or stuck miner's '!'/'?' marker can sit under the top HUD band if a collapse relocates that miner to the surface row; leaving a cracking span with under 0.167 s left still costs a life because the step must finish; difficulty is low for a careful player."
       }
     },
     {

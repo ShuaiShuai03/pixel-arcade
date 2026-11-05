@@ -1,0 +1,149 @@
+{
+  "date": "2026-11-05",
+  "phase": "complete",
+  "finalCollectionReview": false,
+  "records": [
+    {
+      "game": "dash-duelist",
+      "owner": "owner-duelist",
+      "reviewer": "review-duelist",
+      "verdict": "approved",
+      "draftFindings": [
+        {
+          "id": "duel-presentation",
+          "status": "closed",
+          "observation": "Courtyard setting, labelled HP rows, larger distinct rival silhouettes."
+        },
+        {
+          "id": "duel-stale-dash-hint",
+          "status": "closed",
+          "observation": "Danger prompt now follows the live dash count."
+        },
+        {
+          "id": "duel-stale-link-prompt",
+          "status": "closed",
+          "observation": "Removed the 0.12 s link; a strike prompt always has a drawn shape."
+        },
+        {
+          "id": "duel-dash-required",
+          "status": "closed",
+          "observation": "Sidestep-only won everything; heavy attacks (3 HP, magenta, >=0.9 s) now require a dash; sidestep-only wins 0/40, a dashing policy 40/40 in both reaction bands."
+        },
+        {
+          "id": "duel-run-out-copy",
+          "status": "closed",
+          "observation": "No-charge heavy prompt now 'No dash: run if you can!'."
+        }
+      ],
+      "finalReview": {
+        "status": "approved by independent reviewer",
+        "sourceSha256": "c51b3b6e79c6d6a6e793724eea7f8abaea6e761349efd6c707ad568bd85e6cec",
+        "testSha256": {
+          "tests/dash-duelist.test.js": "ab2602f9ffa3eda78d73e978c59387c7f6eae6a666b45646d92dbcf8865871f1",
+          "tests/dash-duelist-quality.test.js": "9cd091c0ac5145a314d704783dfe3348c9f5a5005484085012efa5afd1b5203a"
+        },
+        "evidence": "62/62 tests, 99.05% line coverage. ~70,000-position telegraph sweep with heavy attacks: 0 misses, 0 false hits. Invalid time inert; identical state at 30/60/120 Hz. Dash invulnerability exactly 0.3 s with a 0.2 s heavy dash window. Sidestep-only 0/40, dash-when-needed and full dash policies 40/40 in both reaction bands; Space spam loses on rival 1.",
+        "limitations": "Kade's slash can miss a body corner overlapping its edge by under 2 px (sampling limit, favours the player)."
+      },
+      "browserAcceptance": "accepted; see browser.json"
+    },
+    {
+      "game": "vine-warden",
+      "owner": "owner-vine",
+      "reviewer": "review-vine",
+      "verdict": "approved",
+      "draftFindings": [
+        {
+          "id": "vine-countdown",
+          "status": "closed",
+          "observation": "'bloom in 0s' countdown counted grown plants; now only plants still growing."
+        },
+        {
+          "id": "vine-copy-weevils",
+          "status": "closed",
+          "observation": "Description now states that weevils sense live roots and take another lane."
+        },
+        {
+          "id": "vine-plot2-difficulty",
+          "status": "closed",
+          "observation": "Casual play lost Twin Lanes; weevil detour penalty capped and lanes alternate, plus bare-lane chevrons and prompt."
+        },
+        {
+          "id": "vine-plot3-difficulty",
+          "status": "closed",
+          "observation": "Casual play lost Greenhouse Crossing; plot 3 now starts with 5 seeds and 5 s pest gaps."
+        },
+        {
+          "id": "vine-idle-blooms",
+          "status": "closed",
+          "observation": "Unused full blooms could tie up all seeds; blooms unbitten for 15 s are marked and the no-seed prompt names them."
+        },
+        {
+          "id": "vine-stale-harvest-prompt",
+          "status": "closed",
+          "observation": "A harvest prompt could outlive harvestability during its 0.6 s hold; it is now replaced immediately (0 bad frames in ~379,000)."
+        },
+        {
+          "id": "vine-seed-plural",
+          "status": "closed",
+          "observation": "'Harvested +1 seeds' now singular."
+        }
+      ],
+      "browserAcceptance": "accepted; see browser.json",
+      "finalReview": {
+        "status": "approved by independent reviewer",
+        "sourceSha256": "90dbef7ab3a5e137dbb16a04d546f29fa2d21de7302fc305e8c177d792f88216",
+        "testSha256": {
+          "tests/vine-warden.test.js": "d6d5abf5b3991ec30270796efa5dbf17ac055f5c8337cbba8322626074c1e5de",
+          "tests/vine-warden-quality.test.js": "011020b8df8f6fc02de5fe31b6f32c2c218aca18a334d3a97ff3c842f900f212"
+        },
+        "evidence": "44/44 tests in three consecutive runs; 100% line, 97.57% branch coverage. Prompt-following casual policy won 30/30 at 30/60/120 Hz with 0.4-0.6 s delay. No-seed prompt never named an unharvestable plant. State identical at 30/60/120 Hz over 60 scripts; 150-seed fuzz clean; getState/draw have no side effects.",
+        "limitations": "Policies that ignore the on-screen prompts (one-lane planting, harvesting only spent plants) still lose plot 2; ruled informative, not gating."
+      }
+    },
+    {
+      "game": "tether-twins",
+      "owner": "owner-tether",
+      "reviewer": "review-tether",
+      "verdict": "approved",
+      "draftFindings": [
+        {
+          "id": "tether-robot-collision",
+          "status": "closed",
+          "observation": "Robot-to-robot resolution could teleport a robot past its partner or into a wall; robots now resolve sequentially with bounded snaps."
+        },
+        {
+          "id": "tether-payout-prompt",
+          "status": "closed",
+          "observation": "A reeled-in taut cable now prompts the pay-out key in every room."
+        },
+        {
+          "id": "tether-slow-band",
+          "status": "closed",
+          "observation": "Added the 0.4-0.6 s human band; widened corridors, thin live rings around plates and moved strips off natural routes."
+        },
+        {
+          "id": "tether-copy",
+          "status": "closed",
+          "observation": "'1 cell left' singular; loss text now says to keep the robots, not the insulated cable, off live strips."
+        },
+        {
+          "id": "tether-phantom-wrap",
+          "status": "closed",
+          "observation": "Collinear float noise could hook the cable on a corner it no longer touched; wraps now need a noise floor and a truly blocked segment, with replay and fuzz regressions."
+        }
+      ],
+      "browserAcceptance": "accepted; see browser.json",
+      "finalReview": {
+        "status": "approved by independent reviewer",
+        "sourceSha256": "e40c6b96b252835c51c9d6c6645a9f6ba2721aa7718202e0de834add94678372",
+        "testSha256": {
+          "tests/tether-twins.test.js": "97e8c842193e79120f4484a639efd39c6e6a35541797e7bc3a958532d1b2d9ce",
+          "tests/tether-twins-quality.test.js": "4072db8787f9732e324913a74269c5d21d71650c34d39b41ebfd044b8eb82e7a"
+        },
+        "evidence": "46/46 tests; 100% line, 97.13% branch coverage. Fuzz at 30/60/120 Hz in both modes: 0 teleports, 0 in-wall frames, cable never stretched or crossed a wall. Phantom-hook replay fixed. State identical across rates; invalid dt inert; terminal once and frozen. Ring pits reachable only by cable; pads reachable; markers >= 35 px from live strips.",
+        "limitations": "The reviewer's own slow-band policies were weak (mostly timeouts at pads) and did not reproduce the owner's 26-28/30; a 630,000-frame scan found one single-frame transient corner bend at 120 Hz. No full soft-lock search."
+      }
+    }
+  ]
+}

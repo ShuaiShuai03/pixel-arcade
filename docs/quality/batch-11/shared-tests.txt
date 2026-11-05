@@ -1,0 +1,35 @@
+✔ keys distinguish held and one-frame press even on repeat (0.377917ms)
+✔ touch and keyboard ownership cannot release each other (0.073667ms)
+✔ clearing input on blur releases pointer and presses (0.056375ms)
+✔ an accessible button pulse lasts one physics step without releasing a held key (0.058125ms)
+✔ keyboard and button restart retain best and create fresh games (2.432459ms)
+✔ finished result follows language changes without losing score (0.961417ms)
+✔ pause updates HUD immediately and resume preserves the run (0.359583ms)
+✔ blur releases held keys and long frames are capped (0.347666ms)
+✔ late module resolution cannot overwrite a newer route (0.226875ms)
+✔ a press survives a frame without a physics tick and fires only once during catch-up (0.436416ms)
+✔ language changes release controls whose touch buttons are replaced (0.20025ms)
+✔ the shelf loads only visible previews and navigation shares their in-flight load (0.456416ms)
+✔ a failed preview load can be retried by opening the game (1.943667ms)
+✔ secondary touches cannot steer or release the active canvas gesture (0.279042ms)
+✔ right click does not fire a canvas action (0.139291ms)
+✔ unsupported fullscreen expands the player and Escape restores its normal layout (0.33925ms)
+✔ denied fullscreen falls back and navigation restores the page (0.143042ms)
+✔ fullscreen returns keyboard focus to an active game when entering and leaving (0.102875ms)
+✔ opposite touch groups retain independent pointer ownership (0.161125ms)
+✔ keyboard activation of a touch control produces one deliberate action (0.089416ms)
+✔ opted-in two-player touch controls replace solo buttons and keep independent input (0.178833ms)
+✔ two-player games without a dedicated touch layout keep solo controls hidden (0.386ms)
+✔ simulation advances equally on 30, 60, 120 and 144 Hz displays (0.770417ms)
+✔ a long stall has a bounded catch-up and never produces a large physics step (0.065292ms)
+✔ reset discards time from the previous run or pause (0.051875ms)
+✔ ending a game stops catch-up immediately and discards remaining time (0.060292ms)
+✔ invalid elapsed values cannot poison subsequent updates (0.062917ms)
+ℹ tests 27
+ℹ suites 0
+ℹ pass 27
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 46.34175

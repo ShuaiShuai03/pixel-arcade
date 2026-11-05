@@ -28,5 +28,8 @@ export const catalog = [
   ['raft-rush', 'Raft Rush', '激流木筏', 'sports', '1', '#6fb4c8'],
   ['burrow-rescue', 'Burrow Rescue', '地底救援', 'action', '1', '#c49a6c'],
   ['shield-sentinel', 'Shield Sentinel', '护盾卫士', 'action', '1', '#a7a3d6'],
+  ['dash-duelist', 'Dash Duelist', '瞬步决斗', 'action', '1', '#d98a6a'],
+  ['tether-twins', 'Tether Twins', '牵绳双子', 'action', '1-2', '#7fb7e6'],
+  ['vine-warden', 'Vine Warden', '藤蔓守卫', 'action', '1', '#86c06c'],
 ].map(([id, en, zh, genre, players, color]) => ({ id, name: { en, zh }, genre, players, color }));
 export const loadGame = (id) => import(`./games/${id}.js`);

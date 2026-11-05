@@ -1,0 +1,84 @@
+{
+  "date": "2026-11-05",
+  "commit": "1c8efde0bd4f84ffc00a6f14a4e3d043552b6ca4",
+  "url": "https://shuaishuai03.github.io/pixel-arcade/",
+  "workflow": {
+    "runId": 42102266391,
+    "url": "https://github.com/ShuaiShuai03/pixel-arcade/actions/runs/42102266391",
+    "conclusion": "success",
+    "jobs": {
+      "build": "success",
+      "deploy": "success",
+      "report-build-status": "success"
+    },
+    "logsInspected": true,
+    "deploymentReportedSuccessAt": "2026-11-05T20:20:14Z"
+  },
+  "assets": [
+    {
+      "path": "index.html",
+      "bytes": 9421,
+      "sha256": "b660ce3e50c66ade22d92971dc42aa72295778a8e411e91429d1b35a7e007768",
+      "matchesLocal": true
+    },
+    {
+      "path": "src/catalog.js",
+      "bytes": 2474,
+      "sha256": "7ec7ad8581979ba658e609361b80077679bfe2d37c81cdb5b36491d99725cd8d",
+      "matchesLocal": true
+    },
+    {
+      "path": "src/app.js",
+      "bytes": 23386,
+      "sha256": "6fc8fbaa4c101f3a1a771b63579c1c2610ca2c2578c825e131d362377d53a890",
+      "matchesLocal": true
+    },
+    {
+      "path": "src/games/burrow-rescue.js",
+      "bytes": 37264,
+      "sha256": "ceb0bf443d259a72a1a622d3f50b11912edb3c251fd6b0cf6e7970a71113fa3d",
+      "matchesLocal": true
+    },
+    {
+      "path": "src/games/raft-rush.js",
+      "bytes": 31389,
+      "sha256": "91ad2264359681fd27feeaa6418e0b0da65643895422d7a4147bcc021ab6ba58",
+      "matchesLocal": true
+    },
+    {
+      "path": "src/games/shield-sentinel.js",
+      "bytes": 35210,
+      "sha256": "4dd02dbe16b0252950ff404a064ef50e9d495d41ed4dab35471d8058971324e9",
+      "matchesLocal": true
+    },
+    {
+      "path": "README.md",
+      "bytes": 5828,
+      "sha256": "5f18120d784ba336aa618510f95b741e8f578411d4277fd398304bf92511c72b",
+      "matchesLocal": true
+    },
+    {
+      "path": "docs/quality/batch-10/ACCEPTANCE.md",
+      "bytes": 5691,
+      "sha256": "c46706125743e7fa53f9f21655a82940539a1ffee8ffb2758ddc558550eb9e02",
+      "matchesLocal": true
+    },
+    {
+      "path": "tests/catalog.test.js",
+      "bytes": 3961,
+      "sha256": "241c101f31d80f1eb6d85a39ae2ae8ef9dee79f627c6a29062e4f8a64a83c7ba",
+      "matchesLocal": true
+    }
+  ],
+  "publishedChecks": {
+    "browser": "Installed stable Google Chrome 156 (headless) over the DevTools protocol; trusted input only, no state injection.",
+    "observed": [
+      "Raft Rush: holding Up steered the raft north and the prompt switched to Press Down.",
+      "Shield Sentinel: Left+Up+Space raised the shield toward the charging turret.",
+      "Burrow Rescue: Down then Space dug the first tile below the lift.",
+      "The game shelf lists 29 games."
+    ],
+    "screenshots": ["published-raft.jpg", "published-shield.jpg", "published-burrow.jpg"],
+    "screenshotsInspected": true
+  }
+}

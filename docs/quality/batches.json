@@ -1,6 +1,6 @@
 {
   "maxActiveGames": 3,
-  "activeBatch": null,
+  "activeBatch": 12,
   "acceptedGames": [
     "snowball-siege",
     "pinball-pocket",
@@ -31,7 +31,10 @@
     "glider-ridge",
     "burrow-rescue",
     "raft-rush",
-    "shield-sentinel"
+    "shield-sentinel",
+    "dash-duelist",
+    "tether-twins",
+    "vine-warden"
   ],
   "batches": [
     {
@@ -94,12 +97,12 @@
     {
       "number": 11,
       "games": ["dash-duelist", "tether-twins", "vine-warden"],
-      "status": "queued"
+      "status": "complete"
     },
     {
       "number": 12,
       "games": ["magnet-marauder", "echo-hunter", "frost-forge"],
-      "status": "queued"
+      "status": "in_progress"
     },
     {
       "number": 13,

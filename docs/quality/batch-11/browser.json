@@ -1,0 +1,135 @@
+{
+  "date": "2026-11-05",
+  "browser": "Installed stable Google Chrome 156 (headless, temporary profile) driven over the DevTools protocol; trusted keyboard, mouse and touch events only; visible DOM text and screenshots read; no game state read or injected; no Playwright.",
+  "status": "complete",
+  "stateInjection": false,
+  "viewports": [
+    [1440, 900],
+    [390, 844],
+    [844, 390]
+  ],
+  "preliminaryChecks": [
+    {
+      "id": "dash-duelist",
+      "sourceSha256": "bacf27bb9c2728047dbeac75fcea9f38bdb02fff931d021a141376c883a7fe1c",
+      "observed": ["Plain dark arena, unlabeled HP rows, small generic fighters."],
+      "screenshots": ["duel-draft-desktop.jpg", "duel-draft-phone.jpg"],
+      "screenshotsInspected": true
+    },
+    {
+      "id": "dash-duelist",
+      "sourceSha256": "42a285192019ad34b44f14bd6d6c0d23e92ec55b30761a1dcbc4ccfcb84f9932",
+      "observed": [
+        "Flagstone courtyards, labelled rows, larger distinct rivals. Presentation accepted."
+      ],
+      "screenshots": ["duel-revised-art.jpg"],
+      "screenshotsInspected": true
+    },
+    {
+      "id": "vine-warden",
+      "sourceSha256": "5cbb117efca94fc862525ea2bd7b1d03b9f0889628af406045d36f1e88ee0901",
+      "observed": [
+        "Presentation accepted. Plot 1 cleared twice; loss path and frozen loss screen verified; plot 2 lost repeatedly by a casual-style driver; difficulty check and '+1 seed' copy fix requested."
+      ],
+      "screenshots": ["vine-draft-desktop.jpg", "vine-draft-phone.jpg", "vine-final-loss.jpg"],
+      "screenshotsInspected": true
+    },
+    {
+      "id": "tether-twins",
+      "sourceSha256": "f4ff52c76a9b9856a74ff434d679782e2b2c98194c213661a3eac6dcd0da4708",
+      "observed": [
+        "Presentation accepted: robots, slack/taut cable, gate, live strip, plate, pads, tension gauge, cells; mode picker offered."
+      ],
+      "screenshots": ["tether-draft-desktop.jpg"],
+      "screenshotsInspected": true
+    },
+    {
+      "id": "tether-twins",
+      "sourceSha256": "906c6ee58f8d6d1badf170b371eac8b0c2d8b1880aa8a6662f6b3e60668cf2e2",
+      "observed": [
+        "Solo campaign won for 5650 with no cells lost; co-op, Chinese touch and loss path worked. Found '1 cells left' and loss text blaming the insulated cable."
+      ],
+      "screenshotsInspected": true
+    },
+    {
+      "id": "tether-twins",
+      "sourceSha256": "59b63a9e4367c1473deceafac5a254c3f557c04f572aea2cd928604dbc709938",
+      "observed": [
+        "Widened layout won solo for 5650 with no cells lost; room 1 strip sat on the natural gate-to-pad path and was moved."
+      ],
+      "screenshotsInspected": true
+    },
+    {
+      "id": "vine-warden",
+      "sourceSha256": "184f1d5bc33577acaf93e7d9cc24781c360fc64dcad7a82bf5a62a47534b2bb7",
+      "observed": [
+        "Plots 1-2 cleared at full health after the weevil routing fix; plot 3 lost by sensible casual play, leading to plot-3 easing and idle-bloom cues."
+      ],
+      "screenshotsInspected": true
+    }
+  ],
+  "games": [
+    {
+      "id": "dash-duelist",
+      "status": "accepted",
+      "sourceSha256": "c51b3b6e79c6d6a6e793724eea7f8abaea6e761349efd6c707ad568bd85e6cec",
+      "observed": [
+        "A visual driver that reads only the prompt text and canvas pixels (player tunic and fighter skin colours) — sidestepping normal telegraphs, running out of rings, dashing about 0.65 s into HEAVY telegraphs and striking during OPEN — won all three rivals for 3050 without taking a hit. An earlier run dodged several HEAVY ring sweeps ('Dash dodge! +25') and then lost at 2 HP to a mistimed dash, reaching 'You fell in the courtyard'.",
+        "Win screen ignored input. Chinese 390x844 portrait shows six touch controls; touch Up+Dash spent a charge. 844x390 landscape fullscreen places movement and strike/dash controls in side columns."
+      ],
+      "screenshots": [
+        "duel-final-win.jpg",
+        "duel-final-phone-touch.jpg",
+        "duel-final-landscape.jpg"
+      ],
+      "screenshotsInspected": true,
+      "consoleWarningsOrErrors": [],
+      "limitations": ["Emulated touch and phone layouts only.", "Module is 1153 lines."]
+    },
+    {
+      "id": "vine-warden",
+      "status": "accepted",
+      "sourceSha256": "90dbef7ab3a5e137dbb16a04d546f29fa2d21de7302fc305e8c177d792f88216",
+      "observed": [
+        "Following the visible prompts and map — planting beside the path, patrolling, harvesting when the prompt said 'No seeds: X harvests …' and replanting — won all three plots for 4200 with 4 of 5 health. The new 'A bare lane! Space plants beside it' hint, the idle-bloom prompt and the grey spent-plant prompt all appeared in play.",
+        "Three earlier plot-3 attempts on this build lost because the driver's walk helper overshot tiles and left seeds unplanted; after fixing the driver the plot was won.",
+        "Win screen ignored input. Chinese 390x844 portrait shows six labelled touch controls and touch planting worked; 844x390 landscape fullscreen places the controls in side columns. The loss screen was verified on an earlier build."
+      ],
+      "screenshots": [
+        "vine-final-win.jpg",
+        "vine-bare-lane.jpg",
+        "vine-final-phone-touch.jpg",
+        "vine-final-landscape.jpg",
+        "vine-final-loss.jpg"
+      ],
+      "screenshotsInspected": true,
+      "consoleWarningsOrErrors": [],
+      "limitations": ["Emulated touch and phone layouts only.", "Module is 1157 lines."]
+    },
+    {
+      "id": "tether-twins",
+      "status": "accepted",
+      "sourceSha256": "e40c6b96b252835c51c9d6c6645a9f6ba2721aa7718202e0de834add94678372",
+      "observed": [
+        "Solo, following the prompts and route markers and switching robots with X, won all three rooms for 5650 with no cells lost: plate and gate, cable wrapped on a post to light a plate inside a live ring, and a relay latched by reeling the cable taut with F then paying out with G.",
+        "Holding F alone pulled the cable taut (red striped cable, TAUT gauge) and showed 'Cable taut: hold G to pay out'. Three deliberate live-strip touches showed '2 cells left', '1 cell left' and the loss 'Keep the robots off live strips'; win and loss screens ignored input.",
+        "Two-player mode moved both robots at once and the cable lit the plate. Chinese 390x844 portrait shows seven labelled touch controls; touch switch and move worked. 844x390 landscape fullscreen places the controls in side columns."
+      ],
+      "screenshots": [
+        "tether-final-win.jpg",
+        "tether-final-loss.jpg",
+        "tether-taut-prompt.jpg",
+        "tether-coop.jpg",
+        "tether-phone-touch.jpg",
+        "tether-landscape.jpg"
+      ],
+      "screenshotsInspected": true,
+      "consoleWarningsOrErrors": [],
+      "limitations": [
+        "Emulated touch and phone layouts only.",
+        "Co-op checked for simultaneous control, not played to completion.",
+        "Module is 1151 lines."
+      ]
+    }
+  ]
+}

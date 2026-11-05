@@ -1,0 +1,12 @@
+✔ release contains thirty-two unique loadable games with bilingual instructions (16.744833ms)
+✔ dash-duelist: seeded mixed input remains finite, draws and terminates at most once (8.345833ms)
+✔ tether-twins: seeded mixed input remains finite, draws and terminates at most once (25.874666ms)
+✔ vine-warden: seeded mixed input remains finite, draws and terminates at most once (11.003792ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 95.8885
