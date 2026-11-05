@@ -2,11 +2,17 @@
 
 At the user's direction, at most **three games** may be under development and acceptance testing at one time. Do not begin the next batch until all games in the active batch satisfy the gates below. The 100-game target includes Pixel Parkour. Roster themes are not work assignments.
 
+## Completed batch 10
+
+Burrow Rescue, Raft Rush, and Shield Sentinel passed initial development, independent review, and browser acceptance, bringing the accepted total to 30. All 118 focused tests, 27 shared regressions and four scoped catalog checks pass. All three were built new. Raft Rush was played by following only its prompt text; Shield Sentinel by a driver that reads only the prompt and the drawn canvas; Burrow Rescue by following its prompts on the visible mine map. See the [batch 10 evidence](batch-10/ACCEPTANCE.md). Publication verification follows the final integration checks.
+
+The next batch is Dash Duelist, Tether Twins, and Vine Warden. It remains queued until batch 10 publication is verified.
+
 ## Completed batch 9
 
-Wallrunner Relay, Clockwork Bridge, and Glider Ridge passed initial development, independent review, and browser acceptance, bringing the accepted total to 27. All 112 focused tests, 27 shared regressions and four scoped catalog checks pass. The queued drafts were stubs, so all three were built new. Each completed a full browser campaign on its final source; Glider Ridge was flown by following only its on-screen prompts. See the [batch 9 evidence](batch-09/ACCEPTANCE.md). Publication verification follows the final integration checks.
+Wallrunner Relay, Clockwork Bridge, and Glider Ridge passed initial development, independent review, and browser acceptance, bringing the accepted total to 27. All 112 focused tests, 27 shared regressions and four scoped catalog checks pass. The queued drafts were stubs, so all three were built new. Each completed a full browser campaign on its final source; Glider Ridge was flown by following only its on-screen prompts. See the [batch 9 evidence](batch-09/ACCEPTANCE.md). Commit `d24fbea` is live. All nine checked assets match, and the three published games accepted real input. See the [deployment receipt](batch-09/deployment.json).
 
-The next batch is Burrow Rescue, Raft Rush, and Shield Sentinel. It remains queued until batch 9 publication is verified.
+The next batch is Burrow Rescue, Raft Rush, and Shield Sentinel. It began after batch 9 passed integration and publication verification.
 
 ## Completed batch 8
 

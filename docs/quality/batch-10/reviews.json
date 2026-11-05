@@ -1,0 +1,170 @@
+{
+  "date": "2026-11-05",
+  "phase": "batch accepted",
+  "finalCollectionReview": false,
+  "records": [
+    {
+      "game": "raft-rush",
+      "owner": "owner-raft",
+      "reviewer": "review-raft",
+      "verdict": "approved",
+      "queuedFiles": {
+        "tests/raft-rush.test.js": "2d075938909bd318b11d122cdaf6ca86907a9858c054f7f1bfc5ffe62b59d6b6"
+      },
+      "draftFindings": [
+        {
+          "id": "raft-no-source",
+          "status": "closed",
+          "observation": "Queue held only a 3-line test stub; a complete module was implemented."
+        },
+        {
+          "id": "raft-art-prompts",
+          "status": "closed",
+          "observation": "Parent browser: flat water/banks and box raft; key-less opening prompt. Fixed with foam, ripples, eddy spirals, layered shores, paddler and wake; prompts name keys."
+        },
+        {
+          "id": "raft-F1-end-walls",
+          "status": "closed",
+          "observation": "End walls had outward normals so the raft escaped the river and soft-locked; fixed and regression-tested at 250-5000 px/s."
+        },
+        {
+          "id": "raft-F2-offscreen",
+          "status": "closed",
+          "observation": "Raft could sit off-screen at the upstream end; wall moved to x=0 with a drawn start log."
+        },
+        {
+          "id": "raft-F3-slow-players",
+          "status": "closed",
+          "observation": "Text-only players with 0.4-0.8 s lag won 13-20/40 in section 3. Eddies/cross-currents softened, gates widened, damage threshold 100 px/s; 0.4-0.6 s lag now wins 40/40 per rate."
+        },
+        {
+          "id": "raft-prompt-flicker",
+          "status": "closed",
+          "observation": "Parent browser: prompts changed every 0.3-0.5 s. Now held about 0.6 s except dock/damage events, with a test."
+        }
+      ],
+      "finalReview": {
+        "status": "approved by independent reviewer",
+        "sourceSha256": "91ad2264359681fd27feeaa6418e0b0da65643895422d7a4147bcc021ab6ba58",
+        "testSha256": {
+          "tests/raft-rush.test.js": "0fea0eb2abea3ce54c2147a2d7e1e628cfbc5153043a71714cb6b0222563e1fe",
+          "tests/raft-rush-quality.test.js": "4120d378066437ec0b47998f61a7777b849c70d15a01aacd75ab22548f2ed8c0"
+        },
+        "evidence": "35/35 tests. Invalid time inert; identical state at 30/60/120 Hz; 152,527 random fast collisions without tunnelling or speed gain; 897k random steps without NaN or rock overlap; walls hold at x=12 and 1788; forces compose additively with no hidden thrust; flags once, dock needs a stop, loss fires once and freezes. Text-only policy: 40/40 at 0-0.6 s lag per rate, 27-33/40 at 0.4-0.8 s.",
+        "limitations": "About 5-6% of prompt changes are shorter than 0.55 s (dock/damage exemptions and section starts)."
+      },
+      "browserAcceptance": "accepted; see browser.json"
+    },
+    {
+      "game": "burrow-rescue",
+      "owner": "owner-burrow",
+      "reviewer": "review-burrow",
+      "verdict": "approved",
+      "queuedFiles": {
+        "tests/burrow-rescue.test.js": "13e09dc66c9ce1cc11f2192e61381c037ab1ffff389b1f74a4db953243bd8701"
+      },
+      "draftFindings": [
+        {
+          "id": "burrow-no-source",
+          "status": "closed",
+          "observation": "Queue held only a 3-line test stub; a complete module was implemented."
+        },
+        {
+          "id": "burrow-presentation",
+          "status": "closed",
+          "observation": "Parent browser: clipped lives icons, no visible lift, missing helmet lamps/collapse dust, banner overlap. Fixed."
+        },
+        {
+          "id": "burrow-F1-x-brace",
+          "status": "closed",
+          "observation": "X woke a miner while the prompt said brace; bracing now takes priority inside a cracking span."
+        },
+        {
+          "id": "burrow-F2-useless-beam",
+          "status": "closed",
+          "observation": "Beam prompt shown where a beam could not prevent the crack; now says the ceiling will crack."
+        },
+        {
+          "id": "burrow-F3-prompt-flicker",
+          "status": "closed",
+          "observation": "Dig prompts alternated every 0.25-0.3 s; now held."
+        },
+        {
+          "id": "burrow-F4-low-air-hidden",
+          "status": "closed",
+          "observation": "Cracks-nearby prompt hid low air; low air now outranks it outside the span."
+        },
+        {
+          "id": "burrow-F5-surface-hint",
+          "status": "closed",
+          "observation": "Added a fresh-air refill hint at the surface."
+        },
+        {
+          "id": "burrow-F6-loss-unexplained",
+          "status": "closed",
+          "observation": "Beams-restocked message overwrote the loss reason; loss message now holds."
+        },
+        {
+          "id": "burrow-status-messages",
+          "status": "closed",
+          "observation": "Parent: event messages never reached getState().status (screen-reader text); now included before the prompt in both languages."
+        }
+      ],
+      "browserAcceptance": "accepted; see browser.json",
+      "finalReview": {
+        "status": "approved by independent reviewer",
+        "sourceSha256": "ceb0bf443d259a72a1a622d3f50b11912edb3c251fd6b0cf6e7970a71113fa3d",
+        "testSha256": {
+          "tests/burrow-rescue.test.js": "20d1496412933b7d799d85e23a112ec69f8b35c05e5bb46d72b489ec845bad99"
+        },
+        "evidence": "39/39 tests; 100% line, 98.03% branch coverage. Invalid time inert; identical state at 30/60/120 Hz; collapse warning 3.84 s precedes damage at exactly the displayed time; rubble re-diggable, rock not; miners move orthogonally on open tiles, wake only adjacent, board only on the lift, score once; oxygen invariants held over 24 monitored bot runs; reviewer prompt-and-tiles policy won 144/144 across 0.15-0.6 s lag and 30/60/120 Hz without losing a life; about 37 test mutants written.",
+        "limitations": "A collapse can cut a player off; the only loss path is running out of air, which is explained. Module is about 1100 lines."
+      }
+    },
+    {
+      "game": "shield-sentinel",
+      "owner": "owner-shield",
+      "reviewer": "review-shield",
+      "verdict": "approved",
+      "queuedFiles": {},
+      "draftFindings": [
+        {
+          "id": "shield-no-source",
+          "status": "closed",
+          "observation": "No queued files existed; a complete module was implemented."
+        },
+        {
+          "id": "shield-presentation",
+          "status": "closed",
+          "observation": "Parent browser: thin, hard-to-see shield arc; plain checkerboard instead of an observatory; unexplained circle. Fixed with bold glowing plates whose drawn shape is the hit shape, stone flagstones, starry ring wall, plinths; circle removed."
+        },
+        {
+          "id": "shield-F1-spawn-inside-arc",
+          "status": "closed",
+          "observation": "Shots spawned inside the catch radius when the sentinel hugged a wall turret; walkable bounds keep muzzles >= 34 px away, with regression tests."
+        },
+        {
+          "id": "shield-F2-plate-geometry",
+          "status": "closed",
+          "observation": "Block test ignored plate ends (14% of 6000 random paths disagreed with an exact oracle); now a swept circle against the drawn plates, 2 margin cases in 6000."
+        },
+        {
+          "id": "shield-slam-colour-copy",
+          "status": "closed",
+          "observation": "Parent browser: slam circle drawn purple but every text said red; prompt, description and loss text now say purple in both languages, pinned by a test."
+        }
+      ],
+      "browserAcceptance": "accepted; see browser.json",
+      "finalReview": {
+        "status": "approved by independent reviewer",
+        "sourceSha256": "4dd02dbe16b0252950ff404a064ef50e9d495d41ed4dab35471d8058971324e9",
+        "testSha256": {
+          "tests/shield-sentinel.test.js": "ec88b7182feeedbde807954dfe42fc8be1085eb8d4b5cf64ac11ff53c4c7c0aa",
+          "tests/shield-sentinel-quality.test.js": "0c0d0f18f90a615382fc6b5a73a882ba5ce7462a0e51fa83cad9f0c3f63b5da6"
+        },
+        "evidence": "44/44 tests, 100% line coverage. Invalid time inert; identical state at 30/60/120 Hz; 6000-path shield sweep matches an exact plate oracle with no tunnelling; reviewer bot seeing only prompts, telegraphs and shots wins 20/20 at 0.15-0.35 s lag and 16-18/20 at 0.4-0.6 s. The final wording revision produced bit-identical probe results to the approved c2edc3d2 build.",
+        "limitations": "Strings-only nature of the last revision was established by identical probe results and string inspection, not a textual diff. Module is about 1150 lines."
+      }
+    }
+  ]
+}

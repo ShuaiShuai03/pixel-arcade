@@ -1,0 +1,154 @@
+{
+  "date": "2026-11-05",
+  "browser": "Installed stable Google Chrome 156 (headless, temporary profile) driven over the DevTools protocol; trusted keyboard, mouse and touch events only; visible DOM text and screenshots read; no game state read or injected; no Playwright.",
+  "status": "complete",
+  "stateInjection": false,
+  "viewports": [
+    [1440, 900],
+    [390, 844],
+    [844, 390]
+  ],
+  "preliminaryChecks": [
+    {
+      "id": "raft-rush",
+      "sourceSha256": "89897c9b65e138bf31830ee693db5ed95aee1e23a8cfcddb83a43a810e9c7fc3",
+      "observed": [
+        "Readable layout, but flat water, flat banks and a box raft fell short of the roster art; the opening prompt named no key."
+      ],
+      "screenshots": ["raft-draft-desktop.jpg", "raft-draft-phone.jpg"],
+      "screenshotsInspected": true
+    },
+    {
+      "id": "raft-rush",
+      "sourceSha256": "f5238c26fc2d3f40f79e6841d8298774d0dd51eba6c61f3deda3847bb47c2cca",
+      "observed": [
+        "Paddler with wake, moving ripples, rock foam, bank shallows, reeds and cliffs; prompts name keys. Presentation accepted."
+      ],
+      "screenshots": ["raft-revised-art.jpg"],
+      "screenshotsInspected": true
+    },
+    {
+      "id": "raft-rush",
+      "sourceSha256": "160bf932a0808b0f10afd0bdcc8b99330b048407f3d273633d36542175023fd0",
+      "observed": [
+        "A prompt-text-only driver won (2400, hull intact) but the steering prompt flickered every 0.3-0.5 s; sent as a finding with the reviewer's slow-player tuning finding."
+      ],
+      "screenshots": [],
+      "screenshotsInspected": true
+    },
+    {
+      "id": "shield-sentinel",
+      "sourceSha256": "66ab2c70cf9a5740afd926caf8e482a88916cecc9de3eda281cf4de884d4359f",
+      "observed": [
+        "Thin pale shield arc hard to see; plain checkerboard floor; unexplained faint circle."
+      ],
+      "screenshots": [
+        "shield-draft-desktop.jpg",
+        "shield-draft-phone.jpg",
+        "shield-draft-raised.jpg"
+      ],
+      "screenshotsInspected": true
+    },
+    {
+      "id": "shield-sentinel",
+      "sourceSha256": "b4613e9c0573086c0f162fea094b26d8c658423dc7649d00c3d4186cede31e5b",
+      "observed": [
+        "Bold glowing segmented shield, stone flagstones, starry ring wall with telescope, plinth turrets. Presentation accepted."
+      ],
+      "screenshots": ["shield-revised-arc.jpg"],
+      "screenshotsInspected": true
+    },
+    {
+      "id": "burrow-rescue",
+      "sourceSha256": "5bcefc89deb116bee159d8f4f30805b1a39aa6c83e88f3fb9e6fbf697d51948c",
+      "observed": [
+        "Strata, caves and key-naming prompts read well; lives icons clipped at the right edge; no visible lift; helmet lamps and collapse dust missing; sector banner overlapped the top tunnels."
+      ],
+      "screenshots": ["burrow-draft-desktop.jpg", "burrow-draft-phone.jpg"],
+      "screenshotsInspected": true
+    },
+    {
+      "id": "burrow-rescue",
+      "sourceSha256": "09945d0675280fc525fc6b3fb9931e21d30b762a628875d8f97a2c7a603fc9a8",
+      "observed": [
+        "Hearts inside the frame, labelled lift cage, helmet-lamp halos, timber beams. Presentation accepted."
+      ],
+      "screenshots": ["burrow-revised-art.jpg"],
+      "screenshotsInspected": true
+    }
+  ],
+  "games": [
+    {
+      "id": "raft-rush",
+      "status": "accepted",
+      "sourceSha256": "91ad2264359681fd27feeaa6418e0b0da65643895422d7a4147bcc021ab6ba58",
+      "observed": [
+        "Full English campaign won for 2400 with hull 3/3 by a driver that reads only the page status text every 0.15 s and presses the key it names (Press Up/Down, Right + Space, Press X / Docking). All three rivers docked after a real stop.",
+        "Prompts now hold about 0.6 s; 12 of 105 changes were shorter than 0.5 s, mostly section-start Up/Down alternation and dock events.",
+        "Win screen ignored input; R restarted at 0 with best 2400. Ramming the banks with strokes cost hull 3 to 0 and reached 'The raft broke apart'; the loss screen ignored input.",
+        "Chinese 390x844 portrait: no horizontal overflow; six touch controls; holding Down plus a stroke moved the raft into the bank and the prompt asked to press Up. 844x390 landscape fullscreen places direction and stroke/brake controls in side columns."
+      ],
+      "screenshots": [
+        "raft-final-win.jpg",
+        "raft-final-loss.jpg",
+        "raft-final-phone-touch.jpg",
+        "raft-final-landscape.jpg"
+      ],
+      "screenshotsInspected": true,
+      "consoleWarningsOrErrors": [],
+      "limitations": [
+        "Emulated touch and phone layouts; no physical device or audio check.",
+        "Players with 0.4-0.8 s reactions win about 70-80% of runs (reviewer); 0.4-0.6 s wins every run."
+      ]
+    },
+    {
+      "id": "shield-sentinel",
+      "status": "accepted",
+      "sourceSha256": "4dd02dbe16b0252950ff404a064ef50e9d495d41ed4dab35471d8058971324e9",
+      "observed": [
+        "On c2edc3d2 (identical mechanics), a visual-only driver that reads the page status text and the canvas pixels — facing the nearest cyan or orange threat with Space held, stepping perpendicular out of red lanes, leaving the slam circle and bashing nearby crawlers — won all three waves and the Guardian for 5725. Earlier, cruder driver runs reached the loss screen ('The sentinel fell…').",
+        "The slam telegraph is purple while the text said red; the final build says purple everywhere (EN/ZH).",
+        "Win screen ignored input. On the final build, Chinese 390x844 portrait shows six touch controls and multi-touch Left+Up+Shield raised the arc facing up-left; 844x390 landscape fullscreen places movement and shield/bash in side columns."
+      ],
+      "screenshots": [
+        "shield-final-guardian.jpg",
+        "shield-final-win.jpg",
+        "shield-final-loss.jpg",
+        "shield-final-phone-touch.jpg",
+        "shield-final-landscape.jpg"
+      ],
+      "screenshotsInspected": true,
+      "consoleWarningsOrErrors": [],
+      "limitations": [
+        "The winning visual run ended at 1 HP; the driver is cruder than a human. Emulated touch and phone layouts only."
+      ]
+    },
+    {
+      "id": "burrow-rescue",
+      "status": "accepted",
+      "sourceSha256": "ceb0bf443d259a72a1a622d3f50b11912edb3c251fd6b0cf6e7970a71113fa3d",
+      "observed": [
+        "Full English campaign on 37a3d611 (rules, colliders and art identical to the final build): all three sectors cleared for 9100 with all seven miners and no lives lost, following the visible prompts (dig, place a beam when asked, wake with X, stand on the lift). Air tanks and surface refills kept oxygen up; one route correction returned to the surface to refill.",
+        "Every collapse was preceded by the 'Cracks! X: brace here' countdown; deliberately unbraced tunnels collapsed after the warning, each costing a life and hauling the player up; the third ended the run. Win and loss screens ignored input; R restarted with the best score kept.",
+        "Final build e5b2287d (prompt-only changes): sector 1 replayed in Chinese; an unbraced run showed the stay-clear warning then 'Cracks! press X to brace (1 s)', bracing saved it and the miner was rescued without losing a life; dig prompts held steadily.",
+        "Chinese 390x844 portrait: six touch controls; touch Down+Dig cut a shaft. 844x390 landscape fullscreen places movement and dig/beam controls in side columns.",
+        "Final build ceb0bf44 (status-text and message changes only since e5b2287d): sector 1 west miner rescued; the page status line announced 'Beams restocked · Stay on the lift: miners coming' then 'Miner rescued! +1000 · Face earth, press Space to dig' and fell back to the prompt. Earlier f5de127d check confirmed the 'Cracks! X: brace here (3s…1s)' countdown precedes a cave-in."
+      ],
+      "screenshots": [
+        "burrow-final-sector2-tunnel.jpg",
+        "burrow-final-loose-soil.jpg",
+        "burrow-final-win.jpg",
+        "burrow-final-loss.jpg",
+        "burrow-final-phone-touch.jpg",
+        "burrow-final-landscape.jpg"
+      ],
+      "screenshotsInspected": true,
+      "consoleWarningsOrErrors": [],
+      "limitations": [
+        "Prompts say what to press but not which way to dig; players read the static map for direction.",
+        "The tester's walk helper overshot by a tile several times; corrections were made through normal play.",
+        "Emulated touch and phone layouts only."
+      ]
+    }
+  ]
+}

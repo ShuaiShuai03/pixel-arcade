@@ -1,0 +1,84 @@
+{
+  "date": "2026-11-05",
+  "commit": "d24fbeafb3cbffa901946026b0834f7d09eaa1a9",
+  "url": "https://shuaishuai03.github.io/pixel-arcade/",
+  "workflow": {
+    "runId": 42088685466,
+    "url": "https://github.com/ShuaiShuai03/pixel-arcade/actions/runs/42088685466",
+    "conclusion": "success",
+    "jobs": {
+      "build": "success",
+      "deploy": "success",
+      "report-build-status": "success"
+    },
+    "logsInspected": true,
+    "deploymentReportedSuccessAt": "2026-11-05T18:54:31Z"
+  },
+  "assets": [
+    {
+      "path": "index.html",
+      "bytes": 9421,
+      "sha256": "b660ce3e50c66ade22d92971dc42aa72295778a8e411e91429d1b35a7e007768",
+      "matchesLocal": true
+    },
+    {
+      "path": "src/catalog.js",
+      "bytes": 2238,
+      "sha256": "33e3e913acdc381adb4dc95f01e29d0116d01b36595ef279e961868983978c5d",
+      "matchesLocal": true
+    },
+    {
+      "path": "src/app.js",
+      "bytes": 23386,
+      "sha256": "6fc8fbaa4c101f3a1a771b63579c1c2610ca2c2578c825e131d362377d53a890",
+      "matchesLocal": true
+    },
+    {
+      "path": "src/games/wallrunner-relay.js",
+      "bytes": 29620,
+      "sha256": "0c8b041b5dfae6725a79dee513380d22324470ebc978cf4708a9f7de0b7d5b94",
+      "matchesLocal": true
+    },
+    {
+      "path": "src/games/clockwork-bridge.js",
+      "bytes": 32168,
+      "sha256": "f3576126416990cd56033b513e6b5b9bbb19c2d5338cbb9b979075da04ff287d",
+      "matchesLocal": true
+    },
+    {
+      "path": "src/games/glider-ridge.js",
+      "bytes": 46237,
+      "sha256": "3bb070ee09bc3ca2a2678486267cf5ca4012997d82f14fee6e51f08c650520ce",
+      "matchesLocal": true
+    },
+    {
+      "path": "README.md",
+      "bytes": 5840,
+      "sha256": "22e240a0192dc393de01dff815b282e12a28dfc4965870b1ed869ec1bbd467d2",
+      "matchesLocal": true
+    },
+    {
+      "path": "docs/quality/batch-09/ACCEPTANCE.md",
+      "bytes": 5929,
+      "sha256": "45193fab7bdc2960bc772b78475f5acc41fffb55a2978f51f402b0157467d4c4",
+      "matchesLocal": true
+    },
+    {
+      "path": "tests/catalog.test.js",
+      "bytes": 3960,
+      "sha256": "93ea3716a9079d953f8f8e2eb57e005d219c2d253ef7ab9bc8ac192e347ce2cb",
+      "matchesLocal": true
+    }
+  ],
+  "publishedChecks": {
+    "browser": "Installed stable Google Chrome 156 (headless) over the DevTools protocol; trusted input only, no state injection.",
+    "observed": [
+      "Wallrunner Relay: Right+X with two roof hops reached the chalk wall and wall-ran (status WALL-RUN).",
+      "Clockwork Bridge: Right then Z took the key (Key carried).",
+      "Glider Ridge: the glider launched and flew toward gate 1 with the LIFT ribbons and gate pole drawn.",
+      "The game shelf lists 26 games."
+    ],
+    "screenshots": ["published-wallrunner.jpg", "published-clockwork.jpg", "published-glider.jpg"],
+    "screenshotsInspected": true
+  }
+}

@@ -28,7 +28,10 @@
     "grapnel-gorge",
     "wallrunner-relay",
     "clockwork-bridge",
-    "glider-ridge"
+    "glider-ridge",
+    "burrow-rescue",
+    "raft-rush",
+    "shield-sentinel"
   ],
   "batches": [
     {
@@ -86,7 +89,7 @@
     {
       "number": 10,
       "games": ["burrow-rescue", "raft-rush", "shield-sentinel"],
-      "status": "queued"
+      "status": "accepted"
     },
     {
       "number": 11,

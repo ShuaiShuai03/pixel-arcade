@@ -25,5 +25,8 @@ export const catalog = [
   ['wallrunner-relay', 'Wallrunner Relay', '飞檐接力', 'action', '1', '#8fb3c9'],
   ['clockwork-bridge', 'Clockwork Bridge', '发条桥梁', 'action', '1', '#c9a45c'],
   ['glider-ridge', 'Glider Ridge', '滑翔山脊', 'sports', '1', '#9cc7a4'],
+  ['raft-rush', 'Raft Rush', '激流木筏', 'sports', '1', '#6fb4c8'],
+  ['burrow-rescue', 'Burrow Rescue', '地底救援', 'action', '1', '#c49a6c'],
+  ['shield-sentinel', 'Shield Sentinel', '护盾卫士', 'action', '1', '#a7a3d6'],
 ].map(([id, en, zh, genre, players, color]) => ({ id, name: { en, zh }, genre, players, color }));
 export const loadGame = (id) => import(`./games/${id}.js`);

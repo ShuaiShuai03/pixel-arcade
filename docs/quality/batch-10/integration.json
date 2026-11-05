@@ -1,0 +1,53 @@
+{
+  "date": "2026-11-05",
+  "status": "complete",
+  "checks": {
+    "focused game tests with coverage": {
+      "command": "node --experimental-test-coverage (3 games) --test 5 test files",
+      "exitCode": 0,
+      "passed": 118,
+      "failed": 0,
+      "coverageLines": {
+        "burrow-rescue": 100.0,
+        "raft-rush": 100.0,
+        "shield-sentinel": 100.0
+      },
+      "log": "coverage.txt"
+    },
+    "shared input, simulation and platform lifecycle": {
+      "command": "node --test tests/input.test.js tests/simulation.test.js tests/platform-lifecycle.test.js",
+      "exitCode": 0,
+      "passed": 27,
+      "failed": 0,
+      "log": "shared-tests.txt"
+    },
+    "scoped catalog tests": {
+      "command": "node --test --test-name-pattern='release contains|^(burrow|raft|shield)' tests/catalog.test.js",
+      "exitCode": 0,
+      "passed": 4,
+      "failed": 0,
+      "log": "catalog-tests.txt"
+    },
+    "static check": {
+      "command": "npm run check",
+      "exitCode": 0,
+      "log": "static-check.txt"
+    },
+    "format check": {
+      "command": "npm run format:check",
+      "exitCode": 0,
+      "log": "format-check.txt"
+    },
+    "build": {
+      "command": "npm run build",
+      "exitCode": 0,
+      "log": "build.txt"
+    },
+    "diff check": {
+      "command": "git diff --check",
+      "exitCode": 0
+    }
+  },
+  "catalog": "Three entries added; release assertion raised from 26 to 29 JavaScript games.",
+  "reviewStatus": "All three games independently approved and browser-accepted; accepted total 30."
+}
