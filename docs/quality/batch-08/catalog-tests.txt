@@ -1,0 +1,12 @@
+✔ release contains twenty-three unique loadable games with bilingual instructions (11.153625ms)
+✔ lantern-climber: seeded mixed input remains finite, draws and terminates at most once (65.3005ms)
+✔ gravity-courier: seeded mixed input remains finite, draws and terminates at most once (12.731625ms)
+✔ grapnel-gorge: seeded mixed input remains finite, draws and terminates at most once (55.893333ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 179.979291

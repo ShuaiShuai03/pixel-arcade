@@ -19,5 +19,8 @@ export const catalog = [
   ['pinball-pocket', 'Pinball Pocket', '口袋弹球', 'sports', '1', '#d3ad70'],
   ['dungeon-dash', 'Dungeon Dash', '地牢冲刺', 'action', '1', '#b1a07e'],
   ['bubble-pop', 'Bubble Pop', '泡泡消消乐', 'puzzle', '1', '#7cb6cd'],
+  ['lantern-climber', 'Lantern Climber', '提灯攀登', 'action', '1', '#e2bc75'],
+  ['gravity-courier', 'Gravity Courier', '重力信使', 'action', '1', '#84c3d0'],
+  ['grapnel-gorge', 'Grapnel Gorge', '钩索峡谷', 'action', '1', '#cc9579'],
 ].map(([id, en, zh, genre, players, color]) => ({ id, name: { en, zh }, genre, players, color }));
 export const loadGame = (id) => import(`./games/${id}.js`);

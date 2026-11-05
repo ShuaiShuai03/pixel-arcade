@@ -8,7 +8,7 @@ export const copy = {
   ],
   enter: ['Find your game', '挑选游戏'],
   random: ['Surprise me', '随机来一局'],
-  worldNote: ['20 small adventures. One happy place.', '20 场小冒险，一个快乐天地。'],
+  worldNote: ['Small adventures. One happy place.', '小小冒险，一个快乐天地。'],
   libraryEyebrow: ['PICK A GAME. STAY A WHILE.', '选个游戏，再玩一局'],
   libraryTitle: [
     'The game shelf<span class="small-star">✦</span>',

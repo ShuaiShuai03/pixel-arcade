@@ -1,0 +1,202 @@
+{
+  "date": "2026-11-05",
+  "phase": "batch accepted",
+  "finalCollectionReview": false,
+  "records": [
+    {
+      "game": "lantern-climber",
+      "owner": "quality_action",
+      "reviewer": "action_review",
+      "verdict": "approved",
+      "draftSourceSha256": "ec6c39b64b35672f7bbb5566c0e1e349b36944fee75b2eafccbac5072e142850",
+      "draftFindings": [
+        {
+          "id": "lantern-invalid-time",
+          "status": "closed",
+          "observation": "Independent review: update(0) with Space changes vertical velocity from0 to-140; NaN poisons time, player and camera."
+        },
+        {
+          "id": "lantern-missing-core-mechanics",
+          "status": "closed",
+          "observation": "Draft has no grip/stamina, lantern fuel/reveal or shrine relight. Nineteen ledges repeat one offset pattern rather than three distinct summit layouts."
+        },
+        {
+          "id": "lantern-jump-cut-momentum",
+          "status": "closed",
+          "observation": "Parent source inspection: releasing jump instantly sets airborne vy to-140 without a contact or explained external force."
+        },
+        {
+          "id": "lantern-hidden-deadline",
+          "status": "closed",
+          "observation": "The baseline ends after240seconds without displaying a timer; any retained deadline must be visible or replaced by explicit resource limits."
+        },
+        {
+          "id": "lantern-draft-art-readability",
+          "status": "closed",
+          "observation": "Parent desktop/phone preview: seven touch controls fit and resource bars are present. Requested larger14-16px essential text, distinct indigo/amber ruin palette, masonry detail, and meaningful warm light rather than primarily a radius ring."
+        },
+        {
+          "id": "lantern-edge-grace",
+          "status": "closed",
+          "observation": "Independent reviewer reproduced ordinary walk-off after0.558seconds leaving ground null and coyote0; Space on the following frame fails. Support-exit clears ground before constraints can arm grace. Owner is adding a regression and correction."
+        }
+      ],
+      "browserAcceptance": "accepted; see browser.json",
+      "draftPositiveEvidence": "Independent draft tests2/2 pass; legal input bot lights all19ledges at30/60/120Hz with1800score and5lives. Left-only play reaches a legal5life loss. These checks do not establish missing roster mechanics.",
+      "implementationPlan": "Retain vertical ruin/checkpoints with three distinct sections: teaching stairs, powered moving galleries, then an actual handrail climb. Finite ground/air forces, swept solid contacts and inherited deck motion; stamina drains only with actual grip and recovers only at supported rests. Add lantern fuel/reveal, X at marked braziers, buffered ballistic jumps, clear checkpoint recovery and complete bilingual touch controls. Parent approved; no hidden mandatory jumps or score farming from relighting.",
+      "ownerProgress": "First playable core: five initial regressions pass. Owner public-input route wins all three summits at60Hz in14.75seconds with all19trail lanterns and4lives. More support, resource, recovery and30/120Hz tests plus independent review pending.",
+      "finalReview": {
+        "status": "approved by independent reviewer",
+        "sourceSha256": "421e12ea69689bdf8b33d18f6109ce18d1e8728a3f0341c0225083eae9172b67",
+        "testSha256": {
+          "tests/lantern-climber.test.js": "25aa78ee90d4bf073658a674554d09a70678db9d38ec115119bd79976d96b4c1",
+          "tests/lantern-climber-quality.test.js": "4e7f0ed26bb25773b4b2b268d51f4ba676f800404d0eba49858ac7b02c9f2543"
+        },
+        "evidence": "action_review independently approved the exact frozen source and tests: 25/25 pass, 97.36% line, 94.27% branch, 100% function coverage. A separate feedback pilot won at 30/60/120Hz (16.65/15.63/15.53s) with all 19 lanterns, 1800 points and 4 lives using the real grip route; the next ledge was revealed at every jump with no hidden mandatory launch. Fuel-only loss reached at 287.51s with one terminal callback and frozen terminal state. Coyote-grace and Z-held rest fixes reproduced independently. No unresolved actionable findings."
+      }
+    },
+    {
+      "game": "gravity-courier",
+      "owner": "quality_arcade",
+      "reviewer": "review_snowball_batch1",
+      "verdict": "approved",
+      "draftSourceSha256": "143e88b5531e6e5d68ccae1fe7deb88e3903e4b523c086bce44b48f704e7a436",
+      "draftFindings": [
+        {
+          "id": "gravity-flip-momentum",
+          "status": "closed",
+          "observation": "Independent flip fixture changes vy from -138.1667 to +48.5833 instead of continuous-velocity acceleration to -134.5833."
+        },
+        {
+          "id": "gravity-invalid-time",
+          "status": "closed",
+          "observation": "Zero and negative dt consume actions; NaN corrupts state."
+        },
+        {
+          "id": "gravity-rate-drift",
+          "status": "closed",
+          "observation": "Independent0.2-second free-flight comparison differs by1.075 pixels at30 versus120Hz. Endpoint wall rollback also leaves frame-dependent gaps."
+        },
+        {
+          "id": "gravity-sprite-contact-mismatch",
+          "status": "closed",
+          "observation": "The visible16x16 courier disagrees with the14x18 collision box."
+        },
+        {
+          "id": "gravity-missing-fragile-delivery",
+          "status": "closed",
+          "observation": "Draft automatically collects proximity tokens; no fragile carried parcel, arrival-speed handling or X pickup/delivery, and rooms repeat a bulkhead zigzag."
+        },
+        {
+          "id": "gravity-phone-readability",
+          "status": "closed",
+          "observation": "Parent390px phone preview: essential10-12px canvas text shrinks to roughly7-9px. Increase essential text size, shorten prompts, and explain field/speed safety indicators."
+        },
+        {
+          "id": "gravity-facility-art",
+          "status": "closed",
+          "observation": "Parent revised preview still shows a flat box with repeated arrows. Add specific restrained conduit/field-coil/panel detail while preserving clear open trajectories."
+        },
+        {
+          "id": "gravity-dock-readiness",
+          "status": "closed",
+          "observation": "Parent real-key first delivery: HUD SPEED0 refers only to vertical velocity, while docking also requires horizontal speed<=8. An X attempt after a short coast was not ready; additional coasting succeeded. Requested accurate speed label and visible near-pad docking readiness, supplementing existing delayed invalid-action feedback."
+        },
+        {
+          "id": "gravity-impact-advice-axis",
+          "status": "closed",
+          "observation": "A deliberate horizontal bulkhead impact correctly damaged packaging once, but feedback advised reversing the vertical field. Requested axis-appropriate braking advice."
+        },
+        {
+          "id": "gravity-landing-guide-first-contact",
+          "status": "closed",
+          "observation": "Parent source/math review: courierLanding chooses a surface by gravity sign even when opposite momentum can hit the nearer surface before turning. Example in240field: y84, vy-100, gravity+1 reaches ceiling64 before reversing, but the helper targets the floor. Sent to independent reviewer."
+        },
+        {
+          "id": "gravity-buffer-flip-tie",
+          "status": "closed",
+          "observation": "Independent reviewer found the exact event where a field reversal makes a landing dock eligible as the buffered X action expires. Owner observed the regression fail and is correcting same-event reconsideration after the flip, with damage ordered first."
+        },
+        {
+          "id": "gravity-airborne-docking-cue",
+          "status": "closed",
+          "observation": "Independent candidate3b7ceefc review: at glass x416/y84/vy-100 with downward braking field, the docking cue says to point the field toward the pad before considering airborne motion. Following it changes a safe20-speed ceiling impact into140-speed damage. Airborne braking/settling advice must precede field-to-pad advice, which applies only at rest/contact."
+        }
+      ],
+      "browserAcceptance": "accepted; see browser.json",
+      "draftPositiveEvidence": "The two existing focused tests pass. Reviewer did not claim high-speed tunneling without a reachable reproduction.",
+      "implementationPlan": "Three delivery challenges: open floor-to-ceiling braking lesson, alternating floor/ceiling bulkhead route, then visible field-strength zones with a fragile glass shipment. Continuous powered acceleration and thruster/drag motion, chronological swept inelastic contacts, explicit X pickup/handoff, impact-speed parcel damage, visible spare stock and repacking at the source. Score handoffs once; exhausted recovery is an explicit loss. Parent approved.",
+      "ownerProgress": "Candidate3b7ceefc has22passing tests, six full legal campaigns, larger essential UI, H/V speed and dock readiness, directional impact advice, and event-based coast forecast. Reviewer independently validates410forecast-vs-actual cases and exactbuffer/flip/contactfix; approval pending airborne docking-cue ordering.",
+      "finalReview": {
+        "status": "approved by independent reviewer",
+        "sourceSha256": "798c1aaaec850b7bdaac0e52954a89be31d1d6e151c6f74c3cbc290f683a9010",
+        "testSha256": {
+          "tests/gravity-courier.test.js": "41216c370736931a48ded0b79377b54df731493da818d7a2267a13717b81dfa7"
+        },
+        "evidence": "review_snowball_batch1 independently approved the exact frozen source and tests: 33/33 focused plus Gravity catalog check pass, 98.52% line, 94.44% branch, 100% function coverage; hashes stable after the run. 410 forecast-versus-actual released-physics cases passed; buffer/flip tie and airborne docking-cue ordering fixes verified. All findings closed."
+      }
+    },
+    {
+      "game": "grapnel-gorge",
+      "owner": "quality_adventure",
+      "reviewer": "review_starbreaker_batch1",
+      "verdict": "approved",
+      "draftSourceSha256": "afdbb15e2ea5c453352a8c68f3ca72b6639fd79040c6ce321bf0eebb34a82b76",
+      "draftFindings": [
+        {
+          "id": "grapnel-invalid-time",
+          "status": "closed",
+          "observation": "Independent baseline review: zero/invalid dt mutates state; NaN corrupts state."
+        },
+        {
+          "id": "grapnel-reel-velocity",
+          "status": "closed",
+          "observation": "Reeling changes rope length at -40 units/s while radial velocity remains approximately zero; motion and velocity are inconsistent."
+        },
+        {
+          "id": "grapnel-render-rate-drift",
+          "status": "closed",
+          "observation": "The same initial attachment plus three seconds Right yields vx -108.191, -116.604 and -121.283 at30/60/120Hz."
+        },
+        {
+          "id": "grapnel-ground-rest-energy",
+          "status": "closed",
+          "observation": "A resting rope/ground configuration creates unforced vx0.8053 and0.342px creep."
+        },
+        {
+          "id": "grapnel-count-only-stages",
+          "status": "closed",
+          "observation": "One long layout is labeled as three reaches by x/400 rather than authored distinct route mechanics."
+        },
+        {
+          "id": "grapnel-hidden-deadline",
+          "status": "closed",
+          "observation": "The draft ends at240seconds without displaying a countdown or deadline warning."
+        }
+      ],
+      "browserAcceptance": "accepted; see browser.json",
+      "draftPositiveEvidence": "Both baseline tests pass. An independent public-input policy sweep found11of20 policies win without losing a life; one finished in28.175seconds with5lives and600points. The baseline is reachable; findings concern physics, depth and a hidden deadline, not a proven unwinnable route.",
+      "implementationPlan": "Three authored reaches: static-anchor teaching swing; two-anchor/rest-island combination with rock occlusion; powered moving-anchor rail mastery. Internal240Hz simulation with unilateral slack/taut rope, energy-conserving passive pendulum, inelastic outward capture and preserved release velocity. Explicit winch/anchor work is separate from numerical residual. True supported rest, finite ground forces and ballistic detached flight. Visible solids block hooks and cut obstructed ropes with feedback; no hidden timer. Safe rest refills winch; Z rescue costs a life; Enter advances only at a reached exit; relics score once. Parent approved.",
+      "finalReview": {
+        "status": "approved by independent reviewer",
+        "sourceSha256": "507ac73dc499c6377aebfa4e362ee0f0fd43b3b11f1a445ebb570a6cd678bb47",
+        "testSha256": {
+          "tests/grapnel-gorge.test.js": "0d7b1a1c9697a1a4a428cda23178317c5687095dee8ee8ba0314d2efe86088cb",
+          "tests/grapnel-gorge-quality.test.js": "79b3ad33b6de22d9d6c75ea608e3fa8f993f4666333e715c3c7075e405a16682"
+        },
+        "evidence": "review_starbreaker_batch1 approved all mechanics at 5f4218b2 (48 tests plus 28 extra rest/in/out/alternating corner cases and 9 public campaigns at 30/60/120Hz x insets 10/18/24, all winning 1700 points with 5 lives; max numerical residual 5.84e-7, energy balance 3.73e-10, rope excess 5.7e-14), then approved the renderer/copy-only delta to the exact frozen source: reversing only that delta reproduces the mechanics-approved hash. 97.52% line, 93.09% branch, 93.88% function coverage. All findings closed.",
+        "parentCopyDelta": {
+          "sourceSha256": "4a2565aaa2a42a76070e39088e987a9095d8c07ffbdd5e3ae326f18d4464b36d",
+          "change": "English status line pluralizes 1 life",
+          "reversalReproducesApprovedSha256": "507ac73dc499c6377aebfa4e362ee0f0fd43b3b11f1a445ebb570a6cd678bb47",
+          "tests": "48/48 pass"
+        }
+      }
+    }
+  ],
+  "integrationReview": {
+    "reviewer": "action_review",
+    "verdict": "draft changes approved; final metadata validation pending",
+    "scope": ["src/catalog.js", "tests/catalog.test.js", "index.html", "src/i18n.js"]
+  }
+}

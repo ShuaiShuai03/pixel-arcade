@@ -2,11 +2,17 @@
 
 At the user's direction, at most **three games** may be under development and acceptance testing at one time. Do not begin the next batch until all games in the active batch satisfy the gates below. The 100-game target includes Pixel Parkour. Roster themes are not work assignments.
 
+## Completed batch 8
+
+Lantern Climber, Gravity Courier, and Grapnel Gorge passed initial development, independent review, and browser acceptance, bringing the accepted total to 24. All 106 focused tests, 27 shared regressions and four scoped catalog checks pass. Lantern Climber and Grapnel Gorge completed full browser campaigns on their final sources; Gravity Courier's corrected airborne docking cue was verified in the browser on its final source after a full campaign on the preceding revision. See the [batch 8 evidence](batch-08/ACCEPTANCE.md). Publication verification follows the final integration checks.
+
+The next batch is Wallrunner Relay, Clockwork Bridge, and Glider Ridge. It remains queued until batch 8 publication is verified.
+
 ## Completed batch 7
 
-Crate Keeper, Memory Grove, and Pixel Parkour passed initial development, independent review, and browser acceptance. All 192 focused checks and three scoped catalog checks pass. Crate Keeper and Memory Grove completed full browser campaigns; Pixel Parkour completed a 277-metre run, legal losses, roof and spring-shoe play, and save/reload checks. See the [batch 7 evidence](batch-07/ACCEPTANCE.md). Publication verification follows the final integration checks.
+Crate Keeper, Memory Grove, and Pixel Parkour passed initial development, independent review, and browser acceptance. All 192 focused checks and three scoped catalog checks pass. Crate Keeper and Memory Grove completed full browser campaigns; Pixel Parkour completed a 277-metre run, legal losses, roof and spring-shoe play, and save/reload checks. See the [batch 7 evidence](batch-07/ACCEPTANCE.md). Commit `1693048` is live. All nine checked assets match, and the published Parkour help and keyboard run passed. See the [deployment receipt](batch-07/deployment.json).
 
-The next batch is Lantern Climber, Gravity Courier, and Grapnel Gorge. It remains queued until batch 7 integration is complete.
+Batch 8 began after batch 7 passed integration and publication verification.
 
 ## Completed batch 6
 

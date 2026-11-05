@@ -1,0 +1,52 @@
+{
+  "date": "2026-11-05",
+  "status": "complete",
+  "checks": {
+    "shared input, simulation and platform lifecycle": {
+      "command": "node --test tests/input.test.js tests/simulation.test.js tests/platform-lifecycle.test.js",
+      "exitCode": 0,
+      "passed": 27,
+      "failed": 0,
+      "log": "shared-tests.txt"
+    },
+    "focused game tests with coverage": {
+      "command": "node --experimental-test-coverage (3 games) --test 5 test files",
+      "exitCode": 0,
+      "passed": 106,
+      "failed": 0,
+      "coverageLines": {
+        "lantern-climber": 97.36,
+        "gravity-courier": 98.52,
+        "grapnel-gorge": 97.52
+      },
+      "log": "coverage.txt"
+    },
+    "scoped catalog tests": {
+      "command": "node --test --test-name-pattern='release contains|^(lantern-climber|gravity-courier|grapnel-gorge):' tests/catalog.test.js",
+      "exitCode": 0,
+      "passed": 4,
+      "failed": 0,
+      "log": "catalog-tests.txt"
+    },
+    "static check": {
+      "command": "npm run check",
+      "exitCode": 0,
+      "log": "static-check.txt"
+    },
+    "format check": {
+      "command": "npm run format:check",
+      "exitCode": 0,
+      "log": "format-check.txt"
+    },
+    "build": {
+      "command": "npm run build",
+      "exitCode": 0,
+      "log": "build.txt"
+    },
+    "diff check": {
+      "command": "git diff --check",
+      "exitCode": 0
+    }
+  },
+  "reviewStatus": "All three games independently approved and browser-accepted; accepted total 24."
+}

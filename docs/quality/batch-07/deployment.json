@@ -1,0 +1,82 @@
+{
+  "date": "2026-11-05",
+  "commit": "169304828a03927da282f5ebdfb02156d7b5a230",
+  "url": "https://shuaishuai03.github.io/pixel-arcade/",
+  "workflow": {
+    "runId": 42032396786,
+    "url": "https://github.com/ShuaiShuai03/pixel-arcade/actions/runs/42032396786",
+    "conclusion": "success",
+    "logsInspected": true,
+    "deploymentReportedSuccessAt": "2026-11-05T13:04:22Z"
+  },
+  "assets": [
+    {
+      "path": "index.html",
+      "bytes": 9427,
+      "sha256": "f8ce514a795966c125415e9657bb65c87f02a844be5418c5e6ce5ebde16e14bf",
+      "matchesLocal": true
+    },
+    {
+      "path": "src/catalog.js",
+      "bytes": 1740,
+      "sha256": "1e318781a95431d30522fcfe7996a422b90f8cea8b3c9d6dd2258c841b9d54ac",
+      "matchesLocal": true
+    },
+    {
+      "path": "src/app.js",
+      "bytes": 23386,
+      "sha256": "6fc8fbaa4c101f3a1a771b63579c1c2610ca2c2578c825e131d362377d53a890",
+      "matchesLocal": true
+    },
+    {
+      "path": "src/games/crate-keeper.js",
+      "bytes": 26944,
+      "sha256": "a84396234e054adaa0682425167417858a3f8dbbddb3490252c630d9993eccd4",
+      "matchesLocal": true
+    },
+    {
+      "path": "src/games/memory-grove.js",
+      "bytes": 22949,
+      "sha256": "48aa22672f1a7b2d7c2101107377d002a8770051b4aa982362e887551f869048",
+      "matchesLocal": true
+    },
+    {
+      "path": "public/parkour/index.html",
+      "bytes": 4310,
+      "sha256": "00714712f49333f59daeb505a2d2578b66de658bf3592c4a48bb15eab3ca9be6",
+      "matchesLocal": true
+    },
+    {
+      "path": "public/parkour/parkour.css",
+      "bytes": 5425,
+      "sha256": "14bc1b159755cdb6f739a72d1ae8c30e87324b1b0b67ba97bde2b0998065478e",
+      "matchesLocal": true
+    },
+    {
+      "path": "public/parkour/build-info.json",
+      "bytes": 4636,
+      "sha256": "d83e97488333df4761129861cfcc529f0f9e3be1bb3b65b3cd140daba3170487",
+      "matchesLocal": true
+    },
+    {
+      "path": "public/parkour/pixel_parkour.wasm",
+      "bytes": 776595,
+      "sha256": "e0a0b9c8602567e20ca6ffbc99c98318a10f59a53bf6ac49bc545ef142bb03c1",
+      "matchesLocal": true
+    }
+  ],
+  "publicBrowser": {
+    "browser": "Installed stable Google Chrome via Codex Chrome extension",
+    "observed": [
+      "Published WASM help includes the new momentum-preserving air-tuck description.",
+      "A real keyboard start, jump, tuck and lane-left input reached 28 metres on the published game.",
+      "Final error/warning log empty."
+    ],
+    "screenshots": [
+      "screenshots/published-parkour-help.jpg",
+      "screenshots/published-parkour-run.jpg"
+    ],
+    "screenshotsInspected": true,
+    "consoleErrors": []
+  }
+}

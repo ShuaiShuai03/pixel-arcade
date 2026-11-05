@@ -1,0 +1,194 @@
+{
+  "date": "2026-11-05",
+  "browser": "Installed stable Google Chrome via Codex Chrome extension",
+  "status": "complete",
+  "stateInjection": false,
+  "preliminaryChecks": [
+    {
+      "id": "lantern-climber",
+      "revisionNotes": "Restored unaccepted draft; baseline only, not acceptance.",
+      "observed": [
+        "Blank navy space, thin identical ledges and gray squares do not yet communicate grip or light. Requested specific moonlit masonry, distinct rest/grip platforms, lantern light and readable active character feedback."
+      ],
+      "screenshots": ["lantern-baseline.jpg"],
+      "screenshotsInspected": true
+    },
+    {
+      "id": "gravity-courier",
+      "revisionNotes": "Restored unaccepted draft; baseline only, not acceptance.",
+      "observed": [
+        "Flat stripes and rectangles with three floating gifts do not explain fragile delivery. Requested field coils, copper mail tubes, visible carried parcel/damage and clear pickup/delivery pads."
+      ],
+      "screenshots": ["gravity-baseline.jpg"],
+      "screenshotsInspected": true
+    },
+    {
+      "id": "grapnel-gorge",
+      "revisionNotes": "Restored unaccepted draft; baseline only, not acceptance.",
+      "observed": [
+        "Flat cliff polygons and suspended anchor squares lack physical context. Requested rock strata, visible anchor supports/rails, rope tension feedback and unambiguous solid versus one-way support art."
+      ],
+      "screenshots": ["grapnel-baseline.jpg"],
+      "screenshotsInspected": true
+    },
+    {
+      "id": "gravity-courier",
+      "revisionNotes": "Owner preliminary candidate7843d243; four core regressions pass, full route and physics review pending.",
+      "observed": [
+        "Actual X pickup mounts a parcel visibly; source/delivery pads and four Chinese touch controls are present.",
+        "The portrait phone preview makes essential small text hard to read; requested larger essential text and shorter prompts.",
+        "Requested more specific postal facility/field-coil background detail while keeping open trajectories clear.",
+        "A preliminary real-key first shipment was delivered intact for480points using floor movement, field acceleration/braking, a ceiling approach and a stopped X handoff. Requested clearer docking readiness because the speed display omits horizontal drift.",
+        "Second shipment recovered after a deliberate wall impact and delivered with2/3pack for total900; moving upward from rest against the wall worked. Requested horizontal-impact-specific advice.",
+        "Glass shipment broke on an intentional unbraked impact; returning to source and X restored2/2pack, reduced spares3to2 and kept score900. A later strong-field timing mistake damaged it again; this preliminary run did not complete the campaign."
+      ],
+      "screenshots": [
+        "gravity-draft-desktop.jpg",
+        "gravity-draft-carried.jpg",
+        "gravity-draft-phone.jpg",
+        "gravity-draft-first-delivery.jpg",
+        "gravity-draft-recovered-delivery.jpg",
+        "gravity-draft-repack.jpg",
+        "gravity-draft-strong-field-mistake.jpg"
+      ],
+      "screenshotsInspected": true
+    },
+    {
+      "id": "lantern-climber",
+      "revisionNotes": "First replacement core; five initial regressions pass, full independent review pending.",
+      "observed": [
+        "Visible character, stamina/fuel bars and all seven Chinese touch controls fit.",
+        "Requested larger essential text and stronger moonlit ruin identity with masonry detail and warm lantern illumination.",
+        "Actual keyboard play reached both initial beacons and ledge13 with4lives/1300points; required rail grip/climb reduced stamina100to85. A mistimed release returned safely to checkpoint12 without losing a life and resting restored stamina92. X at the first beacon refilled the lamp. This remains preliminary, before final fixes.",
+        "Completed the preliminary browser campaign for1800points with4lives. After returning to the required rail, a directional Space jump from grip reached the higher ledge, and normal jumps completed the last beacon. This validates a human-input route before final fixes, not the final accepted revision."
+      ],
+      "screenshots": [
+        "lantern-draft-desktop.jpg",
+        "lantern-draft-phone.jpg",
+        "lantern-draft-first-summit.jpg",
+        "lantern-draft-grip.jpg",
+        "lantern-draft-campaign-win.jpg"
+      ],
+      "screenshotsInspected": true
+    }
+  ],
+  "games": [
+    {
+      "id": "gravity-courier",
+      "status": "physics and complete flows passed; revised airborne cue pending",
+      "sourceSha256": "3b7ceefcc4f906ec91a5dfeee2a94de18cd30edff96ae7b99b39465172202e42",
+      "observed": [
+        "Full three-chamber campaign won for1380points with real keyboard and touch-control input. First intact delivery480; entire second chamber used four Chinese touch controls and reached960.",
+        "Deliberately broke the third glass parcel with an unbraked flight; returned to source, X repacked2/2 and reduced spares3to2 without changing score. Traversed150,90and240field zones and delivered intact glass.",
+        "New horizontal/vertical speed readouts and visible READY/X handoff cues correctly supported stopped docking; desktop,390x844portrait and844x390landscape layouts inspected in English and Chinese.",
+        "Right/X input after win preserved terminal result. R reset to score0/three spares while keeping best1380. Paused right input did not move the new run; resume stayed at source.",
+        "Four deliberate break cycles with three repacks exhausted spare stock and reached the explicit loss message. Browser warnings/errors were empty."
+      ],
+      "screenshots": [
+        "gravity-final-desktop.jpg",
+        "gravity-final-ready.jpg",
+        "gravity-final-first-delivery.jpg",
+        "gravity-final-phone.jpg",
+        "gravity-final-touch-chamber2.jpg",
+        "gravity-final-touch-delivery.jpg",
+        "gravity-final-landscape.jpg",
+        "gravity-final-broken.jpg",
+        "gravity-final-repack.jpg",
+        "gravity-final-weak-field.jpg",
+        "gravity-final-glass-ready.jpg",
+        "gravity-final-win.jpg",
+        "gravity-final-restart.jpg",
+        "gravity-final-loss.jpg"
+      ],
+      "screenshotsInspected": true,
+      "consoleWarningsOrErrors": [],
+      "limitations": [
+        "Browser-emulated phone layouts and button input; no physical-device or audio-quality certification.",
+        "Independent reviewer found unsafe airborne docking-cue ordering after this run; targeted verification of the corrected cue is required before acceptance."
+      ]
+    },
+    {
+      "id": "lantern-climber",
+      "status": "accepted",
+      "sourceSha256": "421e12ea69689bdf8b33d18f6109ce18d1e8728a3f0341c0225083eae9172b67",
+      "observed": [
+        "Full English keyboard campaign on the frozen source won for 1800 points: all three summits (Moonlit Atrium, Cable Gallery, Broken Spire) and all scoring ledges. X at braziers refilled the lamp each time; moving cable decks carried the climber.",
+        "The required Broken Spire rail was climbed with Z+Up (stamina 100 to 82) and exited with Left+Space while Z was still held, landing on the high ledge for 1400. Releasing Z on the same frame as Space detaches instead of jumping, which matches the help text.",
+        "Two real falls from the rail section each cost one life and returned the climber to the summit-2 brazier with full grip and unchanged score; a short walk-off onto a lower ledge cost nothing. The run finished with 2 of 4 lives because of these tester timing mistakes.",
+        "Pause while gripping preserved stamina 91 and the climbing state on resume. The shared host clears held input on every pause/resume (src/app.js); physical keys return through auto-repeat, so the tester re-pressed Z after resuming.",
+        "Lamp exhaustion alone cost a life about every 70 seconds and reached the explicit loss at about 270 seconds with score 400. Arrow, X and Z+Up input on the loss screen left status, score and best unchanged. R restarted at score 0 with best 1800.",
+        "Chinese 390x844 portrait: no horizontal overflow, readable canvas HUD, all seven touch controls; touch Refill restored the lamp 51 to 100 and two multi-touch direction+jump presses scored 200. 844x390 landscape fullscreen places controls in side columns; touch jumps scored to 400."
+      ],
+      "screenshots": [
+        "lantern-final2-first-ledge.jpg",
+        "lantern-final2-grip.jpg",
+        "lantern-final2-rail-exit.jpg",
+        "lantern-final2-win.jpg",
+        "lantern-final2-loss.jpg",
+        "lantern-final2-phone.jpg",
+        "lantern-final2-phone-touch.jpg",
+        "lantern-final2-landscape.jpg"
+      ],
+      "screenshotsInspected": true,
+      "consoleWarningsOrErrors": [],
+      "limitations": [
+        "Headless Chrome with emulated phone layouts and dispatched touch events; no physical device or audio check.",
+        "After the win, Space activated the focused Play Again button (host behavior), so terminal freeze was checked on the loss screen with non-activating keys."
+      ]
+    },
+    {
+      "id": "gravity-courier",
+      "status": "accepted",
+      "sourceSha256": "798c1aaaec850b7bdaac0e52954a89be31d1d6e151c6f74c3cbc290f683a9010",
+      "observed": [
+        "Targeted check of the corrected airborne docking cue: after flipping the field toward the ceiling pad and reversing it to brake while still airborne (V 144 then 42), the cue read BRAKE BEFORE RAIL CONTACT / BRAKE FIRST, FIELD INTO RAIL AFTER CONTACT instead of advising a field toward the pad.",
+        "After soft rail contact, flipping the field into the rail and pressing X delivered the first parcel intact for 480 with pack 3/3 and spares 3.",
+        "The full campaign, recovery, loss and layout checks recorded for 3b7ceefc remain valid because the reviewer approved the final delta as cue ordering only."
+      ],
+      "screenshots": [
+        "gravity-final2-airborne-brake-cue.jpg",
+        "gravity-final2-brake-first-cue.jpg",
+        "gravity-final2-delivery.jpg"
+      ],
+      "screenshotsInspected": true,
+      "consoleWarningsOrErrors": []
+    },
+    {
+      "id": "grapnel-gorge",
+      "status": "accepted",
+      "sourceSha256": "4a2565aaa2a42a76070e39088e987a9095d8c07ffbdd5e3ae326f18d4464b36d",
+      "observed": [
+        "Full English keyboard campaign won for 1700 points with 4 of 5 lives: Copper Arch, Split Spire (anchor 2 selected with X after a small step on the middle cairn) and Skyrail Crossing with motor-driven anchors. Enter travelled after each clear.",
+        "Slack rope draws dotted and taut rope solid with a load readout; landing dots ended in a cross over gaps and a check over safe stone, and every release on a check landed safely.",
+        "Walking off the narrow middle cairn into the canyon cost one life and returned to the cairn with the winch recharged.",
+        "After R, five Z rescues each spent one life and the fifth reached the explicit loss with best 1700 retained; Right, Z and X on the loss screen changed nothing.",
+        "Found the status line 1 lives. Parent applied a copy-only fix (1 life); reversing that one expression reproduces the independently approved 507ac73d hash exactly, and all 48 Grapnel tests pass.",
+        "Chinese 390x844 portrait fits without overflow and shows all eight touch controls; touch hook, reel and release worked, collected the optional relic (+250) and a water landing cost one rescue life. 844x390 landscape fullscreen places controls in side columns."
+      ],
+      "screenshots": [
+        "grapnel-final-desktop.jpg",
+        "grapnel-final-swing.jpg",
+        "grapnel-final-cross-warning.jpg",
+        "grapnel-final-anchor2.jpg",
+        "grapnel-final-skyrail.jpg",
+        "grapnel-final-win.jpg",
+        "grapnel-final-loss.jpg",
+        "grapnel-final-phone.jpg",
+        "grapnel-final-phone-touch.jpg",
+        "grapnel-final-landscape.jpg"
+      ],
+      "screenshotsInspected": true,
+      "consoleWarningsOrErrors": [],
+      "limitations": [
+        "Headless Chrome with emulated phone layouts and dispatched touch events; no physical device or audio check.",
+        "The browser campaign used pause-and-inspect timing; automated public campaigns cover 30/60/120 Hz."
+      ]
+    }
+  ],
+  "viewports": [
+    [1440, 900],
+    [390, 844],
+    [844, 390]
+  ],
+  "finalBrowser": "Installed stable Google Chrome 156.0.8078.80 (headless, temporary profile) driven over the DevTools protocol from a parent script. The Codex Chrome extension and Claude in Chrome were unavailable in the continuation session. Only trusted keyboard, mouse and touch input events were dispatched; visible DOM text and screenshots were read; no game state was read or injected and Playwright was not used."
+}

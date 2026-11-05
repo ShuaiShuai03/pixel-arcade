@@ -22,7 +22,10 @@
     "minefield",
     "crate-keeper",
     "memory-grove",
-    "pixel-parkour"
+    "pixel-parkour",
+    "lantern-climber",
+    "gravity-courier",
+    "grapnel-gorge"
   ],
   "batches": [
     {
@@ -70,7 +73,7 @@
     {
       "number": 8,
       "games": ["lantern-climber", "gravity-courier", "grapnel-gorge"],
-      "status": "queued"
+      "status": "accepted"
     },
     {
       "number": 9,
