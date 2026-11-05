@@ -1,0 +1,14 @@
+{
+  "repository": "https://github.com/ShuaiShuai03/pixel-parkour",
+  "revision": "a5d147ce782cb8618d03c41a9740e63d77ef5f94",
+  "version": "0.4.0",
+  "originalWorktreeClean": true,
+  "importedAt": "2026-11-05",
+  "changes": [
+    "Browser localStorage persistence through a miniquad plugin",
+    "Browser-safe clock, command-line and screenshot handling",
+    "Exported touch controls, native quit navigates to the arcade",
+    "Explicit JavaScript imports for newer Rust WASM linkers",
+    "Live synchronized English/Chinese preference, pause on focus loss, fullscreen with controls"
+  ]
+}

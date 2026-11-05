@@ -1,0 +1,17 @@
+# Game module contract
+
+All games are original implementations, English and Simplified Chinese only. No third-party game art or trademarks. Games render pixel art into a 480 x 320 canvas. Browser ES modules with no dependencies or network calls. Pure modules must import under Node for testing.
+
+Each src/games/<id>.js exports:
+
+- `meta`: `{id, name:{en,zh}, description:{en,zh}, genre:'action'|'arcade'|'puzzle'|'sports', players:'1'|'1-2'|'2', keys:[{label:{en,zh}, keys:'WASD / Arrows'}], touch:boolean}`. Descriptions teach the goal. For local 2-player, provide separate P1/P2 controls and a solo mode when sensible.
+- `createGame(env)` returns `{update(dt,input),draw(ctx),getState()}`. `dt` is seconds capped at 1/30. Canvas is always 480x320. Game starts immediately on creation (host owns start panel, pause, restart and end overlays).
+- `env` contains `{width:480,height:320,lang:'en'|'zh',mode:1|2,random:()=>number,t:(en,zh)=>string,sound:(name)=>void,end:({won:boolean,score:number,message:string})=>void}`. Use env.random for deterministic tests. End only once; stop simulation after end. Terminal conditions must match the game: campaigns support reachable wins and losses, endless score games may have loss only, and reversible puzzles such as Crate Keeper may have win only with unlimited undo. Host displays your localized message. Allowed sounds: coin, hit, shoot, win, lose, move.
+- `input` contains `held(...codes)`, `pressed(...codes)` (KeyboardEvent.code, e.g. KeyA, ArrowLeft, Space), `pointer:{x,y,down,clicked}`. Touch buttons emulate key codes. Pointer values canvas-local; clicked is first frame only. Use `pressed` for discrete puzzle actions, held for movement. Each game must respond to documented keys. Do not use Escape, KeyP or KeyR (reserved host pause/restart). Enter may confirm game-specific action. Pointer-only games must also have keyboard navigation/activation.
+- `getState()` returns an inspectable, JSON-safe snapshot with `{phase:'playing'|'won'|'lost',score:number,...}` plus meaningful gameplay state (positions, board, health, level, etc.) for deterministic tests. Add `status:{en,zh}` if useful. Do not create testing-only cheat APIs. Host shows score and status; game may draw HUD elements.
+
+Shared optional helpers from `../shared/utils.js`: `clamp`, `rectsOverlap`, `distance`, `randInt(random,min,max)` (inclusive), `choose(random,array)`, `drawPixelText(ctx,text,x,y,color='#fff',size=12,align='left')`, `pixelSprite(ctx,rows,x,y,scale,palette)` (characters map to colors, '.' transparent), `background(ctx,color='#101b2d')`, `roundedRect` is NOT available. Prefer hard pixel shapes, particles and distinct environments. Canvas text must support Chinese with system fonts.
+
+Each owner writes `tests/<id>.test.js` using Node test/assert. Write meaningful tests BEFORE game implementation, run to see failure then implement: movement/board rules, collisions, scoring, win/loss, restart via new instance, seeded long simulation, draw smoke with proxy ctx from `tests/harness.js`. Target 80%+ coverage; do not settle for import-only tests. No console errors, NaN, unbounded arrays, immediate unavoidable deaths or unwinnable levels. Include sufficient game depth: designed progression, multiple levels or score escalation, feedback, clear objectives. Quality over code golf.
+
+Ownership: edit ONLY assigned game modules and tests unless explicitly delegated. Do not modify shared files, package.json, catalog, shell, build/deployment, or other games. Do not commit/push. Report tests and limitations to parent.

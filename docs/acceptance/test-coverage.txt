@@ -1,0 +1,216 @@
+npm notice run pixel-arcade@1.0.0 test:coverage
+npm notice run node --experimental-test-coverage --test-coverage-include="src/games/**" --test-coverage-include="src/shared/**" --test tests/*.test.js
+✔ Blockfall rotates four times back to original and rejects overlap/walls (0.54875ms)
+✔ Blockfall clears complete rows, preserves incomplete rows, and prepends empties (0.120709ms)
+✔ Blockfall moves, rotates, drops and ends once when stack reaches roof (0.9455ms)
+✔ Blockfall completes 30 lines using legal rotations, moves and drops (135.528458ms)
+✔ bomb: blasts stop at walls and include first crate (0.871875ms)
+✔ bomb: safe spawn, two local players and bilingual instructions (0.815291ms)
+✔ bomb: planted bombs explode, destroy crates and do not duplicate on hold (3.098084ms)
+✔ bomb: self-blast resolves death once and restart resets arena (4.635875ms)
+✔ bomb: walls stop walking and movement respects repeat cadence (0.337583ms)
+✔ bomb: legal planting, escaping and navigation clear all three gardens (254.411916ms)
+✔ Bubble cluster removes three plus disconnected bubbles (0.765916ms)
+✔ Bubble mismatches persist and neighbor graph is symmetric (0.162416ms)
+✔ Bubble aiming and shot has wall bounces (0.358333ms)
+✔ Bubble terminal clear/overflow, restart and drawing (0.466375ms)
+✔ Bubble cavern can be cleared through real aim, fire and swap actions (202.789334ms)
+✔ release contains twenty unique loadable games with bilingual instructions (26.062291ms)
+✔ snowball-siege: seeded mixed input remains finite, draws and terminates at most once (11.87725ms)
+✔ ember-knights: seeded mixed input remains finite, draws and terminates at most once (8.800667ms)
+✔ bomb-garden: seeded mixed input remains finite, draws and terminates at most once (12.133291ms)
+✔ iron-bastion: seeded mixed input remains finite, draws and terminates at most once (27.778542ms)
+✔ sky-raiders: seeded mixed input remains finite, draws and terminates at most once (14.513667ms)
+✔ neon-snake: seeded mixed input remains finite, draws and terminates at most once (4.532375ms)
+✔ starbreaker: seeded mixed input remains finite, draws and terminates at most once (110.7205ms)
+✔ orbit-invaders: seeded mixed input remains finite, draws and terminates at most once (39.321583ms)
+✔ river-hop: seeded mixed input remains finite, draws and terminates at most once (17.579417ms)
+✔ meteor-drift: seeded mixed input remains finite, draws and terminates at most once (35.4875ms)
+✔ blockfall: seeded mixed input remains finite, draws and terminates at most once (12.360917ms)
+✔ gem-match: seeded mixed input remains finite, draws and terminates at most once (15.652083ms)
+✔ crate-keeper: seeded mixed input remains finite, draws and terminates at most once (33.583625ms)
+✔ minefield: seeded mixed input remains finite, draws and terminates at most once (6.220292ms)
+✔ memory-grove: seeded mixed input remains finite, draws and terminates at most once (3.560458ms)
+✔ pixel-rally: seeded mixed input remains finite, draws and terminates at most once (10.142375ms)
+✔ paddle-duel: seeded mixed input remains finite, draws and terminates at most once (4.1215ms)
+✔ pinball-pocket: seeded mixed input remains finite, draws and terminates at most once (26.343959ms)
+✔ dungeon-dash: seeded mixed input remains finite, draws and terminates at most once (41.540167ms)
+✔ bubble-pop: seeded mixed input remains finite, draws and terminates at most once (23.391584ms)
+✔ Crate Keeper all eight levels have verified solutions (906.351875ms)
+✔ Crate Keeper cannot enter walls or push two crates and does not mutate previous state (0.101167ms)
+✔ Crate Keeper undo restores state and completing all levels wins once (630.743458ms)
+✔ Crate Keeper touch arrows, undo and useful hints operate on real state (0.24125ms)
+✔ Dungeon all room keys and exits are reachable by flood fill (4.738541ms)
+✔ Dungeon walls stop movement and melee defeats nearby enemies (0.843959ms)
+✔ Dungeon key unlocks next room only after clearing enemies (0.272958ms)
+✔ Dungeon loss and final exit are terminal (0.635459ms)
+✔ Dungeon can clear five full rooms with legal movement and attacks (432.005708ms)
+✔ knights: strike respects reach, facing and blocks (2.314042ms)
+✔ knights: solo and local duel initialize and render (0.556041ms)
+✔ knights: controls move both local players and attacks cost stamina (0.467375ms)
+✔ knights: jump rises then returns to arena floor (0.744625ms)
+✔ knights: combat resolves a best-of-three match and restart is fresh (42.748666ms)
+✔ Gem Match generated boards have no initial matches and always have valid swaps (125.534958ms)
+✔ Gem Match identifies crossing lines once and rejects distant swaps (0.541375ms)
+✔ Gem Match keyboard selection and legal swaps reduce moves and award score (2.428084ms)
+✔ Gem Match completes all gardens with legal pointer swaps (129.913708ms)
+✔ Gem Match move budget can be exhausted through legal low-value swaps (99.854958ms)
+✔ Gem Match constant-random generation stays productive without hanging (0.909042ms)
+✔ keys distinguish held and one-frame press even on repeat (0.907792ms)
+✔ touch and keyboard ownership cannot release each other (2.093958ms)
+✔ clearing input on blur releases pointer and presses (0.077333ms)
+✔ tank: tile intersections distinguish armor and open ground (0.452625ms)
+✔ tank: defender moves, fires and renders a guarded base (1.042208ms)
+✔ tank: enemies approach and eventually damage an undefended base (16.962708ms)
+✔ tank: sustained player fire scores and survives deterministic simulation (8.028625ms)
+✔ tank: legal three-wave victory preserves safe terrain placement (seed 2) (124.983375ms)
+✔ tank: legal three-wave victory preserves safe terrain placement (seed 18) (71.925166ms)
+✔ Memory Grove decks contain exactly two copies of every symbol (0.790791ms)
+✔ Memory Grove rejects flipping same card twice and hides a mismatch (0.689042ms)
+✔ Memory Grove matches all cards across levels and wins once (3.134833ms)
+✔ Memory Grove peek has a cost, can only be used once, and timeout ends once (8.579083ms)
+✔ Memory Grove pointer flips the selected card and keyboard wraps the grid (0.651458ms)
+✔ Memory Grove preserves a last-second completed stage through its clear animation (98.934541ms)
+✔ meteor wrap and spawn are deterministic and safe (0.9875ms)
+✔ meteor thrust, rotation, firing and speed cap (8.818166ms)
+✔ meteor shooting splits rocks and awards score (0.1575ms)
+✔ meteor collision loses life then protected respawn; five waves win (0.099083ms)
+✔ meteor game renders in both languages and projectiles expire (132.784542ms)
+✔ legal thrust, turning and firing clear all five sectors on two seeds (347.271542ms)
+✔ meteor corner wrapping draws all four asteroid copies, including the diagonal (0.491ms)
+✔ meteor ship corner wrapping renders a visible ship in every corresponding corner (0.328167ms)
+✔ meteor diagonal collisions agree with the rendered corner copies (0.074584ms)
+✔ Minefield guarantees the first click and all adjacent cells are safe (5.347292ms)
+✔ Minefield flood reveal expands blank cells but never flags or mines (0.297709ms)
+✔ Minefield supports keyboard flags, safe reveal and win without revealing a mine (1.19975ms)
+✔ Minefield flag mode toggles through touch, respects flags, and a mine ends once (0.272167ms)
+✔ Minefield exact flags allow numbered-cell chording and arrows wrap safely (0.23825ms)
+✔ snake turns without reversing and eats food (1.520833ms)
+✔ snake loses against walls, own body and obstacles (0.763458ms)
+✔ snake can enter a vacating tail and wins after eighteen fruit (0.816792ms)
+✔ snake food avoids occupied cells and stage walls (5.467917ms)
+✔ snake game draws, terminates once, and restarts cleanly in both languages (1.1625ms)
+✔ legal keyboard play clears all three snake gardens on two seeds (298.5775ms)
+✔ invader waves increase and ship moves and fires (0.760916ms)
+✔ invader shots destroy enemies and shields absorb hostile fire (0.143916ms)
+✔ invader ship loses health, is temporarily invulnerable, and loses at zero (0.077542ms)
+✔ invader descent can lose and last wave can win (0.060875ms)
+✔ invader game has bounded projectiles and deterministic end (118.608334ms)
+✔ legal movement and firing defend all four waves on two seeds (219.334083ms)
+✔ Paddle player movement is clamped and solo opponent tracks ball (0.95775ms)
+✔ Paddle contact changes direction and applies aim (0.093917ms)
+✔ Paddle duel two-player controls do not use AI (0.063125ms)
+✔ Paddle match has winner and cannot score after finish (0.654958ms)
+✔ Paddle solo match can be won through documented controls (158.899541ms)
+✔ Paddle reflects from both boundaries and right paddle; opponent can win (0.121709ms)
+✔ Paddle pointer moves the appropriate paddle and a point starts a new serve (0.100708ms)
+✔ parkour bridge reads and writes UTF-8 save text without network (2.014083ms)
+✔ parkour bridge gracefully falls back when browser storage is blocked (1.059583ms)
+✔ parkour language is limited to English and Chinese (2.685334ms)
+✔ parkour bridge rejects oversized save data and out-of-range wasm pointers (0.390459ms)
+✔ parkour WebAssembly links every import against the shipped versioned JavaScript (6.735042ms)
+✔ wrapper initial language agrees with a saved Chinese native setting (0.946583ms)
+✔ wrapper switches live language through the queue without navigating or restarting (0.648667ms)
+✔ focus departures queue pause-only and fullscreen includes controls (0.469958ms)
+✔ native fullscreen request uses the same shell containing touch controls (0.415042ms)
+✔ explicit query language wins over saved language and invalid native events are ignored (0.419041ms)
+✔ fullscreen denied enters CSS fallback and exits by button (0.619583ms)
+✔ fullscreen unavailable enters CSS fallback and exits by button (0.57675ms)
+✔ fallback Escape exits without sending the same key into gameplay (0.733334ms)
+✔ native request and language change preserve fallback and translate its exit label (0.41275ms)
+✔ Pinball launches and obeys gravity (0.876292ms)
+✔ Pinball bumper collision reflects and scores once with cooldown (0.158458ms)
+✔ Pinball flippers return falling balls upward (0.072083ms)
+✔ Pinball drains three balls then freezes terminal state (0.374875ms)
+✔ Pinball three real launches eventually drain without input and retain finite physics (11.355792ms)
+✔ Pinball both active flippers sustain realistic finite play (29.062416ms)
+✔ Pinball lighting all bumpers awards a bonus and resets their lights (0.22575ms)
+✔ Pinball rollover pair earns bonus, pointer launches and controls flippers (0.516333ms)
+✔ Rally accelerates, steers, brakes and bounds the car (2.2575ms)
+✔ Rally collisions cost health only once during protection (0.133042ms)
+✔ Rally finish and timer loss end exactly once (0.120333ms)
+✔ Rally collect coins and fresh game resets (0.436209ms)
+✔ Rally completes all three regions using legal steering controls (36.864125ms)
+✔ Rally cannot finish by driving through the grass for the entire race (157.910291ms)
+✔ Rally braking throughout the race reaches the real time limit (26.722958ms)
+✔ keyboard and button restart retain best and create fresh games (1.871625ms)
+✔ finished result follows language changes without losing score (1.719292ms)
+✔ pause updates HUD immediately and resume preserves the run (0.543958ms)
+✔ blur releases held keys and long frames are capped (0.343958ms)
+✔ late module resolution cannot overwrite a newer route (0.18525ms)
+✔ search works in either supported language and filters local multiplayer (0.965209ms)
+✔ unavailable or damaged local storage does not prevent play (0.285708ms)
+✔ preferences reject unexpected language, settings and scores (0.569625ms)
+✔ scores retain personal best and recent list is unique and bounded (0.105791ms)
+✔ route parser accepts only declared safe ids (0.057542ms)
+✔ captured game results retain both translations across a language change (0.13025ms)
+✔ Chinese control hints translate actions while preserving physical key identifiers (0.164334ms)
+✔ river hop moves one grid cell and stays inside edges (1.047333ms)
+✔ river vehicle collisions and drowning consume lives (0.196125ms)
+✔ river logs carry the frog, home scores and round advances (0.162ms)
+✔ river filled home and timeout hurt; final homes win (0.088291ms)
+✔ river game ends once without input and resets cleanly (14.962625ms)
+✔ legal timed hops fill every home in all three rounds without losing a life (118.422917ms)
+✔ sky: collision circles include touching edges (0.549042ms)
+✔ sky: movement clamps to playfield and fires upgrades-ready projectiles (4.463917ms)
+✔ sky: enemies, projectiles and collectibles remain finite (10.194584ms)
+✔ sky: idle player loses once, restart restores shields (3.204ms)
+✔ sky: legal piloting clears three sectors and all carriers (138.952792ms)
+✔ sky: pulse is finite, clears hostile projectiles and damages enemies (0.205417ms)
+✔ snow: movement lands on one-way platforms and cannot fall through (0.555834ms)
+✔ snow: starts with a playable first arena and bilingual metadata (0.475333ms)
+✔ snow: walking, jumping and throwing are functional (0.585958ms)
+✔ snow: hitting foes packs snow, rolling snowballs score and clear a stage (11.0345ms)
+✔ snow: timer or enemy contact ends a run once and a new run resets (4.691083ms)
+✔ snow: legal movement and throwing complete all three towers (9.000209ms)
+✔ breaker brick layouts have increasing durability (0.543792ms)
+✔ breaker launches, steers paddle and bounces walls (0.392ms)
+✔ breaker destroys brick, reflects and scores (0.134375ms)
+✔ breaker paddle saves ball and misses cost lives ending once (0.125209ms)
+✔ breaker last stage clears into victory, collects powerups (0.065334ms)
+✔ breaker game supports pointer, draw and prolonged input (834.703666ms)
+✔ breaker side, ceiling, armoured hits and upgrade variants are stable (0.200209ms)
+✔ breaker spawns a falling upgrade every sixth destroyed brick (0.094959ms)
+✔ legal pointer play clears all three brick fields on two seeds (323.280291ms)
+ℹ tests 172
+ℹ suites 0
+ℹ pass 172
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1629.88025
+ℹ start of coverage report
+ℹ ----------------------------------------------------------------------------------
+ℹ file                | line % | branch % | funcs % | uncovered lines
+ℹ ----------------------------------------------------------------------------------
+ℹ src                 |        |          |         |
+ℹ  games              |        |          |         |
+ℹ   blockfall.js      |  99.10 |    95.83 |  100.00 | 162-164
+ℹ   bomb-garden.js    |  99.36 |    98.15 |  100.00 | 239-241
+ℹ   bubble-pop.js     |  97.85 |    96.72 |  100.00 | 137-140 276-278
+ℹ   crate-keeper.js   | 100.00 |    95.74 |  100.00 |
+ℹ   dungeon-dash.js   |  97.70 |    90.00 |  100.00 | 189-190 203-205 258-260
+ℹ   ember-knights.js  |  99.18 |    91.89 |  100.00 | 103-105
+ℹ   gem-match.js      |  91.93 |    91.87 |   95.00 | 83-90 143-145 191-193 289-300
+ℹ   iron-bastion.js   | 100.00 |    95.48 |  100.00 |
+ℹ   memory-grove.js   |  95.86 |    95.88 |  100.00 | 255-266
+ℹ   meteor-drift.js   | 100.00 |   100.00 |  100.00 |
+ℹ   minefield.js      |  98.74 |    95.08 |  100.00 | 138-141
+ℹ   neon-snake.js     |  94.82 |    93.33 |  100.00 | 170-178 235-238
+ℹ   orbit-invaders.js | 100.00 |    99.01 |  100.00 |
+ℹ   paddle-duel.js    | 100.00 |    98.70 |  100.00 |
+ℹ   pinball-pocket.js |  98.02 |    93.91 |  100.00 | 51-53 205-207
+ℹ   pixel-rally.js    |  95.90 |    94.12 |  100.00 | 190-199
+ℹ   river-hop.js      |  99.20 |    97.78 |  100.00 | 180-181
+ℹ   sky-raiders.js    | 100.00 |    96.48 |  100.00 |
+ℹ   snowball-siege.js |  98.76 |    97.32 |  100.00 | 199-203
+ℹ   starbreaker.js    |  95.79 |    95.35 |  100.00 | 210-212 244-251
+ℹ  shared             |        |          |         |
+ℹ   input.js          | 100.00 |   100.00 |  100.00 |
+ℹ   platform.js       | 100.00 |    93.18 |  100.00 |
+ℹ   utils.js          | 100.00 |   100.00 |   70.00 |
+ℹ ----------------------------------------------------------------------------------
+ℹ all files           |  98.29 |    95.69 |   99.04 |
+ℹ ----------------------------------------------------------------------------------
+ℹ end of coverage report

@@ -1,0 +1,23 @@
+export const catalog = [
+  ['snowball-siege', 'Snowball Siege', '雪球围城', 'action', '1', '#76c5c9'],
+  ['ember-knights', 'Ember Knights', '余烬骑士', 'action', '1-2', '#dc8b58'],
+  ['bomb-garden', 'Bomb Garden', '炸弹花园', 'action', '1-2', '#8bb57f'],
+  ['iron-bastion', 'Iron Bastion', '钢铁堡垒', 'action', '1', '#a4af83'],
+  ['sky-raiders', 'Sky Raiders', '天空突击队', 'action', '1', '#80adcf'],
+  ['neon-snake', 'Neon Snake', '霓虹贪吃蛇', 'arcade', '1', '#a8c969'],
+  ['starbreaker', 'Starbreaker', '碎星弹球', 'arcade', '1', '#df9b67'],
+  ['orbit-invaders', 'Orbit Invaders', '轨道入侵者', 'arcade', '1', '#77bdc4'],
+  ['river-hop', 'River Hop', '河畔跳跳', 'arcade', '1', '#97b76a'],
+  ['meteor-drift', 'Meteor Drift', '陨石漂移', 'arcade', '1', '#b2bcb5'],
+  ['blockfall', 'Blockfall', '方块降落', 'puzzle', '1', '#dba275'],
+  ['gem-match', 'Gem Match', '宝石消消乐', 'puzzle', '1', '#79bfb2'],
+  ['crate-keeper', 'Crate Keeper', '箱子管理员', 'puzzle', '1', '#b9a379'],
+  ['minefield', 'Minefield', '扫雷原野', 'puzzle', '1', '#a8b193'],
+  ['memory-grove', 'Memory Grove', '记忆森林', 'puzzle', '1', '#9db990'],
+  ['pixel-rally', 'Pixel Rally', '像素拉力赛', 'sports', '1', '#d69a75'],
+  ['paddle-duel', 'Paddle Duel', '球拍对决', 'sports', '1-2', '#82bfc2'],
+  ['pinball-pocket', 'Pocket Pinball', '口袋弹珠台', 'sports', '1', '#d3ad70'],
+  ['dungeon-dash', 'Dungeon Dash', '地牢疾行', 'action', '1', '#b1a07e'],
+  ['bubble-pop', 'Bubble Pop', '泡泡消除', 'puzzle', '1', '#7cb6cd'],
+].map(([id, en, zh, genre, players, color]) => ({ id, name: { en, zh }, genre, players, color }));
+export const loadGame = (id) => import(`./games/${id}.js`);

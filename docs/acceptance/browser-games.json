@@ -1,0 +1,147 @@
+{
+  "browser": "Google Chrome stable via Codex Chrome extension",
+  "testedAt": "2026-11-05T09:05:36.568Z",
+  "games": [
+    {
+      "id": "snowball-siege",
+      "ready": "ready",
+      "phase": "playing",
+      "score": 100,
+      "screenshot": "screenshots/snowball-siege.png"
+    },
+    {
+      "id": "ember-knights",
+      "ready": "ready",
+      "phase": "playing",
+      "score": 0,
+      "screenshot": "screenshots/ember-knights.png"
+    },
+    {
+      "id": "bomb-garden",
+      "ready": "ready",
+      "phase": "playing",
+      "score": 0,
+      "screenshot": "screenshots/bomb-garden.png"
+    },
+    {
+      "id": "iron-bastion",
+      "ready": "ready",
+      "phase": "playing",
+      "score": 0,
+      "screenshot": "screenshots/iron-bastion.png"
+    },
+    {
+      "id": "sky-raiders",
+      "ready": "ready",
+      "phase": "playing",
+      "score": 0,
+      "screenshot": "screenshots/sky-raiders.png"
+    },
+    {
+      "id": "neon-snake",
+      "ready": "ready",
+      "phase": "playing",
+      "score": 0,
+      "screenshot": "screenshots/neon-snake.png"
+    },
+    {
+      "id": "starbreaker",
+      "ready": "ready",
+      "phase": "playing",
+      "score": 0,
+      "screenshot": "screenshots/starbreaker.png"
+    },
+    {
+      "id": "orbit-invaders",
+      "ready": "ready",
+      "phase": "playing",
+      "score": 625,
+      "screenshot": "screenshots/orbit-invaders.png"
+    },
+    {
+      "id": "river-hop",
+      "ready": "ready",
+      "phase": "playing",
+      "score": 10,
+      "screenshot": "screenshots/river-hop.png"
+    },
+    {
+      "id": "meteor-drift",
+      "ready": "ready",
+      "phase": "playing",
+      "score": 40,
+      "screenshot": "screenshots/meteor-drift.png"
+    },
+    {
+      "id": "blockfall",
+      "ready": "ready",
+      "phase": "playing",
+      "score": 34,
+      "screenshot": "screenshots/blockfall.png"
+    },
+    {
+      "id": "gem-match",
+      "ready": "ready",
+      "phase": "playing",
+      "score": 0,
+      "screenshot": "screenshots/gem-match.png"
+    },
+    {
+      "id": "crate-keeper",
+      "ready": "ready",
+      "phase": "playing",
+      "score": 0,
+      "screenshot": "screenshots/crate-keeper.png"
+    },
+    {
+      "id": "minefield",
+      "ready": "ready",
+      "phase": "playing",
+      "score": 60,
+      "screenshot": "screenshots/minefield.png"
+    },
+    {
+      "id": "memory-grove",
+      "ready": "ready",
+      "phase": "playing",
+      "score": 0,
+      "screenshot": "screenshots/memory-grove.png"
+    },
+    {
+      "id": "pixel-rally",
+      "ready": "ready",
+      "phase": "playing",
+      "score": 187,
+      "screenshot": "screenshots/pixel-rally.png"
+    },
+    {
+      "id": "paddle-duel",
+      "ready": "ready",
+      "phase": "playing",
+      "score": 0,
+      "screenshot": "screenshots/paddle-duel.png"
+    },
+    {
+      "id": "pinball-pocket",
+      "ready": "ready",
+      "phase": "playing",
+      "score": 300,
+      "screenshot": "screenshots/pinball-pocket.png"
+    },
+    {
+      "id": "dungeon-dash",
+      "ready": "ready",
+      "phase": "playing",
+      "score": 0,
+      "screenshot": "screenshots/dungeon-dash.png"
+    },
+    {
+      "id": "bubble-pop",
+      "ready": "ready",
+      "phase": "playing",
+      "score": 0,
+      "screenshot": "screenshots/bubble-pop.png"
+    }
+  ],
+  "method": "Opened each catalog link, started the game, exercised its documented keyboard controls, observed the playing phase and score, and captured the game screen."
+}

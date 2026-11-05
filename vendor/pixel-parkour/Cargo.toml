@@ -1,0 +1,16 @@
+[package]
+name = "pixel_parkour"
+version = "0.4.0"
+edition = "2024"
+rust-version = "1.88"
+description = "An original pixel-art three-lane endless runner across a night-time rail yard"
+license = "MIT"
+repository = "https://github.com/ShuaiShuai03/pixel-parkour"
+
+[dependencies]
+dirs = "6"
+macroquad = { version = "0.4.16", features = ["audio"] }
+
+[profile.release]
+lto = "thin"
+strip = true

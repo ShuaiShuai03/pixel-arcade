@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b1321">
+<meta name="description" content="Play Pixel Parkour: a pixel-art endless runner through a night-time rail yard. Free in your browser, in English and Chinese.">
+<title>Pixel Parkour · Pixel Arcade</title>
+<link rel="stylesheet" href="parkour.css">
+</head>
+<body>
+<header>
+<a class="back" href="../../index.html#games" data-en="← Arcade" data-zh="← 游戏世界">← Arcade</a>
+<div><strong>PIXEL PARKOUR</strong><span data-en="Night shift. Full speed." data-zh="夜幕降临，全速前进。">Night shift. Full speed.</span></div>
+<button id="language" type="button" lang="zh">中文</button>
+</header>
+<main>
+<div class="game-shell">
+<div class="game-frame">
+<canvas id="glcanvas" width="960" height="540" tabindex="0" aria-label="Pixel Parkour game. Use arrows to move and jump, Space to confirm, Escape to pause."></canvas>
+<div id="loading" class="cover"><h1>PIXEL<br><em>PARKOUR</em></h1><p id="load-status" role="status" data-en="Run the night-time rail yard." data-zh="穿越夜幕下的铁道站场。">Run the night-time rail yard.</p><button id="load-game" type="button" data-en="Enter the rail yard" data-zh="进入铁道站场">Enter the rail yard</button></div>
+</div>
+<div class="control-bar">
+<button data-action="16" data-en="Start / Select" data-zh="开始 / 确认">Start / Select</button>
+<button data-action="32" data-en="Pause / Back" data-zh="暂停 / 返回">Pause / Back</button>
+<button data-action="64" data-en="Hoverboard · B" data-zh="悬浮板 · B">Hoverboard · B</button>
+<button id="fullscreen" data-en="Fullscreen" data-zh="全屏">Fullscreen</button>
+</div>
+<div class="touch-pad" role="group" aria-label="Movement controls" data-aria-en="Movement controls" data-aria-zh="移动控制">
+<button data-action="4" aria-label="Move left" data-aria-en="Move left" data-aria-zh="向左移动">←</button>
+<button data-action="1" data-en="↑ Jump" data-zh="↑ 跳跃">↑ Jump</button>
+<button data-action="2" data-en="↓ Roll" data-zh="↓ 翻滚">↓ Roll</button>
+<button data-action="8" aria-label="Move right" data-aria-en="Move right" data-aria-zh="向右移动">→</button>
+</div>
+</div>
+<section class="instructions">
+<h2 data-en="Make the next train." data-zh="奔向下一列火车。">Make the next train.</h2>
+<p data-en="Switch lanes, jump barriers, roll under signs, and follow ramps onto train roofs. Collect coins, complete missions, and unlock upgrades in the shop." data-zh="切换跑道，跳过路障，翻滚穿过标牌，沿斜坡登上车顶。收集金币，完成任务，在商店解锁升级。">Switch lanes, jump barriers, roll under signs, and follow ramps onto train roofs. Collect coins, complete missions, and unlock upgrades in the shop.</p>
+<dl>
+<div><dt data-en="Move" data-zh="移动">Move</dt><dd>← → / A D</dd></div>
+<div><dt data-en="Jump / roll" data-zh="跳跃 / 翻滚">Jump / roll</dt><dd>↑ ↓ / W S</dd></div>
+<div><dt data-en="Confirm / pause" data-zh="确认 / 暂停">Confirm / pause</dt><dd>Enter / Esc</dd></div>
+<div><dt data-en="Hoverboard" data-zh="悬浮板">Hoverboard</dt><dd>B</dd></div>
+</dl>
+<p class="note" data-en="Progress saves in this browser when local storage is available. On touch screens, use the buttons or swipe. Sound starts after an input." data-zh="浏览器允许本地存储时会自动保存进度。触屏可使用按钮或滑动。操作后开启音效。">Progress saves in this browser when local storage is available. On touch screens, use the buttons or swipe. Sound starts after an input.</p>
+</section>
+</main>
+<footer><a href="https://github.com/ShuaiShuai03/pixel-parkour" target="_blank" rel="noreferrer" data-en="Original game" data-zh="原版游戏">Original game</a><a href="LICENSE-pixel-parkour.txt">MIT</a><a href="LICENSE-ARK-PIXEL-FONT.txt" data-en="Font license" data-zh="字体许可">Font license</a></footer>
+<script src="gl.js"></script>
+<script src="audio.js"></script>
+<script src="bridge.js"></script>
+<script src="parkour.js"></script>
+</body>
+</html>

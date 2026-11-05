@@ -1,0 +1,4 @@
+# quad-snd 0.2.8 declares imports without an explicit wasm module.
+# These are supplied by the shipped audio.js; the web loader verifies every import.
+[target.wasm32-unknown-unknown]
+rustflags = ["-C", "link-arg=--allow-undefined"]

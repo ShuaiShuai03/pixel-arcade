@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="en" data-type="software">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#142b2b" />
+    <meta
+      name="description"
+      content="A little world of pixel games. Play 20 original arcade, puzzle, action and two-player games, free in your browser. English and Chinese."
+    />
+    <meta name="page-type" content="software" />
+    <meta name="site-kind" content="gaming" />
+    <title>Pixel Arcade — A little world of games</title>
+    <link rel="icon" href="./public/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="./src/style.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#games">Skip to games</a>
+    <header class="site-header">
+      <a class="brand" href="#home" aria-label="Pixel Arcade home"
+        ><svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M5 2h14v3h3v16h-3v2H5v-2H2V5h3z" fill="currentColor" />
+          <path d="M6 6h12v8H6zM7 17h4v3H7zM15 17h3v3h-3z" fill="#142b2b" /></svg
+        ><span>PIXEL ARCADE</span></a
+      >
+      <nav aria-label="Main">
+        <a href="#games" data-i18n="navGames">The games</a
+        ><a href="#about" data-i18n="navAbout">About</a>
+      </nav>
+      <div class="header-tools">
+        <button id="sound-toggle" class="quiet-button" aria-pressed="false">Sound off</button
+        ><button id="language-toggle" class="lang-button" aria-label="Switch to Chinese">
+          中文
+        </button>
+      </div>
+    </header>
+    <main id="home-view">
+      <section class="hero" id="home" aria-labelledby="hero-title">
+        <canvas
+          id="world"
+          width="960"
+          height="500"
+          aria-label="A pixel-art island with an arcade, forest, mountain and harbor"
+        ></canvas>
+        <div class="hero-content">
+          <p class="eyebrow" data-i18n="eyebrow">OPEN ALL DAY. JUST PRESS PLAY.</p>
+          <h1 id="hero-title">
+            PIXEL<br /><span>ARCADE</span><span class="title-star" aria-hidden="true">✦</span>
+          </h1>
+          <p class="hero-copy" data-i18n="heroCopy">
+            A little world of games.<br />No downloads. No coins required.
+          </p>
+          <div class="hero-actions">
+            <a class="button primary" href="#games"
+              ><span data-i18n="enter">Find your game</span><span aria-hidden="true">↗</span></a
+            ><button class="button secondary" id="random-game">
+              <span aria-hidden="true">⚄</span><span data-i18n="random">Surprise me</span>
+            </button>
+          </div>
+        </div>
+        <div class="world-note">
+          <span class="live-dot"></span
+          ><span data-i18n="worldNote">20 small adventures. One happy place.</span>
+        </div>
+        <a class="world-sign" href="#games" aria-label="Enter the arcade">PLAY</a>
+      </section>
+      <section class="library wrap" id="games" aria-labelledby="library-title">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow" data-i18n="libraryEyebrow">PICK A GAME. STAY A WHILE.</p>
+            <h2 id="library-title" data-i18n="libraryTitle">
+              The game shelf<span class="small-star">✦</span>
+            </h2>
+          </div>
+          <label class="search"
+            ><svg viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="10" cy="10" r="6" />
+              <path d="m15 15 5 5" /></svg
+            ><input
+              id="game-search"
+              type="search"
+              placeholder="Find a game…"
+              aria-label="Find a game"
+          /></label>
+        </div>
+        <div class="filter-row">
+          <div class="filters" role="group" aria-label="Game categories">
+            <button data-filter="all" aria-pressed="true">All games</button
+            ><button data-filter="action" aria-pressed="false">Action</button
+            ><button data-filter="arcade" aria-pressed="false">Arcade</button
+            ><button data-filter="puzzle" aria-pressed="false">Puzzle</button
+            ><button data-filter="sports" aria-pressed="false">Sports</button
+            ><button data-filter="duo" aria-pressed="false">Two players</button>
+          </div>
+          <span id="game-count" class="game-count"></span>
+        </div>
+        <div id="game-grid" class="game-grid"></div>
+        <p id="no-results" hidden data-i18n="noResults">
+          No games found. Try another name or category.
+        </p>
+        <a class="parkour-banner" href="./public/parkour/index.html" id="parkour-link"
+          ><div>
+            <p class="eyebrow" data-i18n="parkourEyebrow">ONE MORE ADVENTURE</p>
+            <h3>Pixel Parkour <span aria-hidden="true">↗</span></h3>
+            <p data-i18n="parkourCopy">Three lanes. One midnight rail yard. How far can you run?</p>
+          </div>
+          <svg viewBox="0 0 240 90" aria-hidden="true">
+            <path
+              d="m20 90 55-90h14L48 90m58 0 10-90h14l10 90m58 0L157 0h14l55 90"
+              fill="#53645a"
+            />
+            <path
+              d="M97 26h44v34H97zm8-13h28v13h-28zm-3 47h13v25h-13zm24 0h13v25h-13z"
+              fill="#efb35f"
+            />
+            <path d="M105 30h8v6h-8zm20 0h8v6h-8z" fill="#142b2b" /></svg
+        ></a>
+      </section>
+      <section class="about wrap" id="about">
+        <div class="about-mark" aria-hidden="true">1UP</div>
+        <div>
+          <p class="eyebrow" data-i18n="aboutEyebrow">MADE FOR THE JOY OF PLAYING</p>
+          <h2 data-i18n="aboutTitle">A good game needs<br />very little.</h2>
+        </div>
+        <div class="about-copy">
+          <p data-i18n="aboutCopy">
+            A few pixels. A simple idea. That “one more try” feeling. This is a collection of
+            original, bite-size games inspired by the arcade classics.
+          </p>
+          <p data-i18n="aboutSecond">
+            Play on your keyboard or touch screen. Bring a friend for local two-player games. Your
+            best scores stay in this browser.
+          </p>
+          <a
+            href="https://github.com/ShuaiShuai03/pixel-arcade"
+            target="_blank"
+            rel="noopener"
+            class="text-link"
+            data-i18n="source"
+            >Made to be played. Open source. ↗</a
+          >
+        </div>
+      </section>
+    </main>
+    <main id="play-view" hidden>
+      <div class="wrap play-wrap">
+        <div class="play-heading">
+          <a href="#games" class="back-link" data-i18n="back">← All games</a
+          ><span id="play-category" class="eyebrow"></span>
+          <h1 id="play-title"></h1>
+        </div>
+        <div class="play-layout">
+          <section class="machine" aria-label="Game">
+            <div class="machine-bar">
+              <span id="game-status">READY</span>
+              <div>
+                <span data-i18n="score">SCORE</span> <strong id="score-value">0</strong
+                ><span class="best-label" data-i18n="best">BEST</span>
+                <strong id="best-value">0</strong>
+              </div>
+            </div>
+            <div class="screen">
+              <canvas
+                id="game-canvas"
+                width="480"
+                height="320"
+                tabindex="0"
+                aria-label="Game screen"
+              ></canvas>
+              <div id="game-overlay" class="game-overlay">
+                <div>
+                  <p id="overlay-eyebrow" class="eyebrow"></p>
+                  <h2 id="overlay-title"></h2>
+                  <p id="overlay-message"></p>
+                  <div id="mode-picker" class="mode-picker">
+                    <button data-mode="1" aria-pressed="true">1 player</button
+                    ><button data-mode="2" aria-pressed="false">2 players</button>
+                  </div>
+                  <button id="start-button" class="button primary">Start game ↗</button>
+                </div>
+              </div>
+            </div>
+            <div class="machine-controls">
+              <button id="pause-button" data-i18n="pause">Pause</button
+              ><span data-i18n="pauseHint">P / Esc to pause · R to restart</span
+              ><button id="restart-button" data-i18n="restart">Restart ↻</button
+              ><button id="fullscreen-button" aria-label="Full screen">⛶</button>
+            </div>
+            <div id="touch-controls" class="touch-controls" aria-label="Touch controls"></div>
+          </section>
+          <aside class="game-details">
+            <p class="eyebrow" data-i18n="howToPlay">HOW TO PLAY</p>
+            <p id="game-description" class="game-description"></p>
+            <div id="key-guide" class="key-guide"></div>
+            <p class="save-note" data-i18n="saveNote">
+              Personal bests are saved on this device. No account needed.
+            </p>
+            <button id="next-random" class="text-link" data-i18n="another">
+              Try another game ↗
+            </button>
+          </aside>
+        </div>
+      </div>
+    </main>
+    <footer class="site-footer wrap">
+      <a class="brand" href="#home"
+        >PIXEL ARCADE<span class="small-star" aria-hidden="true">✦</span></a
+      >
+      <p data-i18n="footer">Small games. Good times.</p>
+      <span>EN / 中文</span>
+    </footer>
+    <div id="toast" class="toast" role="status" hidden></div>
+    <script type="module" src="./src/app.js"></script>
+  </body>
+</html>

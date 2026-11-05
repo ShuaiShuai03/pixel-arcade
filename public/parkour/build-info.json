@@ -1,0 +1,31 @@
+{
+  "source": {
+    "repository": "https://github.com/ShuaiShuai03/pixel-parkour",
+    "revision": "a5d147ce782cb8618d03c41a9740e63d77ef5f94",
+    "version": "0.4.0",
+    "originalWorktreeClean": true,
+    "importedAt": "2026-11-05",
+    "changes": [
+      "Browser localStorage persistence through a miniquad plugin",
+      "Browser-safe clock, command-line and screenshot handling",
+      "Exported touch controls, native quit navigates to the arcade",
+      "Explicit JavaScript imports for newer Rust WASM linkers",
+      "Live synchronized English/Chinese preference, pause on focus loss, fullscreen with controls"
+    ]
+  },
+  "dependencies": {
+    "macroquad": "0.4.16",
+    "miniquad": "0.4.11",
+    "quad-snd": "0.2.8"
+  },
+  "compiler": "rustc 1.99.1 (58cf8f9c3 2026-10-13)",
+  "sha256": {
+    "pixel_parkour.wasm": "969b23f3c5cd0ba92401fa7b75625d3536e8c5142d83c29227ff5ef3252671aa",
+    "gl.js": "3e40bcbd9645c264645fcf1d174b8adedc706a9bb45aa72d271d37755005fa15",
+    "audio.js": "764a9bc5634f36d9b508fe2ef6b32befb356b6c797238a8e5cf0d1c881def522",
+    "bridge.js": "2c6fd127e733e1d5fb518c891caa52bdd1707810203a776e6103b337b34fff74",
+    "parkour.js": "184e9a392802f23a6f3660df4e2d4405a29ed34f6ee15c18da90b15e71eb56e8",
+    "parkour.css": "71b989c6b538400df12cd5f0be062ff6e94dba537f601d4d7635337070707405",
+    "index.html": "eee11800ff85f48a64f3fa01aeb0c39ce234f397fef1153132acb9649239f3dd"
+  }
+}
