@@ -1,0 +1,213 @@
+{
+  "date": "2026-11-05",
+  "phase": "initial batch review",
+  "finalCollectionReview": false,
+  "records": [
+    {
+      "game": "blockfall",
+      "reviewer": "action_review",
+      "verdict": "approved",
+      "draftFindings": [
+        {
+          "id": "blockfall-invalid-dt-mutation",
+          "status": "closed",
+          "observation": "Zero, negative and NaN elapsed-time calls can hard-drop/lock a piece and award 36 points."
+        },
+        {
+          "id": "blockfall-floor-kick-score-farm",
+          "status": "closed",
+          "observation": "Independent public-input reproduction with seed 2000: repeated grounded rotations plus held soft drop keep the board empty after 5000 updates at 120 Hz even after the 15-reset cap, while score rises from 18 to 944. Airborne kicks reset grounded time unconditionally."
+        },
+        {
+          "id": "blockfall-opposing-directions",
+          "status": "closed",
+          "observation": "Opposing directional inputs are left-biased and behave inconsistently at walls."
+        },
+        {
+          "id": "blockfall-speed-only-progression",
+          "status": "closed",
+          "observation": "The draft campaign only accelerates across 30 lines; it needs three meaningfully different challenges."
+        },
+        {
+          "id": "blockfall-missing-reverse-touch",
+          "status": "closed",
+          "observation": "KeyZ reverse rotation is documented but has no equivalent touch control. Three clockwise rotations can follow different kicks and consume extra lock time, so they do not supply equivalent play near stacks."
+        },
+        {
+          "id": "blockfall-frame-dependent-timing",
+          "status": "closed",
+          "observation": "Implementation audit identified frame-dependent gravity and lock transitions; replacement timing must preserve phase remainders and agree at 30/60/120 Hz."
+        },
+        {
+          "id": "blockfall-host-retry-key-conflict",
+          "status": "closed",
+          "observation": "Early parent Chrome check found new district retry bound to R, which the host reserves for full-game restart. Requested an unreserved key, matching touch metadata and updated localized text."
+        },
+        {
+          "id": "blockfall-hold-freezes-time",
+          "status": "closed",
+          "observation": "Independent replacement-core review: rejected Hold while holdUsed is true returns before time integration. After an initial hold then 120 pressed-C updates at 1/120, time stays zero and the piece stays at spawn. A successful hold also discards its frame elapsed time."
+        },
+        {
+          "id": "blockfall-exploit-test-fixture",
+          "status": "closed",
+          "observation": "New replayable RNG changed the original floor-kick fixture seed from an I piece to Z. Reviewer requested explicit I-shape assertion (new seed 8) and the original lock/depth-credit exploit sequence so a changed fixture cannot falsely pass."
+        },
+        {
+          "id": "blockfall-repeat-backlog-crosses-spawn",
+          "status": "closed",
+          "observation": "Independent candidate review: while manipulation is disabled after the 3-second contact deadline, held-repeat time becomes negative. Seed 8 I-piece sequence reaches repeat -0.912; the next O spawns x=4 then jumps to x=8 in one 1/120-second tick when queued repeats are repaid. Missed repeats need discarding/bounding across spawn."
+        }
+      ],
+      "implementationPlan": "Three city districts: four foundation lines, marked rubble excavation, then a four-line power spine. District retry restores entry board, queue and score. Exact gravity/contact/lock timing, bounded resets, continuous visible descent, complete touch actions, and clearer current/ghost/hold/queue rendering.",
+      "draftSourceSha256": "b384e3042c13494758547f158ce76f2b13c2e5bdc8f76357422d14d3c8ad2136",
+      "sourceSha256": "df0cf572d91530ac208db75c000a417db8b8a033a2834508bf003f406f744901",
+      "testSha256": {
+        "tests/blockfall.test.js": "cd87cd80f76146aed8ec80fa6f3e7531ea35276cc07282f3a924a019f7999c7f",
+        "tests/blockfall-quality.test.js": "47fa67b250c488990cf4ec9c80ec1df66b3a2b1043d03c0dd96426ca63f4f54c"
+      },
+      "testsPassed": 35,
+      "reviewerEvidence": [
+        "Independent 34/34 tests pass, including nine legal campaigns at 30/60/120 Hz, district retry recovery, bounded locking, score conservation, input timing, terminal state and reset.",
+        "Final repeat-clock regression discards disabled movement backlog and treats the exact contact deadline as an event boundary.",
+        "Final test-only cap-exhaustion addition independently reviewed; all35 tests pass on the final source/test hashes."
+      ],
+      "ownerLatestTests": {
+        "count": 35,
+        "qualitySha256": "47fa67b250c488990cf4ec9c80ec1df66b3a2b1043d03c0dd96426ca63f4f54c",
+        "note": "Independently confirmed: the 15-reset lift-off fixture passes without floating lock or extra score."
+      },
+      "browserAcceptance": "passed"
+    },
+    {
+      "game": "gem-match",
+      "reviewer": "review_snowball_batch1",
+      "verdict": "approved",
+      "draftFindings": [
+        {
+          "id": "gem-invalid-dt-mutation",
+          "status": "closed",
+          "observation": "Independent review found zero, negative, NaN and infinite elapsed time can change cursor/selection. NaN during a legal clear drops resolving to false while pending matches remain uncleared."
+        },
+        {
+          "id": "gem-instant-motion",
+          "status": "closed",
+          "observation": "The restored draft instantly swaps pieces and compacts/refills complete columns. Movement, collision and settling need an explicit consistent visual and logical sequence."
+        },
+        {
+          "id": "gem-hidden-board-reset",
+          "status": "closed",
+          "observation": "The draft silently replaces the full board on a dead board or after twelve cascades. Recovery must be explicit, preserve resources/goals, and avoid farmable free matches."
+        },
+        {
+          "id": "gem-missing-touch-actions",
+          "status": "closed",
+          "observation": "The implementation owner found touch metadata lacks the complete keyboard-equivalent board navigation and confirmation controls."
+        },
+        {
+          "id": "gem-discarded-time-remainder",
+          "status": "closed",
+          "observation": "Independent review found phase transitions discard the elapsed-time remainder: a 0.19-second clear finishes at 0.2 seconds at 30/60 Hz and 0.19167 seconds at 120 Hz. Replacement settling must preserve event order and remaining elapsed time."
+        },
+        {
+          "id": "gem-key-guide-localization",
+          "status": "closed",
+          "observation": "Parent browser found untranslated prose in the Chinese key guide. Final metadata separates bilingual labels from plain key tokens; no gameplay change. Final browser reload confirmation remains pending."
+        },
+        {
+          "id": "gem-obscured-soil-markers",
+          "status": "closed",
+          "observation": "Parent final-garden browser check found soil marks mostly hidden under opaque gem carriers. Requested persistent visible soil edge/corner marks that preserve piece/selection readability."
+        },
+        {
+          "id": "gem-soil-map-position",
+          "status": "closed",
+          "observation": "The 3x4 soil display visually resembles a position map but currently fills the first N cells by total progress. Requested actual remaining/cleared soil positions with distinct symbols."
+        }
+      ],
+      "implementationPlan": "Three gardens: score target, leaf/sun collection, and soil restoration. Timed reversible swaps, simultaneous clears, continuously falling and refilling pieces, exact phase remainders, explicit garden-clear/next boundary, and free mixing only when no legal move remains.",
+      "ownerProgress": "Replacement core passes the initial invalid-time and instant-swap red-to-green regressions and opening productivity checks. Lane/refill ordering, full campaigns and independent review remain pending.",
+      "draftSourceSha256": "bdbc0a2a4713263f51cf7d110cddca8ba490bbeadea227ad25af7337f2ee6b95",
+      "interimReviewEvidence": [
+        "Replacement prefix b0fc8978: independent 45,658 public-input physics samples across 20 seeds and eight turns kept falling/support spacing at least one 34-unit cell, finite ballistic motion and inelastic support stopping.",
+        "Dead-board X remix preserved moves, score, soil and collection; four constant-random traces settled in at most 149 frames at 120 Hz.",
+        "Seven timing checkpoints around swap, clear and fall boundaries agreed between 30 and 120 Hz. Final campaigns and complete source-hash approval still pending."
+      ],
+      "sourceSha256": "67b83b366046a12d75bbb1a38f4a94c75bc43a0ad6f0f290dd1853406a8640bc",
+      "testSha256": {
+        "tests/gem-match.test.js": "0b34fb14625ca976b6ec0f4c98f6ba7ac2fabb14f6d8e7920ad33dae01c0066b",
+        "tests/gem-match-quality.test.js": "ca7819f41b8fcaa544905f118b8d5d1e61d44085b51af302e70ec6ff87bc2396"
+      },
+      "testsPassed": 25,
+      "reviewerEvidence": [
+        "All draft findings and discarded time-remainder concern closed by independent review.",
+        "Nine full keyboard campaigns across seeds 1/7/21 and 30/60/120 Hz include a low-value specimen move and all win; three pointer campaigns and legal budget loss pass.",
+        "Independent 45,658 motion samples across 20 seeds and seven event-timing partition checks pass; free dead-board mixing preserves resources.",
+        "Gem-only catalog case passes. Broader release check was pending Minefield replacement at review time.",
+        "Final render-only delta independently approved: visible soil hatches above carriers, positional miniature, and a new public-play render regression that failed before the fix. Final coverage 98.39% lines, 95.29% branches, 97.56% functions."
+      ],
+      "browserAcceptance": "passed"
+    },
+    {
+      "game": "minefield",
+      "reviewer": "review_starbreaker_batch1",
+      "verdict": "approved",
+      "draftFindings": [
+        {
+          "id": "minefield-invalid-dt-mutation",
+          "status": "closed",
+          "observation": "Zero-time updates still read and apply difficulty, flag and mode input. NaN elapsed time poisons the elapsed timer."
+        },
+        {
+          "id": "minefield-post-terminal-input",
+          "status": "closed",
+          "observation": "A keyboard mine loss followed by a pointer mode click in the same update changes mode after the terminal callback."
+        },
+        {
+          "id": "minefield-partial-fatal-chord",
+          "status": "closed",
+          "observation": "Fatal chording is order-sensitive and partially reveals safe cells before encountering a mine. Seed 1: reveal 40, wrong flag 22, chord clue 31; mine 23 is unflagged, safe reveals rise 27 to 28, but score stays 270."
+        },
+        {
+          "id": "minefield-no-campaign",
+          "status": "closed",
+          "observation": "The draft offers three isolated board sizes rather than three distinct campaign stages."
+        },
+        {
+          "id": "minefield-held-repeat-time",
+          "status": "closed",
+          "observation": "Independent review found two seconds of held Right reached cursor42 at30/60Hz and43 at120Hz because the initial repeat branch discarded the first frame. The final change consumes first-frame elapsed time and tolerates floating-point repeat boundaries."
+        }
+      ],
+      "draftPositiveEvidence": "Reviewer confirmed pre-display basic/subset-deduction certification, visible-clue solver tests, and fixed mines after first reveal. All ten draft tests passed despite the separately reproduced defects.",
+      "draftSourceSha256": "cb691a57214bd4dec9eaf0bfc71e06906bfa9a3f0cc51435707e62040acd9115",
+      "implementationPlan": "Three-stage expedition: rectangular Camp, Quarry with explicit inactive-cell geometry, Ridge with visible sector mine totals. Permanently fixed certified fields, reversible marks, logical-proof hints, finite probes, explicit travel and complete keyboard/touch controls.",
+      "ownerCandidate": {
+        "sourceSha256": "c36f52b72174cf9147d4648127d5f6995c6c82f7909c29740aca46688238197e",
+        "standardTestsSha256": "7191ec9d37a58941ff85f97cb00f9f468790777a5d7a946840fe41f2bc4ff70e",
+        "qualityTestsSha256": "9880c8c37292de464629bd914b45f4be6c40273672c72ad239f747df3fa4cb57",
+        "tests": 26,
+        "coverage": {
+          "line": 98.12,
+          "branch": 96.7,
+          "function": 96.77
+        },
+        "evidence": "18 complete visible-proof campaigns (30/60/120Hz × three guides × seeds1/42), fixed fields, atomic chords, wrong-flag/empty-probe recovery, invalid dt and terminal freeze; exhaustive fallback certification for738 active openings/guide/stage combinations. Independent review and parent browser pending."
+      },
+      "sourceSha256": "192d0751628bc34c19f5918ef59c2d77e5c1cd63158b2aa4056a91445b338068",
+      "testSha256": {
+        "tests/minefield.test.js": "7191ec9d37a58941ff85f97cb00f9f468790777a5d7a946840fe41f2bc4ff70e",
+        "tests/minefield-quality.test.js": "ffae1258b52bb57e7413fa4018d844987104a26d2a6c9d15a3c7f606b60a3890"
+      },
+      "testsPassed": 27,
+      "reviewerEvidence": [
+        "All27 focused tests independently pass; all five findings closed.",
+        "Independent visible-clue solver completed27 campaigns/81 sites across30/60/120Hz, three guides and seeds1/42/167 without hints or probes.",
+        "All738 fallback openings independently certified solvable.",
+        "All27,465 inferences across900 partially visible boards were sound; proxy guards detected zero hidden-data reads.",
+        "All28 independent held-navigation timing comparisons agree."
+      ],
+      "browserAcceptance": "passed"
+    }
+  ]
+}

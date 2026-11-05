@@ -48,57 +48,122 @@ test('Blockfall moves, rotates, drops and ends once when stack reaches roof', ()
   assert.equal(createGame(h.env).getState().score, 0);
 });
 
-test('Blockfall completes 30 lines using legal rotations, moves and drops', () => {
-  const h = harness({ seed: 12 });
-  const game = createGame(h.env);
-  for (let turn = 0; turn < 500 && game.getState().phase === 'playing'; turn++) {
-    const state = game.getState();
-    let best = null;
-    let matrix = state.piece.matrix;
-    for (let rotation = 0; rotation < 4; rotation++) {
-      if (rotation) matrix = rotatePiece(matrix);
-      for (let x = -2; x < 10; x++) {
-        if (!canPlace(state.board, matrix, x, state.piece.y)) continue;
-        let y = state.piece.y;
-        while (canPlace(state.board, matrix, x, y + 1)) y++;
-        const board = state.board.map((r) => r.slice());
-        matrix.forEach((row, py) =>
-          row.forEach((v, px) => {
-            if (v) board[y + py][x + px] = v;
-          }),
-        );
-        const cleared = clearRows(board),
-          heights = [],
-          holes = [];
-        for (let col = 0; col < 10; col++) {
-          let top = 20,
-            hole = 0;
-          for (let row = 0; row < 20; row++) {
-            if (cleared.board[row][col]) top = Math.min(top, row);
-            else if (top < row) hole++;
-          }
-          heights.push(20 - top);
-          holes.push(hole);
+for (const hz of [30, 60, 120])
+  for (const seed of [1, 9, 12])
+    test(`Blockfall completes all three districts through legal input (${hz}Hz seed${seed})`, (t) => {
+      const h = harness({ seed });
+      const game = createGame(h.env);
+      const visited = new Set();
+      let recovered = false;
+      for (let turn = 0; turn < 500 && game.getState().phase === 'playing'; turn++) {
+        for (
+          let n = 0;
+          n < hz * 2 && !game.getState().piece && game.getState().phase === 'playing';
+          n++
+        )
+          game.update(1 / hz, input());
+        const state = game.getState();
+        if (state.phase !== 'playing') break;
+        visited.add(state.stage);
+        assert.ok(state.piece);
+        if (hz === 60 && seed === 12 && state.stage === 2 && !recovered) {
+          game.update(1 / hz, input([], ['Space']));
+          game.update(1 / hz, input([], ['KeyX']));
+          const restored = game.getState();
+          assert.equal(restored.stage, 2);
+          for (const key of [
+            'board',
+            'preview',
+            'bag',
+            'rng',
+            'hold',
+            'score',
+            'lines',
+            'placed',
+            'removed',
+            'injected',
+            'discarded',
+          ])
+            assert.deepEqual(restored[key], state[key]);
+          assert.equal(restored.retries, 1);
+          game.update(1 / hz, input());
+          recovered = true;
+          continue;
         }
-        const bump = heights.slice(1).reduce((sum, v, i) => sum + Math.abs(v - heights[i]), 0);
-        const value =
-          cleared.count * 100 -
-          heights.reduce((a, b) => a + b, 0) * 0.6 -
-          holes.reduce((a, b) => a + b, 0) * 12 -
-          bump * 0.6 -
-          Math.max(...heights);
-        if (!best || value > best.value) best = { value, rotation, x };
+        assert.equal(
+          state.board.flat().filter(Boolean).length,
+          state.injected + state.placed - state.removed - state.discarded,
+        );
+        const beforeDraw = game.getState();
+        game.draw(mockContext());
+        assert.deepEqual(game.getState(), beforeDraw);
+        let best = null;
+        let matrix = state.piece.matrix;
+        for (let rotation = 0; rotation < 4; rotation++) {
+          if (rotation) matrix = rotatePiece(matrix);
+          for (let x = -2; x < 10; x++) {
+            if (!canPlace(state.board, matrix, x, state.piece.y)) continue;
+            let y = state.piece.y;
+            while (canPlace(state.board, matrix, x, y + 1)) y++;
+            const board = state.board.map((r) => r.slice());
+            matrix.forEach((row, py) =>
+              row.forEach((v, px) => {
+                if (v) board[y + py][x + px] = v;
+              }),
+            );
+            if (
+              state.stage === 3 &&
+              clearRows(board).count < 4 &&
+              matrix.some((r) => r.some((v, px) => v && x + px === 8))
+            )
+              continue;
+            if (
+              state.stage === 2 &&
+              state.piece.name !== 'O' &&
+              matrix.some((r) => r.some((v, px) => v && [4, 5].includes(x + px)))
+            )
+              continue;
+            const cleared = clearRows(board),
+              heights = [],
+              holes = [];
+            for (let col = 0; col < 10; col++) {
+              let top = 20,
+                hole = 0;
+              for (let row = 0; row < 20; row++) {
+                if (cleared.board[row][col]) top = Math.min(top, row);
+                else if (top < row) hole++;
+              }
+              heights.push(20 - top);
+              holes.push(hole);
+            }
+            const bump = heights.slice(1).reduce((sum, v, i) => sum + Math.abs(v - heights[i]), 0);
+            const value =
+              cleared.count * 100 -
+              heights.reduce((a, b) => a + b, 0) * 0.6 -
+              holes.reduce((a, b) => a + b, 0) * 12 -
+              bump * 0.6 -
+              Math.max(...heights);
+            if (!best || value > best.value) best = { value, rotation, x };
+          }
+        }
+        assert.ok(best);
+        for (let i = 0; i < best.rotation; i++) game.update(1 / hz, input([], ['ArrowUp']));
+        for (let i = 0; i < 15 && game.getState().piece.x !== best.x; i++) {
+          const px = game.getState().piece.x;
+          game.update(1 / hz, input([], [px < best.x ? 'ArrowRight' : 'ArrowLeft']));
+        }
+        game.update(1 / hz, input([], ['Space']));
       }
-    }
-    assert.ok(best);
-    for (let i = 0; i < best.rotation; i++) game.update(1 / 60, input([], ['ArrowUp']));
-    for (let i = 0; i < 15 && game.getState().piece.x !== best.x; i++) {
-      const px = game.getState().piece.x;
-      game.update(1 / 60, input([], [px < best.x ? 'ArrowRight' : 'ArrowLeft']));
-    }
-    game.update(1 / 60, input([], ['Space']));
-  }
-  assert.equal(game.getState().phase, 'won');
-  assert.ok(game.getState().lines >= 30);
-  assert.equal(h.ends.length, 1);
-});
+      assert.equal(game.getState().phase, 'won');
+      assert.ok(game.getState().lines >= 12);
+      assert.equal(visited.size, 3);
+      t.diagnostic(
+        `stage3 won in ${game.getState().locks} locks, lines${game.getState().lines}, score${game.getState().score}`,
+      );
+      assert.equal(h.ends.length, 1);
+      const final = game.getState();
+      for (let n = 0; n < 10; n++) game.update(1 / hz, input(['ArrowDown'], ['Space', 'KeyX']));
+      assert.deepEqual(game.getState(), final);
+      assert.equal(h.ends.length, 1);
+      if (hz === 60 && seed === 12) assert.equal(recovered, true);
+    });

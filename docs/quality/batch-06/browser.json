@@ -1,0 +1,197 @@
+{
+  "date": "2026-11-05",
+  "browser": "Installed stable Google Chrome via Codex Chrome extension",
+  "status": "passed",
+  "stateInjection": false,
+  "preliminaryChecks": [
+    {
+      "id": "blockfall",
+      "observed": [
+        "Published baseline has a narrow central well, large in-canvas controls and sparse sidebars. Requested stronger piece/ghost/locked contrast, purposeful queue/hold/progress displays, removal of redundant canvas controls and early phone-legibility review."
+      ],
+      "screenshots": ["blockfall-public-baseline.jpg"],
+      "screenshotsInspected": true,
+      "revisionNotes": "Public pre-batch-6 baseline at commit 51b9558; not acceptance."
+    },
+    {
+      "id": "gem-match",
+      "observed": [
+        "Published baseline uses the same pentagon silhouette for every gem color. Requested distinct shape cues and garden/goal artwork while keeping instructions outside active cells."
+      ],
+      "screenshots": ["gem-public-baseline.jpg"],
+      "screenshotsInspected": true,
+      "revisionNotes": "Public pre-batch-6 baseline at commit 51b9558; not acceptance."
+    },
+    {
+      "id": "minefield",
+      "observed": [
+        "Published baseline is a generic 9x9 covered grid with a large flag-mode control. Requested distinct covered/revealed/flagged/focused states, visible stage identity, generous hit areas and complete host touch controls."
+      ],
+      "screenshots": ["minefield-public-baseline.jpg"],
+      "screenshotsInspected": true,
+      "revisionNotes": "Public pre-batch-6 baseline at commit 51b9558; not acceptance."
+    },
+    {
+      "id": "blockfall",
+      "revisionNotes": "Unfrozen replacement layout only; final gameplay acceptance pending.",
+      "observed": [
+        "New city district, ghost, hold and three-item queue render clearly on desktop. All eight touch buttons fit in Chinese portrait; landscape offers a larger well.",
+        "Found R district-retry conflict with host restart; also requested localized canvas title and corrected English timing spacing."
+      ],
+      "screenshots": [
+        "blockfall-draft-desktop.jpg",
+        "blockfall-draft-phone.jpg",
+        "blockfall-draft-landscape.jpg"
+      ],
+      "screenshotsInspected": true
+    },
+    {
+      "id": "blockfall",
+      "revisionNotes": "Final source df0cf572; current run paused at first district clear, not yet final acceptance.",
+      "observed": [
+        "Held left/right movement, clockwise and reverse rotation, hard drop and hold exercised.",
+        "First attempt misplaced I because rapid zero-duration automated key events coalesced. X restored identical opening T/J/I/S sequence and score zero.",
+        "With distinct key presses, built first line, used S/Z/T/O/L planning and a final vertical I to clear three more lines. Foundation4/4 at1020.",
+        "Soft drop, Chinese touch/layout, district2/3, loss/restart and final console check remain."
+      ],
+      "screenshots": [
+        "blockfall-final-desktop.jpg",
+        "blockfall-first-drop.jpg",
+        "blockfall-misdrop.jpg",
+        "blockfall-district-retry.jpg",
+        "blockfall-first-line.jpg",
+        "blockfall-hold-and-rotation.jpg",
+        "blockfall-foundation-complete.jpg"
+      ],
+      "screenshotsInspected": true
+    }
+  ],
+  "games": [
+    {
+      "id": "gem-match",
+      "verdict": "passed",
+      "sourceSha256": "67b83b366046a12d75bbb1a38f4a94c75bc43a0ad6f0f290dd1853406a8640bc",
+      "observed": [
+        "English keyboard opening match; pointer swaps and visible continuous invalid-swap return preserved moves and score. Productive-board X request explained why no remix occurred.",
+        "All seven Chinese touch controls exercised. Directional cursor movement was checked, and touch-only selection/swap collected three leaf specimens.",
+        "Earlier run cleared Bloom at600 and Specimens at2040, exposed the soil visibility/mapping defect, and ended at10/12 soil before a fresh final-build run.",
+        "Final build: full three-garden browser victory at2360. Bloom cleared at600 with10moves left, Specimens at1700 with18moves left, all12soil cells restored with26moves left.",
+        "Final positional soil map matched a non-prefix clear (top-right two cells). Hatches and remaining/restored symbols are visible at390x844 and844x390.",
+        "Terminal directional/hint/remix input preserved the win. Restart restored garden1,20moves,zero score and retained2360best.",
+        "Final Chinese key guide fully localized; final error/warning log empty."
+      ],
+      "screenshots": [
+        "gem-desktop-hint.jpg",
+        "gem-keyboard-first-match.jpg",
+        "gem-invalid-swap.jpg",
+        "gem-invalid-swap-motion-2.jpg",
+        "gem-productive-mixer-rejected.jpg",
+        "gem-first-garden-clear.jpg",
+        "gem-touch-right-down.jpg",
+        "gem-landscape-specimens.jpg",
+        "gem-touch-leaf-collection.jpg",
+        "gem-sun-collection.jpg",
+        "gem-specimen-garden-clear.jpg",
+        "gem-soil-start.jpg",
+        "gem-soil-map-before-fix.jpg",
+        "gem-final-phone.jpg",
+        "gem-final-bloom-clear.jpg",
+        "gem-final-specimen-clear.jpg",
+        "gem-final-soil-start.jpg",
+        "gem-final-soil-map-match.jpg",
+        "gem-final-soil-phone.jpg",
+        "gem-final-soil-landscape.jpg",
+        "gem-final-campaign-win.jpg",
+        "gem-final-restart.jpg"
+      ],
+      "screenshotsInspected": true,
+      "revisionNotes": "Opening keyboard/touch and invalid-action evidence used569792; metadata-only fix59e641 and render-only soil fix67b83b were independently checked. Final complete campaign, final soil layouts, localization and restart use67b83b. Before-fix soil images document the resolved issue.",
+      "consoleErrors": [],
+      "limitations": [
+        "Move-budget loss and dead-board recovery are covered by automated legal-input tests; no separate browser loss or naturally occurring dead board was observed.",
+        "Physical touch devices and other browsers not tested."
+      ]
+    },
+    {
+      "id": "blockfall",
+      "verdict": "passed",
+      "sourceSha256": "df0cf572d91530ac208db75c000a417db8b8a033a2834508bf003f406f744901",
+      "observed": [
+        "Full English keyboard campaign won through legal inputs: Foundation4/4 at1020, Repair Yard32 rubble cleared at2417, four-line Power Spine clear and win at4845.",
+        "Held left/right, soft drop, clockwise/reverse rotation, hard drop and hold all exercised. X retry restored the original board, queue and entry score after an ordinary placement mistake.",
+        "All eight Chinese touch controls exercised; touch retry restored the starting O/I/J/L queue, empty board and zero score.",
+        "Chinese portrait390x844 and fullscreen landscape844x390 retain readable playfield, queue, objective and all actions.",
+        "Deliberate center stacking produced top-out at184. Terminal movement/retry input preserved the result; Play Again restored district1, empty board, zero score and retained4845best.",
+        "Final browser error/warning log empty."
+      ],
+      "screenshots": [
+        "blockfall-final-desktop.jpg",
+        "blockfall-first-drop.jpg",
+        "blockfall-misdrop.jpg",
+        "blockfall-district-retry.jpg",
+        "blockfall-first-line.jpg",
+        "blockfall-hold-and-rotation.jpg",
+        "blockfall-foundation-complete.jpg",
+        "blockfall-repair-start.jpg",
+        "blockfall-repair-half.jpg",
+        "blockfall-power-start.jpg",
+        "blockfall-campaign-win.jpg",
+        "blockfall-phone-start.jpg",
+        "blockfall-touch-actions.jpg",
+        "blockfall-touch-retry.jpg",
+        "blockfall-landscape.jpg",
+        "blockfall-loss.jpg",
+        "blockfall-restart.jpg"
+      ],
+      "screenshotsInspected": true,
+      "consoleErrors": [],
+      "limitations": ["Physical touch devices and other browsers not tested."]
+    },
+    {
+      "id": "minefield",
+      "verdict": "passed",
+      "sourceSha256": "192d0751628bc34c19f5918ef59c2d77e5c1cd63158b2aa4056a91445b338068",
+      "observed": [
+        "Complete three-site campaign through visible keyboard and touch controls: Camp64/64 at1140, Quarry66/66 at2300 with zero probes left, Ridge84/84 and campaign victory at3640.",
+        "Direction keys, all three pre-opening guide choices, flag/question/clear cycle, safe first opening, inspection, and visible-clue hints exercised. A deliberately wrong flag was identified and removed.",
+        "All nine Chinese touch controls exercised, including pointer selection and reveal, mode changes, guide, marks, inspection, hints, probes, meaningful chording and travel.",
+        "A chord with zero flags where two were needed was rejected with explicit feedback. Flagging D2/D3 from visible clues and chording C3 revealed D4 and advanced25/66 to26/66.",
+        "All three quarry probes were consumed. Another probe was rejected, but free hints and normal reveals remained usable and completed the site. Ridge renewed probes to3 and displayed truthful West4/Centre5/East5 totals.",
+        "Restart restored Camp, covered board, zero score, three probes and retained3640best. Clicking visibly inferable C5 mine produced a legal loss at530. Terminal mark/mode/probe/hint inputs did not resume play.",
+        "Chinese phone390x844 and landscape844x390 retain all controls and distinct active/rubble cells. Final console error/warning log empty."
+      ],
+      "screenshots": [
+        "minefield-desktop-start.jpg",
+        "minefield-flag.jpg",
+        "minefield-opening.jpg",
+        "minefield-proof.jpg",
+        "minefield-mistaken-flag.jpg",
+        "minefield-camp-clear.jpg",
+        "minefield-phone-clear.jpg",
+        "minefield-quarry-phone.jpg",
+        "minefield-touch-probe.jpg",
+        "minefield-quarry-landscape.jpg",
+        "minefield-chord-ready.jpg",
+        "minefield-chord-result.jpg",
+        "minefield-empty-probes.jpg",
+        "minefield-quarry-clear.jpg",
+        "minefield-ridge-start.jpg",
+        "minefield-campaign-win.jpg",
+        "minefield-restart.jpg",
+        "minefield-loss.jpg"
+      ],
+      "screenshotsInspected": true,
+      "consoleErrors": [],
+      "visibleInputTrace": "minefield-visible-hints.json",
+      "limitations": [
+        "Physical touch devices and other browsers not tested.",
+        "Browser campaign used the built-in explanatory hints; independent automated campaigns also solve all sites without hints or probes."
+      ]
+    }
+  ],
+  "viewports": [
+    [1440, 900],
+    [390, 844],
+    [844, 390]
+  ]
+}

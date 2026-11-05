@@ -2,11 +2,15 @@
 
 At the user's direction, at most **three games** may be under development and acceptance testing at one time. Do not begin the next batch until all games in the active batch satisfy the gates below. The 100-game target includes Pixel Parkour. Roster themes are not work assignments.
 
+## Completed batch 6
+
+Blockfall, Gem Match, and Minefield passed initial development, independent review, and browser acceptance. All 114 focused tests and four scoped catalog checks pass. See the [batch 6 evidence](batch-06/ACCEPTANCE.md). Publication verification is pending.
+
+The next batch is Crate Keeper, Memory Grove, and Pixel Parkour. It remains queued until batch 6 publication is verified.
+
 ## Completed batch 5
 
-River Hop, Neon Snake, and Bubble Pop passed their initial development, tests, independent review, and browser acceptance. All 119 focused tests and four scoped catalog checks pass. See the [batch 5 evidence](batch-05/ACCEPTANCE.md). Deployment verification is pending.
-
-The next queued batch is Blockfall, Gem Match, and Minefield. Development will begin after batch 5 is published and checked.
+River Hop, Neon Snake, and Bubble Pop passed their initial development, tests, independent review, and browser acceptance. All 119 focused tests and four scoped catalog checks pass. See the [batch 5 evidence](batch-05/ACCEPTANCE.md). Commit `51b9558` is live. All eight checked assets matched, and two keyboard shots cleared groups on the published Bubble Pop page. See the [deployment receipt](batch-05/deployment.json).
 
 ## Completed batch 4
 

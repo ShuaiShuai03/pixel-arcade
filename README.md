@@ -20,10 +20,10 @@ No account, downloads, ads, analytics, or CDN dependencies. Personal bests and l
 | Orbit Invaders | Protect the moon colony through four formations                         | 1       |
 | River Hop      | Time real hops across traffic, logs, diving turtles and a cable ferry   | 1       |
 | Meteor Drift   | Thrust, turn, and blast through five asteroid sectors                   | 1       |
-| Blockfall      | Rotate falling blocks and clear 30 lines                                | 1       |
-| Gem Match      | Create matches and restore three jewel gardens                          | 1       |
+| Blockfall      | Build lines, excavate rubble, and power three city districts            | 1       |
+| Gem Match      | Match shapes, collect specimens, and restore garden soil                | 1       |
 | Crate Keeper   | Solve eight box-pushing warehouses, with undo and hints                 | 1       |
-| Minefield      | Map every safe tile and mark the mines                                  | 1       |
+| Minefield      | Deduce safe ground across a camp, split quarry, and ridge sectors       | 1       |
 | Memory Grove   | Find every matching pair across three woodland stages                   | 1       |
 | Pixel Rally    | Steer through traffic, collect coins, and reach the finish              | 1       |
 | Paddle Duel    | Win a seven-point match against a friend or the computer                | 1 or 2  |
@@ -34,7 +34,7 @@ No account, downloads, ads, analytics, or CDN dependencies. Personal bests and l
 
 The collection uses original code and artwork inspired by classic game mechanics. It does not include the assets or characters of commercial arcade games.
 
-The collection is being expanded and refined in batches of at most three games. Fifteen games have passed initial acceptance; [batch 5](docs/quality/batch-05/ACCEPTANCE.md) upgrades River Hop, Neon Snake, and Bubble Pop. The [quality schedule](docs/quality/BATCHES.md) tracks the 100-game target and the required second independent review after development is complete.
+The collection is being expanded and refined in batches of at most three games. Eighteen games have passed initial acceptance; [batch 6](docs/quality/batch-06/ACCEPTANCE.md) upgrades Blockfall, Gem Match, and Minefield. The [quality schedule](docs/quality/BATCHES.md) tracks the 100-game target and the required second independent review after development is complete.
 
 ## Controls
 

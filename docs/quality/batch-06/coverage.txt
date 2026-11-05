@@ -1,0 +1,117 @@
+✔ Blockfall hold preserves the queue and is available once per locked piece (2.044125ms)
+✔ Blockfall grounded pieces allow a half second adjustment before locking (30.52825ms)
+✔ Blockfall seven-piece bags give every shape once in each group and no snapshot aliases (0.521042ms)
+✔ Blockfall gravity and locking agree at 60 and 120 Hz (4.413ms)
+✔ Blockfall long-piece pivot kicks away from the left wall and off the floor (0.252542ms)
+✔ Blockfall zero, negative and non-finite updates preserve every field and consume no input/resources (0.309875ms)
+✔ Blockfall simultaneous opposing directions cancel even at a wall and never restart repeat (6.86625ms)
+✔ Blockfall floor kicks cannot indefinitely delay locking or farm repeated downward score (36.055125ms)
+✔ Blockfall rejected or successful hold still advances the frame clock and gravity (0.420542ms)
+✔ Blockfall Retry X restores the random stream across three bags and clears held/discrete actions (5.149625ms)
+✔ Blockfall all essential actions have bilingual touch controls and Retry uses unreserved X (0.303459ms)
+✔ Blockfall mixed press/hold opposing directions cancel without a wall-dependent move (0.188541ms)
+✔ Blockfall simultaneous reverse rotations cancel without consuming a lock reset (0.223833ms)
+✔ Blockfall lock stamp, simultaneous clear and conservation ledger are atomic (1.430792ms)
+✔ Blockfall a topped-out stamp leaves no partial cells and never locks a floating expired piece (0.212083ms)
+✔ Blockfall the formerly exploitable I rotation cycle exhausts its reset budget and then locks (45.331042ms)
+✔ Blockfall district entry discards discrete actions while intentional held movement and soft drop continue (0.2335ms)
+✔ Blockfall line-clear buffering rotates exactly the next piece and never buffers a hard drop (0.143833ms)
+✔ Blockfall mutable snapshots and drawing cannot alter board, queue or objective metadata (0.829875ms)
+✔ Blockfall seeded traces retain finite bounded state, collision legality and cell conservation (51.301584ms)
+✔ Blockfall expired manipulation discards repeat backlog instead of sliding the next piece across the well (31.767708ms)
+✔ Blockfall airborne contact deadline cancels a repeat scheduled just after the deadline (0.119708ms)
+✔ Blockfall an exhausted reset cap survives lift-off and locks on the next supported contact (0.133542ms)
+✔ Blockfall rotates four times back to original and rejects overlap/walls (0.581791ms)
+✔ Blockfall clears complete rows, preserves incomplete rows, and prepends empties (0.113291ms)
+✔ Blockfall moves, rotates, drops and ends once when stack reaches roof (3.725708ms)
+✔ Blockfall completes all three districts through legal input (30Hz seed1) (40.026958ms)
+ℹ stage3 won in 24 locks, lines12, score4778
+✔ Blockfall completes all three districts through legal input (30Hz seed9) (42.681375ms)
+ℹ stage3 won in 27 locks, lines12, score4876
+✔ Blockfall completes all three districts through legal input (30Hz seed12) (38.703375ms)
+ℹ stage3 won in 26 locks, lines12, score4812
+✔ Blockfall completes all three districts through legal input (60Hz seed1) (34.425917ms)
+ℹ stage3 won in 24 locks, lines12, score4778
+✔ Blockfall completes all three districts through legal input (60Hz seed9) (36.184916ms)
+ℹ stage3 won in 27 locks, lines12, score4876
+✔ Blockfall completes all three districts through legal input (60Hz seed12) (37.159209ms)
+ℹ stage3 won in 26 locks, lines12, score4812
+✔ Blockfall completes all three districts through legal input (120Hz seed1) (42.140667ms)
+ℹ stage3 won in 24 locks, lines12, score4778
+✔ Blockfall completes all three districts through legal input (120Hz seed9) (44.731458ms)
+ℹ stage3 won in 27 locks, lines12, score4876
+✔ Blockfall completes all three districts through legal input (120Hz seed12) (40.269458ms)
+ℹ stage3 won in 26 locks, lines12, score4812
+✔ Gem Match hint identifies an actually legal swap without spending a move (5.488459ms)
+✔ Gem Match garden restoration tracks substrate and per-color collection separately (1.135958ms)
+✔ Gem Match invalid neighbors never consume moves and held arrows do not repeat puzzle choices (1.912625ms)
+✔ Gem Match settles a real cascade identically at 60 and 120 Hz (3.900333ms)
+✔ Gem Match generated boards have no initial matches and always have valid swaps (42.169334ms)
+✔ Gem Match identifies crossing lines once and rejects distant swaps (0.466083ms)
+✔ Gem Match keyboard selection and legal swaps reduce moves and award score (21.594958ms)
+✔ Gem Match completes all gardens with legal pointer swaps (141.683709ms)
+✔ Gem Match move budget can be exhausted through legal low-value swaps (67.054458ms)
+✔ Gem Match constant-random generation stays productive without hanging (0.534375ms)
+✔ Gem Match zero and invalid time preserve every exposed state and input side effect (0.974583ms)
+✔ Gem Match legal swaps visibly travel before committing board cells (0.77125ms)
+✔ Gem Match all three gardens complete through public keyboard controls at30/60/120Hz with ordinary mistake recovery (1610.669542ms)
+✔ Gem Match swap carriers lift clear before translating and lower only at separated sockets (1.319166ms)
+✔ Gem Match falling carriers obey ballistic gravity, settle on real supports and keep column order (2.056958ms)
+✔ Gem Match event boundary remainder gives the same active swap, clear and fall state at30/60/120Hz (4.767834ms)
+✔ Gem Match invalid adjacent swap animates out and back without cost then allows a real match (0.83175ms)
+✔ Gem Match dead-board mixer is explicit and free, productive and never awards unearned matches (3.021ms)
+✔ Gem Match simultaneous crossing removal scores each cell exactly once and records exact collection and soil (0.309125ms)
+✔ Gem Match final move resolves its full goal and opens an intentional fresh garden boundary before exhaustion (0.671917ms)
+✔ Gem Match last-move soil victory wins once and terminal state remains fully frozen (0.546958ms)
+✔ Gem Match zero or invalid dt is a total no-op during every busy phase as well as at rest (0.575167ms)
+✔ Gem Match touch metadata includes all keyboard actions and opposing direction chords do not bias the cursor (1.164125ms)
+✔ Gem Match seeded mixed input remains finite and bounded and fresh instances restore every resource (1579.762416ms)
+✔ Gem Match soil markers remain visible above carriers and miniature tracks exact remaining locations (61.479375ms)
+✔ Minefield complete three-site campaigns use public visible proofs at 30/60/120Hz (688.004333ms)
+✔ Minefield all three sites preserve mines and numbers after flags, hints, inspection and probes (45.955417ms)
+✔ Minefield an incorrect safe flag can be proved, cleared and revealed without a paid helper (0.446833ms)
+✔ Minefield probes verify fixed mines, clear wrong safe flags, and avoid duplicate charges (0.556667ms)
+✔ Minefield empty probes leave free logical recovery available (0.546084ms)
+✔ Minefield correct chords open their full safe union exactly once (0.4135ms)
+✔ Minefield rubble ignores taps and navigation stays on active ground in each site (24.089167ms)
+✔ Minefield seeded public action traces remain finite, bounded and draw in both languages (48.222ms)
+✔ Minefield inspection explains flags and hints are free before an opening (0.507666ms)
+✔ Minefield two-second held cursor movement has the same repeat count at 30/60/120Hz (0.578417ms)
+✔ Minefield opening protects every active neighbor and adjacency is exact (18.168459ms)
+✔ Minefield invalid geometry fails clearly and edge adjacency never wraps (0.691417ms)
+✔ Minefield immutable field and region totals stay truthful (0.175125ms)
+✔ Minefield flood excludes flags, rubble, mines and duplicate reveals (0.225583ms)
+✔ Minefield three stages provide distinct terrain and sector rules (0.091916ms)
+✔ Minefield guide cycles only before opening and clears old hypotheses (1.324958ms)
+✔ Minefield mark cycle is reversible without starting or consuming time (0.131959ms)
+✔ Minefield reveal, mark and select touch modes use exact board geometry (0.582834ms)
+✔ Minefield navigation wraps and skips inactive quarry cells (0.144084ms)
+✔ Minefield key repeat advances at a bounded rate and diagonal input is neutral (1.007375ms)
+✔ Minefield zero, negative and nonfinite steps read no input and change no state (3.756833ms)
+✔ Minefield flags block reveals and chord requires an opened exact-count clue (0.598292ms)
+✔ Minefield fatal chord is atomic and never awards safe neighbors first (0.405167ms)
+✔ Minefield mine loss freezes terminal callbacks and simultaneous tap controls (1.031166ms)
+✔ Minefield free hints use visible clues, never hidden mine/number reads (0.492542ms)
+✔ Minefield bounded certification works across openings, guides and constant random (434.747292ms)
+✔ Minefield fallback is certified for every supported opening without random retries (62.761084ms)
+ℹ tests 87
+ℹ suites 0
+ℹ pass 87
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3598.366375
+ℹ start of coverage report
+ℹ ---------------------------------------------------------------------------
+ℹ file           | line % | branch % | funcs % | uncovered lines
+ℹ ---------------------------------------------------------------------------
+ℹ src            |        |          |         |
+ℹ  games         |        |          |         |
+ℹ   blockfall.js |  98.51 |    96.99 |  100.00 | 616-620 792-794 814-818
+ℹ   gem-match.js |  98.39 |    95.29 |   97.56 | 106 116-123 204-207
+ℹ   minefield.js |  98.12 |    96.69 |   96.77 | 310 525-531 563-569 914-916
+ℹ ---------------------------------------------------------------------------
+ℹ all files      |  98.33 |    96.40 |   98.18 |
+ℹ ---------------------------------------------------------------------------
+ℹ end of coverage report

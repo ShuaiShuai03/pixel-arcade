@@ -1,0 +1,12 @@
+✔ release contains twenty unique loadable games with bilingual instructions (17.19925ms)
+✔ blockfall: seeded mixed input remains finite, draws and terminates at most once (11.142958ms)
+✔ gem-match: seeded mixed input remains finite, draws and terminates at most once (14.094834ms)
+✔ minefield: seeded mixed input remains finite, draws and terminates at most once (25.458458ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 110.483

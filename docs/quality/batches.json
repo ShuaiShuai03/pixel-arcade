@@ -16,7 +16,10 @@
     "orbit-invaders",
     "river-hop",
     "neon-snake",
-    "bubble-pop"
+    "bubble-pop",
+    "blockfall",
+    "gem-match",
+    "minefield"
   ],
   "batches": [
     {
@@ -52,7 +55,8 @@
     {
       "number": 6,
       "games": ["blockfall", "gem-match", "minefield"],
-      "status": "queued"
+      "status": "accepted",
+      "acceptance": "batch-06/ACCEPTANCE.md"
     },
     {
       "number": 7,
