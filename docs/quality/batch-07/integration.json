@@ -1,0 +1,27 @@
+{
+  "date": "2026-11-05",
+  "checks": {
+    "npm run check": {
+      "exitCode": 0,
+      "result": "29 JavaScript files, 20 games, local links and Parkour WASM checked"
+    },
+    "npm run format:check": {
+      "exitCode": 0
+    },
+    "npm run build": {
+      "exitCode": 0,
+      "result": "Static site built in dist/"
+    },
+    "node --test tests/parkour-web.test.js": {
+      "exitCode": 0,
+      "passed": 15,
+      "failed": 0,
+      "durationMs": 56.804
+    },
+    "git diff --check": {
+      "exitCode": 0
+    }
+  },
+  "originalParkourRepository": "Unmodified; clean worktree verified",
+  "reviewStatus": "All three games independently approved; second collection review pending"
+}

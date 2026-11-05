@@ -506,6 +506,22 @@ fn draw_train(t: &Textures, o: &Obstacle, l: f32, r: f32) {
             vec3(l, h, a),
         ],
     );
+    if o.kind == Kind::Oncoming {
+        // Paired bright lamps and a roof beacon distinguish moving stock from
+        // parked cars before it enters collision range, even without color.
+        for x in [l + 0.25, r - 0.25] {
+            block(
+                vec3(x - 0.12, 0.7, a - 0.04),
+                vec3(x + 0.12, 0.94, a),
+                YELLOW,
+            );
+        }
+        block(
+            vec3(-0.18 + lane_x(o.lane), h, a + 0.25),
+            vec3(0.18 + lane_x(o.lane), h + 0.12, a + 0.6),
+            ORANGE,
+        );
+    }
     block(vec3(l, 0.0, b - 0.01), vec3(r, h, b), o.color);
 }
 

@@ -36,6 +36,17 @@ impl Mission {
         )
     }
 
+    /// Display/check progress without allowing a valid large legacy value to
+    /// wrap before the mission-completion comparison.
+    pub fn progress(&self, stats: &Stats, meters: u32, score: u32, banked: u32) -> u32 {
+        let value = self.value(stats, meters, score);
+        if self.cumulative() {
+            value.saturating_add(banked)
+        } else {
+            value
+        }
+    }
+
     pub fn text(&self) -> String {
         let template = match self.goal {
             Goal::Coins => tr("COLLECT {} COINS IN ONE RUN", "单局收集 {} 枚金币"),
@@ -156,6 +167,20 @@ pub const OUTFITS: [Outfit; 4] = [
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn legacy_max_cumulative_progress_still_completes_instead_of_wrapping() {
+        let stats = Stats {
+            jumps: 1,
+            ..Default::default()
+        };
+        let jump = missions(0)[1];
+        assert_eq!(jump.goal, Goal::Jumps);
+        assert!(jump.progress(&stats, 0, 0, u32::MAX) >= jump.target);
+        let distance = missions(0)[2];
+        assert_eq!(distance.goal, Goal::Meters);
+        assert_eq!(distance.progress(&stats, 17, 0, u32::MAX), 17);
+    }
 
     #[test]
     fn sets_mix_goals_and_get_harder() {

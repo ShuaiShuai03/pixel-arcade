@@ -1,0 +1,3 @@
+npm notice run pixel-arcade@1.0.0 check
+npm notice run node tools/check.mjs
+Checked 29 JavaScript files, 20 games, local links, and Pixel Parkour WASM.

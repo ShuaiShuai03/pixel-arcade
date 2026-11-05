@@ -1,0 +1,202 @@
+{
+  "date": "2026-11-05",
+  "phase": "initial batch review",
+  "finalCollectionReview": false,
+  "records": [
+    {
+      "game": "crate-keeper",
+      "reviewer": "action_review",
+      "verdict": "approved",
+      "draftSourceSha256": "1720543b28b341900cbfc8c35a72ceeabf94222851ac269d1cee3f22832933ea",
+      "draftFindings": [
+        {
+          "id": "crate-nonfinite-transition",
+          "status": "closed",
+          "observation": "NaN elapsed time during level completion poisons the transition permanently."
+        },
+        {
+          "id": "crate-par-localization",
+          "status": "closed",
+          "observation": "Parent Chinese phone preview found the canvas still labels minimum pushes as PAR; requested a Chinese label."
+        }
+      ],
+      "draftPositiveEvidence": "Independent7/7 focused tests pass; independent grid interpreter solves all8 levels and40k hint budget covers their exact PAR pushes. Additional independent assertions covered every solution step undo/restore/replay, completion input freeze, zero-time transition preservation, exact7080score/168moves, and one terminal callback with frozen terminal state.",
+      "implementationPlan": "Retain eight authored layouts (minimum pushes1/2/2/3/5/6/7/14). Guard invalid elapsed time, cancel opposing directions, distinguish proven dead squares from bounded hint-search exhaustion, add short synchronized player/crate slides and one deliberate input buffer, enlarge boards and refine warehouse art. Explicit Next/Enter commits the solved room score; Z undo and X retry remain available beforehand. Complete bilingual host touch controls and optional adjacent-cell taps.",
+      "ownerAudit": [
+        "Zero/invalid elapsed time can still consume player actions.",
+        "Simultaneous directions favor Left.",
+        "Hint search conflates dead ends and its node budget.",
+        "Current board is undersized with redundant in-canvas controls."
+      ],
+      "sourceSha256": "a84396234e054adaa0682425167417858a3f8dbbddb3490252c630d9993eccd4",
+      "testSha256": {
+        "tests/crate-keeper.test.js": "2729196316415295db4a88e8b3c37ce133c29169111737c5b353495785c607ca",
+        "tests/crate-keeper-quality.test.js": "ae7b009d709ccd61ab40e1c550459abb0f74493f351990c7bb7a37adc1b1bde2"
+      },
+      "testsPassed": 22,
+      "browserAcceptance": "passed",
+      "reviewerEvidence": [
+        "All 22 focused tests independently pass on the recorded final source and test hashes.",
+        "Separate eight-room runtime campaign queued Undo during every one of 168 moves, then restored and replayed it; all eight Next confirmations, 7080 points and one terminal callback verified.",
+        "Single buffered input, undo invalidation, adjacent taps, invalid elapsed time, honest bounded hint statuses, proven dead squares, completion and terminal freeze verified.",
+        "Final diff check clean; no actionable findings remain."
+      ]
+    },
+    {
+      "game": "memory-grove",
+      "reviewer": "review_snowball_batch1",
+      "verdict": "approved",
+      "draftSourceSha256": "6cb3d64900bfafdfc00ba6de622e49b4d1721dd5592262ab58cda91fffd0119e",
+      "draftFindings": [
+        {
+          "id": "memory-invalid-time-mutation",
+          "status": "closed",
+          "observation": "Zero/nonfinite elapsed time can change cards and resources."
+        },
+        {
+          "id": "memory-feedback-remainder",
+          "status": "closed",
+          "observation": "Feedback completion discards elapsed-time remainder. Same1s mismatch path leaves64.795833s at30Hz versus64.779167s at120Hz."
+        },
+        {
+          "id": "memory-future-expiry-preempts-input",
+          "status": "closed",
+          "observation": "With0.005s remaining, a valid partner click at the start of the frame loses to expiry later in the frame."
+        },
+        {
+          "id": "memory-count-only-stages",
+          "status": "closed",
+          "observation": "Draft stages differ only in deck count, layout and time; match rules are identical."
+        },
+        {
+          "id": "memory-study-mode-transition",
+          "status": "closed",
+          "observation": "Independent replacement review: switch to relaxed before the first flip, start Study, then return to timed. Study remains manual/indefinite and faces stay visible without the timed cost. Starting Study must lock the one-way mode transition."
+        },
+        {
+          "id": "memory-study-cost-copy",
+          "status": "closed",
+          "observation": "Parent browser preview: English says Study lasts for5s and Chinese says it needs5s, while the HUD deducts5 seconds immediately as a cost. Clarify decision-time cost in both languages."
+        }
+      ],
+      "reviewerNotes": "Inspectable deck state is acceptable for automated invariants, but legal campaign tests must learn identities only when actually revealed.",
+      "implementationPlan": "Three12-card clearings: six free pairs, six pairs in a visible symbol order, then four triples. Animated flip/reveal/close feedback, exact phase remainders, explicit Next, complete navigation/touch, reusable Study assistance, and one-way timed-to-relaxed recovery without score farming.",
+      "ownerProgress": "Initial regressions fail as expected for invalid-time mutation, missing distinct rules, and a valid start-of-frame action losing to later expiry. Replacement core is in development. Scoring awards each completed group once with a bounded streak bonus and no time bonuses.",
+      "interimReviewEvidence": [
+        "Replacement core e76d1950: nine independent learned-memory keyboard campaigns win across seeds1/7/36 and30/60/120Hz, observing only revealed faces. Each recovers from6\u20138 mismatches or wrong-order attempts.",
+        "Scores are identical for each seed across frame rates:2180,2260,2440.",
+        "Wrong-order attempts award no score, triples require three distinct fully revealed cards, duplicate/matched selections are rejected, and seven temporal partition checks pass.",
+        "Study-to-timed transition remains open; final source approval and browser acceptance are pending."
+      ],
+      "sourceSha256": "48aa22672f1a7b2d7c2101107377d002a8770051b4aa982362e887551f869048",
+      "testSha256": {
+        "tests/memory-grove.test.js": "b1e277ebbf00157bcc791af2b43a0088582702a2221e9a4c68a27a36829aa17f",
+        "tests/memory-grove-quality.test.js": "591172988df0f5a7c58431855022140dc545e06581edd336efdd771b2a17c331"
+      },
+      "testsPassed": 28,
+      "reviewerEvidence": [
+        "All 28 focused tests and the Memory-only catalog check independently pass.",
+        "All four draft findings and the Study-mode loophole are closed; final render and copy changes checked.",
+        "Nine additional learned-visible keyboard campaigns pass at 30/60/120 Hz, including ordinary mistake recovery."
+      ],
+      "browserAcceptance": "passed"
+    },
+    {
+      "game": "pixel-parkour",
+      "reviewer": "review_starbreaker_batch1",
+      "verdict": "approved",
+      "draftRevision": "f8f840adc206f1cc5dca82900e03719a683fce3c",
+      "draftFindings": [
+        {
+          "id": "parkour-opposed-lanes",
+          "status": "closed",
+          "observation": "Independent baseline: simultaneous opposing input from the left edge moves lane0 to lane1 and reports movement."
+        },
+        {
+          "id": "parkour-glide-expiry-grace",
+          "status": "closed",
+          "observation": "Independent baseline: expiring glide timer leaves glide grace at0."
+        },
+        {
+          "id": "parkour-fatal-pickup-order",
+          "status": "closed",
+          "observation": "Independent baseline produces Coin/PowerUp events after Crash/Down. Exact fixtures distinguish pickups whose collection windows begin before versus after fatal contact."
+        },
+        {
+          "id": "parkour-separating-tangency",
+          "status": "closed",
+          "observation": "Independent event-loop review: sweep_point documents an open box but returnsSome(0) for a boundary point moving outward, risking false zero-time contacts."
+        },
+        {
+          "id": "parkour-pre-stumble-pickup-path",
+          "status": "closed",
+          "observation": "Runner resets x on Stumble before Run reconstructs pickup path, losing earlier sideways collection. Reviewer supplied exact coin/power entries before train contact."
+        },
+        {
+          "id": "parkour-legacy-mission-overflow",
+          "status": "closed",
+          "observation": "Independent review found check_missions still adds valid legacy progress with unchecked v+=progress despite new saturating bank changes."
+        },
+        {
+          "id": "parkour-zero-time-pickup-tie",
+          "status": "closed",
+          "observation": "Independent event-loop review found initial collect(0) could apply a Board pickup at the exact same instant as solid contact, contradicting the solid-first tie rule."
+        },
+        {
+          "id": "parkour-magnet-preimpact-pickup",
+          "status": "closed",
+          "observation": "A coin pulled into range by an active magnet before fatal impact could be lost because event detection omitted magnet motion and the fatal branch skipped elapsed collection."
+        },
+        {
+          "id": "parkour-air-roll-momentum",
+          "status": "closed",
+          "observation": "Parent and independent review found that an unpowered airborne roll instantaneously changed vertical speed to -30 m/s, including while rising. Replace it with a posture-only tuck preserving ballistic momentum, and update English/Chinese help."
+        },
+        {
+          "id": "parkour-stumble-position-continuity",
+          "status": "closed",
+          "observation": "Independent review found that side contact computed the correct impact position, then reset x to the substep start before returning to the prior lane. Retain impact x and return at finite speed so contact does not teleport the runner."
+        },
+        {
+          "id": "parkour-distant-pickup-boundary-loop",
+          "status": "closed",
+          "observation": "The long procedural-run check found a floating-point boundary loop at distant coordinates. Owner reports aligning sweep and collection expanded bounds and adding regressions at 3000, 4096, and 20000 metres; independent final verification is pending."
+        },
+        {
+          "id": "parkour-untuck-nonwalkable-top",
+          "status": "closed",
+          "observation": "Independent Runner fixture: airborne y2.5, vy0, roll0.002, overhead Bar spanning z[-1,3], step0.002 ended standing and overlapping the bar without a hit. The untuck landing exception must apply only to actual walkable surfaces."
+        }
+      ],
+      "ownerInitialAudit": [
+        "Red regression: Runner invalid elapsed-time step mutates state.",
+        "Red regression: Run invalid elapsed-time step mutates state/events.",
+        "Red regression: opposing lane inputs produce phantom movement.",
+        "Red regression: glider expiry misses grace because previous gliding state is sampled after timer decay.",
+        "Red regression: fatal collision still awards same-tick coin/power pickup.",
+        "Red regression: a jump at0.5m snaps through a1m hurdle onto its top because step allowance applies to the solid vertical face."
+      ],
+      "implementationPlan": "Preserve the perspective rail yard, menu/shop/missions and save schema. Correct input/timing/contact ordering and validate roof, lane and glide transitions. Add readable district/tier progression within existing art; rebuild the actual WASM with recorded provenance.",
+      "controllerGuidance": "Crash/pickup resolution must follow event times: earlier pickups may count; later pickups cannot reverse an earlier fatal hit. Avoid merely rejecting all pickups in any frame containing a collision.",
+      "reviewerGuidance": "Fixture: blockz0=.4 contacts at runner centerz=.1; coinz1.05 and pickupz1.15 begin collection at centerz=.15, after contact, within a step endingz=.18333. Earlier pickup counterparts must retain rewards.",
+      "ownerProgress": "Implementation frozen and independently approved; parent keyboard/touch, responsive layout, legal loss and persistence checks completed.",
+      "browserAcceptance": "passed",
+      "sourceTreeSha256": "17bebe4ff78a2785ca4c5608f2864520ece29342b0e2610b1ee5689ed3672bd2",
+      "wasmSha256": "e0a0b9c8602567e20ca6ffbc99c98318a10f59a53bf6ac49bc545ef142bb03c1",
+      "buildInfoSha256": "d83e97488333df4761129861cfcc529f0f9e3be1bb3b65b3cd140daba3170487",
+      "wrapperCssSha256": "14bc1b159755cdb6f739a72d1ae8c30e87324b1b0b67ba97bde2b0998065478e",
+      "testsPassed": {
+        "rust": 100,
+        "web": 15,
+        "additionalIndependentBoundaryCases": 612
+      },
+      "reviewerEvidence": [
+        "All 100 Rust tests and 15 web tests independently pass; native and WASM clippy, formatting, source/artifact provenance and final diff checked.",
+        "612 additional independent boundary cases verified; all twelve recorded findings are closed.",
+        "Four seeded legal autopilot runs survive 4000 metres each without relaxing track-safety assertions; 480 simulation steps match across 30/60/120 Hz render schedules.",
+        "Final parent landscape CSS independently reviewed and approved. After the build helper refreshed provenance, all 15 web tests passed again on the final CSS and manifest hashes.",
+        "Original adjacent Pixel Parkour repository remains unchanged."
+      ]
+    }
+  ]
+}

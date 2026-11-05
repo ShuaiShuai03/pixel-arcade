@@ -1,0 +1,23 @@
+✔ parkour bridge reads and writes UTF-8 save text without network (0.924208ms)
+✔ parkour bridge gracefully falls back when browser storage is blocked (0.610458ms)
+✔ parkour language is limited to English and Chinese (0.655833ms)
+✔ parkour bridge rejects oversized save data and out-of-range wasm pointers (0.259958ms)
+✔ parkour WebAssembly links every import against the shipped versioned JavaScript (3.412041ms)
+✔ wrapper initial language agrees with a saved Chinese native setting (0.714583ms)
+✔ wrapper switches live language through the queue without navigating or restarting (0.566541ms)
+✔ focus departures queue pause-only and fullscreen includes controls (0.47075ms)
+✔ native fullscreen request uses the same shell containing touch controls (0.372209ms)
+✔ explicit query language wins over saved language and invalid native events are ignored (0.347958ms)
+✔ fullscreen denied enters CSS fallback and exits by button (0.335708ms)
+✔ fullscreen unavailable enters CSS fallback and exits by button (0.283792ms)
+✔ fallback Escape exits without sending the same key into gameplay (0.321084ms)
+✔ native request and language change preserve fallback and translate its exit label (0.305167ms)
+✔ parkour build provenance matches every current vendored input and shipped artifact (1.662334ms)
+ℹ tests 15
+ℹ suites 0
+ℹ pass 15
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 49.240959

@@ -10,9 +10,45 @@
       "Browser-safe clock, command-line and screenshot handling",
       "Exported touch controls, native quit navigates to the arcade",
       "Explicit JavaScript imports for newer Rust WASM linkers",
-      "Live synchronized English/Chinese preference, pause on focus loss, fullscreen with controls"
+      "Live synchronized English/Chinese preference, pause on focus loss, fullscreen with controls",
+      "Quality refinement: swept contacts, chronological pickup/power expiry, ballistic air tuck, continuous side recovery, safe ramp/roof transitions and recovery without replayed inputs",
+      "Visible district unlock progress, distinct oncoming train lamps, overflow-safe compatible progress settlement"
     ]
   },
+  "sourceFilesSha256": {
+    ".cargo/config.toml": "2821943c3d769829f2909acda8d280452ac2fb811d08494ad8bc8941b14faae9",
+    "Cargo.lock": "33b1b3fedc30361a3542ba16059679883ba658fff2c80c7787d2a7bb415c39fd",
+    "Cargo.toml": "586f53e14ff811fa6291f6cd8f4d4c9fb7c77c81333f36040e95eec466e47ed7",
+    "SOURCE.json": "e0c71924bac76bac198f16188e3c3f7f15fd4b4d4b25390a29028690bceb44db",
+    "src/art/cjk.rs": "e11c5310cb9e0d877505f244c10b3516933151ef1af880b8fee8ebd179cbceb5",
+    "src/art/font.rs": "0d28730ba109e6092ff240e747f4eeb0df89bde3a37f154d2089bcef29b9251d",
+    "src/art/mod.rs": "b34fab3099c7c67bf89fd1ce8c91ee0294d3bf948021f369442a1bc4bc2cf1f7",
+    "src/art/palette.rs": "7ab1b899ac5f99e2f8e2f080fed79cf90c8ed4ff294784756fa48e7ec3f39d21",
+    "src/art/sprites.rs": "15a827446c034bb7254c17257ba612351170a393b217836840945422abb8258b",
+    "src/art/ui.rs": "358776fa3a52a79c04ba127ddf43025b88b48ccf01bb493c815b7194218986bc",
+    "src/audio.rs": "db3c259a23c73d1369658dfaa42a780427f4b9adb825f4429fe1d1b07ee55655",
+    "src/background.rs": "9d33c15890ae8b633c31f4902821cb5013ce4c83f975ef198b1ee0aacc358477",
+    "src/i18n.rs": "dd41bc0b838dcc286db4d6f9f6e9002be60727c99a73a3e04af0344304cb247e",
+    "src/input.rs": "4946344064defc009bf2ad38d62ea6093a96c4be794b5711651b6851cda3d29c",
+    "src/main.rs": "1362711f6ea410d5d4a8df2c2d372cd1a35a86651f5b272e923260e88046cd2f",
+    "src/meta.rs": "591b9dc5d594915d9047bf6398ef4b26e8d14f40541040eb59f742907f8dbac8",
+    "src/particles.rs": "518864aaa60582f3876a7b5fe95757bedbe2b8fcd71cf8140f79dfe79e1c1cdb",
+    "src/render/mod.rs": "ac8c5e1860dcee7981294936d175078ddbc37bb982a0dd7175c74701185cd079",
+    "src/render/models.rs": "ff4f1796dcca24eaf7a6f0b4a2cb47254aa88180e4907177fbefcfec11da8e21",
+    "src/render/textures.rs": "45a296ec3ff77e6b74f2c715258cbb23d349285c2a120199b9cb83df3819de87",
+    "src/rng.rs": "51cb2cb64e2e6d07ce8df0e491513c61dc3860b4a3a7c2e32b58ef8aeca879e0",
+    "src/run/autopilot.rs": "dc5b21b1df1950dda5b52744433c98565c96f266a7b8ece489fda4d6e032a921",
+    "src/run/mod.rs": "7932721b18807f2b08c3c8852e7e1c0cfe3710e2a0e4d17fe204fb7e9d662e77",
+    "src/run/runner.rs": "ccf7c50e796939ad1122dec43727fb2d9890f03edbcbede01c1360b5e530d0e7",
+    "src/run/track.rs": "bec7884eca820869e4f3b1c4d11e20416d2b412dcc81eaecb4c1d1b33f68185b",
+    "src/save.rs": "2c9e0f3b71287021759c5940aab2dd0c10836684d760450bcbe129e8602c6ced",
+    "src/script.rs": "2b447cdfd0d4232349f45efb80e0a16b519c770a85c21820eccac083908e30bb",
+    "src/state.rs": "c6777abc4ec8c47e98a255a5a25571f3b4b1c006656d8486d2a007979ae8f467",
+    "src/web.rs": "a742368d262e8fcdc7af055711bf942584e524be29e7216b6dc98b8ffaf47734",
+    "tools/gen_cjk.py": "c1f2477d8fadee97850b68eb86faacc4fe0b09ef9a506db5805a1a06cc8b9370"
+  },
+  "sourceTreeSha256": "17bebe4ff78a2785ca4c5608f2864520ece29342b0e2610b1ee5689ed3672bd2",
+  "buildScriptSha256": "ddfa7d98a276d9108f395dd54c3a8aa590471b965b82a70e79f2e17b780d8fd4",
   "dependencies": {
     "macroquad": "0.4.16",
     "miniquad": "0.4.11",
@@ -20,12 +56,12 @@
   },
   "compiler": "rustc 1.99.1 (58cf8f9c3 2026-10-13)",
   "sha256": {
-    "pixel_parkour.wasm": "969b23f3c5cd0ba92401fa7b75625d3536e8c5142d83c29227ff5ef3252671aa",
+    "pixel_parkour.wasm": "e0a0b9c8602567e20ca6ffbc99c98318a10f59a53bf6ac49bc545ef142bb03c1",
     "gl.js": "3e40bcbd9645c264645fcf1d174b8adedc706a9bb45aa72d271d37755005fa15",
     "audio.js": "764a9bc5634f36d9b508fe2ef6b32befb356b6c797238a8e5cf0d1c881def522",
     "bridge.js": "2c6fd127e733e1d5fb518c891caa52bdd1707810203a776e6103b337b34fff74",
     "parkour.js": "184e9a392802f23a6f3660df4e2d4405a29ed34f6ee15c18da90b15e71eb56e8",
-    "parkour.css": "71b989c6b538400df12cd5f0be062ff6e94dba537f601d4d7635337070707405",
-    "index.html": "eee11800ff85f48a64f3fa01aeb0c39ce234f397fef1153132acb9649239f3dd"
+    "parkour.css": "14bc1b159755cdb6f739a72d1ae8c30e87324b1b0b67ba97bde2b0998065478e",
+    "index.html": "00714712f49333f59daeb505a2d2578b66de658bf3592c4a48bb15eab3ca9be6"
   }
 }

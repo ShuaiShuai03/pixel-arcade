@@ -232,10 +232,7 @@ impl App {
             if self.save.done & (1 << i) != 0 {
                 continue;
             }
-            let mut v = m.value(&self.run.stats, meters, score);
-            if m.cumulative() {
-                v += self.save.progress[i];
-            }
+            let v = m.progress(&self.run.stats, meters, score, self.save.progress[i]);
             if v >= m.target {
                 self.save.done |= 1 << i;
                 self.audio.play(Sfx::PowerUp);
@@ -249,12 +246,14 @@ impl App {
 
     /// Bank the run: coins, best score, mission progress and set rollover.
     fn finish_run(&mut self) {
-        self.run.end();
+        if !self.run.end() {
+            return;
+        }
         let set = meta::missions(self.save.set);
         for (i, m) in set.iter().enumerate() {
             if self.save.done & (1 << i) == 0 && m.cumulative() {
                 let v = m.value(&self.run.stats, self.run.meters(), self.run.score());
-                self.save.progress[i] = (self.save.progress[i] + v).min(m.target);
+                self.save.progress[i] = (self.save.progress[i].saturating_add(v)).min(m.target);
             }
         }
         if self.save.done == 0b111 && self.save.set < MAX_SET {
@@ -263,10 +262,7 @@ impl App {
             self.save.done = 0;
             self.level_up = Some(self.save.multiplier());
         }
-        self.save.coins += self.run.coins;
-        let score = self.run.score();
-        self.new_best = score > self.save.best;
-        self.save.best = self.save.best.max(score);
+        self.new_best = self.save.bank_run(self.run.coins, self.run.score());
         self.store_save();
         self.go(Screen::GameOver);
     }
@@ -370,7 +366,7 @@ impl App {
                 self.update_camera();
                 if self.run.awaiting_revive() {
                     let cost = revive_cost(self.run.revives);
-                    if self.save.coins + self.run.coins >= cost {
+                    if self.save.coins.saturating_add(self.run.coins) >= cost {
                         self.go(Screen::Revive(REVIVE_TIME));
                     } else {
                         self.finish_run();
@@ -461,7 +457,7 @@ impl App {
                 _ => false,
             }
         } else if self.cursor == BOARD_ROW {
-            let ok = self.save.coins >= BOARD_PRICE;
+            let ok = self.save.coins >= BOARD_PRICE && self.save.boards < u32::MAX;
             if ok {
                 self.save.coins -= BOARD_PRICE;
                 self.save.boards += 1;
@@ -697,6 +693,44 @@ impl App {
         for (i, (text, _)) in self.toasts.iter().enumerate() {
             f.draw_centered(text, VIEW_W / 2.0, 44.0 + i as f32 * 13.0, 1, YELLOW);
         }
+        // These are the existing pattern unlocks, not additional difficulty
+        // changes. Show the next landmark without obscuring the approach lanes.
+        if r.time >= HINT_TIME {
+            let district = crate::run::track::max_difficulty(r.runner.z) as usize;
+            let label = match district {
+                0 => tr("YARD", "站场"),
+                1 => tr("SIDINGS", "岔道"),
+                2 => tr("ROOFLINE", "车顶"),
+                _ => tr("EXPRESS", "快线"),
+            };
+            let boundaries = [0.0, 300.0, 900.0, 1800.0];
+            let next = boundaries.get(district + 1).copied();
+            let caption = if let Some(end) = next {
+                format!("{} {}/{}M", label, r.meters(), end as u32)
+            } else {
+                format!("{} {}M", label, r.meters())
+            };
+            let width = measure(&caption, 1) + 12.0;
+            ui::draw_panel(&a.sprites, 4.0, 154.0, width, 22.0);
+            f.draw(&caption, 10.0, 158.0, 1, LIGHT_BLUE);
+            let frac = next.map_or(1.0, |end| {
+                ((r.runner.z - boundaries[district]) / (end - boundaries[district])).clamp(0.0, 1.0)
+            });
+            draw_rectangle(
+                10.0,
+                171.0,
+                width - 12.0,
+                2.0,
+                palette::color(palette::DARK_BLUE),
+            );
+            draw_rectangle(
+                10.0,
+                171.0,
+                (width - 12.0) * frac,
+                2.0,
+                palette::color(LIGHT_GREEN),
+            );
+        }
         if r.time < HINT_TIME {
             ui::draw_panel(&a.sprites, 30.0, 150.0, VIEW_W - 60.0, 24.0);
             let lines = [
@@ -909,7 +943,7 @@ impl App {
             ),
             (
                 ("", ""),
-                ("ROLL IN THE AIR TO DROP FAST", "在空中下滑可快速落地"),
+                ("AIR TUCK KEEPS YOUR FLIGHT PATH", "空中收身不改变飞行轨迹"),
             ),
             (
                 ("TRAINS", "火车"),
@@ -1002,7 +1036,12 @@ impl App {
             1,
             WHITE,
         );
-        self.draw_coins(a, self.save.coins + self.run.coins, 212.0, 83.0);
+        self.draw_coins(
+            a,
+            self.save.coins.saturating_add(self.run.coins),
+            212.0,
+            83.0,
+        );
         f.draw(tr("YOU HAVE", "持有"), 100.0, 83.0, 1, GRAY);
         let w = 128.0 * (t / REVIVE_TIME).max(0.0);
         draw_rectangle(96.0, 96.0, 128.0, 4.0, palette::color(palette::INK));

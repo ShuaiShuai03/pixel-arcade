@@ -1,0 +1,71 @@
+{
+  "commit": "f8f840adc206f1cc5dca82900e03719a683fce3c",
+  "site": "https://shuaishuai03.github.io/pixel-arcade/",
+  "run": "https://github.com/ShuaiShuai03/pixel-arcade/actions/runs/42026316730",
+  "conclusion": "success",
+  "assetChecks": [
+    {
+      "path": "index.html",
+      "matches": true,
+      "sha256": "f8ce514a795966c125415e9657bb65c87f02a844be5418c5e6ce5ebde16e14bf",
+      "bytes": 9427
+    },
+    {
+      "path": "src/app.js",
+      "matches": true,
+      "sha256": "6fc8fbaa4c101f3a1a771b63579c1c2610ca2c2578c825e131d362377d53a890",
+      "bytes": 23386
+    },
+    {
+      "path": "src/style.css",
+      "matches": true,
+      "sha256": "4760219c776e6f9c6066d60fab24c7f1622979f747e0c7c952a56812671ba421",
+      "bytes": 24191
+    },
+    {
+      "path": "src/shared/input.js",
+      "matches": true,
+      "sha256": "1ac10423d816838e784562ea6b2ba9dfdc8717a14efed8ea11f60cd9033f2bc5",
+      "bytes": 968
+    },
+    {
+      "path": "src/shared/simulation.js",
+      "matches": true,
+      "sha256": "6b1c5d5198cd7f5f1c2e1c42a7e61f0ea1e0ff43f44f5f73f77e5373c81227f9",
+      "bytes": 554
+    },
+    {
+      "path": "src/games/blockfall.js",
+      "matches": true,
+      "sha256": "df0cf572d91530ac208db75c000a417db8b8a033a2834508bf003f406f744901",
+      "bytes": 24358
+    },
+    {
+      "path": "src/games/gem-match.js",
+      "matches": true,
+      "sha256": "67b83b366046a12d75bbb1a38f4a94c75bc43a0ad6f0f290dd1853406a8640bc",
+      "bytes": 26750
+    },
+    {
+      "path": "src/games/minefield.js",
+      "matches": true,
+      "sha256": "192d0751628bc34c19f5918ef59c2d77e5c1cd63158b2aa4056a91445b338068",
+      "bytes": 32233
+    }
+  ],
+  "browserVerification": {
+    "status": "passed",
+    "game": "minefield",
+    "observed": [
+      "The published game loaded the accepted three-site expedition.",
+      "A real Space input opened51safe cells and earned510points; H selected A1 and explained its visible-clue proof."
+    ],
+    "consoleErrorsOrWarnings": [],
+    "screenshots": [
+      "screenshots/published-minefield-initial.jpg",
+      "screenshots/published-minefield-proof.jpg"
+    ],
+    "screenshotsInspected": true
+  },
+  "workflowLogInspected": true
+}

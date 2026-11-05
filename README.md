@@ -22,9 +22,9 @@ No account, downloads, ads, analytics, or CDN dependencies. Personal bests and l
 | Meteor Drift   | Thrust, turn, and blast through five asteroid sectors                   | 1       |
 | Blockfall      | Build lines, excavate rubble, and power three city districts            | 1       |
 | Gem Match      | Match shapes, collect specimens, and restore garden soil                | 1       |
-| Crate Keeper   | Solve eight box-pushing warehouses, with undo and hints                 | 1       |
+| Crate Keeper   | Plan eight warehouses with animated pushes, undo, and optional hints    | 1       |
 | Minefield      | Deduce safe ground across a camp, split quarry, and ridge sectors       | 1       |
-| Memory Grove   | Find every matching pair across three woodland stages                   | 1       |
+| Memory Grove   | Remember free pairs, ordered pairs, and triples in three clearings      | 1       |
 | Pixel Rally    | Steer through traffic, collect coins, and reach the finish              | 1       |
 | Paddle Duel    | Win a seven-point match against a friend or the computer                | 1 or 2  |
 | Pinball Pocket | Launch three balls, work the flippers, and chase a high score           | 1       |
@@ -34,7 +34,7 @@ No account, downloads, ads, analytics, or CDN dependencies. Personal bests and l
 
 The collection uses original code and artwork inspired by classic game mechanics. It does not include the assets or characters of commercial arcade games.
 
-The collection is being expanded and refined in batches of at most three games. Eighteen games have passed initial acceptance; [batch 6](docs/quality/batch-06/ACCEPTANCE.md) upgrades Blockfall, Gem Match, and Minefield. The [quality schedule](docs/quality/BATCHES.md) tracks the 100-game target and the required second independent review after development is complete.
+The collection is being expanded and refined in batches of at most three games. Twenty-one games have passed initial acceptance; [batch 7](docs/quality/batch-07/ACCEPTANCE.md) upgrades Crate Keeper, Memory Grove, and Pixel Parkour. The [quality schedule](docs/quality/BATCHES.md) tracks the 100-game target and the required second independent review after development is complete.
 
 ## Controls
 

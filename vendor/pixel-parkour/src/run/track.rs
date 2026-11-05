@@ -53,15 +53,29 @@ pub struct Aabb {
     pub max: Vec3,
 }
 
-impl Aabb {
-    pub fn overlaps(&self, o: &Aabb) -> bool {
-        self.min.x < o.max.x
-            && o.min.x < self.max.x
-            && self.min.y < o.max.y
-            && o.min.y < self.max.y
-            && self.min.z < o.max.z
-            && o.min.z < self.max.z
+/// First inward contact with an open box, as a fraction of the path.
+/// Tangencies and boundary motion away from the interior are not contacts.
+/// Shared by solid contacts and pickup events so their ordering uses one rule.
+pub fn sweep_point(start: Vec3, delta: Vec3, min: Vec3, max: Vec3) -> Option<f32> {
+    let mut enter = f32::NEG_INFINITY;
+    let mut exit = f32::INFINITY;
+    for axis in 0..3 {
+        let (p, d, lo, hi) = (start[axis], delta[axis], min[axis], max[axis]);
+        if d == 0.0 {
+            if p <= lo || p >= hi {
+                return None;
+            }
+        } else {
+            let a = (lo - p) / d;
+            let b = (hi - p) / d;
+            enter = enter.max(a.min(b));
+            exit = exit.min(a.max(b));
+            if enter > exit {
+                return None;
+            }
+        }
     }
+    (enter <= 1.0 && exit > enter.max(0.0)).then_some(enter.max(0.0))
 }
 
 #[derive(Clone, Debug)]
@@ -309,7 +323,7 @@ pub struct Track {
 }
 
 /// Distance at which each difficulty tier unlocks.
-fn max_difficulty(distance: f32) -> u8 {
+pub fn max_difficulty(distance: f32) -> u8 {
     match distance {
         d if d < 300.0 => 0,
         d if d < 900.0 => 1,
@@ -495,8 +509,20 @@ impl Track {
         self.obstacles
             .iter()
             .filter(|o| (lane_x(o.lane) - x).abs() < LANE_HALF + half_w)
-            .filter_map(|o| o.surface(z))
-            .filter(|&s| s <= y + step)
+            .filter_map(|o| {
+                // Keep the feet supported until the complete longitudinal
+                // footprint leaves an edge; center-only support causes a
+                // spurious rear-face crash while stepping off a roof.
+                let depth = super::runner::DEPTH;
+                if z + depth < o.z0 || z - depth > o.z1 {
+                    return None;
+                }
+                let surface = o.surface(z.clamp(o.z0, o.z1))?;
+                // Ramps are walked up gradually. A vertical solid face is
+                // never a step: feet must already have cleared its top.
+                let allowance = if o.kind == Kind::Ramp { step } else { 0.001 };
+                (surface <= y + allowance).then_some(surface)
+            })
             .fold(0.0, f32::max)
     }
 
@@ -615,6 +641,36 @@ mod tests {
     }
 
     #[test]
+    fn swept_contacts_distinguish_inward_entry_from_tangency_and_exit() {
+        let min = vec3(0.0, 0.0, 0.0);
+        let max = vec3(1.0, 1.0, 1.0);
+        assert_eq!(
+            sweep_point(vec3(0.0, 0.5, 0.5), vec3(-1.0, 0.0, 0.0), min, max),
+            None
+        );
+        assert_eq!(
+            sweep_point(vec3(0.0, 0.5, 0.5), vec3(1.0, 0.0, 0.0), min, max),
+            Some(0.0)
+        );
+        assert_eq!(
+            sweep_point(vec3(0.0, -1.0, 0.5), vec3(0.0, 3.0, 0.0), min, max),
+            None
+        );
+        assert_eq!(
+            sweep_point(vec3(-1.0, 0.0, 0.5), vec3(2.0, 2.0, 0.0), min, max),
+            None
+        );
+        assert_eq!(
+            sweep_point(vec3(-1.0, 0.5, 0.5), vec3(1.0, 0.0, 0.0), min, max),
+            Some(1.0)
+        );
+        assert_eq!(
+            sweep_point(vec3(0.5, 0.5, 0.5), Vec3::ZERO, min, max),
+            Some(0.0)
+        );
+    }
+
+    #[test]
     fn every_pattern_is_well_formed() {
         for p in PATTERNS {
             let n = p.lanes[0].len();
@@ -714,6 +770,21 @@ mod tests {
                     assert!(l[..start].chars().all(|c| c == '.'));
                 }
             }
+        }
+    }
+
+    #[test]
+    fn visible_district_boundaries_match_the_pattern_unlocks() {
+        for (meters, tier) in [
+            (0.0, 0),
+            (299.99, 0),
+            (300.0, 1),
+            (899.99, 1),
+            (900.0, 2),
+            (1799.99, 2),
+            (1800.0, 3),
+        ] {
+            assert_eq!(max_difficulty(meters), tier);
         }
     }
 

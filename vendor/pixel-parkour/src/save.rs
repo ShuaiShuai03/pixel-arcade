@@ -85,6 +85,15 @@ fn join<T: ToString>(values: &[T]) -> String {
 }
 
 impl Save {
+    /// Bank one finished run without overflowing a valid legacy save balance.
+    /// The caller owns once-only settlement; settings and unlocks are preserved.
+    pub fn bank_run(&mut self, coins: u32, score: u32) -> bool {
+        self.coins = self.coins.saturating_add(coins);
+        let new_best = score > self.best;
+        self.best = self.best.max(score);
+        new_best
+    }
+
     pub fn multiplier(&self) -> u32 {
         self.set + 1
     }
@@ -185,6 +194,21 @@ impl Save {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn banking_preserves_legacy_unlocks_and_saturates_a_full_balance() {
+        let mut save =
+            Save::parse("coins=4294967295\nbest=900\nset=3\nupgrades=1,2,3,4\nboards=7\nlang=zh\n");
+        let previous = save.clone();
+        assert!(!save.bank_run(17, 800));
+        assert_eq!(save, previous);
+        assert!(save.bank_run(0, 1200));
+        assert_eq!(save.best, 1200);
+        assert_eq!(save.coins, u32::MAX);
+        assert_eq!(save.upgrades, [1, 2, 3, 4]);
+        assert_eq!(save.boards, 7);
+        assert_eq!(Save::parse(&save.serialize()), save);
+    }
 
     #[test]
     fn round_trip() {

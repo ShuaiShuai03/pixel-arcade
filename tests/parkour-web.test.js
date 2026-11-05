@@ -1,7 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import vm from 'node:vm';
-import { readFileSync } from 'node:fs';
+import { readFileSync, readdirSync } from 'node:fs';
+import { createHash } from 'node:crypto';
 
 function bridge({ stored = null, blocked = false, search = '' } = {}) {
   const memory = new WebAssembly.Memory({ initial: 1 });
@@ -383,4 +384,46 @@ test('native request and language change preserve fallback and translate its exi
   );
   assert.equal(w.shell.classList.contains('is-fullscreen'), false);
   assert.equal(w.fullscreen.textContent, '全屏');
+});
+
+test('parkour build provenance matches every current vendored input and shipped artifact', () => {
+  const info = JSON.parse(
+    readFileSync(new URL('../public/parkour/build-info.json', import.meta.url), 'utf8'),
+  );
+  const source = new URL('../vendor/pixel-parkour/', import.meta.url);
+  const list = (directory, prefix = '') =>
+    readdirSync(directory, { withFileTypes: true }).flatMap((entry) =>
+      entry.isDirectory()
+        ? list(new URL(entry.name + '/', directory), prefix + entry.name + '/')
+        : entry.isFile() && entry.name.endsWith('.rs')
+          ? [prefix + entry.name]
+          : [],
+    );
+  const files = [
+    'Cargo.toml',
+    'Cargo.lock',
+    '.cargo/config.toml',
+    'SOURCE.json',
+    'tools/gen_cjk.py',
+    ...list(new URL('src/', source), 'src/'),
+  ].sort();
+  assert.deepEqual(Object.keys(info.sourceFilesSha256), files);
+  const digest = (data) => createHash('sha256').update(data).digest('hex');
+  for (const file of files)
+    assert.equal(info.sourceFilesSha256[file], digest(readFileSync(new URL(file, source))), file);
+  assert.equal(
+    info.sourceTreeSha256,
+    digest(files.map((file) => `${file}\0${info.sourceFilesSha256[file]}\n`).join('')),
+  );
+  assert.equal(
+    info.buildScriptSha256,
+    digest(readFileSync(new URL('../tools/build-parkour.mjs', import.meta.url))),
+  );
+  for (const [file, hash] of Object.entries(info.sha256))
+    assert.equal(
+      hash,
+      digest(readFileSync(new URL('../public/parkour/' + file, import.meta.url))),
+      file,
+    );
+  assert.equal(info.source.revision, 'a5d147ce782cb8618d03c41a9740e63d77ef5f94');
 });

@@ -19,7 +19,10 @@
     "bubble-pop",
     "blockfall",
     "gem-match",
-    "minefield"
+    "minefield",
+    "crate-keeper",
+    "memory-grove",
+    "pixel-parkour"
   ],
   "batches": [
     {
@@ -61,7 +64,8 @@
     {
       "number": 7,
       "games": ["crate-keeper", "memory-grove", "pixel-parkour"],
-      "status": "queued"
+      "status": "accepted",
+      "acceptance": "batch-07/ACCEPTANCE.md"
     },
     {
       "number": 8,

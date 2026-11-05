@@ -1,0 +1,73 @@
+✔ Crate Keeper current warehouse restart restores crates, pushes and history (1.422625ms)
+✔ Crate Keeper solutions satisfy an independent grid interpreter at every step (198.834333ms)
+✔ Crate Keeper movement never allows diagonal or multi-cell jumps (0.122542ms)
+✔ Crate Keeper invalid or paused time never reads input, changes timers or consumes an action (0.318417ms)
+✔ Crate Keeper opposite or diagonal direction presses are neutral instead of ordered (0.077666ms)
+✔ Crate Keeper solved rooms remain inspectable until explicit Next, with undo and reset still available (0.426708ms)
+✔ Crate Keeper rapid undo feedback retraces cardinal moves rather than cutting a diagonal corner (0.280666ms)
+✔ Crate Keeper static dead-square proof never marks a goal or any verified solution prefix (259.103125ms)
+✔ Crate Keeper a legal wall trap gives an honest hint and undo restores a solvable route (1.510125ms)
+✔ Crate Keeper player and crate share one straight slide and a held key cannot repeat it (0.300958ms)
+✔ Crate Keeper one buffered step is deliberate and reset/undo/Next clear pending actions (0.517875ms)
+✔ Crate Keeper inspect/undo/reset cycles cannot farm room score (0.768209ms)
+✔ Crate Keeper snapshots, drawing and seeded bounded input traces preserve legal deterministic state (12.842791ms)
+✔ Crate Keeper final-slide queued Undo has explicit replacement/clearing rules for Next, Hint, direction and Reset (0.485083ms)
+✔ Crate Keeper neutral keyboard combinations cannot fall through into simultaneous pointer movement (0.07475ms)
+✔ Crate Keeper all eight levels have verified solutions (195.392125ms)
+✔ Crate Keeper cannot enter walls or push two crates and does not mutate previous state (0.1415ms)
+✔ Crate Keeper undo restores a pushed crate and leaves room confirmation uncommitted (1.331416ms)
+✔ Crate Keeper all eight rooms complete through legal keys and explicit Next (30Hz) (184.418541ms)
+ℹ 30Hz:168moves/40pushes/7080points; all8 rooms explicitly confirmed
+✔ Crate Keeper all eight rooms complete through legal keys and explicit Next (60Hz) (174.434875ms)
+ℹ 60Hz:168moves/40pushes/7080points; all8 rooms explicitly confirmed
+✔ Crate Keeper all eight rooms complete through legal keys and explicit Next (120Hz) (170.042875ms)
+ℹ 120Hz:168moves/40pushes/7080points; all8 rooms explicitly confirmed
+✔ Crate Keeper adjacent board taps are one legal step and host touch exposes all actions (0.674959ms)
+✔ Memory Grove decision clock begins on the first card and pauses through forced reveal rather than leaking time (2.470834ms)
+✔ Memory Grove player mode may toggle before play but recovery after play is one-way (0.130417ms)
+✔ Memory Grove study auto-closes exactly in timed play and never carries flip input into an uncovered card (0.352ms)
+✔ Memory Grove late animation input does not flip a card upon reaching ready and gap taps are rejected (0.086666ms)
+✔ Memory Grove scenery and rule HUD render in English and Chinese with route, study and terminal states (2.392875ms)
+✔ Memory Grove relaxed study starts the visit and cannot be laundered back into free indefinite timed study (0.2245ms)
+✔ Memory Grove decks contain exact pair or triple multiplicities and deterministic permutations (1.344375ms)
+✔ Memory Grove zero and invalid dt leave complete state and all side effects untouched (0.49875ms)
+✔ Memory Grove has equally readable boards with three distinct rules rather than growing card count (0.459666ms)
+✔ Memory Grove public snapshots redact hidden faces including animation objects and show only genuinely turned cards (0.3565ms)
+✔ Memory Grove hidden card drawing is independent of hidden identity (1.011833ms)
+✔ Memory Grove rejects repeated or already matched cards and ignores held keys (0.244666ms)
+✔ Memory Grove a mismatch stays visible long enough then closes without score or identity leakage (0.232959ms)
+✔ Memory Grove route rejects a discovered later pair fairly and advances only its visible current lantern (0.292417ms)
+✔ Memory Grove triples need three distinct fully opened equal cards before scoring (0.163875ms)
+✔ Memory Grove card input at frame start precedes a later clock deadline (0.071292ms)
+✔ Memory Grove timed to relaxed rescue happens before expiry, cannot toggle back or farm points (0.133709ms)
+✔ Memory Grove study is reusable, costs exactly five decision seconds, blocks flips and redacts after closing (1.457375ms)
+✔ Memory Grove relaxed study waits indefinitely for deliberate close and permits learning at any pace (2.738208ms)
+✔ Memory Grove insufficient study time has clear feedback and preserves time for relaxed recovery (0.105292ms)
+✔ Memory Grove active feedback and study event boundaries retain exact time at30/60/120Hz (1.944917ms)
+✔ Memory Grove zero and invalid time preserve every animation phase without input, RNG or sound consumption (0.2975ms)
+✔ Memory Grove full campaigns use only learned visible cards with keyboard controls at30/60/120Hz (111.556583ms)
+✔ Memory Grove pointer and reusable relaxed study also complete all distinct clearings (15.148708ms)
+✔ Memory Grove final successful group cannot expire during forced feedback and Next needs fresh intent (0.337709ms)
+✔ Memory Grove timeout is reachable once, terminal is frozen and a fresh instance restores resources (1.461875ms)
+✔ Memory Grove keyboard and touch expose all actions and opposing/diagonal chords do not move focus (0.094833ms)
+✔ Memory Grove seeded mixed inputs stay finite and bounded across all modes with safe rendering (17.355541ms)
+ℹ tests 50
+ℹ suites 0
+ℹ pass 50
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 779.0375
+ℹ start of coverage report
+ℹ ------------------------------------------------------------------
+ℹ file              | line % | branch % | funcs % | uncovered lines
+ℹ ------------------------------------------------------------------
+ℹ src               |        |          |         |
+ℹ  games            |        |          |         |
+ℹ   crate-keeper.js | 100.00 |    96.75 |  100.00 |
+ℹ   memory-grove.js |  99.14 |    97.85 |  100.00 | 231-233 289-291
+ℹ ------------------------------------------------------------------
+ℹ all files         |  99.60 |    97.30 |  100.00 |
+ℹ ------------------------------------------------------------------
+ℹ end of coverage report

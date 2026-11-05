@@ -128,3 +128,24 @@ impl Input {
         };
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn pending_actions_survive_render_only_frames_and_are_consumed_once() {
+        let mut pending = Input::default();
+        pending.press(ScriptKey::Left);
+        pending.press(ScriptKey::Up);
+        for _ in 0..2 {
+            assert!(pending.controls().left && pending.controls().jump);
+        }
+        pending.end_step();
+        assert!(!pending.controls().left && !pending.controls().jump);
+        pending.press(ScriptKey::Board);
+        pending.press(ScriptKey::Confirm);
+        assert!(pending.board && pending.confirm && !pending.controls().jump);
+        pending.end_step();
+        assert!(!pending.board && !pending.confirm);
+    }
+}

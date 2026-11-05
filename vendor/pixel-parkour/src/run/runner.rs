@@ -1,7 +1,7 @@
 //! The runner: lane switching, jumping, rolling, and collision with the
 //! track. Pure logic, independent of rendering.
 
-use super::track::{Aabb, LANES, TRAIN_SPEED, Track, lane_x};
+use super::track::{Aabb, Kind, LANES, TRAIN_SPEED, TRAIN_TRIGGER, Track, lane_x, sweep_point};
 use macroquad::math::vec3;
 
 pub const SPEED_MIN: f32 = 11.0;
@@ -17,8 +17,6 @@ pub const GRAVITY: f32 = 38.0;
 pub const JUMP_V: f32 = 11.5;
 /// Jump speed with spring shoes: high enough to land on a train roof.
 pub const SPRING_V: f32 = 17.5;
-/// Pressing roll in the air slams the runner down.
-pub const DROP_V: f32 = -30.0;
 pub const MAX_FALL: f32 = 40.0;
 pub const ROLL_TIME: f32 = 0.6;
 /// Sideways speed while changing lanes.
@@ -53,6 +51,14 @@ pub enum HitKind {
 /// What happened during one step.
 #[derive(Clone, Copy, Debug, Default)]
 pub struct Step {
+    /// Time consumed before contact (the full dt when unobstructed).
+    pub elapsed: f32,
+    /// Foot positions along the continuous approach segment.
+    pub path_start: macroquad::math::Vec3,
+    /// Endpoint before any posture change at the interval boundary.
+    pub path_end: macroquad::math::Vec3,
+    /// Collision/pickup height during this interval, before a roll expires.
+    pub body_height: f32,
     pub moved: bool,
     pub jumped: bool,
     pub rolled: bool,
@@ -96,6 +102,14 @@ impl Runner {
         }
     }
 
+    /// Recovery never replays a buffered pre-crash action.
+    pub fn clear_actions(&mut self) {
+        self.jump_buffer = 0.0;
+        self.roll_buffer = 0.0;
+        self.roll = 0.0;
+        self.from_lane = self.lane;
+    }
+
     pub fn rolling(&self) -> bool {
         self.roll > 0.0
     }
@@ -123,40 +137,44 @@ impl Runner {
         gliding: bool,
     ) -> Step {
         let mut out = Step::default();
-        if c.left && self.lane > 0 {
+        if !dt.is_finite() || dt <= 0.0 {
+            return out;
+        }
+        if c.left && !c.right && self.lane > 0 {
             self.from_lane = self.lane;
             self.lane -= 1;
             out.moved = true;
         }
-        if c.right && self.lane < LANES - 1 {
+        if c.right && !c.left && self.lane < LANES - 1 {
             self.from_lane = self.lane;
             self.lane += 1;
             out.moved = true;
         }
-        self.jump_buffer = if c.jump {
-            BUFFER
-        } else {
-            (self.jump_buffer - dt).max(0.0)
-        };
-        self.roll_buffer = if c.roll {
-            BUFFER
-        } else {
-            (self.roll_buffer - dt).max(0.0)
-        };
+        self.jump_buffer = if c.jump { BUFFER } else { self.jump_buffer };
+        self.roll_buffer = if c.roll { BUFFER } else { self.roll_buffer };
 
-        let (px, py, pz) = (self.x, self.y, self.z);
+        out.elapsed = dt;
+        let (px, pz) = (self.x, self.z);
+        let was_grounded = self.grounded;
+        let old_height = self.height();
         let tx = lane_x(self.lane);
         self.x += (tx - self.x).clamp(-LANE_SPEED * dt, LANE_SPEED * dt);
         self.z += speed * dt;
         self.anim += speed * dt;
 
         if gliding {
-            self.y += (GLIDE_Y - self.y) * (4.0 * dt).min(1.0);
+            if !was_grounded {
+                self.y += (old_height - STAND_H) / 2.0;
+            }
+            out.path_start = vec3(px, self.y, pz);
+            self.y += (GLIDE_Y - self.y) * (1.0 - (-4.0 * dt).exp());
             self.vy = 0.0;
             self.grounded = false;
             self.roll = 0.0;
             self.jump_buffer = 0.0;
             self.roll_buffer = 0.0;
+            out.body_height = STAND_H;
+            out.path_end = vec3(self.x, self.y, self.z);
             return out;
         }
 
@@ -167,40 +185,99 @@ impl Runner {
             self.jump_buffer = 0.0;
             out.jumped = true;
         }
-        if self.roll_buffer > 0.0 && (self.grounded || self.vy > DROP_V) {
-            if !self.grounded {
-                self.vy = DROP_V;
-            }
+        if self.roll_buffer > 0.0 {
+            // An unpowered air tuck changes posture, never vertical momentum.
             self.roll = ROLL_TIME;
             self.roll_buffer = 0.0;
             out.rolled = true;
         }
-        self.roll = (self.roll - dt).max(0.0);
-
-        self.vy = (self.vy - GRAVITY * dt).max(-MAX_FALL);
-        self.y += self.vy * dt;
-
-        // Solid obstacles. Tops the runner was already above count as ground.
-        let me = self.aabb();
+        if !was_grounded {
+            self.y += (old_height - self.height()) / 2.0;
+        }
+        let py = self.y;
+        out.path_start = vec3(px, py, pz);
+        let initial_vy = self.vy;
+        let initial_roll = self.roll;
+        let final_vy = (initial_vy - GRAVITY * dt).max(-MAX_FALL);
+        self.y += (initial_vy + final_vy) * 0.5 * dt;
+        let body_height = self.height();
+        out.body_height = body_height;
+        let end = vec3(self.x, self.y, self.z);
+        let start = vec3(px, py, pz);
+        let delta = end - start;
+        let mut earliest = 1.0;
+        let mut ramp_ground = 0.0_f32;
         for (i, o) in track.obstacles.iter().enumerate() {
             let Some(b) = o.solid() else { continue };
-            if !b.overlaps(&me) || py >= b.max.y - STEP {
+            let moving = o.kind == Kind::Oncoming && (o.moving || o.z0 - pz < TRAIN_TRIGGER);
+            let relative = delta + vec3(0.0, 0.0, if moving { TRAIN_SPEED * dt } else { 0.0 });
+            if pz + relative.z.max(0.0) + DEPTH < b.min.z
+                || pz + relative.z.min(0.0) - DEPTH > b.max.z
+                || px.max(self.x) + HALF_W < b.min.x
+                || px.min(self.x) - HALF_W > b.max.x
+            {
                 continue;
             }
-            let moved = if o.moving { TRAIN_SPEED * dt } else { 0.0 };
-            let head_on = pz + DEPTH <= b.min.z + moved + 0.05;
-            if head_on {
-                out.hit = Some((i, HitKind::Crash));
-            } else {
-                self.lane = self.from_lane;
-                self.x = px;
-                out.hit = Some((i, HitKind::Stumble));
+            // A continuous ramp supports the leading foot as it reaches its
+            // joined roof. This exception never applies to standalone solids.
+            let ramp_join = self.grounded
+                && track.obstacles.iter().any(|r| {
+                    !r.broken
+                        && r.kind == Kind::Ramp
+                        && r.lane == o.lane
+                        && (r.z1 - o.z0).abs() < 0.01
+                        && pz >= r.z0
+                        && pz <= r.z1
+                        && r.surface(pz)
+                            .is_some_and(|h| py >= h - 0.02 && py <= h + STEP)
+                });
+            if ramp_join
+                && self.z + DEPTH >= o.z0
+                && self.x + HALF_W > b.min.x
+                && self.x - HALF_W < b.max.x
+            {
+                ramp_ground = ramp_ground.max(b.max.y);
+                continue;
             }
-            break;
+            if py >= b.max.y - 0.001 {
+                continue;
+            }
+            let min = b.min - vec3(HALF_W, body_height, DEPTH);
+            let max = b.max + vec3(HALF_W, 0.0, DEPTH);
+            if let Some(at) = sweep_point(start, relative, min, max)
+                && at <= earliest
+            {
+                earliest = at;
+                let front = pz + DEPTH <= b.min.z + 0.001;
+                let side_entry = (self.x - px).abs() > 0.001
+                    && (px + HALF_W <= b.min.x || px - HALF_W >= b.max.x);
+                out.hit = Some((
+                    i,
+                    if front || !side_entry {
+                        HitKind::Crash
+                    } else {
+                        HitKind::Stumble
+                    },
+                ));
+            }
         }
-
-        // Ground: the highest surface underneath that the runner could reach.
-        let ground = track.ground(self.x, HALF_W, self.z, self.y.max(py), STEP);
+        out.elapsed = dt * earliest;
+        self.x = px + delta.x * earliest;
+        self.y = py + delta.y * earliest;
+        self.z = pz + delta.z * earliest;
+        self.anim -= speed * (dt - out.elapsed);
+        self.vy = (initial_vy - GRAVITY * out.elapsed).max(-MAX_FALL);
+        self.roll = (initial_roll - out.elapsed).max(0.0);
+        self.jump_buffer = (self.jump_buffer - out.elapsed).max(0.0);
+        self.roll_buffer = (self.roll_buffer - out.elapsed).max(0.0);
+        if matches!(out.hit, Some((_, HitKind::Stumble))) {
+            // Contact reverses the lane target; position never rewinds.
+            self.lane = self.from_lane;
+        }
+        // Ground is reached from above, or through a physically joined ramp.
+        let ground = track
+            .ground(self.x, HALF_W, self.z, self.y.max(py), STEP)
+            .max(ramp_ground);
         if self.y <= ground {
             if !self.grounded {
                 out.landed = Some(-self.vy);
@@ -211,6 +288,45 @@ impl Runner {
         } else if self.grounded {
             // Walked off an edge (end of a train roof).
             self.grounded = false;
+        }
+        out.path_end = vec3(self.x, self.y, self.z);
+        if initial_roll > 0.0 && self.roll == 0.0 {
+            let tucked_y = self.y;
+            if !self.grounded {
+                self.y -= (STAND_H - ROLL_H) / 2.0;
+            }
+            let standing = self.aabb();
+            let blocked = track.obstacles.iter().enumerate().find_map(|(i, o)| {
+                let b = o.solid()?;
+                // Feet extending down onto a roof are a landing contact.
+                let landing = o.kind != Kind::Bar
+                    && !self.grounded
+                    && tucked_y >= b.max.y - 0.001
+                    && self.y <= b.max.y;
+                (standing.min.x < b.max.x
+                    && b.min.x < standing.max.x
+                    && standing.min.y < b.max.y
+                    && b.min.y < standing.max.y
+                    && standing.min.z < b.max.z
+                    && b.min.z < standing.max.z
+                    && !landing)
+                    .then_some(i)
+            });
+            if let Some(i) = blocked {
+                // Keep the compact pose at the contact boundary. A shield can
+                // clear the obstruction before the next attempt to stand.
+                self.y = tucked_y;
+                self.roll = f32::EPSILON;
+                out.hit = Some((i, HitKind::Crash));
+            } else if !self.grounded {
+                let ground = track.ground(self.x, HALF_W, self.z, tucked_y, 0.0);
+                if self.y <= ground {
+                    self.y = ground;
+                    self.vy = 0.0;
+                    self.grounded = true;
+                    out.landed = Some(-initial_vy);
+                }
+            }
         }
         out
     }
@@ -258,6 +374,193 @@ mod tests {
 
     fn idle(_: u32) -> Controls {
         Controls::default()
+    }
+
+    #[test]
+    fn zero_and_invalid_steps_preserve_runner_and_ignore_controls() {
+        let t = track_with(&[]);
+        for dt in [0.0, -0.1, f32::NAN, f32::INFINITY, f32::NEG_INFINITY] {
+            let mut r = Runner::new();
+            let before = format!("{r:?}");
+            let out = r.step(
+                Controls {
+                    left: true,
+                    jump: true,
+                    roll: true,
+                    ..Default::default()
+                },
+                dt,
+                SPEED_MIN,
+                &t,
+                JUMP_V,
+                false,
+            );
+            assert_eq!(format!("{r:?}"), before, "dt={dt}");
+            assert!(!out.moved && !out.jumped && !out.rolled && out.hit.is_none());
+        }
+    }
+
+    #[test]
+    fn opposing_lane_presses_are_neutral_even_at_edges() {
+        let t = track_with(&[]);
+        for lane in 0..LANES {
+            let mut r = Runner::new();
+            r.lane = lane;
+            r.x = lane_x(lane);
+            let out = r.step(
+                Controls {
+                    left: true,
+                    right: true,
+                    ..Default::default()
+                },
+                DT,
+                SPEED_MIN,
+                &t,
+                JUMP_V,
+                false,
+            );
+            assert!(!out.moved);
+            assert_eq!(r.lane, lane);
+            assert_eq!(r.x, lane_x(lane));
+        }
+    }
+
+    #[test]
+    fn partial_jump_cannot_step_up_through_a_solid_hurdle_front() {
+        let t = track_with(&[(Kind::Hurdle, 1, 1.0, 1.4)]);
+        let mut r = Runner::new();
+        r.z = 0.65;
+        r.y = 0.5;
+        r.vy = 3.0;
+        r.grounded = false;
+        let out = r.step(Controls::default(), DT, SPEED_MIN, &t, JUMP_V, false);
+        assert_eq!(out.hit, Some((0, HitKind::Crash)));
+        assert!(r.y < 0.7, "cannot snap feet onto the hurdle top");
+    }
+
+    #[test]
+    fn free_jump_trajectory_and_lane_shift_match_at_30_60_120_hz() {
+        let t = track_with(&[]);
+        let mut outcomes = Vec::new();
+        for hz in [30, 60, 120] {
+            let mut r = Runner::new();
+            for frame in 0..hz * 2 / 5 {
+                r.step(
+                    Controls {
+                        left: frame == 0,
+                        jump: frame == 0,
+                        ..Default::default()
+                    },
+                    1.0 / hz as f32,
+                    SPEED_MIN,
+                    &t,
+                    JUMP_V,
+                    false,
+                );
+            }
+            outcomes.push((r.x, r.y, r.vy, r.z));
+        }
+        for a in &outcomes[1..] {
+            let b = outcomes[0];
+            assert!(
+                (a.0 - b.0).abs() < 1e-4
+                    && (a.1 - b.1).abs() < 1e-4
+                    && (a.2 - b.2).abs() < 1e-4
+                    && (a.3 - b.3).abs() < 1e-4,
+                "{outcomes:?}"
+            );
+        }
+    }
+
+    #[test]
+    fn fast_thin_solids_use_swept_contact_and_choose_the_nearest_first() {
+        for reverse in [false, true] {
+            let mut pieces = vec![(Kind::Block, 1, 0.4, 0.41), (Kind::Block, 1, 0.6, 0.61)];
+            if reverse {
+                pieces.reverse();
+            }
+            let t = track_with(&pieces);
+            let mut r = Runner::new();
+            let out = r.step(
+                Controls::default(),
+                1.0 / 30.0,
+                SPEED_MAX,
+                &t,
+                JUMP_V,
+                false,
+            );
+            assert_eq!(out.hit, Some((usize::from(reverse), HitKind::Crash)));
+            assert!((r.z - 0.1).abs() < 1e-5);
+            assert!((out.elapsed - 0.1 / SPEED_MAX).abs() < 1e-5);
+        }
+    }
+
+    #[test]
+    fn joined_ramp_and_roof_edges_are_supported_at_each_step_rate() {
+        let t = track_with(&[(Kind::Ramp, 1, 3.0, 9.0), (Kind::Train, 1, 9.0, 21.0)]);
+        for hz in [30, 60, 120] {
+            let mut r = Runner::new();
+            let mut roof = false;
+            for _ in 0..hz * 3 {
+                let step = r.step(
+                    Controls::default(),
+                    1.0 / hz as f32,
+                    SPEED_MIN,
+                    &t,
+                    JUMP_V,
+                    false,
+                );
+                assert!(step.hit.is_none(), "hz{hz} z{}", r.z);
+                roof |= r.z > 10.0 && r.z < 20.0 && r.grounded && (r.y - TRAIN_H).abs() < 0.001;
+            }
+            assert!(roof && r.grounded && r.y == 0.0);
+        }
+    }
+
+    #[test]
+    fn landing_tucked_then_standing_and_jumping_from_roll_remain_valid() {
+        let t = track_with(&[]);
+        let mut r = Runner::new();
+        let mut tucked_landing = false;
+        for frame in 0..90 {
+            let out = r.step(
+                Controls {
+                    jump: frame == 0,
+                    roll: frame == 10,
+                    ..Default::default()
+                },
+                DT,
+                SPEED_MIN,
+                &t,
+                JUMP_V,
+                false,
+            );
+            tucked_landing |= out.landed.is_some() && r.rolling();
+        }
+        assert!(tucked_landing && r.grounded && !r.rolling() && r.y == 0.0);
+        r.step(
+            Controls {
+                roll: true,
+                ..Default::default()
+            },
+            DT,
+            SPEED_MIN,
+            &t,
+            JUMP_V,
+            false,
+        );
+        let out = r.step(
+            Controls {
+                jump: true,
+                ..Default::default()
+            },
+            DT,
+            SPEED_MIN,
+            &t,
+            JUMP_V,
+            false,
+        );
+        assert!(out.jumped && !r.grounded && r.y > 0.0 && r.vy > 0.0);
     }
 
     #[test]
@@ -375,17 +678,48 @@ mod tests {
     }
 
     #[test]
-    fn roll_in_the_air_drops_fast() {
+    fn air_tuck_and_expiry_preserve_ballistic_center_and_vertical_momentum() {
         let t = track_with(&[]);
+        let mut normal = Runner::new();
+        normal.y = 12.0;
+        normal.vy = 3.0;
+        normal.grounded = false;
+        let mut tucked = normal.clone();
+        for frame in 0..45 {
+            normal.step(Controls::default(), DT, SPEED_MIN, &t, JUMP_V, false);
+            let step = tucked.step(
+                Controls {
+                    roll: frame == 0,
+                    ..Default::default()
+                },
+                DT,
+                SPEED_MIN,
+                &t,
+                JUMP_V,
+                false,
+            );
+            if !normal.grounded && !tucked.grounded {
+                assert!((normal.vy - tucked.vy).abs() < 1e-5);
+                assert!(
+                    ((normal.y + normal.height() / 2.0) - (tucked.y + tucked.height() / 2.0)).abs()
+                        < 1e-4,
+                    "frame{frame}"
+                );
+            }
+            if frame == 0 {
+                assert!(step.rolled && tucked.vy > 0.0);
+            }
+        }
+    }
+
+    #[test]
+    fn side_contact_retains_position_and_returns_at_finite_lane_speed() {
+        let t = track_with(&[(Kind::Train, 0, -1.0, 60.0)]);
         let mut r = Runner::new();
-        run(&mut r, &t, 10, |f| Controls {
-            jump: f == 0,
-            ..Default::default()
-        });
-        assert!(!r.grounded);
-        let s = r.step(
+        r.x = -0.9;
+        let out = r.step(
             Controls {
-                roll: true,
+                left: true,
                 ..Default::default()
             },
             DT,
@@ -394,10 +728,13 @@ mod tests {
             JUMP_V,
             false,
         );
-        assert!(s.rolled);
-        run(&mut r, &t, 6, idle);
-        assert!(r.grounded);
-        assert!(r.rolling());
+        assert_eq!(out.hit, Some((0, HitKind::Stumble)));
+        assert!((r.x + 1.0).abs() < 1e-5);
+        assert_eq!(r.lane, 1);
+        let previous = r.x;
+        let out = r.step(Controls::default(), DT, SPEED_MIN, &t, JUMP_V, false);
+        assert!(out.hit.is_none());
+        assert!(r.x > previous && r.x - previous <= LANE_SPEED * DT + 1e-5);
     }
 
     #[test]

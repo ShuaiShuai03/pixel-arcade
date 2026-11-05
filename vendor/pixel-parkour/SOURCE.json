@@ -9,6 +9,8 @@
     "Browser-safe clock, command-line and screenshot handling",
     "Exported touch controls, native quit navigates to the arcade",
     "Explicit JavaScript imports for newer Rust WASM linkers",
-    "Live synchronized English/Chinese preference, pause on focus loss, fullscreen with controls"
+    "Live synchronized English/Chinese preference, pause on focus loss, fullscreen with controls",
+    "Quality refinement: swept contacts, chronological pickup/power expiry, ballistic air tuck, continuous side recovery, safe ramp/roof transitions and recovery without replayed inputs",
+    "Visible district unlock progress, distinct oncoming train lamps, overflow-safe compatible progress settlement"
   ]
 }

@@ -1,0 +1,228 @@
+{
+  "date": "2026-11-05",
+  "browser": "Installed stable Google Chrome via Codex Chrome extension",
+  "status": "passed",
+  "stateInjection": false,
+  "preliminaryChecks": [
+    {
+      "id": "crate-keeper",
+      "revisionNotes": "Published baseline at f8f840a, before batch7 changes; not acceptance.",
+      "observed": [
+        "Tiny central introductory board surrounded by large blank canvas and large in-canvas controls. Requested useful board scale, warehouse detail, clear occupied goals, and complete host touch metadata."
+      ],
+      "screenshots": ["crate-public-baseline.jpg"],
+      "screenshotsInspected": true
+    },
+    {
+      "id": "memory-grove",
+      "revisionNotes": "Published baseline at f8f840a, before batch7 changes; not acceptance.",
+      "observed": [
+        "Readable4x3cards with repetitive rectangular tree backdrop and simple backs. Requested stronger woodland art, distinct card states and meaningful rule variation across stages."
+      ],
+      "screenshots": ["memory-public-baseline.jpg"],
+      "screenshotsInspected": true
+    },
+    {
+      "id": "pixel-parkour",
+      "revisionNotes": "Published baseline at f8f840a, before batch7 changes; not acceptance.",
+      "observed": [
+        "Actual WebAssembly title and run rendered successfully. Existing perspective rail-yard art is substantially richer; preserve it while auditing physics, response windows, control recovery and progression.",
+        "Portrait fullscreen preserves the wide game view with letterboxing and keeps all eight wrapper buttons visible."
+      ],
+      "screenshots": [
+        "parkour-public-title.jpg",
+        "parkour-public-run.jpg",
+        "parkour-public-phone.jpg"
+      ],
+      "screenshotsInspected": true
+    },
+    {
+      "id": "crate-keeper",
+      "revisionNotes": "Unfrozen batch7 replacement layout only; final gameplay acceptance pending.",
+      "observed": [
+        "Enlarged centered board makes keeper, crate and dock clear. All eight Chinese touch actions and localized key guide are visible.",
+        "Requested Chinese localization of the remaining PAR canvas label."
+      ],
+      "screenshots": ["crate-draft-desktop.jpg", "crate-draft-phone.jpg"],
+      "screenshotsInspected": true
+    },
+    {
+      "id": "memory-grove",
+      "revisionNotes": "Unfrozen replacement layout; not final acceptance.",
+      "observed": [
+        "Twelve card faces remain distinct and readable on desktop and Chinese phone. All seven Chinese touch controls fit.",
+        "Requested precise Study cost wording in both languages; current prose can be read as a duration instead of the immediate5-second decision-time deduction.",
+        "Suggested adding more specific forest silhouettes while preserving card readability."
+      ],
+      "screenshots": [
+        "memory-draft-desktop.jpg",
+        "memory-draft-study.jpg",
+        "memory-draft-phone.jpg"
+      ],
+      "screenshotsInspected": true
+    },
+    {
+      "id": "crate-keeper",
+      "revisionNotes": "Final candidate a8439623; opening checks retained as evidence for the completed campaign.",
+      "observed": [
+        "H showed next RIGHT and highlighted the crate without moving it. Right completed room1 but score stayed0 until Enter.",
+        "Z reversed the solved room. Down/Right/Up deliberately pushed the crate onto a proven dead square; H correctly reported no route. Z and X recovered; X restored the room.",
+        "Right then Enter committed room one at 1185 and opened room two. Source verification confirms 1200 minus 15 per move; hints have no score cost."
+      ],
+      "screenshots": [
+        "crate-final-hint.jpg",
+        "crate-first-room-ready.jpg",
+        "crate-dead-square.jpg",
+        "crate-reset-room.jpg",
+        "crate-room-two.jpg"
+      ],
+      "screenshotsInspected": true
+    },
+    {
+      "id": "pixel-parkour",
+      "revisionNotes": "Final Rust/WASM with the old wrapper landscape layout; superseded by the compact landscape CSS.",
+      "observed": [
+        "Landscape inspection found the wide game reduced to a 320-pixel playfield above two rows of controls. The revised layout places movement and action controls beside the game, allowing a 640-pixel playfield at the checked landscape sizes."
+      ],
+      "screenshots": ["parkour-chinese-landscape-paused.jpg", "parkour-landscape-progress.jpg"],
+      "screenshotsInspected": true
+    }
+  ],
+  "games": [
+    {
+      "id": "memory-grove",
+      "verdict": "passed",
+      "sourceSha256": "48aa22672f1a7b2d7c2101107377d002a8770051b4aa982362e887551f869048",
+      "observed": [
+        "Complete campaign at score 2600: Fern pairs at 1000, Lantern ordered pairs at 2000, then all four triples.",
+        "Started with a keyboard mismatch, recovered into relaxed mode, used visible Study cards, and matched a remembered pair with pointer plus keyboard. Return to timed mode remained locked.",
+        "All seven Chinese touch controls exercised, including navigation, active card turning, Study open/close, relaxed mode and explicit Next. Phone and landscape views kept the four-by-three board and route symbols readable.",
+        "An early matching leaf pair in Lantern was rejected with clear feedback and zero score/progress. Correct sun match advanced the numbered route; all six completed markers were visible.",
+        "Two matching acorns in the triple clearing left progress at zero; the third completed the group.",
+        "Post-win hint/mode/direction input preserved score 2600. Restart restored Fern, a hidden board, Timed mode, 90 decision seconds and zero score while retaining the best.",
+        "A separate timed run exhausted decision time through repeated legal Study use and reached a loss. Final error/warning log empty.",
+        "Final English/Chinese descriptions explicitly identify the five-second decision-time Study cost."
+      ],
+      "screenshots": [
+        "memory-final-desktop.jpg",
+        "memory-first-turn.jpg",
+        "memory-relaxed-study.jpg",
+        "memory-first-match.jpg",
+        "memory-fern-clear.jpg",
+        "memory-route-phone.jpg",
+        "memory-route-landscape.jpg",
+        "memory-wrong-order.jpg",
+        "memory-route-first-match.jpg",
+        "memory-route-clear.jpg",
+        "memory-triple-study.jpg",
+        "memory-triple-two-cards.jpg",
+        "memory-campaign-win.jpg",
+        "memory-restart.jpg",
+        "memory-timed-loss.jpg"
+      ],
+      "screenshotsInspected": true,
+      "consoleErrors": [],
+      "limitations": [
+        "Browser campaign used relaxed recovery and visible Study assistance. Independent automated campaigns additionally win timed play using only learned revealed faces.",
+        "Physical touch devices and other browsers were not tested."
+      ]
+    },
+    {
+      "id": "crate-keeper",
+      "verdict": "passed",
+      "sourceSha256": "a84396234e054adaa0682425167417858a3f8dbbddb3490252c630d9993eccd4",
+      "observed": [
+        "Complete eight-room campaign through actual keyboard and touch input: 168 committed moves, 40 pushes, final score 7080. Each solved room awaited explicit Next/Enter; the last room remained reviewable at score 6840 until confirmed.",
+        "H showed the next direction without moving the player. Solved room one was undone; a deliberate push to the upper wall produced a proven no-route hint, then undo and room reset recovered.",
+        "All eight Chinese touch actions exercised: four directions, undo, hint, reset room, and Next. The entire two-crate third room was solved using touch buttons.",
+        "English desktop/phone and Chinese phone/landscape layouts inspected. Warehouse boards, docked crate checks, separate moves/pushes, and the localized minimum-push label remain readable.",
+        "Post-win Enter activated the focused Play Again button and restored warehouse one, zero score and zero moves, with best score 7080 retained. Independent tests separately verify the game core terminal freeze.",
+        "P paused the restarted game; a Right input while paused did not move the keeper, and P resumed at zero moves. Final error/warning log empty."
+      ],
+      "screenshots": [
+        "crate-final-phone.jpg",
+        "crate-final-phone-zh.jpg",
+        "crate-touch-room-clear.jpg",
+        "crate-final-landscape.jpg",
+        "crate-room-five-clear.jpg",
+        "crate-room-six-clear.jpg",
+        "crate-room-seven-clear.jpg",
+        "crate-final-room-ready.jpg",
+        "crate-campaign-win.jpg",
+        "crate-restart.jpg"
+      ],
+      "screenshotsInspected": true,
+      "consoleErrors": [],
+      "limitations": [
+        "Authored legal routes were used for the full campaign; every step still entered through real controls.",
+        "This reversible puzzle has no terminal loss; dead-square recovery was checked instead.",
+        "Physical touch devices and other browsers were not tested."
+      ]
+    },
+    {
+      "id": "pixel-parkour",
+      "verdict": "passed",
+      "sourceTreeSha256": "17bebe4ff78a2785ca4c5608f2864520ece29342b0e2610b1ee5689ed3672bd2",
+      "wasmSha256": "e0a0b9c8602567e20ca6ffbc99c98318a10f59a53bf6ac49bc545ef142bb03c1",
+      "wrapperCssSha256": "14bc1b159755cdb6f739a72d1ae8c30e87324b1b0b67ba97bde2b0998065478e",
+      "observed": [
+        "Actual WebGL/WASM title, missions, shop, English help and gameplay render. A fresh origin starts with zero coins and no hoverboards.",
+        "Keyboard lane movement, jump, airborne tuck, ground roll, pause, resume and restart exercised. The first legal collision ended at 37 metres with one coin; the result and best score agreed.",
+        "Chinese wrapper and game synchronized during the active session. All eight wrapper controls exercised, including the unavailable hoverboard action, without a granted board or injected currency.",
+        "Phone portrait retains a letterboxed game and all controls. Revised fullscreen landscape places movement and menu controls beside the game; 844x390, 812x375 and 736x414 were inspected.",
+        "Later runs ended at 49 and 67 metres; the 67-metre run awarded 17 coins and showed bank18. A fresh run reset distance and run coins while retaining the bank.",
+        "Final legal run weaved around barriers, followed two ramps onto train roofs, returned to ground, collected spring shoes and used a powered jump. It ended at 277 metres with 78 run coins and bank96.",
+        "Changed native music6 to5, effects8 to7 and Chinese to English. Wrapper text and URL updated. Reloaded the page without an explicit language query: best277, bank96, English, music5 and effects7 persisted.",
+        "Final error/warning log empty."
+      ],
+      "screenshots": [
+        "parkour-air-tuck.jpg",
+        "parkour-banked-progress.jpg",
+        "parkour-barrier-weave.jpg",
+        "parkour-chinese-phone-result.jpg",
+        "parkour-chinese-touch-run.jpg",
+        "parkour-district-progress.jpg",
+        "parkour-final-missions.jpg",
+        "parkour-final-run-result.jpg",
+        "parkour-final-title.jpg",
+        "parkour-first-loss.jpg",
+        "parkour-first-run.jpg",
+        "parkour-ground-roll.jpg",
+        "parkour-help-english.jpg",
+        "parkour-landscape-736.jpg",
+        "parkour-landscape-812.jpg",
+        "parkour-landscape-revised.jpg",
+        "parkour-landscape-running.jpg",
+        "parkour-lane-left.jpg",
+        "parkour-paused-progress.jpg",
+        "parkour-ramp-to-roof.jpg",
+        "parkour-reloaded-settings.jpg",
+        "parkour-reloaded-title.jpg",
+        "parkour-roof-exit-landing.jpg",
+        "parkour-second-collision.jpg",
+        "parkour-second-roof.jpg",
+        "parkour-settings-changed.jpg",
+        "parkour-shop-after-escape.jpg",
+        "parkour-shop-empty-balance.jpg",
+        "parkour-spring-jump.jpg",
+        "parkour-spring-pickup.jpg",
+        "parkour-third-collision.jpg"
+      ],
+      "screenshotsInspected": true,
+      "consoleErrors": [],
+      "limitations": [
+        "This is an endless runner; meaningful progress and legal losses replace a terminal campaign win. The browser did not complete all missions or reach the later districts; seeded automated runs additionally cover 4000 metres.",
+        "The fresh-origin browser balance did not reach purchase or paid-revive costs. Automated tests cover purchase/save/revive boundaries; no currency or state was injected.",
+        "At portrait phone width the original 320x180 pixel game remains small. Landscape provides the inspected readable play area. Physical touch devices and other browsers were not tested.",
+        "Audio settings and playback code were checked, but no separate audible-quality recording was made."
+      ]
+    }
+  ],
+  "viewports": [
+    [1440, 900],
+    [390, 844],
+    [844, 390],
+    [736, 414],
+    [812, 375]
+  ]
+}

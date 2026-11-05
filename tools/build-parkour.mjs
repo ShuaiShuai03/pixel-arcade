@@ -1,5 +1,5 @@
 import { spawnSync } from 'node:child_process';
-import { readFileSync, writeFileSync, copyFileSync, mkdirSync } from 'node:fs';
+import { readFileSync, writeFileSync, copyFileSync, mkdirSync, readdirSync } from 'node:fs';
 import { dirname, resolve, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createHash } from 'node:crypto';
@@ -60,11 +60,45 @@ const hashes = Object.fromEntries(
       .digest('hex'),
   ]),
 );
+// Record the actual vendored inputs as well as the original upstream revision.
+// File names and ordering are portable; build outputs and local caches are excluded.
+function rustSources(directory, prefix = '') {
+  return readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
+    const relative = prefix + entry.name;
+    if (entry.isDirectory()) return rustSources(join(directory, entry.name), relative + '/');
+    return entry.isFile() && entry.name.endsWith('.rs') ? [relative] : [];
+  });
+}
+const sourceFiles = [
+  'Cargo.toml',
+  'Cargo.lock',
+  '.cargo/config.toml',
+  'SOURCE.json',
+  'tools/gen_cjk.py',
+  ...rustSources(join(source, 'src'), 'src/'),
+].sort();
+const sourceFilesSha256 = Object.fromEntries(
+  sourceFiles.map((file) => [
+    file,
+    createHash('sha256')
+      .update(readFileSync(join(source, file)))
+      .digest('hex'),
+  ]),
+);
+const sourceTreeSha256 = createHash('sha256')
+  .update(sourceFiles.map((file) => `${file}\0${sourceFilesSha256[file]}\n`).join(''))
+  .digest('hex');
+const buildScriptSha256 = createHash('sha256')
+  .update(readFileSync(fileURLToPath(import.meta.url)))
+  .digest('hex');
 writeFileSync(
   join(output, 'build-info.json'),
   JSON.stringify(
     {
       source: JSON.parse(readFileSync(join(source, 'SOURCE.json'), 'utf8')),
+      sourceFilesSha256,
+      sourceTreeSha256,
+      buildScriptSha256,
       dependencies: { macroquad: '0.4.16', miniquad: '0.4.11', 'quad-snd': '0.2.8' },
       compiler: spawnSync('rustc', ['--version'], { encoding: 'utf8' }).stdout.trim(),
       sha256: hashes,

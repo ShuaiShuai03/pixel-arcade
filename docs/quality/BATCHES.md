@@ -2,11 +2,15 @@
 
 At the user's direction, at most **three games** may be under development and acceptance testing at one time. Do not begin the next batch until all games in the active batch satisfy the gates below. The 100-game target includes Pixel Parkour. Roster themes are not work assignments.
 
+## Completed batch 7
+
+Crate Keeper, Memory Grove, and Pixel Parkour passed initial development, independent review, and browser acceptance. All 192 focused checks and three scoped catalog checks pass. Crate Keeper and Memory Grove completed full browser campaigns; Pixel Parkour completed a 277-metre run, legal losses, roof and spring-shoe play, and save/reload checks. See the [batch 7 evidence](batch-07/ACCEPTANCE.md). Publication verification follows the final integration checks.
+
+The next batch is Lantern Climber, Gravity Courier, and Grapnel Gorge. It remains queued until batch 7 integration is complete.
+
 ## Completed batch 6
 
-Blockfall, Gem Match, and Minefield passed initial development, independent review, and browser acceptance. All 114 focused tests and four scoped catalog checks pass. See the [batch 6 evidence](batch-06/ACCEPTANCE.md). Publication verification is pending.
-
-The next batch is Crate Keeper, Memory Grove, and Pixel Parkour. It remains queued until batch 6 publication is verified.
+Blockfall, Gem Match, and Minefield passed initial development, independent review, and browser acceptance. All 114 focused tests and four scoped catalog checks pass. See the [batch 6 evidence](batch-06/ACCEPTANCE.md). Commit `f8f840a` is live. All eight checked assets matched, and the published Minefield opening and proof check passed. See the [deployment receipt](batch-06/deployment.json).
 
 ## Completed batch 5
 
