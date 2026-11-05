@@ -1,0 +1,28 @@
+{
+  "date": "2026-11-05",
+  "status": "preliminary",
+  "method": "3600 public-input updates per game at 60 Hz, holding Fire and alternating Left/Right every 120 frames. Timed update plus getState; fresh instance after a terminal result. Node on the development host. Does not measure browser drawing, GPU work or physical mobile hardware.",
+  "games": [
+    {
+      "id": "sky-raiders",
+      "meanMs": 0.04,
+      "p95Ms": 0.09,
+      "p99Ms": 0.165,
+      "maxActorsAndRounds": 17
+    },
+    {
+      "id": "iron-bastion",
+      "meanMs": 0.055,
+      "p95Ms": 0.111,
+      "p99Ms": 0.233,
+      "maxActorsAndRounds": 9
+    },
+    {
+      "id": "orbit-invaders",
+      "meanMs": 0.057,
+      "p95Ms": 0.093,
+      "p99Ms": 0.143,
+      "maxActorsAndRounds": 26
+    }
+  ]
+}

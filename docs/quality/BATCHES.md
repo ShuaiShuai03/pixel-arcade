@@ -2,9 +2,13 @@
 
 At the user's direction, at most **three games** may be under development and acceptance testing at one time. Do not begin the next batch until all games in the active batch satisfy the gates below. The 100-game target includes Pixel Parkour. Roster themes are not work assignments.
 
+## Completed batch 4
+
+Sky Raiders, Iron Bastion, and Orbit Invaders passed their initial development, tests, independent review, and browser acceptance. All 130 focused tests and four catalog checks pass. See the [batch 4 evidence](batch-04/ACCEPTANCE.md). Release verification is in progress; batch 5 remains queued until it finishes.
+
 ## Completed batch 3
 
-Ember Knights, Bomb Garden, and Dungeon Dash passed their initial development, tests, independent review, and browser acceptance. See the [batch 3 evidence](batch-03/ACCEPTANCE.md). All 130 focused tests and four catalog checks pass. The public update is being prepared; batch 4 remains queued until publication is verified.
+Ember Knights, Bomb Garden, and Dungeon Dash passed their initial development, tests, independent review, and browser acceptance. See the [batch 3 evidence](batch-03/ACCEPTANCE.md). All 130 focused tests and four catalog checks pass. Commit `a9d376b` is live; all eight checked assets matched and the published Bomb Garden placement/escape check passed. See the [deployment receipt](batch-03/deployment.json).
 
 ## Completed batch 2
 

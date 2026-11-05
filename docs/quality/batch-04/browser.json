@@ -1,0 +1,265 @@
+{
+  "date": "2026-11-05",
+  "browser": "Installed stable Google Chrome via Codex Chrome extension",
+  "status": "passed",
+  "stateInjection": false,
+  "preliminaryChecks": [
+    {
+      "id": "sky-raiders",
+      "observed": ["Pre-rewrite flight presentation captured with ordinary fire input."],
+      "screenshots": ["sky-baseline.jpg"],
+      "screenshotsInspected": true,
+      "revisionNotes": "Baseline evidence only; not acceptance."
+    },
+    {
+      "id": "iron-bastion",
+      "observed": [
+        "First rewritten core compiles and starts through the real host.",
+        "Up plus Fire for two seconds stopped the tank against steel cover without losing armor or penetrating the wall.",
+        "Right for one second steered the tank clear; armor 4/4, beacon 5/5 and two repair kits remained.",
+        "At a 390 by 844 viewport, the complete battlefield and all seven touch buttons fit on screen."
+      ],
+      "screenshots": [
+        "iron-core-initial.jpg",
+        "iron-core-steel-stop.jpg",
+        "iron-core-steel-recovery.jpg",
+        "iron-core-phone.jpg"
+      ],
+      "screenshotsInspected": true,
+      "revisionNotes": "Early physics checkpoint; art/campaign/review are still in progress. Not final acceptance."
+    },
+    {
+      "id": "orbit-invaders",
+      "observed": [
+        "Holding Fire for four seconds produced 700 points while retaining three craft.",
+        "Left plus Fire and Right plus Fire exposed visible holes in the bunkers; the score reached 900 with three craft.",
+        "Shift plus Fire exercised the guard recharge and gun cooling.",
+        "English-only parenthetical in the Chinese guard key guide was reported for correction.",
+        "Reloaded the correction to the Chinese guard key guide and confirmed its localized text.",
+        "In English, repeated 1.5-second firing sweeps reduced the first fleet to four enemies with one hull at score 2030. Subsequent stationary firing produced a legitimate loss at 2130.",
+        "Play again restored wave one, three hull, 100-second breach timer, all bunkers and score zero, while retaining best 2130.",
+        "Reported that the guard description should explain its brief duration and three-hit capacity."
+      ],
+      "screenshots": [
+        "orbit-core-fire.jpg",
+        "orbit-core-guard.jpg",
+        "orbit-core-sweeps.jpg",
+        "orbit-core-wave-late.jpg",
+        "orbit-core-first-result.jpg",
+        "orbit-core-reset.jpg"
+      ],
+      "screenshotsInspected": true,
+      "revisionNotes": "Early compiling core; campaign, art and independent review pending. Not final acceptance."
+    },
+    {
+      "id": "sky-raiders",
+      "observed": [
+        "The rewritten flight core starts and runs through the host.",
+        "Left plus Fire for two seconds, Right plus Fire for two seconds and Fire for two seconds produced 100 points, three of four shields and visible heat accumulation.",
+        "The sector name, shield and interception-charge counters are visible; full art and campaign review is pending."
+      ],
+      "screenshots": ["sky-core-flight.jpg"],
+      "screenshotsInspected": true,
+      "revisionNotes": "First compiling rewrite; not final acceptance."
+    },
+    {
+      "id": "sky-raiders",
+      "observed": [
+        "Source 6cb3d00a displayed an expanding interception charge and reduced stock from three to two.",
+        "Ordinary Up/Right flight collected a visible weapon pod; weapon rose from one to two and score gained 50.",
+        "Down/Left flight and held fire demonstrated twin rounds and automatic heat recovery; reached score 530 with three shields.",
+        "Paused further source-dependent acceptance after the reviewer found a three-body contact constraint issue."
+      ],
+      "screenshots": [
+        "sky-en-charge.jpg",
+        "sky-en-flight.jpg",
+        "sky-supply-approach.jpg",
+        "sky-powered-fire.jpg"
+      ],
+      "screenshotsInspected": true,
+      "revisionNotes": "Intermediate unified solver 6cb3d00a; final contact fix and acceptance pending."
+    },
+    {
+      "id": "sky-raiders",
+      "observed": [
+        "Reloaded the corrected 8e3a7cb6 contact solver. Keyboard opening fire and an interception charge defeated escorts; controlled Up/Right flight collected a weapon pod and unlocked twin shots.",
+        "Automatic gun cooling recovered without blocking movement; reached score 530 with three shields and weapon two.",
+        "Activated all six Chinese phone touch controls. The charge visibly expanded, reduced stock to one, and the first carrier appeared with its health bar and gold core."
+      ],
+      "screenshots": [
+        "sky-final-opening.jpg",
+        "sky-final-upgrade.jpg",
+        "sky-zh-touch-controls.jpg"
+      ],
+      "screenshotsInspected": true,
+      "revisionNotes": "Intermediate 8e3a7cb6 candidate; superseded by the projectile absorption momentum correction."
+    }
+  ],
+  "games": [
+    {
+      "id": "orbit-invaders",
+      "status": "passed",
+      "keyboard": ["Arrow movement", "Space fire", "Shift guard", "pause/resume", "restart"],
+      "touch": ["Left", "Right", "Fire", "Guard plate"],
+      "observed": [
+        "English desktop shows the active guard with three remaining hits and a visible countdown; the gun reports GUN SAFE while the plate is deployed.",
+        "Chinese phone layout fits the complete battlefield and all four controls; each control was activated.",
+        "Chinese landscape fullscreen keeps movement and action buttons outside the battlefield.",
+        "An initial Chinese loss at score 1400 and restart restored wave one, three hull, 60 cover blocks, zero heat and score zero.",
+        "Reloaded the final bonus-craft collision correction (d267f530). Ordinary keyboard movement, firing and timed guarding then defeated all 24 first-wave scouts at score 2415.",
+        "The crew-service transition restored one hull and repaired cover. Entered Diving Wings 2/4 with two hull and four visibly distinct diver silhouettes; continued play reached score 3465 before a legitimate second-encounter loss.",
+        "Restart after that loss restored wave one, three hull, 60 cover blocks, zero heat and score zero while preserving best 3465.",
+        "Reloaded the final f75473c1 source after the separating-contact correction and cooldown wording clarification. Chinese and English text agree that the cooldown starts at activation; movement, firing and active guard run cleanly with no console errors or warnings."
+      ],
+      "screenshots": [
+        "orbit-en-guard.jpg",
+        "orbit-zh-phone-touch.jpg",
+        "orbit-zh-landscape.jpg",
+        "orbit-zh-result.jpg",
+        "orbit-zh-restart.jpg",
+        "orbit-corrected-play.jpg",
+        "orbit-corrected-midwave.jpg",
+        "orbit-corrected-tracking.jpg",
+        "orbit-corrected-endwave.jpg",
+        "orbit-corrected-targeted.jpg",
+        "orbit-corrected-last-targets.jpg",
+        "orbit-corrected-last-column.jpg",
+        "orbit-corrected-last-scout.jpg",
+        "orbit-first-clear-result.jpg",
+        "orbit-diving-wings.jpg",
+        "orbit-second-encounter.jpg",
+        "orbit-second-encounter-loss.jpg",
+        "orbit-corrected-restart.jpg",
+        "orbit-frozen-final.jpg"
+      ],
+      "screenshotsInspected": true,
+      "consoleErrorsOrWarnings": [],
+      "revisionNotes": "UI and control checks began on 078f88ab. Reloaded d267f530 for the complete first encounter, second-encounter play, loss and restart. Final f75473c1 adds the separating-contact correction and clarified activation-cooldown wording; reloaded, checked both languages, and exercised movement, firing and guarding again. Final source and test hashes are independently approved.",
+      "browserTestedSourceSha256": "f75473c14266d531feabfc92da6ec493a03fd7981779f12fbecb10261a85d06d",
+      "limitations": [
+        "Full four-encounter victory is established by automated public-input campaigns, not this browser journey.",
+        "Touch controls were activated in desktop Chrome at phone dimensions; no physical touch device or non-Chrome browser was tested."
+      ],
+      "sourceHashes": {
+        "src/games/orbit-invaders.js": "f75473c14266d531feabfc92da6ec493a03fd7981779f12fbecb10261a85d06d",
+        "tests/orbit-invaders.test.js": "9e336c370ee13551566d01f973f07a02ace90fb0c453cf131f7cf1a843507540"
+      }
+    },
+    {
+      "id": "iron-bastion",
+      "status": "passed",
+      "keyboard": [
+        "Arrow steering",
+        "X plus Left/Right turret aiming",
+        "Space firing",
+        "H repair refusal when full",
+        "pause/resume",
+        "restart"
+      ],
+      "touch": [
+        "Left",
+        "Right",
+        "Up",
+        "Down",
+        "Fire",
+        "Brake/Aim",
+        "Repair",
+        "direct field aim/fire"
+      ],
+      "observed": [
+        "English desktop displays separate labeled armor, beacon, kit and ammunition readouts; a full-health repair attempt displayed kit saved and retained both kits.",
+        "Keyboard turret aiming and fire defeated an attacker and destroyed brick cover. Steel remained solid.",
+        "Touch repair restored two armor and one nearby beacon point per kit. The final repair was visibly confirmed at armor 4/4, beacon 5/5 and zero kits.",
+        "Activated all seven Chinese touch buttons. Both the phone and landscape fullscreen layouts kept every control accessible.",
+        "A legitimate beacon-destruction loss ended the first run at score 320. Restart restored the original battlefield, armor 4/4, beacon 5/5, two kits, 600 rounds and score zero while retaining the best score.",
+        "On a second run, direct field aiming and firing defeated the first three attackers while retaining full armor and beacon health.",
+        "Ordinary Up and Right movement collected a dropped repair supply, increasing kits from two to three.",
+        "Defeated the final attacker and cleared Courtyard at score 900. The dedicated three-line engineer transition remained readable.",
+        "Foundry 2/3 preserved the tank position, rearmed ammunition from 553 to 600, and retained full armor, beacon health and three kits. Down movement then crossed the rebuilt central corridor successfully."
+      ],
+      "screenshots": [
+        "iron-en-start.jpg",
+        "iron-keyboard-aim.jpg",
+        "iron-keyboard-combat.jpg",
+        "iron-zh-before-repair.jpg",
+        "iron-zh-subsequent-damage.jpg",
+        "iron-zh-touch-recovery.jpg",
+        "iron-zh-touch-controls.jpg",
+        "iron-courtyard-result.jpg",
+        "iron-zh-restart.jpg",
+        "iron-zh-landscape.jpg",
+        "iron-pointer-aim.jpg",
+        "iron-pointer-combat.jpg",
+        "iron-last-attacker.jpg",
+        "iron-supply-approach.jpg",
+        "iron-engineer-transition.jpg",
+        "iron-foundry.jpg",
+        "iron-foundry-access.jpg"
+      ],
+      "screenshotsInspected": true,
+      "consoleErrorsOrWarnings": [],
+      "revisionNotes": "All final browser checks used the unchanged runtime source 4d82fbe3. Final source and test hashes are independently approved.",
+      "browserTestedSourceSha256": "4d82fbe3f256aa3447350b6f845e4451fb92d3f41dc877fddc75a12afeeca293",
+      "limitations": [
+        "Complete three-battlefield victories are established by automated keyboard-input campaigns; this browser journey cleared Courtyard and entered Foundry.",
+        "Touch controls were activated in desktop Chrome at phone dimensions; no physical touch device or non-Chrome browser was tested."
+      ],
+      "sourceHashes": {
+        "src/games/iron-bastion.js": "4d82fbe3f256aa3447350b6f845e4451fb92d3f41dc877fddc75a12afeeca293",
+        "tests/iron-bastion.test.js": "66dcb278aa8c24246ab46200d6c333f681c7ed774a2f2e183fd0c65d88b1b941"
+      }
+    },
+    {
+      "id": "sky-raiders",
+      "status": "passed",
+      "keyboard": [
+        "Arrow movement",
+        "Space fire",
+        "K interception charge",
+        "pause/resume",
+        "restart"
+      ],
+      "touch": ["Left", "Right", "Up", "Down", "Fire", "Charge"],
+      "observed": [
+        "Reloaded final source 04d0703a. Keyboard firing, an interception charge and directional flight defeated escorts and collected a weapon pod, raising weapon power to two and score to 530.",
+        "Activated all six Chinese phone touch controls; the expanding charge visibly consumed one stock. All controls and instructions remained accessible at 390x844.",
+        "Chinese 844x390 fullscreen kept the battlefield and controls separate and readable. Tracked the first carrier core while moving across its announced fan attacks; heat rose, entered automatic cooling, and recovered.",
+        "After losing one shield during the carrier fight, used the final charge and defeated the carrier. Copper Coast 2/6 began at score 1230; the transition restored shields from two to three, retained weapon two, and left charge stock at zero.",
+        "Continued ordinary movement and firing in the second sector. Stationary firing eventually produced a legitimate hostile-fire loss at score 1410 with a localized explanation.",
+        "Play again restored Cloudbreak 1/6, three shields, weapon one, three charges, zero heat and score zero while retaining best 1410. Confirmed restored resources again on the English desktop after moving right.",
+        "Final browser error/warning log was empty."
+      ],
+      "screenshots": [
+        "sky-impulse-opening.jpg",
+        "sky-impulse-upgrade.jpg",
+        "sky-impulse-touch.jpg",
+        "sky-carrier-landscape.jpg",
+        "sky-carrier-tracking.jpg",
+        "sky-carrier-dodge.jpg",
+        "sky-carrier-core.jpg",
+        "sky-carrier-late.jpg",
+        "sky-copper-coast.jpg",
+        "sky-second-sector-result.jpg",
+        "sky-final-restart.jpg",
+        "sky-final-restart-desktop.jpg"
+      ],
+      "screenshotsInspected": true,
+      "browserTestedSourceSha256": "04d0703ac7791e3f72521438bae922517fd60a10a5d2ca42fdb8a396dbfdaf76",
+      "revisionNotes": "Final keyboard/touch, first carrier victory, sector transition, second-sector loss and restart all used the unchanged 04d0703a source.",
+      "consoleErrorsOrWarnings": [],
+      "limitations": [
+        "All six-sector victories are established by automated public-input campaigns; this browser journey cleared Cloudbreak and played Copper Coast.",
+        "Touch controls were activated in desktop Chrome at phone dimensions; no physical touch device or non-Chrome browser was tested."
+      ],
+      "sourceHashes": {
+        "src/games/sky-raiders.js": "04d0703ac7791e3f72521438bae922517fd60a10a5d2ca42fdb8a396dbfdaf76",
+        "tests/sky-raiders.test.js": "030da3d11e5e9400c07b109b970673c9320b06f09d352ca8665a0a5351d92e99"
+      }
+    }
+  ],
+  "viewports": [
+    [1440, 900],
+    [844, 390],
+    [390, 844]
+  ]
+}

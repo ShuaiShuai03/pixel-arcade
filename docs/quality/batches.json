@@ -10,7 +10,10 @@
     "pixel-rally",
     "ember-knights",
     "bomb-garden",
-    "dungeon-dash"
+    "dungeon-dash",
+    "sky-raiders",
+    "iron-bastion",
+    "orbit-invaders"
   ],
   "batches": [
     {
@@ -34,7 +37,8 @@
     {
       "number": 4,
       "games": ["sky-raiders", "iron-bastion", "orbit-invaders"],
-      "status": "queued"
+      "status": "accepted",
+      "acceptance": "batch-04/ACCEPTANCE.md"
     },
     {
       "number": 5,

@@ -1,0 +1,78 @@
+{
+  "date": "2026-11-05",
+  "phase": "initial batch review",
+  "finalCollectionReview": false,
+  "records": [
+    {
+      "game": "orbit-invaders",
+      "reviewer": "review_snowball_batch1",
+      "verdict": "approved",
+      "focusedTestsPassed": 35,
+      "coverage": {
+        "lines": 99.21,
+        "branches": 95.65,
+        "functions": 100
+      },
+      "evidence": [
+        "All 35 focused tests pass on the frozen source, including six complete public-input campaigns across seeds 1/2 at 30/60/120Hz.",
+        "Recovery after deliberately reducing cover, overheating and stopping at the rail edge completes the four encounters; losses, reset, one-shot terminal callback and frozen terminal state pass.",
+        "Independently checked finite motors and fleet descent, nearest two-dimensional projectile contacts, shared solid bunker material, sprite-derived player/enemy/bonus geometry, live warning emitters, finite bonus spawns and late diver peer/cover clearance.",
+        "All reported blockers closed, including zero-time input mutation, duplicate simultaneous scoring, transparent-corner hits and separating contact at a bunker arch. Approaching contact at the end of the step still registers.",
+        "The later second review of the complete 100-game collection remains separate."
+      ],
+      "sha256": {
+        "src/games/orbit-invaders.js": "f75473c14266d531feabfc92da6ec493a03fd7981779f12fbecb10261a85d06d",
+        "tests/orbit-invaders.test.js": "9e336c370ee13551566d01f973f07a02ace90fb0c453cf131f7cf1a843507540"
+      }
+    },
+    {
+      "game": "iron-bastion",
+      "reviewer": "review_starbreaker_batch1",
+      "verdict": "approved",
+      "focusedTestsPassed": 25,
+      "coverage": {
+        "lines": 98.16,
+        "branches": 92.94,
+        "functions": 98.25
+      },
+      "evidence": [
+        "All 25 focused tests and diff checks pass on the frozen source.",
+        "Six independent keyboard-only campaigns cleared all three battlefields and 15 tanks at 30/60/120Hz. Baseline and deliberately missed defenses followed by repair passed in 64.117–64.738 seconds.",
+        "Three idle losses at 30/60/120Hz ended at 15.0167 seconds; callback snapshots already contained final state, and later updates stayed frozen. New-instance reset passed.",
+        "Two hundred passive-contact momentum/energy fixtures, fourteen retained-pickup construction access cases, and exact pickup-boundary cases passed.",
+        "Verified earliest/tied projectile contacts, launch and capture momentum, real shell radius, lifetime ordering, safe announced spawning and preservation of player position/access through construction.",
+        "Three seeds of 3600 input frames remained finite, bounded and deterministic. Steering, braking and manual turret motion had zero measured frame-rate error.",
+        "All reported actionable findings are closed. This is initial review only; the later complete-collection review remains required."
+      ],
+      "sha256": {
+        "src/games/iron-bastion.js": "4d82fbe3f256aa3447350b6f845e4451fb92d3f41dc877fddc75a12afeeca293",
+        "tests/iron-bastion.test.js": "66dcb278aa8c24246ab46200d6c333f681c7ed774a2f2e183fd0c65d88b1b941"
+      }
+    },
+    {
+      "game": "sky-raiders",
+      "reviewer": "action_review",
+      "verdict": "approved",
+      "focusedTestsPassed": 43,
+      "coverage": {
+        "lines": 99.46,
+        "branches": 94.01,
+        "functions": 98.8
+      },
+      "evidence": [
+        "All 43 tests independently pass on the frozen source. Complete six-sector campaigns pass for seeds 1 and 9 at 30/60/120Hz, with four shields remaining.",
+        "The owner measured 195.93s, 195.17s and 208.51s campaigns at 30/60/120Hz. A campaign after spending all initial charges also wins, in 219.79s.",
+        "Verified unified chronology for body impacts, projectile hits, pickups, projectile and pod lifetime, expanding interception waves, and disappearing destroyed hull/part geometry.",
+        "Persistent active contacts are projected after subsequent third-body impulses. Separating or sliding tangency causes no new impact while approaching end-of-step contact still counts.",
+        "Projectile launch recoil and coalesced inelastic absorption account for mass and momentum. Reversed simultaneous bullet ordering produces the same capture result without passive energy gain.",
+        "Carrier cleanup preserves live hostile rounds and defensive fire/charges; later pickups cannot revive an earlier fatal hit. Frozen terminal state, one callback, reset and finite-state checks pass.",
+        "A supplemental chronology reviewer independently passed 16 targeted tests on the preceding 8e3a7cb6 source. The lead reviewed the later absorption correction and final complete matrix.",
+        "All reported actionable findings are closed. This is initial review only; the later complete-collection review remains required."
+      ],
+      "sha256": {
+        "src/games/sky-raiders.js": "04d0703ac7791e3f72521438bae922517fd60a10a5d2ca42fdb8a396dbfdaf76",
+        "tests/sky-raiders.test.js": "030da3d11e5e9400c07b109b970673c9320b06f09d352ca8665a0a5351d92e99"
+      }
+    }
+  ]
+}

@@ -54,6 +54,8 @@ Two-player games must also work in solo mode with an actual AI opponent, a partn
 - Jumping games require deliberate air control, jump buffering, coyote time where appropriate, and a documented jump envelope.
 - Collision geometry must correspond to visible solids. Fast projectiles and moving obstacles must not tunnel.
 - Resolve penetration without unexplained teleportation or imparting energy repeatedly.
+- Detect approaching contact at the end of a simulation step, but do not count separating tangency as another impact. Recheck active contacts after a later impulse from a third body.
+- Order body impacts, projectile hits, pickups, expiration, and disappearing geometry by their actual event times. A later pickup cannot undo an earlier fatal hit, and a destroyed body or part cannot consume a later shot.
 - Distinguish inactive objects, damaging objects, and intentional attacks. For Snowball Siege specifically, an idle or merely touching snowball must not become a damaging moving attack.
 - Input cancellation, simultaneous directions, cooldown boundaries, and action release must behave consistently.
 - Resolve simultaneous attacks, detonations, and terminal outcomes without favoring a player or object because it appears first in an array.

@@ -1,0 +1,163 @@
+✔ keys distinguish held and one-frame press even on repeat (0.494875ms)
+✔ touch and keyboard ownership cannot release each other (0.070166ms)
+✔ clearing input on blur releases pointer and presses (0.050875ms)
+✔ an accessible button pulse lasts one physics step without releasing a held key (0.046084ms)
+✔ Bastion shell has real radius at narrow brick gaps (1.297708ms)
+✔ Bastion starts and stops through finite acceleration with opposing keys cancelling (1.782458ms)
+✔ Bastion holds kits when no repair is needed and publishes every essential touch action (0.290667ms)
+✔ Bastion circle sweep respects a rounded corner rather than an expanded-box false hit (0.471791ms)
+✔ Bastion firing removes carried-round mass and conserves momentum in translated frames (0.783125ms)
+✔ Bastion a captured round adds mass, preserves momentum and cannot create passive kinetic energy (0.326ms)
+✔ Bastion muzzle next to a wall cannot shoot through it (0.152417ms)
+✔ Bastion fast shells hit nearest brick/steel geometry and expire before distant targets (0.16025ms)
+✔ Bastion inactive shells still stop at solids without becoming attacks (0.108708ms)
+✔ Bastion passive solid tank contact preserves momentum without damaging armor (4.771375ms)
+✔ Bastion simultaneous last-enemy and beacon impacts resolve all damage before one terminal result (0.879292ms)
+✔ Bastion tied brick damage and shell interception are order-independent (0.226958ms)
+✔ Bastion repair covers tank, beacon, both and preserves full or out-of-range kits (0.250125ms)
+✔ Bastion reinforcement warnings cannot materialize a tank into an occupied lane (2.198125ms)
+✔ Bastion engineers preserve tank position and retained-kit reachability (0.37675ms)
+✔ Bastion depletion of carried rounds has a visible terminal outcome instead of silent lost controls (0.184833ms)
+✔ Bastion complete keyboard-only three-field campaigns and missed-defense recovery at 30/60/120Hz (4615.729125ms)
+✔ Bastion last live round resolves before depletion and can secure the final field or rearm the next (1.659416ms)
+✔ Bastion full stock exhausts finitely and engineer ammunition load conserves vehicle momentum (0.2735ms)
+✔ Bastion ordinary steel-stop movement recovers through real steering without passive damage (15.981708ms)
+✔ Bastion empty kit inventory can recover from floor supply and full packs leave it available (0.2615ms)
+✔ Bastion body-contact and shell outcomes do not depend on array order (0.312417ms)
+✔ Bastion driving/steering are frame-rate invariant and brake dissipates kinetic energy (1.607417ms)
+✔ Bastion actual idle losses, resets and terminal callbacks remain stable (614.367417ms)
+✔ Bastion seeded public-input simulations are finite, deterministic and drawable in both languages (542.42225ms)
+✔ invader waves increase and ship moves and fires (2.833208ms)
+✔ invader shots destroy enemies and shields absorb hostile fire (3.315458ms)
+✔ invader ship loses health, is temporarily invulnerable, and loses at zero (0.32075ms)
+✔ invader descent can lose and last wave can win (0.118542ms)
+✔ invader game has bounded projectiles and deterministic end (319.963583ms)
+✔ legal rail movement, interception and guard clear all four encounters at 30,60,120Hz (3518.1225ms)
+✔ invader campaigns have scouts, divers, a command ship, and a rechargeable barrier (0.258916ms)
+✔ invader fire is telegraphed before hostile bullets appear (3.101708ms)
+✔ invader barrier absorbs shots, respects recharge and pointer moves and fires (4.276208ms)
+✔ invader commander changes attack and swept shots cannot tunnel (0.278542ms)
+✔ invader ship speed is identical at 30, 60 and 120 Hz (3.998667ms)
+✔ orbit physics: pointer motor cannot teleport and fleet turns never step downward instantly (0.300833ms)
+✔ orbit physics: a swept shot hits the nearest body and diagonal hostile rounds cannot tunnel (0.475709ms)
+✔ orbit physics: bunker material blocks friendly rounds as well as hostile rounds (0.183208ms)
+✔ orbit physics: guard intercepts at its visible plate, never below the ship (0.133375ms)
+✔ orbit resources: gun heat and guard charge recover after ordinary overuse (129.144208ms)
+✔ orbit lifecycle: zero or invalid time cannot fire, move, or spend guard charge (0.246541ms)
+✔ orbit scoring: simultaneous hits on one bonus craft award exactly one bounty (0.139917ms)
+✔ orbit scoring: simultaneous interceptions destroy a heavy round only once (0.423375ms)
+✔ orbit formation: powered descents have finite acceleration and continuous endpoint velocity (4.301291ms)
+✔ orbit diver: late return stays above the defense line and never penetrates bunker material (5.197917ms)
+✔ orbit diver: late attack first clears peer altitude before moving across the formation (4.791958ms)
+✔ orbit visible hull: transparent player corners do not take remote hits (0.807917ms)
+✔ orbit visible hull: enemy transparent corners and wing gaps share the rendered sprite mask (0.5055ms)
+✔ orbit bonus: score requires contact with visible craft material (0.46225ms)
+✔ orbit warning: a destroyed emitter cannot leave ghost muzzle flashes or shots (0.448375ms)
+✔ orbit warning: aiming stays attached to the live moving muzzle and rounds inherit gun motion (0.531083ms)
+✔ orbit cover: the real arch is open below its roof and both sides can cut a firing slot (0.328333ms)
+✔ orbit guard: three normal contacts shatter the plate, while recharge remains recoverable (13.008208ms)
+✔ orbit simultaneous hits: enemy elimination and hull destruction have one array-independent outcome (0.425792ms)
+✔ orbit cleanup: surviving hostile fire must be intercepted before the final victory (0.229625ms)
+✔ orbit launch and finite bonuses: deployment has a response window and no endless bonus farming (130.232416ms)
+✔ orbit recovery: exhausted cover, overheated gun and a rail stop still allow a legal campaign win (582.546125ms)
+✔ orbit legal failure, restart and terminal freeze work in English and Chinese (433.157208ms)
+✔ orbit resources and public snapshots remain finite, bounded and detached during prolonged play (203.637958ms)
+✔ keyboard and button restart retain best and create fresh games (2.552875ms)
+✔ finished result follows language changes without losing score (1.000875ms)
+✔ pause updates HUD immediately and resume preserves the run (0.423959ms)
+✔ blur releases held keys and long frames are capped (0.422291ms)
+✔ late module resolution cannot overwrite a newer route (0.257167ms)
+✔ a press survives a frame without a physics tick and fires only once during catch-up (0.6395ms)
+✔ language changes release controls whose touch buttons are replaced (0.192875ms)
+✔ the shelf loads only visible previews and navigation shares their in-flight load (1.233834ms)
+✔ a failed preview load can be retried by opening the game (2.867917ms)
+✔ secondary touches cannot steer or release the active canvas gesture (0.327708ms)
+✔ right click does not fire a canvas action (0.160166ms)
+✔ unsupported fullscreen expands the player and Escape restores its normal layout (0.634334ms)
+✔ denied fullscreen falls back and navigation restores the page (0.264667ms)
+✔ fullscreen returns keyboard focus to an active game when entering and leaving (0.174916ms)
+✔ opposite touch groups retain independent pointer ownership (0.221959ms)
+✔ keyboard activation of a touch control produces one deliberate action (0.132792ms)
+✔ opted-in two-player touch controls replace solo buttons and keep independent input (0.236792ms)
+✔ two-player games without a dedicated touch layout keep solo controls hidden (0.644333ms)
+✔ simulation advances equally on 30, 60, 120 and 144 Hz displays (1.223334ms)
+✔ a long stall has a bounded catch-up and never produces a large physics step (0.083666ms)
+✔ reset discards time from the previous run or pause (0.059583ms)
+✔ ending a game stops catch-up immediately and discards remaining time (0.059916ms)
+✔ invalid elapsed values cannot poison subsequent updates (0.051416ms)
+✔ sky: finite thrust and airbrakes preserve a bounded stopping trajectory (0.801416ms)
+✔ sky: flight-limit assist remains bounded and can reverse (1,0) (0.46625ms)
+✔ sky: flight-limit assist remains bounded and can reverse (-1,0) (0.269209ms)
+✔ sky: flight-limit assist remains bounded and can reverse (0,1) (0.369583ms)
+✔ sky: flight-limit assist remains bounded and can reverse (0,-1) (0.356167ms)
+✔ sky: flight-limit assist remains bounded and can reverse (1,1) (0.542958ms)
+✔ sky: flight-limit assist remains bounded and can reverse (-1,-1) (0.299667ms)
+✔ sky: movement agrees at 30, 60 and 120 Hz without diagonal speed boosts (0.132708ms)
+✔ sky: the solid wing pixels and swept fast projectiles use shared hull geometry (0.983334ms)
+✔ sky: launched rounds inherit motion and their recoil conserves launch momentum (0.139083ms)
+✔ sky: hull impulses dissipate energy without changing positions or awarding kills (0.081375ms)
+✔ sky: nearest projectile impact wins regardless of enemy array order (0.765083ms)
+✔ sky: a lethal trade resolves both launched impacts before terminal state (0.86875ms)
+✔ sky: charge activation consumes one stock and propagates instead of globally deleting (1.620291ms)
+✔ sky: ordinary raiders visibly lock an aim warning before they launch rounds (7.151417ms)
+✔ sky: a hull killed at an earlier time cannot consume a later round (0.113583ms)
+✔ sky: battery contact is chronological and cannot revive a previously destroyed hull (0.200875ms)
+✔ sky: the interception front meets the actual near-side turret before the far turret (0.106042ms)
+✔ sky: armored carriers require the marked core after both turret mounts are broken (0.083167ms)
+✔ sky: full six-sector public-input victory (30 Hz, seed 1) (1024.651666ms)
+ℹ Campaign 30Hz seed 1: 195.93s, shields 4, weapon 3, charges 2
+✔ sky: full six-sector public-input victory (30 Hz, seed 9) (932.081792ms)
+ℹ Campaign 30Hz seed 9: 195.93s, shields 4, weapon 3, charges 2
+✔ sky: full six-sector public-input victory (60 Hz, seed 1) (1266.587375ms)
+ℹ Campaign 60Hz seed 1: 195.17s, shields 4, weapon 3, charges 3
+✔ sky: full six-sector public-input victory (60 Hz, seed 9) (1248.714125ms)
+ℹ Campaign 60Hz seed 9: 195.17s, shields 4, weapon 3, charges 3
+✔ sky: full six-sector public-input victory (120 Hz, seed 1) (1962.991875ms)
+ℹ Campaign 120Hz seed 1: 208.51s, shields 4, weapon 3, charges 0
+✔ sky: full six-sector public-input victory (120 Hz, seed 9) (1837.286916ms)
+ℹ Campaign 120Hz seed 9: 208.51s, shields 4, weapon 3, charges 0
+✔ sky: spending every initial charge early does not block the campaign (1628.897375ms)
+ℹ No-charge campaign: 219.79s, shields 4, weapon 3
+✔ sky: idle defeat, restart and terminal freeze are real (18.960666ms)
+✔ sky: overheat is visibly recoverable without ammunition or a restart (2.279291ms)
+✔ sky: the final carrier leaves live counterfire and both defenses available during cleanup (1.442708ms)
+✔ sky: a carrier countershot can still defeat an undefended pilot before clear (0.388375ms)
+✔ sky: a destroyed turret cannot absorb a later round at its vanished pixels (0.0695ms)
+✔ sky: fast rounds continue to surviving armor within the same tick after a turret breaks (0.050583ms)
+✔ sky: a shield at time zero saves against later hull contact; a late shield cannot revive (0.393584ms)
+✔ sky: an earlier projectile kill prevents both a later hull impulse and collision damage (0.097542ms)
+✔ sky: a hull contact before a projectile kill keeps its earlier impulse and damage (0.184625ms)
+✔ sky: expiry clips projectile and supply contacts before their later geometric impact (0.065333ms)
+✔ sky: simultaneous turret and core impacts share one armor snapshot regardless of bullet order (0.13875ms)
+✔ sky: a wave arriving before the hostile round saves the pilot; a later wave cannot undo its hit (0.059584ms)
+✔ sky: all six touch actions and sector instructions are usable in both languages (0.327292ms)
+✔ sky: a third hull impulse preserves the earlier touching constraint without overlap or energy gain (0.522333ms)
+✔ sky: tangent separating or sliding rounds do not damage hulls; approaching and penetrating rounds do (0.142167ms)
+✔ sky: tangent separating rounds remain live while approaching and penetrating rounds collide (0.116416ms)
+✔ sky: nonlethal inelastic hull impacts retain projectile mass and momentum without adding energy (0.126875ms)
+ℹ tests 130
+ℹ suites 0
+ℹ pass 130
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 9996.52175
+ℹ start of coverage report
+ℹ ------------------------------------------------------------------------------------------------
+ℹ file                | line % | branch % | funcs % | uncovered lines
+ℹ ------------------------------------------------------------------------------------------------
+ℹ src                 |        |          |         |
+ℹ  games              |        |          |         |
+ℹ   iron-bastion.js   |  98.16 |    92.94 |   98.25 | 255-263 281-283 289-291 1006-1008 1063-1065
+ℹ   orbit-invaders.js |  99.21 |    95.65 |  100.00 | 403-405 812-815 973-975
+ℹ   sky-raiders.js    |  99.46 |    94.01 |   98.80 | 215 298-300 1398-1401
+ℹ  shared             |        |          |         |
+ℹ   input.js          | 100.00 |   100.00 |  100.00 |
+ℹ   platform.js       |  71.28 |    60.71 |   78.57 | 7-8 28-29 72-94
+ℹ   simulation.js     | 100.00 |   100.00 |  100.00 |
+ℹ   utils.js          | 100.00 |   100.00 |   60.00 |
+ℹ ------------------------------------------------------------------------------------------------
+ℹ all files           |  98.37 |    93.76 |   96.33 |
+ℹ ------------------------------------------------------------------------------------------------
+ℹ end of coverage report
