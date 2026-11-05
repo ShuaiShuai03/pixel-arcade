@@ -4,6 +4,8 @@
 
 The roster contains **79 new games**, arranged in **nine packs of eight and one pack of seven**. Combined with the existing 20 JavaScript games and Pixel Parkour WASM, the result is exactly **100 playable games**.
 
+**Final completion gate:** after all 100 games have completed development and their initial acceptance, independently review every game again against the integrated project. Conduct this second pass in groups of no more than three games. Record the reviewed source revision, evidence, findings, fixes, and final verdict for each game. Resolve and re-review all actionable findings, including regressions from shared changes. The project is complete only when all 100 games have passed this final review; initial batch acceptance does not satisfy this gate.
+
 ## Implementation plan
 
 ### Responsibilities and order

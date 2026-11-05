@@ -2,11 +2,21 @@
 
 At the user's direction, at most **three games** may be under development and acceptance testing at one time. Do not begin the next batch until all games in the active batch satisfy the gates below. The 100-game target includes Pixel Parkour. Roster themes are not work assignments.
 
+## Completed batch 2
+
+Paddle Duel, Meteor Drift, and Pixel Rally passed their initial development, tests, independent review, and browser acceptance. See the [batch 2 evidence](batch-02/ACCEPTANCE.md). The batch is ready for publication. No next-batch game is under development yet.
+
+The next queued batch is Ember Knights, Bomb Garden, and Dungeon Dash.
+
 ## Completed batch 1
 
-Snowball Siege, Pinball Pocket, and Starbreaker passed implementation, testing, independent review, and browser acceptance. See the [batch 1 evidence](batch-01/ACCEPTANCE.md). The next scheduled batch is Paddle Duel, Meteor Drift, and Pixel Rally.
+Snowball Siege, Pinball Pocket, and Starbreaker passed implementation, testing, independent review, and browser acceptance. See the [batch 1 evidence](batch-01/ACCEPTANCE.md). Its deployment is live at commit `c3d1bc7`; the published assets matched the accepted source, and the Snowball kick behavior passed a public-site browser check.
 
 The authoritative schedule and accepted-game list are in [batches.json](batches.json). A queued game is not accepted merely because a draft or older released version exists.
+
+## Required final review
+
+Once all 100 games are developed and initially accepted, run a second independent review of every game in groups of no more than three. Each result must identify the reviewed revision, tests and browser evidence, findings, remediation, and final verdict. Fix and re-review all actionable findings before recording a pass. Changes to shared code require rechecking affected games. The project remains incomplete until all 100 games pass this final review. Track this separate gate in `finalReview` in [batches.json](batches.json).
 
 ## Acceptance gates for each game
 

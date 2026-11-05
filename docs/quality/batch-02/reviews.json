@@ -1,0 +1,70 @@
+{
+  "date": "2026-11-05",
+  "phase": "initial batch review",
+  "finalCollectionReview": false,
+  "records": [
+    {
+      "game": "paddle-duel",
+      "reviewer": "action_review",
+      "verdict": "approved",
+      "focusedTestsPassed": 29,
+      "evidence": [
+        "Independent complete local matches for both players at 30, 60 and 120 Hz.",
+        "10,000 passive-contact and motor-work energy-accounting cases.",
+        "Matching visible and collision paddle geometry, bounded acceleration and braking, reaction-limited AI.",
+        "Final scoring delta re-reviewed: only P1 returns, at most 50 bonus points per completed point; lets discard pending bonuses."
+      ],
+      "sha256": {
+        "src/games/paddle-duel.js": "8b0cee19f67c6ac3297d347d0ecef3383de20064299da0c11ff095cd00890051",
+        "tests/paddle-duel.test.js": "fab890762bee0d5402c54a3f51516def993079a5a1107db67d1c94e341142501"
+      }
+    },
+    {
+      "game": "meteor-drift",
+      "reviewer": "review_starbreaker_batch1",
+      "verdict": "approved",
+      "focusedTestsPassed": 39,
+      "evidence": [
+        "Six independent complete five-sector keyboard campaigns: seeds 3 and 5 at 30, 60 and 120 Hz.",
+        "Additional pointer campaigns produced five wins and one valid final-sector loss.",
+        "1,500 spawn scenarios; mass, linear momentum, angular momentum and energy checks.",
+        "Resolved duplicate integration, unexplained fracture energy, pending-fuse ammo-loss and near-coincident collision-normal amplification.",
+        "Terminal callback exactly once and terminal state frozen."
+      ],
+      "sha256": {
+        "src/games/meteor-drift.js": "b2bb2afbe03ac06e271553eaa22e78d80505c8cf21dd4ab79808d2a1b946287c",
+        "tests/meteor-drift.test.js": "63100a9a0f52087da5f33d956f26cd996dba6bf06da1c4f3d2ecc6c1c848a1ce"
+      }
+    },
+    {
+      "game": "pixel-rally",
+      "reviewer": "review_snowball_batch1",
+      "verdict": "approved",
+      "focusedTestsPassed": 59,
+      "evidence": [
+        "Initial independent extended sweep: 40/40 visibility-limited drives finished; 842 new vehicles had no oriented-rectangle overlap.",
+        "Resolved instantaneous heading changes, unbounded side-slip correction, unsafe traffic spawning and remote collision-chain loss of world time.",
+        "Browser-discovered gravel-shoulder stall reproduced through public controls; independent 60/120 Hz recovery runs rejoined in about four seconds and then finished with full car condition.",
+        "Tests cover stopped recovery from both shoulders on every surface and twelve tangent-guardrail positions.",
+        "Final display-only CAR/\u8f66\u51b5 label and bilingual condition status independently re-reviewed; physics unchanged."
+      ],
+      "sha256": {
+        "src/games/pixel-rally.js": "8acc508316072022b2cbb01e872ea4bbfab39311c2ad86150b486a89ed353a30",
+        "tests/pixel-rally.test.js": "5dc48a75e877e07225588de37fdaea891500a7fcd27230f72b51e9719fc60619"
+      }
+    }
+  ],
+  "sharedHost": {
+    "reviewer": "action_review",
+    "verdict": "approved",
+    "evidence": [
+      "Opt-in multiplayer touch layout replaces solo controls only for games that declare it.",
+      "Independent player pointer ownership, language changes and pause/restart remain covered."
+    ],
+    "sha256": {
+      "src/app.js": "6fc8fbaa4c101f3a1a771b63579c1c2610ca2c2578c825e131d362377d53a890",
+      "tests/platform-lifecycle.test.js": "b520cc708ce4d0a84fdb95e4281ac2119493bc8c7711cc7e44901935fa28bd17",
+      "tests/catalog.test.js": "d8187805bfe4902ea150829cd5fdf9658ae466661008f5f56eb89b7b2639efad"
+    }
+  }
+}

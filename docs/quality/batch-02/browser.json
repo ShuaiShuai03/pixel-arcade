@@ -1,0 +1,105 @@
+{
+  "date": "2026-11-05",
+  "browser": "Installed stable Google Chrome via Codex Chrome extension",
+  "viewports": [
+    [1440, 900],
+    [844, 390],
+    [390, 844]
+  ],
+  "stateInjection": false,
+  "screenshotsInspected": true,
+  "status": "passed",
+  "games": [
+    {
+      "id": "paddle-duel",
+      "status": "passed",
+      "keyboard": ["P1 W/S", "P2 Up/Down", "simultaneous s+Up", "Space serve", "pause/resume"],
+      "touch": ["solo Up/Down/Serve", "P1 Up", "P2 Down", "both players serve"],
+      "observed": [
+        "Independent player movement in a local match",
+        "Final scoring build: P1 won 7-5 with score 705",
+        "Restart restored 0-0 and zero score while retaining best 705",
+        "English desktop and Chinese portrait/landscape layouts",
+        "Full-window layout leaves all six multiplayer buttons accessible"
+      ],
+      "screenshots": [
+        "paddle-desktop-playing.jpg",
+        "paddle-phone-solo-zh.jpg",
+        "paddle-duo-landscape-zh.jpg",
+        "paddle-duo-keyboard.jpg",
+        "paddle-duo-terminal-zh.jpg",
+        "paddle-duo-restart-zh.jpg"
+      ],
+      "revisionNotes": "Control/layout checks preceded a scoring-only correction. Match completion and restart were repeated on the final reviewed scoring code."
+    },
+    {
+      "id": "meteor-drift",
+      "status": "passed",
+      "keyboard": [
+        "rotate",
+        "thrust",
+        "fire",
+        "counter-thrust brake",
+        "charged round",
+        "pause/resume"
+      ],
+      "touch": ["Left", "Right", "Thrust", "Fire", "Brake", "Burst"],
+      "observed": [
+        "Visible hull during spawn grace and readable ammunition/reserve/burst labels",
+        "All six touch actions worked in Chinese landscape",
+        "Stone, ice and iron sectors visited through ordinary input",
+        "Final reviewed build: full browser run reached sector four and ended with a legal loss at score 20160",
+        "Restart restored sector one, four rocks, full hull, 400 magazine rounds and score zero; retained best 21320 from the preceding run",
+        "English desktop and Chinese portrait/landscape layouts"
+      ],
+      "screenshots": [
+        "meteor-desktop-flight.jpg",
+        "meteor-landscape-touch-zh.jpg",
+        "meteor-sector-two-zh.jpg",
+        "meteor-phone-zh.jpg",
+        "meteor-final-campaign.jpg",
+        "meteor-final-terminal-zh.jpg",
+        "meteor-final-restart-zh.jpg"
+      ],
+      "revisionNotes": "After final numerical-contact fixes, reloaded the reviewed source and repeated a full browser run plus restart. Six complete five-sector wins are independently verified by automated public-input tests."
+    },
+    {
+      "id": "pixel-rally",
+      "status": "passed",
+      "keyboard": ["gas", "left/right steering", "brake", "pause/resume"],
+      "touch": ["Left", "Right", "Gas", "Brake"],
+      "observed": [
+        "Starts at rest and requires gas; steering release straightens the car and braking reduces speed.",
+        "Reproduced the gravel-shoulder softlock in the browser and withheld acceptance until fixed.",
+        "Reviewed physics build: deliberately stopped at zero speed on the right gravel shoulder at 918 m; gas plus left steering rejoined the road at about 935 m and 31 km/h.",
+        "Continued into the bridge section past 1260 m; later collision loss ended once with score 1863.",
+        "Restart restored score zero and full car condition while retaining the pre-existing best of 5530.",
+        "Final labelled car-condition UI and all four touch actions checked on the phone; English desktop and Chinese phone/landscape layouts inspected."
+      ],
+      "screenshots": [
+        "rally-recovery-before-fix.jpg",
+        "rally-shoulder-stop.jpg",
+        "rally-shoulder-recovered.jpg",
+        "rally-bridge-driving.jpg",
+        "rally-terminal-zh.jpg",
+        "rally-phone-final-zh.jpg",
+        "rally-desktop-final-en.jpg"
+      ],
+      "revisionNotes": "Full recovery and continuation used reviewed physics source 4f489e4b. The subsequent display-only condition label was re-reviewed and checked in the browser; the simulation code is unchanged."
+    }
+  ],
+  "consoleErrorsOrWarnings": [],
+  "limitations": [
+    "No physical touch-device validation",
+    "No non-Chrome browser validation",
+    "Automated public-input tests establish full solo wins; browser runs do not establish a win for every campaign"
+  ],
+  "sourceHashes": {
+    "src/games/paddle-duel.js": "8b0cee19f67c6ac3297d347d0ecef3383de20064299da0c11ff095cd00890051",
+    "tests/paddle-duel.test.js": "fab890762bee0d5402c54a3f51516def993079a5a1107db67d1c94e341142501",
+    "src/games/meteor-drift.js": "b2bb2afbe03ac06e271553eaa22e78d80505c8cf21dd4ab79808d2a1b946287c",
+    "tests/meteor-drift.test.js": "63100a9a0f52087da5f33d956f26cd996dba6bf06da1c4f3d2ecc6c1c848a1ce",
+    "src/games/pixel-rally.js": "8acc508316072022b2cbb01e872ea4bbfab39311c2ad86150b486a89ed353a30",
+    "tests/pixel-rally.test.js": "5dc48a75e877e07225588de37fdaea891500a7fcd27230f72b51e9719fc60619"
+  }
+}

@@ -81,7 +81,13 @@ class Audio {
   play() {}
   setEnabled() {}
 }
-async function fixture({ manual = false, observe = true, touchControls = [] } = {}) {
+async function fixture({
+  manual = false,
+  observe = true,
+  touchControls = [],
+  multiplayerTouchControls = [],
+  players = '1',
+} = {}) {
   const elements = new Map(),
     window = new Element(),
     frames = [],
@@ -109,9 +115,13 @@ async function fixture({ manual = false, observe = true, touchControls = [] } = 
     if (!elements.has(id)) elements.set(id, new Element(id === 'game-canvas' ? 'canvas' : 'div'));
     return elements.get(id);
   };
+  const modeButtons = [element('mode-one'), element('mode-two')];
+  modeButtons.forEach((button, index) => {
+    button.dataset.mode = String(index + 1);
+  });
   const document = {
     getElementById: element,
-    querySelectorAll: () => [],
+    querySelectorAll: (selector) => (selector === '[data-mode]' ? modeButtons : []),
     querySelector: element,
     createElement: (tag) => new Element(tag),
     body: new Element(),
@@ -127,17 +137,24 @@ async function fixture({ manual = false, observe = true, touchControls = [] } = 
     id,
     name: { en: id, zh: `中文${id}` },
     genre: 'arcade',
-    players: '1',
+    players,
     color: '#000',
   }));
   const modules = Object.fromEntries(
     catalog.map((meta) => [
       meta.id,
       {
-        meta: { ...meta, description: { en: 'Move', zh: '移动' }, keys: [], touchControls },
+        meta: {
+          ...meta,
+          description: { en: 'Move', zh: '移动' },
+          keys: [],
+          touchControls,
+          multiplayerTouchControls,
+        },
         createGame(env) {
           const game = {
             id: meta.id,
+            mode: env.mode,
             score: 0,
             phase: 'playing',
             updates: [],
@@ -491,4 +508,56 @@ test('keyboard activation of a touch control produces one deliberate action', as
   f.tick(10);
   assert.equal(f.instances.at(-1).updates.at(-1).left, false);
   assert.equal(f.instances.at(-1).updates.at(-1).press, false);
+});
+
+test('opted-in two-player touch controls replace solo buttons and keep independent input', async () => {
+  const f = await fixture({
+    players: '1-2',
+    touchControls: [{ code: 'ArrowLeft', label: { en: 'Solo', zh: '单人' }, side: 'left' }],
+    multiplayerTouchControls: [
+      { code: 'ArrowLeft', label: { en: 'Player one', zh: '玩家一' }, side: 'left' },
+      { code: 'ArrowRight', label: { en: 'Player two', zh: '玩家二' }, side: 'right' },
+    ],
+  });
+  await f.go('alpha');
+  await f.click('mode-two');
+  await f.click('start-button');
+  const game = f.instances.at(-1);
+  assert.equal(game.mode, 2);
+  assert.equal(f.element('touch-controls').hidden, false);
+  const [left, right] = f.element('touch-controls').children.map((group) => group.children[0]);
+  assert.equal(left.textContent, 'Player one');
+  assert.equal(right.textContent, 'Player two');
+  await left.emit('pointerdown', { pointerId: 21 });
+  await right.emit('pointerdown', { pointerId: 22 });
+  f.tick();
+  assert.equal(game.updates.at(-1).left, true);
+  assert.equal(game.updates.at(-1).right, true);
+  await left.emit('pointerup', { pointerId: 21 });
+  f.tick();
+  assert.equal(game.updates.at(-1).left, false);
+  assert.equal(game.updates.at(-1).right, true);
+  await f.click('pause-button');
+  await f.click('start-button');
+  await f.click('language-toggle');
+  f.tick();
+  assert.equal(f.element('touch-controls').hidden, false);
+  assert.deepEqual(
+    f.element('touch-controls').children.map((group) => group.children[0].textContent),
+    ['玩家一', '玩家二'],
+  );
+  assert.equal(game.updates.at(-1).right, false);
+});
+
+test('two-player games without a dedicated touch layout keep solo controls hidden', async () => {
+  const f = await fixture({
+    players: '1-2',
+    touchControls: [{ code: 'ArrowLeft', label: { en: 'Solo', zh: '单人' } }],
+  });
+  await f.go('alpha');
+  await f.click('mode-two');
+  await f.click('start-button');
+  assert.equal(f.element('touch-controls').hidden, true);
+  await f.click('language-toggle');
+  assert.equal(f.element('touch-controls').hidden, true);
 });

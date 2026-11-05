@@ -25,7 +25,11 @@ test('release contains twenty unique loadable games with bilingual instructions'
     }
     assert.ok(['1', '1-2', '2'].includes(meta.players));
     assert.ok(Array.isArray(meta.touchControls));
-    for (const control of meta.touchControls) {
+    if (meta.multiplayerTouchControls) {
+      assert.ok(meta.players.includes('2'));
+      assert.ok(Array.isArray(meta.multiplayerTouchControls));
+    }
+    for (const control of [...meta.touchControls, ...(meta.multiplayerTouchControls || [])]) {
       assert.match(
         control.code,
         /^(Arrow(Left|Right|Up|Down)|Key[A-Z]|Space|Enter|Comma|Period|Shift(Left|Right))$/,

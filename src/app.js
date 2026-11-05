@@ -263,22 +263,24 @@ function renderDetails() {
   }
   if (meta.players.includes('2')) {
     const note = make('div');
-    note.append(
-      make(
-        'span',
-        null,
-        preferences.lang === 'zh' ? '双人模式需要共用键盘。' : 'Two players share one keyboard.',
-      ),
-    );
+    const instruction = meta.multiplayerTouchControls?.length
+      ? {
+          en: 'Two players can share a keyboard or use the touch buttons.',
+          zh: '双人模式可共用键盘或使用触屏按钮。',
+        }
+      : { en: 'Two players share one keyboard.', zh: '双人模式需要共用键盘。' };
+    note.append(make('span', null, localized(instruction)));
     $('key-guide').append(note);
   }
+  const touchControls =
+    (current.env.mode === 2 ? meta.multiplayerTouchControls : meta.touchControls) || [];
   $('touch-controls').replaceChildren();
-  $('touch-controls').hidden = current.env.mode === 2 || !meta.touchControls?.length;
+  $('touch-controls').hidden = !touchControls.length;
   const touchGroups = {
     left: make('div', 'touch-group touch-left'),
     right: make('div', 'touch-group touch-right'),
   };
-  for (const control of meta.touchControls || []) {
+  for (const control of touchControls) {
     const button = make('button', null, localized(control.label));
     button.type = 'button';
     button.dataset.code = control.code;
@@ -421,7 +423,7 @@ function startRun() {
   simulation.reset();
   lastHud = '';
   setPhase('playing');
-  $('touch-controls').hidden = current.env.mode === 2 || !current.meta.touchControls?.length;
+  renderDetails();
   showOverlay();
   canvas.focus({ preventScroll: true });
 }

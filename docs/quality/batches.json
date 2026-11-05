@@ -1,7 +1,14 @@
 {
   "maxActiveGames": 3,
   "activeBatch": null,
-  "acceptedGames": ["snowball-siege", "pinball-pocket", "starbreaker"],
+  "acceptedGames": [
+    "snowball-siege",
+    "pinball-pocket",
+    "starbreaker",
+    "paddle-duel",
+    "meteor-drift",
+    "pixel-rally"
+  ],
   "batches": [
     {
       "number": 1,
@@ -12,7 +19,8 @@
     {
       "number": 2,
       "games": ["paddle-duel", "meteor-drift", "pixel-rally"],
-      "status": "queued"
+      "status": "accepted",
+      "acceptance": "batch-02/ACCEPTANCE.md"
     },
     {
       "number": 3,
@@ -174,5 +182,14 @@
       "games": ["constellation-duel"],
       "status": "queued"
     }
-  ]
+  ],
+  "finalReview": {
+    "required": true,
+    "startsAfterAllGamesDeveloped": true,
+    "maxActiveGames": 3,
+    "status": "pending",
+    "requiredGameCount": 100,
+    "passedGames": [],
+    "records": []
+  }
 }
