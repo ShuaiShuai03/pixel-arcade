@@ -1,0 +1,57 @@
+{
+  "date": "2026-11-05",
+  "phase": "initial batch review",
+  "finalCollectionReview": false,
+  "records": [
+    {
+      "game": "dungeon-dash",
+      "reviewer": "review_starbreaker_batch1",
+      "verdict": "approved",
+      "focusedTestsPassed": 30,
+      "evidence": [
+        "Six independent final-source public-input campaign wins: baseline and deliberately missed early defenses followed by healing, each at 30/60/120Hz. All five rooms and twenty guardians cleared; one frozen terminal callback each.",
+        "Three legal idle losses ended once and froze; three seeds of 2400 public input frames remained finite, bounded and deterministic.",
+        "Verified shared visible/damaging sword geometry, locked telegraphs, harmless passive body contact, swept arrows with lifetime and wall occlusion, actual gate/switch progression, preserved full-pack supplies, recovery and reset.",
+        "Extreme knockback actor tunneling resolved with adaptive contact substeps; thirty focused tests pass.",
+        "Final STAMINA label/alignment delta independently approved; reversing that single display line reproduces the previously approved physics hash."
+      ],
+      "sha256": {
+        "src/games/dungeon-dash.js": "8ac1285959b3f1cb63d2e7095ce13ada010a32a3908b34d870933694810fb5d6",
+        "tests/dungeon-dash.test.js": "21ea76d664411f7f3fdad4a23483f6d455e56c54bf0ab6ea9f89c4e1f1fb0386"
+      }
+    },
+    {
+      "game": "ember-knights",
+      "reviewer": "action_review",
+      "verdict": "approved",
+      "focusedTestsPassed": 47,
+      "evidence": [
+        "Six-champion campaigns and both local-player victories at 30/60/120Hz.",
+        "Verified symmetric simultaneous impacts, earlier-hit interruption, visible weapon geometry, fixed gravity/momentum, attack recovery locks, guard exhaustion and corner escape.",
+        "Independent public-input shoulder landing and escape passed.",
+        "Final solo result-copy fix independently re-reviewed; all 47 tests pass, including named Copper Guard losses in English/Chinese and unchanged local result branches."
+      ],
+      "sha256": {
+        "src/games/ember-knights.js": "8d81119b7040a34e77fd10a141cddd61a28422df7b193586d49d585ab4ff0f21",
+        "tests/ember-knights.test.js": "fd0a3d5039158787ed663623969fbea695bccc87056058bf42f611bd0fd4d15d"
+      }
+    },
+    {
+      "game": "bomb-garden",
+      "reviewer": "review_snowball_batch1",
+      "verdict": "approved",
+      "focusedTestsPassed": 26,
+      "evidence": [
+        "Six complete legal-input campaigns across seeds 1/3 at 30/60/120Hz in the focused suite.",
+        "Final independent four-campaign sweep passed seeds 1/3 at 30/120Hz; prior 60Hz and retry checks also passed.",
+        "Observed no actor overlaps or solid penetration in the final campaigns.",
+        "Verified actual-position damage, finite blast propagation, equal-time cover and ownership, harmless embers, head-on contention, blocked swaps and reservations.",
+        "Verified simultaneous duel draw, safe retries, finite state and independent bilingual touch controls."
+      ],
+      "sha256": {
+        "src/games/bomb-garden.js": "3d3e222559951bc6f414d8993bae1568f8aaa4f0ad4e15cdabed7b1245e3a364",
+        "tests/bomb-garden.test.js": "ff456d2bb6242e148707a99b1563d558d3a1291d3835970cf5f11dc95a72148d"
+      }
+    }
+  ]
+}

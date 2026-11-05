@@ -1,0 +1,196 @@
+{
+  "date": "2026-11-05",
+  "browser": "Installed stable Google Chrome via Codex Chrome extension",
+  "viewports": [
+    [1440, 900],
+    [844, 390],
+    [390, 844]
+  ],
+  "stateInjection": false,
+  "status": "passed",
+  "preliminaryChecks": [
+    {
+      "id": "dungeon-dash",
+      "observed": [
+        "Keyboard sword combat defeated all three Entry Hall guardians.",
+        "Collected the key and entered the northeast exit to reach Arrow Gallery 2/5.",
+        "One lost heart was restored with a carried flask; flask count changed from one to zero.",
+        "Chinese portrait full-window layout exposes all eight touch actions.",
+        "A later idle combat loss ended the run at score 900; restart restored room one, five hearts, one flask and score zero while retaining best 900."
+      ],
+      "finding": "English singular grammar for guardian and flask forwarded to owner for correction.",
+      "screenshots": [
+        "dungeon-early-desktop.jpg",
+        "dungeon-early-combat.jpg",
+        "dungeon-early-key.jpg",
+        "dungeon-early-clear.jpg",
+        "dungeon-early-crossroads.jpg",
+        "dungeon-early-phone-zh.jpg",
+        "dungeon-early-terminal-zh.jpg"
+      ],
+      "screenshotsInspected": true,
+      "revisionNotes": "Preliminary development check; superseded by the final passed record below.",
+      "findingResolution": "Corrected and verified before final acceptance."
+    },
+    {
+      "id": "bomb-garden",
+      "observed": [
+        "Chinese landscape full-window layout exposes all five solo touch controls.",
+        "Visible lives, range, capacity and fuse rules are readable.",
+        "Actual keyboard placement and escape destroyed initial crates with all three lives retained.",
+        "Four-direction active flame geometry follows the corridor.",
+        "All five solo touch controls exercised: moved through cleared corridors, placed a second bomb, and escaped.",
+        "Local duel landscape shows ten separately labelled controls, split into one group per player."
+      ],
+      "screenshots": [
+        "bomb-early-landscape-zh.jpg",
+        "bomb-early-clear.jpg",
+        "bomb-early-touch-fuse.jpg",
+        "bomb-early-duo-landscape-zh.jpg"
+      ],
+      "screenshotsInspected": true,
+      "revisionNotes": "Preliminary development check; superseded by the final passed record below.",
+      "finding": "Local duel canvas still shows campaign stage 1/6 and an unattributed range/capacity readout; forwarded to owner for correction.",
+      "findingResolution": "Corrected and verified before final acceptance."
+    },
+    {
+      "id": "ember-knights",
+      "observed": ["Early real-key combat, guard, jump and heavy strike checked."],
+      "screenshots": ["ember-early-desktop.jpg", "ember-early-combat.jpg", "ember-early-jump.jpg"],
+      "screenshotsInspected": true,
+      "revisionNotes": "Preliminary development check; superseded by the final passed record below."
+    }
+  ],
+  "games": [
+    {
+      "id": "dungeon-dash",
+      "status": "passed",
+      "keyboard": ["Arrow movement/facing", "Space sword", "H heal", "pause/resume"],
+      "touch": ["Left", "Right", "Up", "Down", "Sword", "Dodge", "Use", "Heal"],
+      "observed": [
+        "Reviewed physics build: collected key and cleared all three Entry Hall guardians.",
+        "Touch Use opened a supply cache; score increased by 60.",
+        "Touch Sword defeated the final guardian; touch Heal restored one lost heart and consumed one flask.",
+        "Touch movement and dodge traversed the cleared room; entered Arrow Gallery 2/5 through the northeast exit with score 960.",
+        "Continued into a legal second-room loss on the phone layout at score 960.",
+        "Restart restored room one, five hearts, one flask and score zero while preserving best 960.",
+        "English desktop and Chinese landscape/portrait layouts were inspected; all eight controls remained visible.",
+        "Final display-only STAMINA expansion was reloaded and inspected; no console errors or warnings."
+      ],
+      "screenshots": [
+        "dungeon-final-desktop.jpg",
+        "dungeon-final-key.jpg",
+        "dungeon-final-touch-cache.jpg",
+        "dungeon-final-touch-heal.jpg",
+        "dungeon-final-touch-transition.jpg",
+        "dungeon-final-terminal-zh.jpg",
+        "dungeon-final-restart-zh.jpg",
+        "dungeon-final-label-en.jpg"
+      ],
+      "screenshotsInspected": true,
+      "revisionNotes": "Gameplay acceptance used independently reviewed physics SHA256 1a08f5d4. The final source differs only by the English STAMINA label/alignment, independently re-reviewed and reloaded for a final screenshot.",
+      "consoleErrorsOrWarnings": [],
+      "sourceHashes": {
+        "src/games/dungeon-dash.js": "8ac1285959b3f1cb63d2e7095ce13ada010a32a3908b34d870933694810fb5d6",
+        "tests/dungeon-dash.test.js": "21ea76d664411f7f3fdad4a23483f6d455e56c54bf0ab6ea9f89c4e1f1fb0386"
+      }
+    },
+    {
+      "id": "ember-knights",
+      "status": "passed",
+      "keyboard": [
+        "P1 movement and quick attack",
+        "guard",
+        "fixed jump",
+        "heavy attack",
+        "pause/resume",
+        "complete local match"
+      ],
+      "touch": [
+        "Solo Left/Right/Jump/Guard/Quick/Heavy",
+        "All twelve separately labelled local-player controls"
+      ],
+      "observed": [
+        "Completed the first solo champion and reached Copper Guard 2/6 on the reviewed physics build.",
+        "All six solo touch actions and all twelve local controls exercised; both actors moved and spent their own stamina.",
+        "Won a full local match as Player 1 with score 3050. Restart restored round one, 0:0, full health/stamina and score zero while retaining best 3050.",
+        "A solo loss at Copper Guard exposed an incorrect Player 2 result message. Acceptance was withheld until corrected.",
+        "Reloaded the final message fix and reproduced a solo loss. Gate Recruit was named correctly in both English and Chinese.",
+        "Final corrected-build solo restart restored champion one, full health/stamina and zero score.",
+        "Desktop, Chinese landscape and phone layouts inspected, including six solo and twelve local touch buttons."
+      ],
+      "screenshots": [
+        "ember-final-solo-combat.jpg",
+        "ember-final-second-champion.jpg",
+        "ember-final-touch-solo-zh.jpg",
+        "ember-final-solo-terminal-zh.jpg",
+        "ember-final-duo-phone-zh.jpg",
+        "ember-final-duo-landscape-zh.jpg",
+        "ember-final-duo-result-zh.jpg",
+        "ember-final-duo-restart-zh.jpg",
+        "ember-corrected-solo-terminal-zh.jpg",
+        "ember-corrected-solo-terminal-en.jpg",
+        "ember-corrected-solo-restart-en.jpg"
+      ],
+      "screenshotsInspected": true,
+      "consoleErrorsOrWarnings": [],
+      "revisionNotes": "Gameplay and local-match acceptance used reviewed physics SHA256 3b3a685d. The final source changes only solo result copy; the fix was independently re-reviewed and reloaded for bilingual solo-loss and restart checks.",
+      "sourceHashes": {
+        "src/games/ember-knights.js": "8d81119b7040a34e77fd10a141cddd61a28422df7b193586d49d585ab4ff0f21",
+        "tests/ember-knights.test.js": "fd0a3d5039158787ed663623969fbea695bccc87056058bf42f611bd0fd4d15d"
+      }
+    },
+    {
+      "id": "bomb-garden",
+      "status": "passed",
+      "keyboard": [
+        "Movement",
+        "Plant bomb",
+        "Simultaneous Space+Enter for both players",
+        "P2 arrow movement and Enter bomb",
+        "pause/resume"
+      ],
+      "touch": [
+        "Solo Left/Right/Up/Down/Bomb",
+        "All ten separately labelled local-player controls"
+      ],
+      "observed": [
+        "Placed and escaped actual keyboard and touch bombs, destroyed crates and collected an upgrade without losing a life.",
+        "Deliberate self-blast reduced three lives to two and restored a safe arena; retry reset temporary stage score and upgrades.",
+        "Further self-blasts produced one visible terminal loss; restart restored three lives and the initial garden.",
+        "Local HUD identifies duel mode and both players' independent inventories.",
+        "Simultaneous self-blasts from both players produced a genuine draw in the browser.",
+        "All ten local touch controls exercised. Both players planted bombs and moved out of their blast corridors.",
+        "A later P2 self-blast yielded a Player 1 victory. Restart preserved local mode and restored both actors, inventories and the 180-second timer.",
+        "English desktop and Chinese landscape/phone layouts inspected."
+      ],
+      "screenshots": [
+        "bomb-final-solo-blast.jpg",
+        "bomb-final-touch-fuse-zh.jpg",
+        "bomb-final-life-retry.jpg",
+        "bomb-final-solo-terminal-zh.jpg",
+        "bomb-final-solo-restart-zh.jpg",
+        "bomb-final-duo-landscape-zh.jpg",
+        "bomb-final-duo-draw-zh.jpg",
+        "bomb-final-duo-touch.jpg",
+        "bomb-final-duo-victory-zh.jpg",
+        "bomb-final-duo-phone-restart.jpg"
+      ],
+      "screenshotsInspected": true,
+      "consoleErrorsOrWarnings": [],
+      "revisionNotes": "All final checks used the independently reviewed final source, including the corrected duel heading and separate player inventory labels.",
+      "sourceHashes": {
+        "src/games/bomb-garden.js": "3d3e222559951bc6f414d8993bae1568f8aaa4f0ad4e15cdabed7b1245e3a364",
+        "tests/bomb-garden.test.js": "ff456d2bb6242e148707a99b1563d558d3a1291d3835970cf5f11dc95a72148d"
+      }
+    }
+  ],
+  "limitations": [
+    "No physical touch-device validation.",
+    "No non-Chrome browser validation.",
+    "Full solo campaigns are established by automated public-input playthroughs; browser runs establish the listed stages and local match outcomes.",
+    "Initial acceptance does not replace the required second review of all 100 games."
+  ],
+  "screenshotsInspected": true,
+  "consoleErrorsOrWarnings": []
+}

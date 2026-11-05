@@ -7,7 +7,10 @@
     "starbreaker",
     "paddle-duel",
     "meteor-drift",
-    "pixel-rally"
+    "pixel-rally",
+    "ember-knights",
+    "bomb-garden",
+    "dungeon-dash"
   ],
   "batches": [
     {
@@ -25,7 +28,8 @@
     {
       "number": 3,
       "games": ["ember-knights", "bomb-garden", "dungeon-dash"],
-      "status": "queued"
+      "status": "accepted",
+      "acceptance": "batch-03/ACCEPTANCE.md"
     },
     {
       "number": 4,

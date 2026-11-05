@@ -1,0 +1,67 @@
+{
+  "commit": "37691b55ecfcca609b8e7803abaf0a64915c8234",
+  "site": "https://shuaishuai03.github.io/pixel-arcade/",
+  "run": "https://github.com/ShuaiShuai03/pixel-arcade/actions/runs/42008567781",
+  "conclusion": "success",
+  "assetChecks": [
+    {
+      "path": "index.html",
+      "matches": true,
+      "sha256": "f8ce514a795966c125415e9657bb65c87f02a844be5418c5e6ce5ebde16e14bf",
+      "bytes": 9427
+    },
+    {
+      "path": "src/app.js",
+      "matches": true,
+      "sha256": "6fc8fbaa4c101f3a1a771b63579c1c2610ca2c2578c825e131d362377d53a890",
+      "bytes": 23386
+    },
+    {
+      "path": "src/style.css",
+      "matches": true,
+      "sha256": "4760219c776e6f9c6066d60fab24c7f1622979f747e0c7c952a56812671ba421",
+      "bytes": 24191
+    },
+    {
+      "path": "src/shared/simulation.js",
+      "matches": true,
+      "sha256": "6b1c5d5198cd7f5f1c2e1c42a7e61f0ea1e0ff43f44f5f73f77e5373c81227f9",
+      "bytes": 554
+    },
+    {
+      "path": "src/shared/input.js",
+      "matches": true,
+      "sha256": "1ac10423d816838e784562ea6b2ba9dfdc8717a14efed8ea11f60cd9033f2bc5",
+      "bytes": 968
+    },
+    {
+      "path": "src/games/paddle-duel.js",
+      "matches": true,
+      "sha256": "8b0cee19f67c6ac3297d347d0ecef3383de20064299da0c11ff095cd00890051",
+      "bytes": 16474
+    },
+    {
+      "path": "src/games/meteor-drift.js",
+      "matches": true,
+      "sha256": "b2bb2afbe03ac06e271553eaa22e78d80505c8cf21dd4ab79808d2a1b946287c",
+      "bytes": 28217
+    },
+    {
+      "path": "src/games/pixel-rally.js",
+      "matches": true,
+      "sha256": "8acc508316072022b2cbb01e872ea4bbfab39311c2ad86150b486a89ed353a30",
+      "bytes": 35856
+    }
+  ],
+  "browserVerification": {
+    "game": "pixel-rally",
+    "phase": "playing",
+    "observed": [
+      "Published 3.2 km / 120-second rules and car-condition label",
+      "Started from rest and advanced to 8 m through ordinary gas input"
+    ],
+    "consoleErrorsOrWarnings": [],
+    "screenshot": "screenshots/published-rally.jpg",
+    "screenshotInspected": true
+  }
+}

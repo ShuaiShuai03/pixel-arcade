@@ -56,7 +56,9 @@ Two-player games must also work in solo mode with an actual AI opponent, a partn
 - Resolve penetration without unexplained teleportation or imparting energy repeatedly.
 - Distinguish inactive objects, damaging objects, and intentional attacks. For Snowball Siege specifically, an idle or merely touching snowball must not become a damaging moving attack.
 - Input cancellation, simultaneous directions, cooldown boundaries, and action release must behave consistently.
+- Resolve simultaneous attacks, detonations, and terminal outcomes without favoring a player or object because it appears first in an array.
 - No immediate unavoidable damage; hazard spawning must preserve a response window.
+- Test recovery from ordinary mistakes as well as optimal play: stopping at a surface boundary, resting against a solid, interrupted movement, and depleted recoverable resources must not silently remove all useful controls.
 
 **Depth and distinctiveness**
 

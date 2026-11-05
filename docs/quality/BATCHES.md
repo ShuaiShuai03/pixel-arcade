@@ -2,11 +2,13 @@
 
 At the user's direction, at most **three games** may be under development and acceptance testing at one time. Do not begin the next batch until all games in the active batch satisfy the gates below. The 100-game target includes Pixel Parkour. Roster themes are not work assignments.
 
+## Completed batch 3
+
+Ember Knights, Bomb Garden, and Dungeon Dash passed their initial development, tests, independent review, and browser acceptance. See the [batch 3 evidence](batch-03/ACCEPTANCE.md). All 130 focused tests and four catalog checks pass. The public update is being prepared; batch 4 remains queued until publication is verified.
+
 ## Completed batch 2
 
-Paddle Duel, Meteor Drift, and Pixel Rally passed their initial development, tests, independent review, and browser acceptance. See the [batch 2 evidence](batch-02/ACCEPTANCE.md). The batch is ready for publication. No next-batch game is under development yet.
-
-The next queued batch is Ember Knights, Bomb Garden, and Dungeon Dash.
+Paddle Duel, Meteor Drift, and Pixel Rally passed their initial development, tests, independent review, and browser acceptance. See the [batch 2 evidence](batch-02/ACCEPTANCE.md). Commit `37691b5` is live; the published assets matched the accepted source and Rally passed its public-site launch check. See the [deployment receipt](batch-02/deployment.json).
 
 ## Completed batch 1
 
