@@ -8,9 +8,9 @@ function finiteTree(value, path = 'state') {
   else if (value && typeof value === 'object')
     for (const [key, child] of Object.entries(value)) finiteTree(child, `${path}.${key}`);
 }
-test('release contains twenty-three unique loadable games with bilingual instructions', async () => {
-  assert.equal(catalog.length, 23);
-  assert.equal(new Set(catalog.map((g) => g.id)).size, 23);
+test('release contains twenty-six unique loadable games with bilingual instructions', async () => {
+  assert.equal(catalog.length, 26);
+  assert.equal(new Set(catalog.map((g) => g.id)).size, 26);
   for (const entry of catalog) {
     const { meta, createGame } = await loadGame(entry.id);
     assert.equal(meta.id, entry.id);

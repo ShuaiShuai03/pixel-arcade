@@ -1,0 +1,194 @@
+{
+  "date": "2026-11-05",
+  "phase": "batch accepted",
+  "finalCollectionReview": false,
+  "records": [
+    {
+      "game": "wallrunner-relay",
+      "owner": "owner-wallrunner",
+      "reviewer": "review-wallrunner",
+      "verdict": "approved",
+      "queuedFiles": {
+        "src/games/wallrunner-relay.js": "428d6816fc5527dec6e365106c56e86dcefd4dd93d9419748235f56cc27f80cc",
+        "tests/wallrunner-relay.test.js": "23aa78e276d68f17c25233644595a88a1801a1f4b034a1f93cdf3d09ac226f9c"
+      },
+      "draftFindings": [
+        {
+          "id": "wallrunner-stub-only",
+          "status": "closed",
+          "observation": "Queued draft was a 7-line stub; a complete module was implemented."
+        },
+        {
+          "id": "wallrunner-presentation",
+          "status": "closed",
+          "observation": "Parent browser: tiny runner, RELAY label under the runner, faint chalk. Fixed with a 2x camera, moved label and bold chalk/footprints."
+        },
+        {
+          "id": "wallrunner-human-timing",
+          "status": "closed",
+          "observation": "Parent browser and reviewer jitter probes: climbs needed near frame-exact input. Fixed with kick grace (0.1 s after leaving, 0.12 s pre-buffer), slower momentum decay, one-kick canyons and perturbed-route tests."
+        },
+        {
+          "id": "wallrunner-camera",
+          "status": "closed",
+          "observation": "Runner and goal left the screen or sat under the HUD (reviewer; parent saw it in the course-3 canyon). Camera now clamped per sub-step; visibility asserted over legal and random runs."
+        },
+        {
+          "id": "wallrunner-kick-copy",
+          "status": "closed",
+          "observation": "\"Kick any wall\" corrected to non-slick; kick prompt only shown when a kick is available."
+        },
+        {
+          "id": "wallrunner-sprite-float",
+          "status": "closed",
+          "observation": "Sprite floated 2 px above the collider; aligned."
+        },
+        {
+          "id": "wallrunner-rate-reset",
+          "status": "closed",
+          "observation": "stepRun discarded the rest of a frame after a reset, diverging across rates; now consistent at 30/60/120 Hz."
+        }
+      ],
+      "browserAcceptance": "accepted; see browser.json",
+      "finalReview": {
+        "status": "approved by independent reviewer",
+        "sourceSha256": "0c8b041b5dfae6725a79dee513380d22324470ebc978cf4708a9f7de0b7d5b94",
+        "testSha256": {
+          "tests/wallrunner-relay.test.js": "1bc447664b136fb4dfe889320cf22f0de9dae7d55a97dd2af16ac99806f178af",
+          "tests/wallrunner-relay-quality.test.js": "6920c8635af74427009f960590473faa9136a198432a84b1063bf97bbf37e0b4"
+        },
+        "evidence": "33/33 tests, 99.46% line and 96.48% branch coverage. Invalid time inert; reviewer beam-search route wins identically at 30/60/120 Hz (1600, 4 lives); 80 random scripts identical across rates; runner never above 60 px or below 275 px on the legal route; no penetration/NaN in 60 random and 200 accounting runs; energy ledger exact; altitude search bounded ~100-125 px above the highest roof; loss fires once and freezes.",
+        "limitations": "Reviewer edge-hugging route tolerates single 33 ms shifts at 85-99% per course; the authored human routes are the jitter pass criterion."
+      }
+    },
+    {
+      "game": "clockwork-bridge",
+      "owner": "owner-clockwork",
+      "reviewer": "review-clockwork",
+      "verdict": "approved",
+      "queuedFiles": {
+        "tests/clockwork-bridge.test.js": "3b4cf60d4fb78ab986386edbc9baff7d5e6ab83d377b5621e86fe2e91f5f0150"
+      },
+      "draftFindings": [
+        {
+          "id": "clockwork-no-source",
+          "status": "closed",
+          "observation": "Queue held only a 3-line test stub; a complete module was implemented."
+        },
+        {
+          "id": "clockwork-presentation",
+          "status": "closed",
+          "observation": "Parent browser: 8 px player, untranslated EXIT, faint linkage, empty upper half. Fixed with 14x20 player (collider = sprite), localized exit, overhead brass rods with letter badges."
+        },
+        {
+          "id": "clockwork-F1-edge-hover",
+          "status": "closed",
+          "observation": "A key could hover over a pit and the player could stand on a 1 px overlap. Player now tips off edges; key drops clamp to support."
+        },
+        {
+          "id": "clockwork-F2-false-jam",
+          "status": "closed",
+          "observation": "Landing on a rising lift could report a spurious jam; 0.01-2 px gap sweep now shows none."
+        },
+        {
+          "id": "clockwork-F3-score-farming",
+          "status": "closed",
+          "observation": "Unlock score could be re-banked after rewinds; now banked only on machine clear."
+        },
+        {
+          "id": "clockwork-F4-hint-plate",
+          "status": "closed",
+          "observation": "Hint plate covered part of Machine 3; removed, hint moved to the bottom bar."
+        },
+        {
+          "id": "clockwork-F5-hz-test",
+          "status": "closed",
+          "observation": "Loose-tolerance rate test replaced by full-state equality at 30/60/120 Hz."
+        }
+      ],
+      "browserAcceptance": "accepted; see browser.json",
+      "finalReview": {
+        "status": "approved by independent reviewer",
+        "sourceSha256": "f3576126416990cd56033b513e6b5b9bbb19c2d5338cbb9b979075da04ff287d",
+        "testSha256": {
+          "tests/clockwork-bridge.test.js": "b67603f678e73727217eb0c157d923eba87bf69c4c29b249a2d12d8dec627e15",
+          "tests/clockwork-bridge-quality.test.js": "97458d755b4b28a660e5685df57ec7a90f2941506f1d81c18de7d8e7c40477d8"
+        },
+        "evidence": "33/33 tests, 98.84% line coverage. Invalid time inert; 40 random timelines identical at 30/60/120 Hz; zero rider drift including mid-travel reversal; 4,550-run gear/position sweep and 29,048-run key sweep found no penetration (mechanisms jam instead of pushing); 240 goal-directed random runs finite; coyote/buffer once per real exit; terminal callback once and frozen; reviewer bot wins all machines at 30/60/120 Hz; 14 px bilingual canvas text; touch controls cover every action.",
+        "limitations": "Standing under a descending press jams the whole press-and-lift group by design (recoverable). No soft-lock without legal recovery found."
+      }
+    },
+    {
+      "game": "glider-ridge",
+      "owner": "owner-glider",
+      "reviewer": "review-glider",
+      "verdict": "approved",
+      "queuedFiles": {
+        "tests/glider-ridge.test.js": "3a86450d95f7d58f27822f5a888f2b8fcc20ea07976a1721b08ef17df8de0dd3"
+      },
+      "draftFindings": [
+        {
+          "id": "glider-no-source",
+          "status": "closed",
+          "observation": "Queue held only a 3-line test stub; a complete module was implemented."
+        },
+        {
+          "id": "glider-host-status",
+          "status": "closed",
+          "observation": "Parent browser: host status showed only the genre; objective banner overlapped HUD; phone HUD small. Fixed with a bilingual status line and a three-line HUD."
+        },
+        {
+          "id": "glider-flare-cue",
+          "status": "closed",
+          "observation": "Following the flare cue stalled the wing; flare and stall cues later alternated; \"too fast\" cue drove into stall. Fixed with a flare window over the pad with wings level, cue hysteresis, a guarded too-fast cue and speed-hold pitch stability."
+        },
+        {
+          "id": "glider-crash-text",
+          "status": "closed",
+          "observation": "Crash text blamed speed when sink rate failed; now names the failing criterion."
+        },
+        {
+          "id": "glider-human-finishability",
+          "status": "closed",
+          "observation": "Courses 2-3 were only autopilot-finishable. Added LIFT markers, target-altitude line, gate/pad guidance, wider windows and a prompt-text-only test requiring 27/30 clean runs per ridge and rate."
+        },
+        {
+          "id": "glider-F1-relaunch",
+          "status": "closed",
+          "observation": "Relaunch from Warm-up Spur gate 3 left ~5 m margin; gates retuned and margins tested."
+        },
+        {
+          "id": "glider-F2-sky-walls",
+          "status": "closed",
+          "observation": "Invisible walls in open sky replaced by visible terrain and an edge prompt with a key."
+        },
+        {
+          "id": "glider-F3-missed-gate",
+          "status": "closed",
+          "observation": "Missed-gate prompt pointed at a gate behind the glider and named no key; now \"Hold Left: turn back\" and gates can be re-flown in either direction."
+        },
+        {
+          "id": "glider-F4-auto-advance",
+          "status": "closed",
+          "observation": "Crash/clear screens now disclose their automatic countdown."
+        },
+        {
+          "id": "glider-F5-final-speed",
+          "status": "closed",
+          "observation": "Text-only landings failed on touchdown speed; handled by speed-hold stability and a guarded too-fast cue."
+        }
+      ],
+      "browserAcceptance": "accepted; see browser.json",
+      "finalReview": {
+        "status": "approved by independent reviewer",
+        "sourceSha256": "3bb070ee09bc3ca2a2678486267cf5ca4012997d82f14fee6e51f08c650520ce",
+        "testSha256": {
+          "tests/glider-ridge.test.js": "1f21a28acd97e9f7d8fa47780e333974f7cb1f0da97126a163cd1973a78f436c",
+          "tests/glider-ridge-quality.test.js": "0fc0fd73fc3dc5dfa6bea22c1f8035037cf14ffd5cb04519746618b89b9c1952"
+        },
+        "evidence": "46/46 tests, 99.35% line coverage. Invalid time inert; identical state at 30/60/120/240 Hz over 40 seeds; still-air mechanical energy never increased across 10 adversarial policies x 3 courses x 3 rates; visible edge walls; safe landings from tested relaunch checkpoints; gate order enforced and not farmable; reviewer status.en-only policy finished every ridge 30/30 at all rates and 27-30/30 with zero attempts lost at 0.4 s lag, with no corrective-prompt cycling within 1.5 s.",
+        "limitations": "Ridge 3 is the tightest under heavy lag. Gates count in either direction (a deliberate rule change for re-flying). Course 1 is forgiving."
+      }
+    }
+  ]
+}

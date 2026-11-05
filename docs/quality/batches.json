@@ -25,7 +25,10 @@
     "pixel-parkour",
     "lantern-climber",
     "gravity-courier",
-    "grapnel-gorge"
+    "grapnel-gorge",
+    "wallrunner-relay",
+    "clockwork-bridge",
+    "glider-ridge"
   ],
   "batches": [
     {
@@ -78,7 +81,7 @@
     {
       "number": 9,
       "games": ["wallrunner-relay", "clockwork-bridge", "glider-ridge"],
-      "status": "queued"
+      "status": "accepted"
     },
     {
       "number": 10,

@@ -2,11 +2,17 @@
 
 At the user's direction, at most **three games** may be under development and acceptance testing at one time. Do not begin the next batch until all games in the active batch satisfy the gates below. The 100-game target includes Pixel Parkour. Roster themes are not work assignments.
 
+## Completed batch 9
+
+Wallrunner Relay, Clockwork Bridge, and Glider Ridge passed initial development, independent review, and browser acceptance, bringing the accepted total to 27. All 112 focused tests, 27 shared regressions and four scoped catalog checks pass. The queued drafts were stubs, so all three were built new. Each completed a full browser campaign on its final source; Glider Ridge was flown by following only its on-screen prompts. See the [batch 9 evidence](batch-09/ACCEPTANCE.md). Publication verification follows the final integration checks.
+
+The next batch is Burrow Rescue, Raft Rush, and Shield Sentinel. It remains queued until batch 9 publication is verified.
+
 ## Completed batch 8
 
-Lantern Climber, Gravity Courier, and Grapnel Gorge passed initial development, independent review, and browser acceptance, bringing the accepted total to 24. All 106 focused tests, 27 shared regressions and four scoped catalog checks pass. Lantern Climber and Grapnel Gorge completed full browser campaigns on their final sources; Gravity Courier's corrected airborne docking cue was verified in the browser on its final source after a full campaign on the preceding revision. See the [batch 8 evidence](batch-08/ACCEPTANCE.md). Publication verification follows the final integration checks.
+Lantern Climber, Gravity Courier, and Grapnel Gorge passed initial development, independent review, and browser acceptance, bringing the accepted total to 24. All 106 focused tests, 27 shared regressions and four scoped catalog checks pass. Lantern Climber and Grapnel Gorge completed full browser campaigns on their final sources; Gravity Courier's corrected airborne docking cue was verified in the browser on its final source after a full campaign on the preceding revision. See the [batch 8 evidence](batch-08/ACCEPTANCE.md). Commit `935b1cb` is live. All nine checked assets match, and published Lantern Climber and Grapnel Gorge accepted real input. See the [deployment receipt](batch-08/deployment.json).
 
-The next batch is Wallrunner Relay, Clockwork Bridge, and Glider Ridge. It remains queued until batch 8 publication is verified.
+The next batch is Wallrunner Relay, Clockwork Bridge, and Glider Ridge. It began after batch 8 passed integration and publication verification.
 
 ## Completed batch 7
 

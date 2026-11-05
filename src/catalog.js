@@ -22,5 +22,8 @@ export const catalog = [
   ['lantern-climber', 'Lantern Climber', '提灯攀登', 'action', '1', '#e2bc75'],
   ['gravity-courier', 'Gravity Courier', '重力信使', 'action', '1', '#84c3d0'],
   ['grapnel-gorge', 'Grapnel Gorge', '钩索峡谷', 'action', '1', '#cc9579'],
+  ['wallrunner-relay', 'Wallrunner Relay', '飞檐接力', 'action', '1', '#8fb3c9'],
+  ['clockwork-bridge', 'Clockwork Bridge', '发条桥梁', 'action', '1', '#c9a45c'],
+  ['glider-ridge', 'Glider Ridge', '滑翔山脊', 'sports', '1', '#9cc7a4'],
 ].map(([id, en, zh, genre, players, color]) => ({ id, name: { en, zh }, genre, players, color }));
 export const loadGame = (id) => import(`./games/${id}.js`);

@@ -1,0 +1,12 @@
+✔ release contains twenty-six unique loadable games with bilingual instructions (12.672875ms)
+✔ wallrunner-relay: seeded mixed input remains finite, draws and terminates at most once (18.720583ms)
+✔ clockwork-bridge: seeded mixed input remains finite, draws and terminates at most once (18.857542ms)
+✔ glider-ridge: seeded mixed input remains finite, draws and terminates at most once (20.643167ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 105.004875

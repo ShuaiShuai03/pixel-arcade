@@ -1,0 +1,83 @@
+{
+  "date": "2026-11-05",
+  "commit": "935b1cb6ad74ce7371e8a62437412d58265a1037",
+  "url": "https://shuaishuai03.github.io/pixel-arcade/",
+  "workflow": {
+    "runId": 42066930457,
+    "url": "https://github.com/ShuaiShuai03/pixel-arcade/actions/runs/42066930457",
+    "conclusion": "success",
+    "jobs": {
+      "build": "success",
+      "deploy": "success",
+      "report-build-status": "success"
+    },
+    "logsInspected": true,
+    "deploymentReportedSuccessAt": "2026-11-05T16:41:26Z"
+  },
+  "assets": [
+    {
+      "path": "index.html",
+      "bytes": 9421,
+      "sha256": "b660ce3e50c66ade22d92971dc42aa72295778a8e411e91429d1b35a7e007768",
+      "matchesLocal": true
+    },
+    {
+      "path": "src/catalog.js",
+      "bytes": 1988,
+      "sha256": "597e924bf59d4226cd3bb5924219847b793e492ccb03e23994ea20f334df3ba9",
+      "matchesLocal": true
+    },
+    {
+      "path": "src/i18n.js",
+      "bytes": 4018,
+      "sha256": "39e758aa5bba336937299d959a1fd72d641132eaadbdc54fd32b19d62d30fef0",
+      "matchesLocal": true
+    },
+    {
+      "path": "src/app.js",
+      "bytes": 23386,
+      "sha256": "6fc8fbaa4c101f3a1a771b63579c1c2610ca2c2578c825e131d362377d53a890",
+      "matchesLocal": true
+    },
+    {
+      "path": "src/games/lantern-climber.js",
+      "bytes": 25917,
+      "sha256": "421e12ea69689bdf8b33d18f6109ce18d1e8728a3f0341c0225083eae9172b67",
+      "matchesLocal": true
+    },
+    {
+      "path": "src/games/gravity-courier.js",
+      "bytes": 30467,
+      "sha256": "798c1aaaec850b7bdaac0e52954a89be31d1d6e151c6f74c3cbc290f683a9010",
+      "matchesLocal": true
+    },
+    {
+      "path": "src/games/grapnel-gorge.js",
+      "bytes": 58755,
+      "sha256": "4a2565aaa2a42a76070e39088e987a9095d8c07ffbdd5e3ae326f18d4464b36d",
+      "matchesLocal": true
+    },
+    {
+      "path": "README.md",
+      "bytes": 5838,
+      "sha256": "6a5c7ffec82c213dde0b1ee83710db8c6db12b55fe75c4db8589f2ad8d2f2c19",
+      "matchesLocal": true
+    },
+    {
+      "path": "docs/quality/batch-08/ACCEPTANCE.md",
+      "bytes": 6655,
+      "sha256": "91c89eccd7ddcee75179c8548cbc173349b68ee2229fcc43c16d772e2e7709ad",
+      "matchesLocal": true
+    }
+  ],
+  "publishedChecks": {
+    "browser": "Installed stable Google Chrome 156 (headless) over the DevTools protocol; trusted input only, no state injection.",
+    "observed": [
+      "Lantern Climber: Right then Right+Space reached the first ledge for 100 points with the lantern lit.",
+      "Grapnel Gorge: Space hooked anchor 1 and Right+Up reeling showed live slack and load readouts.",
+      "The game shelf lists 23 games."
+    ],
+    "screenshots": ["published-lantern.jpg", "published-grapnel.jpg"],
+    "screenshotsInspected": true
+  }
+}

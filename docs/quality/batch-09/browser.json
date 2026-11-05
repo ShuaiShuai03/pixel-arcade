@@ -1,0 +1,185 @@
+{
+  "date": "2026-11-05",
+  "browser": "Installed stable Google Chrome 156 (headless, temporary profile) driven over the DevTools protocol; trusted keyboard, mouse and touch events only; visible DOM text and screenshots read; no game state read or injected; no Playwright.",
+  "status": "complete",
+  "stateInjection": false,
+  "viewports": [
+    [1440, 900],
+    [390, 844],
+    [844, 390]
+  ],
+  "preliminaryChecks": [
+    {
+      "id": "clockwork-bridge",
+      "sourceSha256": "d4e888e2f2f0706e2ce1d4c378c364b184a3fdf9a3356aab2995fe38ef869efb",
+      "observed": [
+        "Player and key sprites were about 8 px tall on desktop and 4 px on the phone canvas; EXIT was untranslated in Chinese; gear-to-bridge linkage was barely visible; the upper half was mostly empty. Sent to owner as confirmed findings."
+      ],
+      "screenshots": ["clockwork-draft-desktop.jpg", "clockwork-draft-phone.jpg"],
+      "screenshotsInspected": true
+    },
+    {
+      "id": "clockwork-bridge",
+      "sourceSha256": "40a2ede2c7f924a2d9503f2278f71b4c3055b54b2146c17a9c3ba001606c6c0c",
+      "observed": [
+        "Larger actors, localized exit sign, overhead brass rods with letter badges mapping each gear to its bridges. Machine 1 cleared for 1200 in Chinese."
+      ],
+      "screenshots": ["clockwork-revised-desktop.jpg"],
+      "screenshotsInspected": true
+    },
+    {
+      "id": "wallrunner-relay",
+      "sourceSha256": "ceda936ae8d264ffe9bb6848f4fb7ddfa6a3c9f6beee83de8d8184bb82bce472",
+      "observed": [
+        "Runner about 12 px tall on desktop and 5 px on phone; RELAY label drawn under the runner; chalk marks and footprints faint."
+      ],
+      "screenshots": ["wallrunner-draft-desktop.jpg", "wallrunner-draft-phone.jpg"],
+      "screenshotsInspected": true
+    },
+    {
+      "id": "wallrunner-relay",
+      "sourceSha256": "828c31261cc4a341768a52cf90c0c8a20b159fcfd192f901084d5308b56b35ae",
+      "observed": [
+        "2x camera zoom made the runner clear, but jump apexes pushed landing roofs to the bottom edge.",
+        "Replaying the owner's course-2 frame-exact route in real time failed: climbs needed near frame-exact timing. Sent as a blocking human-tolerance finding."
+      ],
+      "screenshots": ["wallrunner-zoom-camera-apex.jpg"],
+      "screenshotsInspected": true
+    },
+    {
+      "id": "wallrunner-relay",
+      "sourceSha256": "46682b8d4ef035ef0b388dab2eb0b4397abb3d6e9c1cc5142273fdabb0205775",
+      "observed": [
+        "Kick grace and one-kick canyons made courses 1-2 winnable with tolerant cues, but the course-3 canyon camera left the runner off-screen while rising and falling."
+      ],
+      "screenshots": ["wallrunner-camera-lost-runner.jpg"],
+      "screenshotsInspected": true
+    },
+    {
+      "id": "glider-ridge",
+      "sourceSha256": "9f5b8844e32bf15206e18c2a449c9f376338a20537161b98c290b36b410f2870",
+      "observed": [
+        "Host status line showed only the genre because getState().status was a flight-data object; objective banner overlapped the HUD; phone HUD text too small."
+      ],
+      "screenshots": ["glider-draft-desktop.jpg", "glider-draft-phone.jpg"],
+      "screenshotsInspected": true
+    },
+    {
+      "id": "glider-ridge",
+      "sourceSha256": "a4c84a0ad898c665c561c79e603bb1c755faac65e4b2ba5a2a5b0c5ec70982ea",
+      "observed": [
+        "Bilingual status and three-line HUD fixed. Holding Space when 'Hold Space to flare' first appeared stalled the wing on the approach and hard-landed; crash text blamed speed instead of sink rate."
+      ],
+      "screenshots": ["glider-revised-hud.jpg", "glider-early-flare-crash.jpg"],
+      "screenshotsInspected": true
+    },
+    {
+      "id": "glider-ridge",
+      "sourceSha256": "921c5dfee1d07627994c24a1301f0392d53e596f7ae8af1a67d42c5015229a8d",
+      "observed": [
+        "A driver obeying only the visible status text lost course-1 attempts: 'Hold Space to flare' and 'Slow! Lower the nose' alternated every 0.2-0.8 s and the glider floated to the course edge; 'Course edge: turn back' named no key."
+      ],
+      "screenshots": [],
+      "screenshotsInspected": true
+    },
+    {
+      "id": "glider-ridge",
+      "sourceSha256": "dc3a442fa0db436ac46764e489488250e4dd91d0363c11d92edac6073fcdb12b",
+      "observed": [
+        "Text-only flight won (2748) with courses 1-2 clean, but course 3 lost two attempts: a missed-gate prompt with no key, and a flare cue while still banked."
+      ],
+      "screenshots": [],
+      "screenshotsInspected": true
+    },
+    {
+      "id": "glider-ridge",
+      "sourceSha256": "3a78adb6f48acb08b40d3776fcc1d40ec198440661f54bf3c455a5c7802e077d",
+      "observed": [
+        "New 'Too fast: hold Up' cue drove the wing into stall, cycling 'Too fast' and 'STALL' about once a second; course 2 lost an attempt."
+      ],
+      "screenshots": [],
+      "screenshotsInspected": true
+    }
+  ],
+  "games": [
+    {
+      "id": "clockwork-bridge",
+      "status": "accepted",
+      "sourceSha256": "f3576126416990cd56033b513e6b5b9bbb19c2d5338cbb9b979075da04ff287d",
+      "observed": [
+        "Full English keyboard campaign won for 4100: three machines at 1200 each plus 100 per remaining life with all five lives. The ferry carried the player and key; a shared gear extended bridge B while lowering lift A; in Master Clockwork lift B rose while press C dropped onto the island behind the player.",
+        "Pressing Z away from the door's 40 px reach drops the key, and the bottom prompt shows which action is in reach. Two tester route errors (walking short of a deck before cranking; jumping before the crate) were recovered by recalling the platform and retaking the key.",
+        "Inputs on the win screen left score and status unchanged. R restarted at 0 with best 4100. Five deliberate pit falls each cost a life and rewound the machine; the fifth reached the explicit loss, which ignored further input.",
+        "Chinese 390x844 portrait: no horizontal overflow; all five touch controls fit; touch took the key and turned the gear, and the ferry carried the player across. 844x390 landscape fullscreen places movement and action controls in side columns; touch movement worked."
+      ],
+      "screenshots": [
+        "clockwork-final-ferry.jpg",
+        "clockwork-final-shared-gear.jpg",
+        "clockwork-final-press-lift.jpg",
+        "clockwork-final-door-prompt.jpg",
+        "clockwork-final-win.jpg",
+        "clockwork-final-loss.jpg",
+        "clockwork-final-phone-touch.jpg",
+        "clockwork-final-landscape.jpg"
+      ],
+      "screenshotsInspected": true,
+      "consoleWarningsOrErrors": [],
+      "limitations": [
+        "Emulated phone layouts and dispatched touch; no physical device or audio check.",
+        "The player accelerates gradually, so short taps under-walk; this is a feel note, not a defect."
+      ]
+    },
+    {
+      "id": "wallrunner-relay",
+      "status": "accepted",
+      "sourceSha256": "0c8b041b5dfae6725a79dee513380d22324470ebc978cf4708a9f7de0b7d5b94",
+      "observed": [
+        "Full English keyboard campaign won for 1672 with all 4 lives: Gutter Row (roof hops and a chalk wall), Antenna Canyon (Left+X chalk climb, one kick across, roof hops, run-up wall-run of the final tower) and Skyline Relay (slick walls, canyon exit onto the right chalk, slick-based tower).",
+        "Momentum for a wall-run comes from the approach: a standing start at the tower edge clung and slid back (a fall cost one life and returned to the pad), while a run-up from the back of the pad ran the tower. The runner stayed visible below the HUD in every captured frame on this build.",
+        "Win screen ignored further input. R restarted at 0 with best 1672; four deliberate falls reached the explicit loss, which ignored input.",
+        "Chinese 390x844 portrait: no horizontal overflow, four touch controls; course 1 was completed entirely with multi-touch Right + Wall-run + Jump. 844x390 landscape fullscreen places controls in side columns."
+      ],
+      "screenshots": [
+        "wallrunner-final-canyon-wallrun.jpg",
+        "wallrunner-final-canyon-exit.jpg",
+        "wallrunner-final-tower-pad.jpg",
+        "wallrunner-final-win.jpg",
+        "wallrunner-final-loss.jpg",
+        "wallrunner-final-phone-touch.jpg",
+        "wallrunner-final-landscape.jpg"
+      ],
+      "screenshotsInspected": true,
+      "consoleWarningsOrErrors": [],
+      "limitations": [
+        "Played with pause-and-inspect segments; edge jumps reward a visible run-up. Emulated touch and phone layouts only.",
+        "Driver note: real-time replays of frame-exact route strings drift in headless Chrome, so segment play was used for acceptance."
+      ]
+    },
+    {
+      "id": "glider-ridge",
+      "status": "accepted",
+      "sourceSha256": "3bb070ee09bc3ca2a2678486267cf5ca4012997d82f14fee6e51f08c650520ce",
+      "observed": [
+        "Final source 3bb070ee (prompt-only guard added after 82254e12): re-flown in full with the same text-only driver and won 2785 with zero attempts lost; gate 3 missed on Needle Crest and recovered via 'Gate 3 missed: Hold Left: turn back'. Courses 1-2 were also clean in a Chinese-language run. The observations below were made on 82254e12, whose physics and courses are identical.",
+        "Full English campaign won for 2809 with no attempts lost by a driver that reads only the page status text every 0.15 s and presses the key it names (flare, hold Left, steer Left/Right, hold Up, stall Down). Thermal LIFT ribbons, gate poles and the minimap guided climbs and gates; courses 1 and 2 landed on the first approach.",
+        "On Needle Crest the glider missed gate 3; 'Gate 3 missed: Hold Left: turn back' led it back through the gate without losing an attempt. No corrective-prompt cycling was observed.",
+        "Win screen ignored input; R restarted at 0 with best 2809. Holding the nose down for the whole run still landed course 1, then missed gate 2 on course 2 twice and reached 'Out of attempts'; the loss screen ignored input.",
+        "Chinese 390x844 portrait: no horizontal overflow; five touch controls; holding the bank-left touch control changed course and the prompt asked to steer right. 844x390 landscape fullscreen places pitch and bank/flare controls in side columns."
+      ],
+      "screenshots": [
+        "glider-final-flight.jpg",
+        "glider-final-course3.jpg",
+        "glider-final-win.jpg",
+        "glider-final-loss.jpg",
+        "glider-final-phone-touch.jpg",
+        "glider-final-landscape.jpg"
+      ],
+      "screenshotsInspected": true,
+      "consoleWarningsOrErrors": [],
+      "limitations": [
+        "Course 1 is forgiving: hands-off or nose-down flight can still land it.",
+        "Emulated touch and phone layouts; no physical device or audio check."
+      ]
+    }
+  ]
+}

@@ -1,0 +1,4 @@
+npm notice run pixel-arcade@1.0.0 format:check
+npm notice run prettier --check index.html src tests tools README.md docs/*.md package.json .prettierrc.json
+Checking formatting...
+All matched files use Prettier code style!
