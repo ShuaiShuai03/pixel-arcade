@@ -1,5 +1,7 @@
 # Release acceptance
 
+This document records the initial release baseline. For subsequent game changes and their current verification evidence, see the [quality batch schedule](quality/BATCHES.md).
+
 Verified on 2026-11-05. This release contains 20 original browser games and the Pixel Parkour WebAssembly integration. The original `pixel_parkour` repository remains a separate, unchanged project.
 
 ## Automated gameplay verification

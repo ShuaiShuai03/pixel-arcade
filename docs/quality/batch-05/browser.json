@@ -1,0 +1,284 @@
+{
+  "date": "2026-11-05",
+  "browser": "Installed stable Google Chrome via Codex Chrome extension",
+  "status": "passed",
+  "stateInjection": false,
+  "preliminaryChecks": [
+    {
+      "id": "neon-snake",
+      "observed": [
+        "Published baseline consists of a uniform tile grid, separate flat snake blocks and a small fruit. Requested connected body/head/tail feedback and distinct garden scenery."
+      ],
+      "screenshots": ["snake-public-baseline.jpg"],
+      "screenshotsInspected": true,
+      "revisionNotes": "Published pre-batch-5 baseline at commit e776213; not acceptance."
+    },
+    {
+      "id": "river-hop",
+      "observed": [
+        "Published baseline uses flat traffic/water lanes and rectangular logs/cars. Requested visible takeoff/landing/shadow feedback, more distinct vehicles and support silhouettes, and shoreline detail outside traffic gaps."
+      ],
+      "screenshots": ["river-public-baseline.jpg"],
+      "screenshotsInspected": true,
+      "revisionNotes": "Published pre-batch-5 baseline at commit e776213; not acceptance."
+    },
+    {
+      "id": "bubble-pop",
+      "observed": [
+        "Published baseline has flat unmarked bubbles, sparse rails and a large empty backdrop. Requested distinct cavern scenery, shaped bubble symbols and a physically accurate aiming/landing guide."
+      ],
+      "screenshots": ["bubble-public-baseline.jpg"],
+      "screenshotsInspected": true,
+      "revisionNotes": "Published pre-batch-5 baseline at commit e776213; not acceptance."
+    },
+    {
+      "id": "neon-snake",
+      "observed": [
+        "The replacement core starts and accepts Calm, directional and Focus controls.",
+        "Collected six fruit through actual keyboard movement, including a detour around rock cells and a corrected missed turn using Focus. Cleared Orchard at score 800 with length 10.",
+        "Pressed Enter to travel. Ruin Gates retained length 10 and replenished Focus.",
+        "Crossed gate A while the body occupied it after gate B opened; collected the next fruit using Focus at score 900, length 11.",
+        "No browser errors or warnings. Requested an explicit visible Normal/Calm mode indicator.",
+        "Long held Focus movement reduced the meter to roughly 5–6%; after release, ordinary steering restored it to about 20%. Reported that the 10% restart threshold needs a visible marker/message. These screenshots are taken after key release and do not establish the held-exhaustion state by themselves."
+      ],
+      "screenshots": [
+        "snake-core-detour.jpg",
+        "snake-core-fifth-fruit.jpg",
+        "snake-core-first-clear.jpg",
+        "snake-core-focus-correction.jpg",
+        "snake-core-focus-depleted.jpg",
+        "snake-core-focus-empty.jpg",
+        "snake-core-focus-recovery.jpg",
+        "snake-core-fourth-route.jpg",
+        "snake-core-fruit.jpg",
+        "snake-core-gate-fruit.jpg",
+        "snake-core-gate-growth.jpg",
+        "snake-core-gate-hold.jpg",
+        "snake-core-initial.jpg",
+        "snake-core-second-fruit.jpg",
+        "snake-core-sixth-route.jpg",
+        "snake-core-third-fruit.jpg",
+        "snake-core-travel.jpg",
+        "snake-core-turn.jpg"
+      ],
+      "screenshotsInspected": true,
+      "sourceSha256": "2c9340b5916cc109aa89b18a33619194ddfc4e26c2c5ec415fc147ac52506ee0",
+      "revisionNotes": "First compiling mechanics core; final art, campaigns, independent review and final browser acceptance are still pending."
+    },
+    {
+      "id": "river-hop",
+      "observed": [
+        "English desktop art displays distinct traffic, log end grain, reeds, frog poses and an airborne shadow.",
+        "Using actual keyboard controls, waited for road gaps, changed direction on the road and reached the middle bank with all four lives.",
+        "Found that the introductory lesson text covers the frog on the middle bank; requested a renderer correction.",
+        "A missed log-edge landing and a mistimed traffic crossing caused ordinary life losses; the traffic collision displayed a release-directions message.",
+        "Restart restored four lives, empty homes, a 45-second timer and score zero while retaining the best score. A fresh controlled route reached the bank again.",
+        "Two left hops, two forward log landings, waiting on the moving second-row log, and two more forward hops rescued a frog into home 2 at score 530, four lives.",
+        "Activated all four Chinese phone touch controls. A forward hop into traffic produced Chinese hit feedback and lost one life."
+      ],
+      "screenshots": [
+        "river-en-desktop.jpg",
+        "river-first-hop.jpg",
+        "river-road-gap.jpg",
+        "river-side-step.jpg",
+        "river-safe-bank.jpg",
+        "river-two-log-landing.jpg",
+        "river-recovery-traffic.jpg",
+        "river-restart-bank.jpg",
+        "river-supported-log.jpg",
+        "river-first-rescue.jpg",
+        "river-zh-touch-controls.jpg"
+      ],
+      "screenshotsInspected": true,
+      "sourceSha256": "fa4c911bcd165b93fa133c6b7d65fad38c0c5e6c9c145ff08945b7ea40cad1f0",
+      "revisionNotes": "Initial final-art candidate. Middle-bank lesson overlap is open; final renderer recheck, landscape and terminal loss acceptance are pending. The screenshots named two-log-landing and recovery-traffic show failed attempts, not successful landings."
+    }
+  ],
+  "games": [
+    {
+      "id": "neon-snake",
+      "status": "passed",
+      "keyboard": [
+        "Arrow movement",
+        "WASD movement",
+        "Space Focus",
+        "C Calm/Normal",
+        "Enter travel on preliminary core",
+        "pause/resume",
+        "restart"
+      ],
+      "touch": ["Up", "Left", "Down", "Right", "Focus", "Next garden", "Calm", "canvas swipe"],
+      "observed": [
+        "Reloaded final art candidate 3f7c954f. Connected body/head/tail, fruit and obstacle silhouettes are clear; Calm mode and the Focus readiness marker are visible.",
+        "A fresh actual-keyboard run collected all six Orchard fruit, including obstacle detours and Focus corrections, ending at score 800 and length 10.",
+        "Chinese phone Next garden button advanced to Ruin Gates and preserved length 10; Focus replenished.",
+        "Landscape fullscreen displayed gate phase and move pips. Passed gate A while the occupied body held it open after B opened.",
+        "Continuing into the top border produced a legitimate loss with a Chinese explanation. Restart restored Orchard, length four, full Focus, Normal pace and score zero while retaining best 800.",
+        "Activated all seven Chinese touch controls, including Next at a valid transition. An actual canvas swipe turned the snake upward.",
+        "Final browser error/warning log was empty."
+      ],
+      "screenshots": [
+        "snake-art-desktop.jpg",
+        "snake-art-fifth-fruit.jpg",
+        "snake-art-first-fruit.jpg",
+        "snake-art-fourth-approach.jpg",
+        "snake-art-fourth-growth.jpg",
+        "snake-art-obstacle-detour.jpg",
+        "snake-art-orchard-complete.jpg",
+        "snake-art-second-fruit.jpg",
+        "snake-art-second-route.jpg",
+        "snake-art-sixth-route.jpg",
+        "snake-art-third-fruit.jpg",
+        "snake-zh-final-loss.jpg",
+        "snake-zh-garden-clear.jpg",
+        "snake-zh-gate-landscape.jpg",
+        "snake-zh-restart.jpg",
+        "snake-zh-swipe.jpg",
+        "snake-zh-touch-controls.jpg",
+        "snake-zh-touch-travel.jpg"
+      ],
+      "screenshotsInspected": true,
+      "consoleErrorsOrWarnings": [],
+      "browserTestedSourceSha256": "3f7c954f6ef9c7c0ffcd16c419ddabde897f33dc320d97de9bdd6aa20de46a0e",
+      "revisionNotes": "All final art, fresh Orchard clear, touch travel, gate pass, loss, restart and touch/swipe checks used unchanged 3f7c954f. Earlier mechanics-only core evidence is separately marked preliminary. Independent review approved the same source.",
+      "limitations": [
+        "All three-garden wins are established by automated public-input campaigns; this browser journey cleared Orchard and entered Ruin Gates.",
+        "Touch buttons and swipes were driven in desktop Chrome at phone dimensions; no physical touch device or non-Chrome browser was tested."
+      ],
+      "sourceHashes": {
+        "src/games/neon-snake.js": "3f7c954f6ef9c7c0ffcd16c419ddabde897f33dc320d97de9bdd6aa20de46a0e"
+      }
+    },
+    {
+      "id": "bubble-pop",
+      "status": "passed",
+      "keyboard": [
+        "Left/Right aiming",
+        "Space and Enter fire",
+        "X swap",
+        "pause/resume",
+        "restart"
+      ],
+      "touch": ["Aim left", "Aim right", "Fire", "Swap", "direct target click"],
+      "observed": [
+        "Completed all three caverns through actual keyboard, visible pointer and touch input; final score 4790. No gameplay state injection was used.",
+        "First cavern: keyboard aim, Space/Enter shots and X swaps cleared exposed groups. The guide showed the eventual socket and a screenshot caught the capsule in flight.",
+        "The final first-cavern drain completed before the next board loaded. Basalt Gates displayed fixed bolts and new geometry; Hanging Keys displayed distinct suspended groups.",
+        "Recovered from a nonmatching shot in Basalt Gates by swapping to clear its support group. The extra capsule drained with the detached group; pressure returned from three to four misses available.",
+        "Cleared hanging groups and aimed past fixed bolts. A right-rail bank shot cleared the last Basalt Gates group before the final cavern.",
+        "Activated every Chinese phone touch control, including a successful touch-fired match in Hanging Keys. Completed the campaign in Chinese landscape fullscreen.",
+        "Restart restored the first cavern, 41 capsules, five misses available and score zero while retaining best 4790.",
+        "A separate deliberate nonmatching stack showed one miss remaining, announced an impending pusher move, then displayed the rack partway through movement. Two further nonmatches produced a legitimate safety-line loss with a Chinese explanation.",
+        "English desktop, Chinese phone and landscape layouts were checked. Final browser error/warning log was empty."
+      ],
+      "screenshots": [
+        "bubble-bank-shot.jpg",
+        "bubble-basalt-blue-route.jpg",
+        "bubble-basalt-bolt-clearance.jpg",
+        "bubble-basalt-center-cut.jpg",
+        "bubble-basalt-detach.jpg",
+        "bubble-basalt-first-match.jpg",
+        "bubble-basalt-gates.jpg",
+        "bubble-basalt-green-clear.jpg",
+        "bubble-basalt-green-route.jpg",
+        "bubble-basalt-left-open.jpg",
+        "bubble-basalt-miss-recovery.jpg",
+        "bubble-basalt-singleton-clear.jpg",
+        "bubble-basalt-upper-cut.jpg",
+        "bubble-blue-clear.jpg",
+        "bubble-center-match.jpg",
+        "bubble-en-desktop.jpg",
+        "bubble-first-flight.jpg",
+        "bubble-first-match.jpg",
+        "bubble-hanging-keys.jpg",
+        "bubble-keyboard-aim.jpg",
+        "bubble-last-column.jpg",
+        "bubble-pointer-pair.jpg",
+        "bubble-pressure-warning.jpg",
+        "bubble-pusher-announced.jpg",
+        "bubble-pusher-moving.jpg",
+        "bubble-rail-contact.jpg",
+        "bubble-second-cavern.jpg",
+        "bubble-second-match.jpg",
+        "bubble-swap-aim.jpg",
+        "bubble-yellow-clear.jpg",
+        "bubble-zh-final-canopy.jpg",
+        "bubble-zh-final-pair.jpg",
+        "bubble-zh-full-victory.jpg",
+        "bubble-zh-hanging-red-clear.jpg",
+        "bubble-zh-hanging-yellow-clear.jpg",
+        "bubble-zh-landscape.jpg",
+        "bubble-zh-pressure-loss.jpg",
+        "bubble-zh-restart.jpg",
+        "bubble-zh-top-blue.jpg",
+        "bubble-zh-top-green.jpg",
+        "bubble-zh-touch-aim.jpg",
+        "bubble-zh-touch-match.jpg"
+      ],
+      "screenshotsInspected": true,
+      "consoleErrorsOrWarnings": [],
+      "browserTestedSourceSha256": "072f775182507c369cbc793bf0ebb3aa50718443d7722a66da3b29f5e6f505a0",
+      "sourceHashes": {
+        "src/games/bubble-pop.js": "072f775182507c369cbc793bf0ebb3aa50718443d7722a66da3b29f5e6f505a0"
+      },
+      "revisionNotes": "Full browser campaign, controls, pusher, loss and restart used unchanged 072f775 source. Independent review approved the final expanded 30-test suite at the same runtime revision.",
+      "limitations": [
+        "Touch was driven in desktop Chrome at phone dimensions; no physical touch device or non-Chrome browser was tested.",
+        "Automated contact and timing tests provide quantitative physics evidence; screenshots alone do not establish conservation or frame-rate invariance."
+      ]
+    },
+    {
+      "id": "river-hop",
+      "status": "passed",
+      "keyboard": [
+        "Arrow hops",
+        "hold to repeat",
+        "release to wait and rearm after rescue or loss",
+        "pause/resume",
+        "restart"
+      ],
+      "touch": ["Left", "Right", "Up", "Down"],
+      "observed": [
+        "Reached the middle bank with all four frogs through actual waits, forward hops and a lateral traffic adjustment.",
+        "The initial browser pass completed a first rescue at home 2, score 530, by landing on two moving logs, riding the second log until the top route aligned, then hopping home.",
+        "Parent source comparison confirms the final correction only changes instructional rendering and status text; the previously tested physics and input paths are unchanged.",
+        "Reloaded final ac9e7c76 and repeated the traffic route. The frog is fully visible on the middle bank; instructions now stay in the top HUD and host status.",
+        "Checked final English desktop, Chinese phone and Chinese landscape layouts.",
+        "A deliberate unsupported landing gave a visible Chinese water-loss/release cue. Further ordinary forward hops depleted the remaining lives and ended at score 90 with a Chinese retry explanation.",
+        "Restarted the final source, activated every Chinese touch action, and reached the first road at score 10 with all four frogs, empty homes and retained best 530.",
+        "Final browser error/warning log was empty."
+      ],
+      "screenshots": [
+        "river-final-clear-bank.jpg",
+        "river-final-terminal.jpg",
+        "river-final-touch-reset.jpg",
+        "river-final-water-loss.jpg",
+        "river-final-zh-bank.jpg",
+        "river-final-zh-landscape.jpg"
+      ],
+      "relatedMechanicsScreenshots": [
+        "river-first-hop.jpg",
+        "river-road-gap.jpg",
+        "river-side-step.jpg",
+        "river-supported-log.jpg",
+        "river-first-rescue.jpg"
+      ],
+      "screenshotsInspected": true,
+      "consoleErrorsOrWarnings": [],
+      "browserTestedSourceSha256": "ac9e7c7664ab1c53177a6187ab6f771852291e9aabdd8156baf6c6ff802ef005",
+      "sourceHashes": {
+        "src/games/river-hop.js": "ac9e7c7664ab1c53177a6187ab6f771852291e9aabdd8156baf6c6ff802ef005"
+      },
+      "revisionNotes": "First-rescue and initial moving-support evidence used fa4c911b. Final ac9e7c76 changes only cues/status/rendering; final bank visibility, layouts, loss, reset and all touch actions were rechecked after reload.",
+      "limitations": [
+        "Full three-crossing victories are established by automated public-input campaigns; the browser run rescued one frog and exercised the listed failure and reset paths.",
+        "Touch was driven in desktop Chrome at phone dimensions; no physical touch device or non-Chrome browser was tested."
+      ]
+    }
+  ],
+  "viewports": [
+    [1440, 900],
+    [844, 390],
+    [390, 844]
+  ]
+}

@@ -1,0 +1,69 @@
+{
+  "commit": "e776213e61ba59837e569c193d6730909ee40aee",
+  "site": "https://shuaishuai03.github.io/pixel-arcade/",
+  "run": "https://github.com/ShuaiShuai03/pixel-arcade/actions/runs/42016865391",
+  "conclusion": "success",
+  "assetChecks": [
+    {
+      "path": "index.html",
+      "matches": true,
+      "sha256": "f8ce514a795966c125415e9657bb65c87f02a844be5418c5e6ce5ebde16e14bf",
+      "bytes": 9427
+    },
+    {
+      "path": "src/app.js",
+      "matches": true,
+      "sha256": "6fc8fbaa4c101f3a1a771b63579c1c2610ca2c2578c825e131d362377d53a890",
+      "bytes": 23386
+    },
+    {
+      "path": "src/style.css",
+      "matches": true,
+      "sha256": "4760219c776e6f9c6066d60fab24c7f1622979f747e0c7c952a56812671ba421",
+      "bytes": 24191
+    },
+    {
+      "path": "src/shared/simulation.js",
+      "matches": true,
+      "sha256": "6b1c5d5198cd7f5f1c2e1c42a7e61f0ea1e0ff43f44f5f73f77e5373c81227f9",
+      "bytes": 554
+    },
+    {
+      "path": "src/shared/input.js",
+      "matches": true,
+      "sha256": "1ac10423d816838e784562ea6b2ba9dfdc8717a14efed8ea11f60cd9033f2bc5",
+      "bytes": 968
+    },
+    {
+      "path": "src/games/sky-raiders.js",
+      "matches": true,
+      "sha256": "04d0703ac7791e3f72521438bae922517fd60a10a5d2ca42fdb8a396dbfdaf76",
+      "bytes": 47542
+    },
+    {
+      "path": "src/games/iron-bastion.js",
+      "matches": true,
+      "sha256": "4d82fbe3f256aa3447350b6f845e4451fb92d3f41dc877fddc75a12afeeca293",
+      "bytes": 38515
+    },
+    {
+      "path": "src/games/orbit-invaders.js",
+      "matches": true,
+      "sha256": "f75473c14266d531feabfc92da6ec493a03fd7981779f12fbecb10261a85d06d",
+      "bytes": 40640
+    }
+  ],
+  "browserVerification": {
+    "status": "passed",
+    "game": "sky-raiders",
+    "phase": "playing",
+    "observed": [
+      "Published six-sector rules and final physics source loaded.",
+      "Keyboard firing, lateral flight and an interception charge defeated two escorts; score 200, three shields and two charges remained."
+    ],
+    "consoleErrorsOrWarnings": [],
+    "screenshot": "screenshots/published-sky.jpg",
+    "screenshotInspected": true
+  },
+  "workflowLogInspected": true
+}

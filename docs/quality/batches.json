@@ -13,7 +13,10 @@
     "dungeon-dash",
     "sky-raiders",
     "iron-bastion",
-    "orbit-invaders"
+    "orbit-invaders",
+    "river-hop",
+    "neon-snake",
+    "bubble-pop"
   ],
   "batches": [
     {
@@ -43,7 +46,8 @@
     {
       "number": 5,
       "games": ["river-hop", "neon-snake", "bubble-pop"],
-      "status": "queued"
+      "status": "accepted",
+      "acceptance": "batch-05/ACCEPTANCE.md"
     },
     {
       "number": 6,

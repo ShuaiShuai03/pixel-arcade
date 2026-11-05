@@ -50,6 +50,7 @@ Two-player games must also work in solo mode with an actual AI opponent, a partn
 **Rules and control feel**
 
 - Run simulation through the controller’s fixed-step loop; keep velocity and timers in seconds.
+- Paused or zero-duration updates must not advance the simulation, consume input actions, or change gameplay resources.
 - Holding a key must not create unintended repeated discrete actions.
 - Jumping games require deliberate air control, jump buffering, coyote time where appropriate, and a documented jump envelope.
 - Collision geometry must correspond to visible solids. Fast projectiles and moving obstacles must not tunnel.

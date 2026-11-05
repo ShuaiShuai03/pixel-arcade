@@ -1,0 +1,170 @@
+{
+  "date": "2026-11-05",
+  "phase": "initial batch review",
+  "finalCollectionReview": false,
+  "records": [
+    {
+      "game": "river-hop",
+      "reviewer": "action_review",
+      "verdict": "approved",
+      "draftFindings": [
+        {
+          "id": "river-support-order",
+          "status": "closed",
+          "observation": "Support is checked after log motion, so a fully supported frog can lose a life at the support edge. A new regression is red."
+        },
+        {
+          "id": "river-continuous-hop",
+          "status": "closed",
+          "observation": "The restored draft instantly changes the frog position and checks hazards at the endpoint. Continuous takeoff, flight, landing and swept contact are required."
+        },
+        {
+          "id": "river-ferry-substep-carry",
+          "status": "closed",
+          "observation": "Independent review of the replacement core reproduced a false water death at a reversing ferry support edge when a turtle warning split the time step. Carry velocity was averaged over the full remaining interval but used over a shorter event interval; actual ferry displacement and frog carry must agree."
+        },
+        {
+          "id": "river-air-control-substep",
+          "status": "closed",
+          "observation": "After the ferry correction, independent review reproduced the same interval mismatch in airborne steering: an analytically supported landing at x289 drifted to x289.000334 and lost a life when a shorter event interval used the full-remainder midpoint velocity. The shared advancement path must integrate actual event duration; partition-invariance and exact-boundary regressions are required."
+        },
+        {
+          "id": "river-bank-lesson-overlap",
+          "status": "closed",
+          "observation": "Parent browser acceptance reached the middle grass bank and found the introductory lesson text drawn across the frog. Move instructions outside traversable geometry and recheck the bank."
+        }
+      ],
+      "focusedTestsPassed": 36,
+      "coverage": {
+        "lines": 99.13,
+        "branches": 96.49,
+        "functions": 100
+      },
+      "evidence": [
+        "All 36 focused tests independently pass on the frozen source and test pair.",
+        "Complete public-input campaigns pass at 30/60/120 Hz. Owner campaign times are 81.44, 81.26 and 81.17 seconds; a campaign after a real traffic loss completes in 85.09 seconds.",
+        "Occupied-home recovery waits for a deck, hops back down onto it and then rescues the frog into another home through public input.",
+        "Ferry carry, airborne acceleration, traffic and wall contacts integrate the actual selected event interval. Support-edge, wrap and contact partition regressions pass.",
+        "Physical rules use ballistic hops, inherited support velocity, full-foot support, explicit grip reactions and powered or current-driven deck motion. Snapshot isolation, loss, reset and terminal freeze pass.",
+        "Active instructions were moved to the host status and existing top HUD. Parent reloaded the final source and confirmed clear frog visibility on the bank in desktop and phone layouts.",
+        "This is initial review only; the later independent review of all 100 games remains required."
+      ],
+      "sha256": {
+        "src/games/river-hop.js": "ac9e7c7664ab1c53177a6187ab6f771852291e9aabdd8156baf6c6ff802ef005",
+        "tests/river-hop.test.js": "61c0ea886de393a718fd481ac3bdefa6d00b034afdf2779585587929085d790f"
+      }
+    },
+    {
+      "game": "neon-snake",
+      "reviewer": "review_starbreaker_batch1",
+      "verdict": "approved",
+      "draftFindings": [
+        {
+          "id": "snake-portal-occupancy",
+          "status": "closed",
+          "observation": "The portal entry can bypass a body collision because only the exit is checked. The instantaneous distant replacement also needs a physically legible replacement rule."
+        },
+        {
+          "id": "snake-focus-exhaustion",
+          "status": "closed",
+          "observation": "Holding Focus after exhaustion alternates recharge and braking from frame to frame."
+        },
+        {
+          "id": "snake-conflicting-input",
+          "status": "closed",
+          "observation": "Simultaneous opposite keys select a direction by branch order; the grid helper also accepts diagonal or zero directions."
+        },
+        {
+          "id": "snake-banner-obstruction",
+          "status": "closed",
+          "observation": "The opening banner obscures the moving head for about 1.6 seconds."
+        },
+        {
+          "id": "snake-growth-transition",
+          "status": "closed",
+          "observation": "The old stage reset silently discards body growth; the replacement should preserve it or make a consistent explicit rule."
+        },
+        {
+          "id": "snake-pace-indicator",
+          "status": "closed",
+          "observation": "The early replacement core accepts C to change Normal/Calm pace without displaying which mode is active. Parent requested visible confirmation."
+        },
+        {
+          "id": "snake-focus-threshold-feedback",
+          "status": "closed",
+          "observation": "The replacement Focus control requires 10% charge to restart. Reviewer and browser checks request a visible threshold and ready/charging/exhausted feedback so a partially green meter does not imply the control is usable."
+        }
+      ],
+      "focusedTestsPassed": 26,
+      "coverage": {
+        "lines": 99.63,
+        "branches": 95.61,
+        "functions": 97.3
+      },
+      "evidence": [
+        "All 26 focused tests independently pass on the frozen source; the gate/tail fixture uses a valid open approach.",
+        "Twelve independent public-input campaigns pass: seeds 1/42 at 30/60/120 Hz in Normal and Calm with wrong-turn and Focus-depletion recovery. Each ends with 18 fruit, length 22, score 2400, six gate entries and six local underpass crossings.",
+        "Nine public losses and three seeded 3600-frame keyboard/swipe traces pass, along with exact callback snapshots, terminal freeze and full fresh-instance resets.",
+        "No portals or distant position changes remain. Explicit paused travel preserves body growth on safe entrance rails; gates remain open while occupied.",
+        "Empty Focus stays stable while held and recharges on release; simultaneous-direction arbitration is deterministic. Active play is unobscured and Normal/Calm plus Focus readiness are visible.",
+        "This is initial review only; the later independent review of all 100 games remains required."
+      ],
+      "sha256": {
+        "src/games/neon-snake.js": "3f7c954f6ef9c7c0ffcd16c419ddabde897f33dc320d97de9bdd6aa20de46a0e",
+        "tests/neon-snake.test.js": "237027d81003877db86306c1ed22a392c1ecba9ac4a92d5e60c7dd32a06186e5"
+      }
+    },
+    {
+      "game": "bubble-pop",
+      "reviewer": "review_snowball_batch1",
+      "verdict": "approved",
+      "draftFindings": [
+        {
+          "id": "bubble-zero-dt",
+          "status": "closed",
+          "observation": "An update with zero elapsed time can create a shot and increment the shot count; the existing zero-time test does not assert this."
+        },
+        {
+          "id": "bubble-contact-geometry",
+          "status": "closed",
+          "observation": "Projectile collision radius 12 exceeds the painted radius 10/outline 11. A vertical roof shot at x240 snaps to x246 and remains visibly below the roof."
+        },
+        {
+          "id": "bubble-ceiling-and-detachment",
+          "status": "closed",
+          "observation": "Ceiling displacement and detached-body motion need explicit physical causes rather than instantaneous descent or arbitrary velocity."
+        },
+        {
+          "id": "bubble-drain-flight-overlap",
+          "status": "closed",
+          "observation": "In the replacement core, a new shot can launch while a low released capsule has not yet cleared beneath the table. The reviewer reproduced a physical overlap and reuse of the same socket; draining geometry needs an interlock or collision handling."
+        },
+        {
+          "id": "bubble-final-drain-freeze",
+          "status": "closed",
+          "observation": "The independent reviewer observed the final released pieces frozen at the table surface when the terminal transition happened before their physical drain completed. Terminal state must be reached after the last required motion settles."
+        }
+      ],
+      "focusedTestsPassed": 30,
+      "coverage": {
+        "lines": 93.97,
+        "branches": 91.24,
+        "functions": 98.31
+      },
+      "evidence": [
+        "All 30 focused tests independently pass on the frozen source and test pair. Scoped catalog checks and shared input/lifecycle checks also pass.",
+        "Three complete keyboard-only campaigns at 30/60/120 Hz use actual arrow-key aim and release, Space fire and X swap through createGame. A complete pointer campaign also passes.",
+        "Wall contacts preserve speed, include approaching end-of-step impacts, ignore separating tangency and retain remaining travel through multiple fast banks.",
+        "Simultaneous and mirrored contacts, capture-arc clearance, reachable socket previews and rendered-radius agreement pass. Capture commits the grid cell only on arrival.",
+        "Released capsules drain below the air table; new launches wait for physical clearance. Final victory and stage changes wait for the last drain, and old-board fire or pointer intent cannot leak into a new board.",
+        "Fixed bolts anchor groups, retired colors cannot create unusable ammunition, the moving pusher is warned and continuous, and controls recover after its travel.",
+        "Parent completed all three caverns in the browser at score 4790 and verified all controls, pusher warning and motion, loss, reset, localized layouts and empty console at the same source hash.",
+        "This is initial review only; the later independent review of all 100 games remains required."
+      ],
+      "sha256": {
+        "src/games/bubble-pop.js": "072f775182507c369cbc793bf0ebb3aa50718443d7722a66da3b29f5e6f505a0",
+        "tests/bubble-pop.test.js": "9ce0d67a5a200b53351c36347fe6a25d34d4a06f3cb632dbfe921c0c52439b79"
+      }
+    }
+  ]
+}

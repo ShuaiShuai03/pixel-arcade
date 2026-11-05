@@ -1,0 +1,152 @@
+✔ Bubble cluster removes three plus disconnected bubbles (0.952416ms)
+✔ Bubble mismatches persist and neighbor graph is symmetric (0.618958ms)
+✔ Bubble aiming and shot has wall bounces (1.690125ms)
+✔ Bubble terminal clear/overflow, restart and drawing (2.152417ms)
+✔ Bubble cavern can be cleared through real aim, fire and swap actions (14723.2995ms)
+✔ Bubble geometry uses an exact hex lattice inside side walls (0.117167ms)
+✔ Bubble shot ignores zero dt and invalid placement cannot overwrite occupied cell (0.245417ms)
+✔ Bubble exact hex neighbors all lie one diameter apart (0.3495ms)
+✔ Bubble emptying a cavern advances a different puzzle without ending campaign (2.649542ms)
+✔ Bubble free shot follows exact linear flight at 60 and 120 Hz (0.906ms)
+✔ Bubble zero and invalid time are complete no-ops, including queued actions and resources (0.488042ms)
+✔ Bubble roof contact starts a continuous guided capture rather than a cell teleport (0.165625ms)
+✔ Bubble mechanical pressure warns and moves continuously instead of stepping the rack (0.658166ms)
+✔ Bubble released cells drain below the air table without gaining unexplained in-plane velocity (0.291834ms)
+✔ Bubble pointer aiming uses a bounded physical gimbal and each stage has authored mechanical features (0.132708ms)
+✔ Bubble launches wait until released capsules have one-diameter vertical clearance (0.853875ms)
+✔ Bubble final victory waits until the physical drain clears before freezing (1.818458ms)
+✔ Bubble safety line includes fixed rack bolts, not only colored capsules (0.052958ms)
+✔ Bubble old-board clicks and fire presses cannot leak through drain or stage boundaries (0.319417ms)
+✔ Bubble terminal drain clears stale intent and never launches a ghost capsule (0.075334ms)
+✔ Bubble three authored air tables clear through actual keyboard aiming, firing and swapping at 30,60,120Hz (26572.76675ms)
+✔ Bubble chamber boundaries use the same radius and lattice as rendered contacts (0.145791ms)
+✔ Bubble wall impacts conserve speed, include end-of-step contact, and ignore separating tangency (0.194083ms)
+✔ Bubble arbitrarily fast bank sweeps preserve all remaining travel and energy (4.010375ms)
+✔ Bubble simultaneous two-capsule and wall contacts choose continuous legal sockets (1.137958ms)
+✔ Bubble mirrored unambiguous contacts produce mirrored captures without overlap or list bias (2.329291ms)
+✔ Bubble guide samples are continuous and never penetrate capsules, bolts, rails or roof (89.595209ms)
+✔ Bubble projected socket is the actual reachable guided socket (4.588125ms)
+✔ Bubble fixed bolts anchor groups and retired colors never leave unusable ammunition (2.047292ms)
+✔ Bubble pusher travel is continuous and frame-rate invariant, and controls recover afterwards (7.605041ms)
+✔ keys distinguish held and one-frame press even on repeat (0.475708ms)
+✔ touch and keyboard ownership cannot release each other (0.089083ms)
+✔ clearing input on blur releases pointer and presses (0.066083ms)
+✔ an accessible button pulse lasts one physics step without releasing a held key (0.051375ms)
+✔ Snake valid grid turns eat once and keep growth and score (1.097042ms)
+✔ Snake zero duration and invalid dt preserve queues, resources, counters and input edges (0.914708ms)
+✔ Snake invalid direction vectors cannot create diagonal or stationary moves (0.133458ms)
+✔ Snake wall, rock, body and closed-gate collisions preserve the last valid body (0.363417ms)
+✔ Snake enters a vacating tail but a growth step cannot vacate it (0.065583ms)
+✔ Snake food never occupies bodies, obstacles, gates or underpasses (1.543375ms)
+✔ Snake announced travel preserves all ten and sixteen body cells on safe contiguous entrance rails (0.234125ms)
+✔ Snake intermission does not move or accept hidden queued turns; Enter travels only once (0.286875ms)
+✔ Snake opposite simultaneous inputs cancel and a perpendicular chord is not ordered arbitrarily (0.186792ms)
+✔ Snake two turns buffer across distinct input frames and reject reversal and queue overflow (0.565083ms)
+✔ Snake held turns do not repeat, and a swipe works without a separate click event (0.412458ms)
+✔ Snake gate phase is a move clock and occupied gates never close onto a body (0.111125ms)
+✔ Snake a gate held by the vacating tail permits safe entry but not self-growth overlap (0.309666ms)
+✔ Snake underpass movement stays adjacent and blocks an occupied exit (0.22475ms)
+✔ Snake no portal data or coordinate replacement remains in the grid state (0.110334ms)
+✔ Snake Focus settles empty while held, recharges only on release, and can rearm (3.167833ms)
+✔ Snake Focus changes speed without losing accrued step progress; Calm has an inspectable state (0.194333ms)
+✔ Snake all authored gardens complete by public keyboard controls with normal/calm and Focus recovery at 30/60/120Hz (4886.13425ms)
+✔ Snake actual edge loss and new-instance reset work at 30/60/120Hz (3.855208ms)
+✔ Snake a tight loop after real growth causes a public-input body collision (1.751542ms)
+✔ Snake exact Focus-empty event and step progress are invariant across tick boundaries (0.072084ms)
+✔ Snake Focus under ten percent cannot start and resource readiness is explicit (0.128042ms)
+✔ Snake fractional movement matches rates and large dt is capped rather than skipping cells (0.225959ms)
+✔ Snake food full-board boundary returns null safely (0.876083ms)
+✔ Snake deterministic public input state remains finite and all arrays are bounded (1.992041ms)
+✔ Snake all keyboard-equivalent touch actions are complete and the key guide is bilingual (0.134333ms)
+✔ keyboard and button restart retain best and create fresh games (2.711416ms)
+✔ finished result follows language changes without losing score (1.062875ms)
+✔ pause updates HUD immediately and resume preserves the run (0.381834ms)
+✔ blur releases held keys and long frames are capped (0.3175ms)
+✔ late module resolution cannot overwrite a newer route (0.240208ms)
+✔ a press survives a frame without a physics tick and fires only once during catch-up (0.585708ms)
+✔ language changes release controls whose touch buttons are replaced (0.181083ms)
+✔ the shelf loads only visible previews and navigation shares their in-flight load (0.671417ms)
+✔ a failed preview load can be retried by opening the game (2.145708ms)
+✔ secondary touches cannot steer or release the active canvas gesture (0.256459ms)
+✔ right click does not fire a canvas action (0.149208ms)
+✔ unsupported fullscreen expands the player and Escape restores its normal layout (0.65225ms)
+✔ denied fullscreen falls back and navigation restores the page (0.241375ms)
+✔ fullscreen returns keyboard focus to an active game when entering and leaving (0.162209ms)
+✔ opposite touch groups retain independent pointer ownership (0.26925ms)
+✔ keyboard activation of a touch control produces one deliberate action (0.191208ms)
+✔ opted-in two-player touch controls replace solo buttons and keep independent input (0.265333ms)
+✔ two-player games without a dedicated touch layout keep solo controls hidden (0.138916ms)
+✔ river: paused, invalid and zero-duration updates leave the entire snapshot untouched (1.94475ms)
+✔ river: a hop has visible takeoff, finite airborne travel and a real touchdown (1.764666ms)
+✔ river: opposing directions cancel and a released tap cannot become another hop (2.522875ms)
+✔ river: a frog at the trailing log edge is carried before support is rechecked (0.355208ms)
+✔ river: takeoff inherits the moving deck velocity without teleporting the frog (0.275083ms)
+✔ river: swept traffic cannot pass through a stationary frog between frame endpoints (0.336875ms)
+✔ river: new-life protection cannot make unsupported water safe (0.092125ms)
+✔ river: a held direction must be released after a lost frog before it can move the next frog (2.716416ms)
+✔ river: ordinary boundary bumps retain inward and forward controls (1.029042ms)
+✔ river: each stage has a distinct crossing rule, including a bounded reversing ferry (0.173834ms)
+✔ river: filled pads are safe to leave, and home acceptance requires both visible feet on the pad (0.121083ms)
+✔ river: timer loss is reachable, ends once, freezes completely and restarts cleanly (482.761542ms)
+✔ river: every essential action and rule is available in English and Chinese (0.271875ms)
+✔ river: a late buffered tap launches once after landing, while an early tap expires (0.832916ms)
+✔ river: touchdown uses the deck velocity at contact and only then establishes support (0.378833ms)
+✔ river: a departed frog is independent of a later reversal or wrap of its old deck (0.2215ms)
+✔ river: adjacent moving decks can support separate feet without a phantom water gap (1.004375ms)
+✔ river: a vehicle wrapping offscreen does not sweep a phantom crossing through the frog (0.131917ms)
+✔ river: leaving a warning turtle before its dive preserves the airborne frog (0.604708ms)
+✔ river: the reversing ferry carries a resting frog without snapping or repeatedly adding velocity (13.006042ms)
+✔ river: timeout before home contact loses; a home reached exactly on the deadline counts (0.194333ms)
+✔ river: full three-crossing public-input campaign (30 Hz) (1970.398625ms)
+ℹ Opening route (0.30s per action): U L L W R U L L L U U U L L L U U U U
+ℹ 30Hz clean: 12 rescues in 81.44s; 1566 planner nodes; score 7380
+✔ river: full three-crossing public-input campaign (60 Hz) (2034.488583ms)
+ℹ Opening route (0.30s per action): U L L W R U L L L U U U L L L U U U U
+ℹ 60Hz clean: 12 rescues in 81.26s; 1640 planner nodes; score 7380
+✔ river: full three-crossing public-input campaign (120 Hz) (2094.380417ms)
+ℹ Opening route (0.30s per action): U L L W R U L L L U U U L L L U U U U
+ℹ 120Hz clean: 12 rescues in 81.17s; 1678 planner nodes; score 7385
+✔ river: a real traffic mistake remains recoverable through the entire public-input campaign (2007.656333ms)
+ℹ 60Hz mistake recovery: 12 rescues in 85.09s; 1737 planner nodes; score 7375
+✔ river: a fast wrapped vehicle is swept along the new offscreen entry instead of tunneling (0.153333ms)
+✔ river: ferry edge support stays exact across acceleration signs and unrelated turtle events (0.377958ms)
+✔ river: continuous traffic still collides when an object crosses a wrap seam more than once per step (0.06925ms)
+✔ river: public snapshots cannot mutate live actors, stages, instructions or later instances (0.182416ms)
+✔ river: finite air steering lands at the analytic deck edge independent of unrelated event partitions (1.1785ms)
+✔ river: leg and contact impulses have equal opposite surface reactions and passive landings lose energy (0.3725ms)
+✔ river: traffic contact at the exact step endpoint counts, while separating tangency stays harmless (0.178375ms)
+✔ river: safe waiting and revisiting rows or filled pads cannot farm progress (2.121709ms)
+✔ river: seeded legal input remains deterministic, finite and bounded in simulation and rendering (32.76775ms)
+✔ river: an occupied home is recoverable by waiting for a deck, returning to the river and rescuing elsewhere (190.100333ms)
+✔ river: detailed lessons stay in the host status and short canvas cues stay above traversable ground (0.478416ms)
+✔ simulation advances equally on 30, 60, 120 and 144 Hz displays (0.933708ms)
+✔ a long stall has a bounded catch-up and never produces a large physics step (0.073ms)
+✔ reset discards time from the previous run or pause (0.051666ms)
+✔ ending a game stops catch-up immediately and discards remaining time (0.054792ms)
+✔ invalid elapsed values cannot poison subsequent updates (0.051042ms)
+ℹ tests 119
+ℹ suites 0
+ℹ pass 119
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 41472.944
+ℹ start of coverage report
+ℹ ----------------------------------------------------------------------------------------------------------------------------
+ℹ file            | line % | branch % | funcs % | uncovered lines
+ℹ ----------------------------------------------------------------------------------------------------------------------------
+ℹ src             |        |          |         |
+ℹ  games          |        |          |         |
+ℹ   bubble-pop.js |  93.97 |    91.24 |   98.31 | 394 400-404 432-434 439-442 529-541 549-551 849-860 886-893 896-901 958-962
+ℹ   neon-snake.js |  99.63 |    95.61 |   97.30 | 321-323
+ℹ   river-hop.js  |  99.13 |    96.49 |  100.00 | 391-393 585-587 620-623
+ℹ  shared         |        |          |         |
+ℹ   input.js      | 100.00 |   100.00 |  100.00 |
+ℹ   platform.js   |  71.28 |    60.71 |   78.57 | 7-8 28-29 72-94
+ℹ   simulation.js | 100.00 |   100.00 |  100.00 |
+ℹ   utils.js      |  66.67 |   100.00 |   37.50 | 15-23
+ℹ ----------------------------------------------------------------------------------------------------------------------------
+ℹ all files       |  96.51 |    93.95 |   94.97 |
+ℹ ----------------------------------------------------------------------------------------------------------------------------
+ℹ end of coverage report

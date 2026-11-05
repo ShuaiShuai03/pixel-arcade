@@ -2,9 +2,15 @@
 
 At the user's direction, at most **three games** may be under development and acceptance testing at one time. Do not begin the next batch until all games in the active batch satisfy the gates below. The 100-game target includes Pixel Parkour. Roster themes are not work assignments.
 
+## Completed batch 5
+
+River Hop, Neon Snake, and Bubble Pop passed their initial development, tests, independent review, and browser acceptance. All 119 focused tests and four scoped catalog checks pass. See the [batch 5 evidence](batch-05/ACCEPTANCE.md). Deployment verification is pending.
+
+The next queued batch is Blockfall, Gem Match, and Minefield. Development will begin after batch 5 is published and checked.
+
 ## Completed batch 4
 
-Sky Raiders, Iron Bastion, and Orbit Invaders passed their initial development, tests, independent review, and browser acceptance. All 130 focused tests and four catalog checks pass. See the [batch 4 evidence](batch-04/ACCEPTANCE.md). Release verification is in progress; batch 5 remains queued until it finishes.
+Sky Raiders, Iron Bastion, and Orbit Invaders passed their initial development, tests, independent review, and browser acceptance. All 130 focused tests and four catalog checks pass. See the [batch 4 evidence](batch-04/ACCEPTANCE.md). Commit `e776213` is live; all eight checked assets matched and the published Sky Raiders flight/fire/interception check passed. See the [deployment receipt](batch-04/deployment.json).
 
 ## Completed batch 3
 
