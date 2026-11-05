@@ -10,7 +10,7 @@ No account, downloads, ads, analytics, or CDN dependencies. Personal bests and l
 
 | Game           | What you play                                                           | Players |
 | -------------- | ----------------------------------------------------------------------- | ------- |
-| Snowball Siege | Pack enemies into snowballs and free three frozen towers                | 1       |
+| Snowball Siege | Freeze, deliberately kick, and clear six frostbound chambers            | 1       |
 | Ember Knights  | Jump, strike, and block in a best-of-three castle duel                  | 1 or 2  |
 | Bomb Garden    | Plant bombs, clear crates, and escape the blast                         | 1 or 2  |
 | Iron Bastion   | Defend a beacon against three waves of enemy tanks                      | 1       |
@@ -33,6 +33,8 @@ No account, downloads, ads, analytics, or CDN dependencies. Personal bests and l
 | Pixel Parkour  | Run through a three-lane rail yard, upgrade gear, and complete missions | 1       |
 
 The collection uses original code and artwork inspired by classic game mechanics. It does not include the assets or characters of commercial arcade games.
+
+The collection is being expanded and refined in batches of at most three games. [Batch 1](docs/quality/batch-01/ACCEPTANCE.md) upgrades Snowball Siege, Pinball Pocket, and Starbreaker. The [quality schedule](docs/quality/BATCHES.md) tracks the 100-game target and remaining work.
 
 ## Controls
 

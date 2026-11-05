@@ -771,44 +771,96 @@ h3 {
   touch-action: none;
   user-select: none;
 }
+.touch-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  justify-content: center;
+}
 .touch-controls button:active {
   background: var(--accent);
   color: var(--deep);
 }
-.toast {
-  position: fixed;
-  bottom: 22px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: var(--ink);
-  color: var(--deep);
-  padding: 12px 24px;
-  z-index: 30;
-  font-size: 13px;
+.full-window-open {
+  overflow: hidden;
 }
-.machine:fullscreen {
+.machine:is(:fullscreen, .full-window) {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  max-height: 100vh;
+  width: 100vw;
+  height: 100dvh;
+  margin: 0;
+  padding: 12px max(12px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom))
+    max(12px, env(safe-area-inset-left));
+  overflow-y: auto;
   background: #071719;
   border: 0;
 }
-.machine:fullscreen .screen {
-  width: min(calc((100vh - 115px) * 1.5), 100vw - 30px);
+.machine:is(:fullscreen, .full-window) .screen {
+  width: min(calc((100dvh - 115px) * 1.5), 100%);
   flex-shrink: 0;
 }
-.machine:fullscreen .machine-bar,
-.machine:fullscreen .machine-controls {
+.machine:is(:fullscreen, .full-window) .machine-bar,
+.machine:is(:fullscreen, .full-window) .machine-controls {
   width: 100%;
   max-width: 1100px;
 }
-.machine:fullscreen .touch-controls {
-  position: absolute;
-  bottom: 20px;
-  right: 30px;
-  opacity: 0.7;
+.machine:is(:fullscreen, .full-window) .touch-controls {
+  flex-shrink: 0;
+  padding-top: 12px;
+  max-width: 700px;
+}
+@media (any-pointer: coarse), (max-width: 960px) {
+  .machine:is(:fullscreen, .full-window) .screen {
+    width: min(calc((100dvh - 200px) * 1.5), 100%);
+  }
+  .touch-controls {
+    display: flex;
+  }
+}
+@media (max-width: 960px) and (orientation: landscape) and (max-height: 600px) {
+  .machine:is(:fullscreen, .full-window) {
+    display: grid;
+    grid-template-columns: 100px minmax(0, 1fr) 100px;
+    grid-template-rows: 24px minmax(0, 1fr) 30px;
+    gap: 8px;
+  }
+  .machine:is(:fullscreen, .full-window) .machine-bar {
+    grid-column: 1 / -1;
+    grid-row: 1;
+    padding: 0;
+  }
+  .machine:is(:fullscreen, .full-window) .screen {
+    grid-column: 2;
+    grid-row: 2;
+    width: min(100%, calc((100dvh - 94px) * 1.5));
+    justify-self: center;
+    align-self: center;
+  }
+  .machine:is(:fullscreen, .full-window) .machine-controls {
+    grid-column: 1 / -1;
+    grid-row: 3;
+    padding: 0;
+  }
+  .machine:is(:fullscreen, .full-window) .touch-controls {
+    display: contents;
+  }
+  .machine:is(:fullscreen, .full-window) .touch-group {
+    grid-row: 2;
+    align-self: center;
+    gap: 8px;
+  }
+  .machine:is(:fullscreen, .full-window) .touch-left {
+    grid-column: 1;
+  }
+  .machine:is(:fullscreen, .full-window) .touch-right {
+    grid-column: 3;
+  }
 }
 @media (min-width: 1600px) {
   .hero-content {
@@ -1290,11 +1342,6 @@ h3 {
   }
   .save-note {
     font-size: 10px;
-  }
-  .toast {
-    font-size: 12px;
-    width: max-content;
-    max-width: 90%;
   }
   .touch-controls {
     display: flex;

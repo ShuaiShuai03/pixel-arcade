@@ -1,0 +1,178 @@
+{
+  "maxActiveGames": 3,
+  "activeBatch": null,
+  "acceptedGames": ["snowball-siege", "pinball-pocket", "starbreaker"],
+  "batches": [
+    {
+      "number": 1,
+      "games": ["snowball-siege", "pinball-pocket", "starbreaker"],
+      "status": "accepted",
+      "acceptance": "batch-01/ACCEPTANCE.md"
+    },
+    {
+      "number": 2,
+      "games": ["paddle-duel", "meteor-drift", "pixel-rally"],
+      "status": "queued"
+    },
+    {
+      "number": 3,
+      "games": ["ember-knights", "bomb-garden", "dungeon-dash"],
+      "status": "queued"
+    },
+    {
+      "number": 4,
+      "games": ["sky-raiders", "iron-bastion", "orbit-invaders"],
+      "status": "queued"
+    },
+    {
+      "number": 5,
+      "games": ["river-hop", "neon-snake", "bubble-pop"],
+      "status": "queued"
+    },
+    {
+      "number": 6,
+      "games": ["blockfall", "gem-match", "minefield"],
+      "status": "queued"
+    },
+    {
+      "number": 7,
+      "games": ["crate-keeper", "memory-grove", "pixel-parkour"],
+      "status": "queued"
+    },
+    {
+      "number": 8,
+      "games": ["lantern-climber", "gravity-courier", "grapnel-gorge"],
+      "status": "queued"
+    },
+    {
+      "number": 9,
+      "games": ["wallrunner-relay", "clockwork-bridge", "glider-ridge"],
+      "status": "queued"
+    },
+    {
+      "number": 10,
+      "games": ["burrow-rescue", "raft-rush", "shield-sentinel"],
+      "status": "queued"
+    },
+    {
+      "number": 11,
+      "games": ["dash-duelist", "tether-twins", "vine-warden"],
+      "status": "queued"
+    },
+    {
+      "number": 12,
+      "games": ["magnet-marauder", "echo-hunter", "frost-forge"],
+      "status": "queued"
+    },
+    {
+      "number": 13,
+      "games": ["mimic-vault", "orbit-gardener", "comet-catcher"],
+      "status": "queued"
+    },
+    {
+      "number": 14,
+      "games": ["conveyor-chef", "firefly-trail", "rail-switch"],
+      "status": "queued"
+    },
+    {
+      "number": 15,
+      "games": ["tilt-lab", "stacksmith", "traffic-conductor"],
+      "status": "queued"
+    },
+    {
+      "number": 16,
+      "games": ["mirror-lab", "circuit-weaver", "tide-lock"],
+      "status": "queued"
+    },
+    {
+      "number": 17,
+      "games": ["phase-tiles", "weightworks", "fold-map"],
+      "status": "queued"
+    },
+    {
+      "number": 18,
+      "games": ["pattern-forge", "cipher-wheels", "tangram-harbor"],
+      "status": "queued"
+    },
+    {
+      "number": 19,
+      "games": ["pathweaver", "slime-split", "magnet-mosaic"],
+      "status": "queued"
+    },
+    {
+      "number": 20,
+      "games": ["orchard-merge", "color-flood", "rope-unravel"],
+      "status": "queued"
+    },
+    {
+      "number": 21,
+      "games": ["latin-garden", "rooftop-hoops", "pocket-striker"],
+      "status": "queued"
+    },
+    {
+      "number": 22,
+      "games": ["sand-volley", "ice-curling", "mini-links"],
+      "status": "queued"
+    },
+    {
+      "number": 23,
+      "games": ["harbor-regatta", "archery-range", "vault-champion"],
+      "status": "queued"
+    },
+    {
+      "number": 24,
+      "games": ["grove-guard", "outpost-lines", "harbor-master"],
+      "status": "queued"
+    },
+    {
+      "number": 25,
+      "games": ["caravan-trader", "island-engineer", "reef-restorer"],
+      "status": "queued"
+    },
+    {
+      "number": 26,
+      "games": ["fortress-siege", "bee-colony", "pulse-forge"],
+      "status": "queued"
+    },
+    {
+      "number": 27,
+      "games": ["echo-drums", "beat-weaver", "conductor-cove"],
+      "status": "queued"
+    },
+    {
+      "number": 28,
+      "games": ["dance-duel", "shadow-watch", "lantern-signals"],
+      "status": "queued"
+    },
+    {
+      "number": 29,
+      "games": ["time-sculptor", "lunar-lander", "rescue-helicopter"],
+      "status": "queued"
+    },
+    {
+      "number": 30,
+      "games": ["deep-diver", "workshop-welder", "wildlife-photographer"],
+      "status": "queued"
+    },
+    {
+      "number": 31,
+      "games": ["telescope-tracker", "balloon-balancer", "robot-foundry"],
+      "status": "queued"
+    },
+    {
+      "number": 32,
+      "games": ["reversi-grove", "hex-conquest", "sum-dice"],
+      "status": "queued"
+    },
+    {
+      "number": 33,
+      "games": ["wordless-detective", "tug-of-tides", "cargo-duel"],
+      "status": "queued"
+    },
+    {
+      "number": 34,
+      "games": ["constellation-duel"],
+      "status": "queued"
+    }
+  ]
+}

@@ -29,5 +29,22 @@ test('clearing input on blur releases pointer and presses', () => {
   i.clear();
   assert.equal(i.pointer.down, false);
   assert.equal(i.pointer.clicked, false);
+  assert.equal(i.pointer.id, null);
+  assert.equal(i.pointer.x, -1);
+  assert.equal(i.pointer.y, -1);
   assert.equal(i.pressed('KeyA'), false);
+});
+
+test('an accessible button pulse lasts one physics step without releasing a held key', () => {
+  const i = new InputState();
+  i.pulse('Space');
+  assert.equal(i.held('Space'), true);
+  assert.equal(i.pressed('Space'), true);
+  i.flush();
+  assert.equal(i.held('Space'), false);
+  assert.equal(i.pressed('Space'), false);
+  i.down('ArrowLeft');
+  i.pulse('ArrowLeft');
+  i.flush();
+  assert.equal(i.held('ArrowLeft'), true);
 });

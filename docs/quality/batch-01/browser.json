@@ -1,0 +1,82 @@
+{
+  "date": "2026-11-05",
+  "browser": "Installed stable Google Chrome via Codex Chrome extension",
+  "viewports": [
+    [1440, 900],
+    [844, 390],
+    [390, 844]
+  ],
+  "stateInjection": false,
+  "screenshotsInspected": true,
+  "games": [
+    {
+      "id": "snowball-siege",
+      "keyboard": ["move", "jump", "snow", "kick"],
+      "touch": ["move", "jump", "snow", "kick"],
+      "observed": [
+        "frozen-contact score remained zero",
+        "explicit kick awarded 100",
+        "first chamber cleared",
+        "second chamber entered with 543 points"
+      ],
+      "screenshots": [
+        "snowball-frozen-contact.jpg",
+        "snowball-desktop-playing.jpg",
+        "snowball-landscape-zh.jpg",
+        "snowball-phone-controls.jpg",
+        "snowball-second-chamber.jpg"
+      ]
+    },
+    {
+      "id": "pinball-pocket",
+      "keyboard": ["launch", "left flipper", "right flipper"],
+      "touch": ["launch", "left flipper", "right flipper"],
+      "observed": [
+        "all three balls played",
+        "terminal score 1000",
+        "pause and resume",
+        "restart score zero and best 1000",
+        "launch-time flipper correction retested"
+      ],
+      "screenshots": [
+        "pinball-desktop-playing.jpg",
+        "pinball-landscape-zh.jpg",
+        "pinball-terminal-zh.jpg",
+        "pinball-phone-restart.jpg",
+        "pinball-launch-flippers.jpg"
+      ]
+    },
+    {
+      "id": "starbreaker",
+      "keyboard": ["launch", "left", "right"],
+      "touch": ["launch", "catch"],
+      "observed": [
+        "score 75",
+        "emergency catch charge used",
+        "Chinese three-charge label",
+        "three-ball loss with score 305",
+        "restart score zero and best 305 retained"
+      ],
+      "screenshots": [
+        "starbreaker-desktop-playing.jpg",
+        "starbreaker-landscape-zh.jpg",
+        "starbreaker-phone-playing.jpg",
+        "starbreaker-terminal-zh.jpg"
+      ]
+    }
+  ],
+  "consoleErrorsOrWarnings": [],
+  "limitations": [
+    "No physical mobile device validation",
+    "No non-Chrome browser validation",
+    "Full campaign wins verified by automated public-input tests rather than manual browser completion"
+  ],
+  "sourceHashes": {
+    "src/games/snowball-siege.js": "66b72fdafc180b09f4a16bd54fe8815ee7372886fdb49f524b53caad016e9ef8",
+    "tests/snowball-siege.test.js": "27b95b28e95e6bc7ff88da41dc3f53f39180ad1558089264588eb7363a823aab",
+    "src/games/pinball-pocket.js": "e362b21e6adc3bee3d1f6656d795ee7c6e72dd83db5e3674b0735369b3164447",
+    "tests/pinball-pocket.test.js": "7ac2e93e8a9612b9937024802d3add24074ad242deb73ade385e4bb9df9023ba",
+    "src/games/starbreaker.js": "ae3df5715a485502324815cd4eefc423a50b8c45981dfa4e1cf2273280b854b5",
+    "tests/starbreaker.test.js": "9899fd2f8ef1a60a304bf836923b064f9a4ff909b886636755adef02d38062de"
+  }
+}

@@ -10,6 +10,7 @@ import {
   formatControlKeys,
 } from './shared/platform.js';
 import { InputState } from './shared/input.js';
+import { SimulationClock } from './shared/simulation.js';
 import { ArcadeAudio } from './shared/audio.js';
 import { drawWorld } from './world.js';
 
@@ -28,14 +29,31 @@ let preferences = readPreferences(storage),
   phase = 'home',
   lastFrame = 0,
   lastHud = '',
-  toastTimer;
+  fullWindow = false,
+  fullscreenPending = false;
 const text = (key) => copy[key]?.[preferences.lang === 'zh' ? 1 : 0] || key;
 const localized = (value) => (typeof value === 'object' ? value[preferences.lang] : value);
 const audio = new ArcadeAudio(preferences.sound),
   input = new InputState(),
+  simulation = new SimulationClock(),
   modules = new Map(),
+  pendingModules = new Map(),
+  previews = new Map(),
   canvas = $('game-canvas'),
   ctx = canvas.getContext('2d');
+const previewObserver =
+  typeof IntersectionObserver === 'function'
+    ? new IntersectionObserver(
+        (entries) => {
+          for (const entry of entries) {
+            if (!entry.isIntersecting) continue;
+            previewObserver.unobserve(entry.target);
+            void drawPreview(entry.target);
+          }
+        },
+        { rootMargin: '240px' },
+      )
+    : null;
 const persist = () => savePreferences(storage, preferences);
 const make = (tag, className, content) => {
   const e = document.createElement(tag);
@@ -43,12 +61,6 @@ const make = (tag, className, content) => {
   if (content !== undefined) e.textContent = content;
   return e;
 };
-function toast(message) {
-  clearTimeout(toastTimer);
-  $('toast').textContent = message;
-  $('toast').hidden = false;
-  toastTimer = setTimeout(() => ($('toast').hidden = true), 4000);
-}
 function setPhase(next) {
   phase = next;
   canvas.dataset.phase = next;
@@ -56,6 +68,7 @@ function setPhase(next) {
   $('pause-button').textContent = text(next === 'paused' ? 'resume' : 'pause');
 }
 function updateLanguage() {
+  input.clear();
   document.documentElement.lang = preferences.lang === 'zh' ? 'zh-CN' : 'en';
   document.querySelectorAll('[data-i18n]').forEach((e) => {
     e.innerHTML = text(e.dataset.i18n);
@@ -72,7 +85,7 @@ function updateLanguage() {
   );
   $('game-search').placeholder = text('search');
   $('game-search').setAttribute('aria-label', text('search'));
-  $('fullscreen-button').setAttribute('aria-label', text('fullscreen'));
+  updateFullscreenButton();
   $('parkour-link').href = `./public/parkour/index.html?lang=${preferences.lang}`;
   document.querySelector('.skip-link').textContent =
     preferences.lang === 'zh' ? '跳转至游戏' : 'Skip to games';
@@ -115,6 +128,7 @@ function updateLanguage() {
   }
 }
 function renderShelf() {
+  previewObserver?.disconnect();
   const list = filterGames(catalog, $('game-search').value, filter),
     grid = $('game-grid');
   grid.replaceChildren();
@@ -133,6 +147,8 @@ function renderShelf() {
       preview = make('canvas');
     preview.width = 480;
     preview.height = 320;
+    preview.dataset.game = game.id;
+    preview.dataset.language = preferences.lang;
     preview.setAttribute('role', 'img');
     preview.setAttribute('aria-label', `${localized(game.name)} — ${text('preview')}`);
     picture.append(preview);
@@ -165,32 +181,60 @@ function renderShelf() {
     grid.append(link);
     const context = preview.getContext('2d');
     context.imageSmoothingEnabled = false;
-    const module = modules.get(game.id);
-    if (module) {
-      try {
-        module
-          .createGame({
-            width: 480,
-            height: 320,
-            lang: preferences.lang,
-            mode: 1,
-            random: seeded(37),
-            t: (en, zh) => (preferences.lang === 'zh' ? zh : en),
-            sound: () => {},
-            end: () => {},
-          })
-          .draw(context);
-      } catch (error) {
-        console.error(`Preview failed: ${game.id}`, error);
-      }
-    } else {
-      context.fillStyle = game.color;
-      context.fillRect(0, 0, 480, 320);
-      context.fillStyle = '#142b2b';
-      context.font = 'bold 30px monospace';
-      context.textAlign = 'center';
-      context.fillText(localized(game.name), 240, 165);
+    context.fillStyle = game.color;
+    context.fillRect(0, 0, 480, 320);
+    context.fillStyle = '#142b2b';
+    context.font = 'bold 30px monospace';
+    context.textAlign = 'center';
+    context.fillText(localized(game.name), 240, 165);
+    if (previewObserver) previewObserver.observe(preview);
+    else void drawPreview(preview);
+  }
+}
+function loadModule(id) {
+  if (modules.has(id)) return Promise.resolve(modules.get(id));
+  if (pendingModules.has(id)) return pendingModules.get(id);
+  const promise = loadGame(id)
+    .then((module) => {
+      modules.set(id, module);
+      return module;
+    })
+    .finally(() => pendingModules.delete(id));
+  pendingModules.set(id, promise);
+  return promise;
+}
+async function drawPreview(preview) {
+  const { game: id, language: lang } = preview.dataset;
+  const key = `${id}:${lang}`;
+  try {
+    let thumbnail = previews.get(key);
+    if (!thumbnail) {
+      const module = await loadModule(id);
+      if (preview.isConnected === false) return;
+      thumbnail = make('canvas');
+      thumbnail.width = 240;
+      thumbnail.height = 160;
+      const context = thumbnail.getContext('2d');
+      context.imageSmoothingEnabled = false;
+      context.scale(0.5, 0.5);
+      module
+        .createGame({
+          width: 480,
+          height: 320,
+          lang,
+          mode: 1,
+          random: seeded(37),
+          t: (en, zh) => (lang === 'zh' ? zh : en),
+          sound: () => {},
+          end: () => {},
+        })
+        .draw(context);
+      previews.set(key, thumbnail);
+      if (previews.size > 64) previews.delete(previews.keys().next().value);
     }
+    preview.getContext('2d').drawImage(thumbnail, 0, 0, 480, 320);
+  } catch {
+    // The labeled fallback stays usable; opening the game retries its load.
   }
 }
 function seeded(seed) {
@@ -230,6 +274,10 @@ function renderDetails() {
   }
   $('touch-controls').replaceChildren();
   $('touch-controls').hidden = current.env.mode === 2 || !meta.touchControls?.length;
+  const touchGroups = {
+    left: make('div', 'touch-group touch-left'),
+    right: make('div', 'touch-group touch-right'),
+  };
   for (const control of meta.touchControls || []) {
     const button = make('button', null, localized(control.label));
     button.type = 'button';
@@ -244,8 +292,17 @@ function renderDetails() {
     });
     for (const type of ['pointerup', 'pointercancel', 'lostpointercapture'])
       button.addEventListener(type, (event) => input.up(`touch-${event.pointerId}`));
-    $('touch-controls').append(button);
+    button.addEventListener('click', (event) => {
+      if (event.detail !== 0 || phase !== 'playing') return;
+      input.pulse(control.code);
+      canvas.focus({ preventScroll: true });
+    });
+    const side =
+      control.side || (['ArrowLeft', 'ArrowRight'].includes(control.code) ? 'left' : 'right');
+    touchGroups[side === 'left' ? 'left' : 'right'].append(button);
   }
+  for (const group of Object.values(touchGroups))
+    if (group.children.length) $('touch-controls').append(group);
   $('best-value').textContent = preferences.scores[meta.id] || 0;
 }
 function formatKeys(keys) {
@@ -297,6 +354,7 @@ function newInstance(module) {
 async function route() {
   const version = ++routeVersion,
     id = normalizeHash(location.hash, catalog);
+  void exitPlayerFullscreen();
   input.clear();
   if (current) rememberProgress();
   if (!id) {
@@ -332,7 +390,7 @@ async function route() {
   $('mode-picker').hidden = true;
   $('score-value').textContent = '0';
   try {
-    const module = modules.get(id) || (await loadGame(id));
+    const module = await loadModule(id);
     if (version !== routeVersion) return;
     modules.set(id, module);
     current = newInstance(module);
@@ -360,6 +418,7 @@ function startRun() {
   }
   input.clear();
   lastFrame = performance.now();
+  simulation.reset();
   lastHud = '';
   setPhase('playing');
   $('touch-controls').hidden = current.env.mode === 2 || !current.meta.touchControls?.length;
@@ -429,11 +488,15 @@ function updateHUD() {
   }
 }
 function frame(now) {
-  const dt = Math.min((now - lastFrame) / 1000, 1 / 30);
+  const elapsed = (now - lastFrame) / 1000;
   lastFrame = now;
   if (current && phase === 'playing') {
     try {
-      current.game.update(dt, input);
+      simulation.advance(elapsed, (dt) => {
+        current.game.update(dt, input);
+        input.flush();
+        return phase === 'playing';
+      });
       drawGame();
       updateHUD();
     } catch (error) {
@@ -441,13 +504,17 @@ function frame(now) {
       setPhase('error');
       showOverlay();
     }
-    input.flush();
   }
   requestAnimationFrame(frame);
 }
 function keydown(event) {
   if (!current || $('play-view').hidden || event.ctrlKey || event.metaKey || event.altKey) return;
   if (['INPUT', 'TEXTAREA', 'SELECT'].includes(event.target.tagName)) return;
+  if (event.code === 'Escape' && (fullWindow || document.fullscreenElement)) {
+    event.preventDefault();
+    void exitPlayerFullscreen();
+    return;
+  }
   if (event.code === 'Escape' || event.code === 'KeyP') {
     event.preventDefault();
     if (!event.repeat) pause();
@@ -480,18 +547,25 @@ function pointerPosition(event) {
   input.pointer.y = ((event.clientY - r.top) * 320) / r.height;
 }
 canvas.addEventListener('pointerdown', (event) => {
-  if (phase !== 'playing') return;
+  if (phase !== 'playing' || event.button > 0 || input.pointer.id !== null) return;
   event.preventDefault();
   canvas.setPointerCapture(event.pointerId);
   canvas.focus({ preventScroll: true });
   pointerPosition(event);
   input.pointer.down = true;
   input.pointer.clicked = true;
+  input.pointer.id = event.pointerId;
 });
-canvas.addEventListener('pointermove', pointerPosition);
+canvas.addEventListener('pointermove', (event) => {
+  if (input.pointer.id !== null && event.pointerId !== input.pointer.id) return;
+  if (input.pointer.id === null && event.pointerType === 'touch') return;
+  pointerPosition(event);
+});
 for (const type of ['pointerup', 'pointercancel', 'lostpointercapture'])
-  canvas.addEventListener(type, () => {
+  canvas.addEventListener(type, (event) => {
+    if (event.pointerId !== input.pointer.id) return;
     input.pointer.down = false;
+    input.pointer.id = null;
   });
 canvas.addEventListener('contextmenu', (event) => event.preventDefault());
 $('start-button').addEventListener('click', startRun);
@@ -532,26 +606,51 @@ function randomGame() {
 }
 $('random-game').addEventListener('click', randomGame);
 $('next-random').addEventListener('click', randomGame);
-$('fullscreen-button').addEventListener('click', async () => {
+function updateFullscreenButton() {
+  const active = fullWindow || !!document.fullscreenElement;
+  $('fullscreen-button').setAttribute('aria-label', text(active ? 'exitFullscreen' : 'fullscreen'));
+  $('fullscreen-button').setAttribute('aria-pressed', String(active));
+}
+function setFullWindow(active) {
+  fullWindow = active;
+  document.querySelector('.machine').classList.toggle('full-window', active);
+  document.body.classList.toggle('full-window-open', active);
+  updateFullscreenButton();
+}
+async function exitPlayerFullscreen() {
+  setFullWindow(false);
   try {
     if (document.fullscreenElement) await document.exitFullscreen();
-    else if (document.querySelector('.machine').requestFullscreen)
-      await document.querySelector('.machine').requestFullscreen();
-    else toast(text('fullscreenError'));
   } catch {
-    toast(text('fullscreenError'));
+    // Browser Escape remains available when an exit request is rejected.
+  }
+  updateFullscreenButton();
+}
+$('fullscreen-button').addEventListener('click', async () => {
+  if (!current || fullscreenPending) return;
+  const version = routeVersion;
+  if (fullWindow || document.fullscreenElement) {
+    await exitPlayerFullscreen();
+    if (version === routeVersion && phase === 'playing') canvas.focus({ preventScroll: true });
+    return;
+  }
+  const machine = document.querySelector('.machine');
+  fullscreenPending = true;
+  try {
+    if (machine.requestFullscreen) await machine.requestFullscreen();
+    else setFullWindow(true);
+    if (version !== routeVersion) await exitPlayerFullscreen();
+  } catch {
+    if (version === routeVersion) setFullWindow(true);
+  } finally {
+    fullscreenPending = false;
+    updateFullscreenButton();
+    if (version === routeVersion && phase === 'playing') canvas.focus({ preventScroll: true });
   }
 });
+document.addEventListener('fullscreenchange', updateFullscreenButton);
 window.addEventListener('hashchange', route);
 drawWorld($('world'));
 updateLanguage();
 void route();
 requestAnimationFrame(frame);
-Promise.allSettled(
-  catalog.map(async (game) => {
-    const module = await loadGame(game.id);
-    modules.set(game.id, module);
-    game.name = module.meta.name;
-    game.players = module.meta.players;
-  }),
-).then(() => renderShelf());

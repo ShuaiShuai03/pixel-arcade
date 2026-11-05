@@ -1,0 +1,1029 @@
+[
+  {
+    "id": "lantern-climber",
+    "name": {
+      "en": "Lantern Climber",
+      "zh": "提灯攀登"
+    },
+    "pack": 1,
+    "genre": "action",
+    "players": "1",
+    "mechanic": "Climb a vertical ruin while managing grip stamina and a lantern that reveals safe ledges. Reach three summits with different rest-point layouts; falls or exhausted light lose a life.",
+    "artAndControls": "Moonlit masonry, warm lantern halo, readable handholds. Move; Space jump; X relight at shrines.",
+    "acceptance": "Complete all summits without hidden mandatory jumps; stamina recovers only in valid resting states."
+  },
+  {
+    "id": "gravity-courier",
+    "name": {
+      "en": "Gravity Courier",
+      "zh": "重力信使"
+    },
+    "pack": 1,
+    "genre": "action",
+    "players": "1",
+    "mechanic": "Deliver fragile parcels by reversing gravity between floor and ceiling. Momentum persists across a flip; rotating hazards and parcel impacts require controlled landings.",
+    "artAndControls": "Copper mail tubes, orientation arrows, parcel damage marks. Move; Space flip; X collect/deliver.",
+    "acceptance": "Ceiling/floor landings resolve symmetrically; flipping into a ceiling never tunnels; all deliveries remain reachable."
+  },
+  {
+    "id": "grapnel-gorge",
+    "name": {
+      "en": "Grapnel Gorge",
+      "zh": "钩索峡谷"
+    },
+    "pack": 1,
+    "genre": "action",
+    "players": "1",
+    "mechanic": "Attach to marked anchors, shorten/lengthen rope, swing, and release across gaps. Cross three routes with moving anchors and optional relics.",
+    "artAndControls": "Layered canyon cliffs, visibly taut rope, anchor glints. Move; Space attach/release; Up/Down adjust rope.",
+    "acceptance": "Rope length constraint does not add energy; releasing preserves tangential velocity; a complete route uses legal swings."
+  },
+  {
+    "id": "wallrunner-relay",
+    "name": {
+      "en": "Wallrunner Relay",
+      "zh": "飞檐接力"
+    },
+    "pack": 1,
+    "genre": "action",
+    "players": "1",
+    "mechanic": "Maintain wall-running momentum across marked wall segments, kick away at corners, and refill stamina at relay pads. Finish three courses before the energy reserve empties.",
+    "artAndControls": "Rainy rooftops, chalk route marks, footstep trails. Move; Space jump/kick; X wall-run hold.",
+    "acceptance": "Wall-running requires actual wall contact; detach and corner transitions cannot generate unlimited height."
+  },
+  {
+    "id": "clockwork-bridge",
+    "name": {
+      "en": "Clockwork Bridge",
+      "zh": "发条桥梁"
+    },
+    "pack": 1,
+    "genre": "action",
+    "players": "1",
+    "mechanic": "Operate gears that move connected bridges while standing in the level. Bridge phases affect routes, safe waiting areas, and carried keys. Escape three machines.",
+    "artAndControls": "Brass gears, toothed platforms, visible linkage. Move; Space jump; X operate nearby gear.",
+    "acceptance": "Moving platforms carry passengers without crushing through solids; each configuration has a tested escape route."
+  },
+  {
+    "id": "glider-ridge",
+    "name": {
+      "en": "Glider Ridge",
+      "zh": "滑翔山脊"
+    },
+    "pack": 1,
+    "genre": "sports",
+    "players": "1",
+    "mechanic": "Trade altitude for speed, pitch into thermals, avoid stalls, and pass checkpoints before landing. Three ridge courses introduce crosswinds and precision landing zones.",
+    "artAndControls": "Alpine silhouettes, fabric wings, thermal ribbons and windsocks. Arrows pitch/steer; Space flare.",
+    "acceptance": "Lift/stall behavior differs from powered thrust; all courses are finishable within the available altitude."
+  },
+  {
+    "id": "burrow-rescue",
+    "name": {
+      "en": "Burrow Rescue",
+      "zh": "地底救援"
+    },
+    "pack": 1,
+    "genre": "action",
+    "players": "1",
+    "mechanic": "Dig connected tunnels, brace unstable ceilings, manage oxygen, and guide stranded miners back to the lift. Rescue three mine sectors.",
+    "artAndControls": "Earth strata, support beams, helmet lamps, cracks before cave-ins. Move; Space dig; X brace/interact.",
+    "acceptance": "Collapse warnings precede damage; supports alter collapse rules; miners follow only traversable tunnels."
+  },
+  {
+    "id": "raft-rush",
+    "name": {
+      "en": "Raft Rush",
+      "zh": "激流木筏"
+    },
+    "pack": 1,
+    "genre": "sports",
+    "players": "1",
+    "mechanic": "Paddle a continuously moving raft across current fields, eddies, and rock gates; collect rescue flags and reach downstream docks.",
+    "artAndControls": "Foaming water, current arrows, flexible raft and shoreline layers. Move; Space strong paddle; X brake/backwater.",
+    "acceptance": "Current plus paddle forces compose consistently; raft collision cannot teleport through banks; no grid-hopping rules."
+  },
+  {
+    "id": "shield-sentinel",
+    "name": {
+      "en": "Shield Sentinel",
+      "zh": "护盾卫士"
+    },
+    "pack": 2,
+    "genre": "action",
+    "players": "1",
+    "mechanic": "Rotate a directional shield to intercept telegraphed attacks and reflect selected projectiles into armored targets. Clear three defense waves and a shield-breaking guardian.",
+    "artAndControls": "Stone observatory, segmented shield, reflected-shot streaks. Move; aim with facing; Space shield; X short bash.",
+    "acceptance": "Only the shield arc blocks; reflectable and unblockable attacks are visually distinct; reflected damage is credited once."
+  },
+  {
+    "id": "dash-duelist",
+    "name": {
+      "en": "Dash Duelist",
+      "zh": "瞬步决斗"
+    },
+    "pack": 2,
+    "genre": "action",
+    "players": "1",
+    "mechanic": "Fight sequential one-on-one opponents by reading windups, spending dash charges, and attacking during recovery. Defeat three stance-based rivals.",
+    "artAndControls": "Sparse dueling courtyards, clear weapon arcs, stance silhouettes. Move; Space strike; X dash.",
+    "acceptance": "Opponent attacks commit to a telegraph direction; recovery windows are real; dash immunity has bounded duration."
+  },
+  {
+    "id": "tether-twins",
+    "name": {
+      "en": "Tether Twins",
+      "zh": "牵绳双子"
+    },
+    "pack": 2,
+    "genre": "action",
+    "players": "1-2",
+    "mechanic": "Two linked characters route a conductive tether through switches while controlling its tension and avoiding live hazards. Solo switches the active partner; co-op controls both.",
+    "artAndControls": "Twin robots, striped energy cable, insulated anchor posts. Dual; solo X switches partner.",
+    "acceptance": "Cable length and obstruction rules hold for both actors; solo can finish every room without simultaneous unreachable inputs."
+  },
+  {
+    "id": "vine-warden",
+    "name": {
+      "en": "Vine Warden",
+      "zh": "藤蔓守卫"
+    },
+    "pack": 2,
+    "genre": "action",
+    "players": "1",
+    "mechanic": "Plant limited seeds on suitable soil, lure invaders into growing roots, and harvest mature plants to recover resources. Protect three garden plots.",
+    "artAndControls": "Layered greenhouse foliage, growth stages, root warning tiles. Move; Space plant; X harvest.",
+    "acceptance": "Growth delay prevents instant traps; enemies cannot be damaged by unarmed seedlings; sustainable seed recovery exists."
+  },
+  {
+    "id": "magnet-marauder",
+    "name": {
+      "en": "Magnet Marauder",
+      "zh": "磁力奇兵"
+    },
+    "pack": 2,
+    "genre": "action",
+    "players": "1",
+    "mechanic": "Attract loose metal into an orbit, switch polarity, and repel it into armored enemies while protecting fragile machinery. Clear three industrial chambers.",
+    "artAndControls": "Steel foundry, marked polarities, heavy metal silhouettes. Move; Space attract; X repel.",
+    "acceptance": "Magnetic force is distance-bounded; walls block or resolve metal consistently; stationary held metal does not repeatedly damage."
+  },
+  {
+    "id": "echo-hunter",
+    "name": {
+      "en": "Echo Hunter",
+      "zh": "回声猎手"
+    },
+    "pack": 2,
+    "genre": "action",
+    "players": "1",
+    "mechanic": "Pulse sonar to reveal moving targets temporarily, then intercept them while noise also attracts threats. Recover beacons from three dark caverns.",
+    "artAndControls": "Dark cave textures, expanding sonar rings, remembered outlines. Move; Space ping; X net/interact.",
+    "acceptance": "Visibility expires without changing collision reality; ping cooldown and threat attraction are enforced; targets remain trackable."
+  },
+  {
+    "id": "frost-forge",
+    "name": {
+      "en": "Frost Forge",
+      "zh": "霜火工坊"
+    },
+    "pack": 2,
+    "genre": "action",
+    "players": "1",
+    "mechanic": "Move between cooling and heating stations, carry hot components, and repair a freezing engine while temperature changes traversal and handling. Complete three repair sequences.",
+    "artAndControls": "Ice-coated machinery, temperature gauges, visible steam and frost. Move; Space handle; X heat/cool tool.",
+    "acceptance": "Heat transfers follow explicit rules; carrying hazards have warnings; a cooled component cannot permanently block the campaign."
+  },
+  {
+    "id": "mimic-vault",
+    "name": {
+      "en": "Mimic Vault",
+      "zh": "幻影宝库"
+    },
+    "pack": 2,
+    "genre": "puzzle",
+    "players": "1",
+    "mechanic": "Record a short legal movement sequence, replay it as a solid helper, and coordinate pressure plates and timed doors with that recording. Solve six vault rooms.",
+    "artAndControls": "Marble vaults, translucent recorded actor, visible timeline. Move; Space record/stop; X replay; Z reset recording.",
+    "acceptance": "Replay reproduces recorded inputs rather than teleporting through geometry; recordings cannot bypass locked doors; every room has a legal solution."
+  },
+  {
+    "id": "orbit-gardener",
+    "name": {
+      "en": "Orbit Gardener",
+      "zh": "轨道园丁"
+    },
+    "pack": 3,
+    "genre": "arcade",
+    "players": "1",
+    "mechanic": "Move between concentric orbital lanes at transfer gates, gather seeds, and plant them in matching orbital beds while avoiding debris. Restore three orbital gardens.",
+    "artAndControls": "Jewel planets, seed trails, differentiated orbit rings. Left/Right orbit direction; Up/Down transfer; Space plant.",
+    "acceptance": "Transfers occur only at valid gates; no free-flight or asteroid-shooter engine; all required beds are reachable."
+  },
+  {
+    "id": "comet-catcher",
+    "name": {
+      "en": "Comet Catcher",
+      "zh": "彗星捕手"
+    },
+    "pack": 3,
+    "genre": "arcade",
+    "players": "1",
+    "mechanic": "Position and tilt a catching net to absorb falling comets, cool dangerous loads, and deliver them to bins. Fulfil three escalating observatory contracts.",
+    "artAndControls": "Rooftop telescope station, glowing comet tails, net deformation. Move; Space catch/close; X unload.",
+    "acceptance": "Catch angle and capacity matter; overfilled nets have a warning; caught objects cannot score repeatedly."
+  },
+  {
+    "id": "conveyor-chef",
+    "name": {
+      "en": "Conveyor Chef",
+      "zh": "传送带厨房"
+    },
+    "pack": 3,
+    "genre": "arcade",
+    "players": "1-2",
+    "mechanic": "Route ingredients through cooking, chopping, and plating stations; timing and station state determine completed orders. Finish three shifts with a minimum satisfaction score.",
+    "artAndControls": "Compact kitchen, animated preparation stages, readable recipe icons. Dual or Move; Space interact; X reroute.",
+    "acceptance": "Raw/burnt/wrong dishes are rejected; holding interact cannot duplicate ingredients; solo station reach times are feasible."
+  },
+  {
+    "id": "firefly-trail",
+    "name": {
+      "en": "Firefly Trail",
+      "zh": "萤火轨迹"
+    },
+    "pack": 3,
+    "genre": "arcade",
+    "players": "1",
+    "mechanic": "Leave a temporary light trail and close loops around fireflies without intersecting hostile moths. Capture quotas across three meadows.",
+    "artAndControls": "Night flowers, warm fading paths, distinct moth silhouettes. Move; Space begin/close trail; X cancel.",
+    "acceptance": "Polygon containment determines captures; self-intersection rules are explicit; movement is free-form rather than snake-grid growth."
+  },
+  {
+    "id": "rail-switch",
+    "name": {
+      "en": "Rail Switch",
+      "zh": "铁轨调度"
+    },
+    "pack": 3,
+    "genre": "arcade",
+    "players": "1",
+    "mechanic": "Change junctions before trains reach them and route each train to its destination without head-on or rear-end collisions. Complete three timetables.",
+    "artAndControls": "Isometric-looking rail yard, signal lamps, distinct cargo symbols. Board; Space switch; X preview route.",
+    "acceptance": "Reservation and collision checks include trains entering the same segment from opposite ends; no train spawns into occupied track."
+  },
+  {
+    "id": "tilt-lab",
+    "name": {
+      "en": "Tilt Lab",
+      "zh": "倾斜实验室"
+    },
+    "pack": 3,
+    "genre": "arcade",
+    "players": "1",
+    "mechanic": "Tilt an entire board to guide a rolling sphere around holes, activate gates, and settle in a goal socket. Complete six laboratories.",
+    "artAndControls": "Glass marbles, beveled channels, moving tilt shadow. Arrows tilt; Space level board.",
+    "acceptance": "Acceleration/friction and wall contact remain stable; holes use the actual sphere position; every board has a legal path."
+  },
+  {
+    "id": "stacksmith",
+    "name": {
+      "en": "Stacksmith",
+      "zh": "叠塔工匠"
+    },
+    "pack": 3,
+    "genre": "arcade",
+    "players": "1",
+    "mechanic": "Release swinging crane loads onto a tower; load center, overlap, and settling determine stability. Build three specified structures under limited material budgets.",
+    "artAndControls": "Harbor crane, textured blocks, leaning tower silhouettes. Left/Right crane; Space release; X change next load.",
+    "acceptance": "Stability uses support geometry rather than arbitrary random collapse; resting blocks stop jittering; required heights are achievable."
+  },
+  {
+    "id": "traffic-conductor",
+    "name": {
+      "en": "Traffic Conductor",
+      "zh": "路口指挥官"
+    },
+    "pack": 3,
+    "genre": "arcade",
+    "players": "1",
+    "mechanic": "Assign signal phases and pedestrian crossings while preserving safe conflict zones and limiting queue delay. Clear three rush-hour scenarios.",
+    "artAndControls": "Detailed intersection, turn indicators, zebra crossings and countdown signs. Board; Space cycle phase; X pedestrian phase.",
+    "acceptance": "Yellow/all-red transitions prevent contradictory greens; waiting vehicles cannot overlap; fair signal schedules meet quotas."
+  },
+  {
+    "id": "mirror-lab",
+    "name": {
+      "en": "Mirror Lab",
+      "zh": "镜光实验室"
+    },
+    "pack": 4,
+    "genre": "puzzle",
+    "players": "1",
+    "mechanic": "Rotate mirrors and shutters to route a fixed laser through ordered sensors without illuminating forbidden cells. Solve eight rooms.",
+    "artAndControls": "Dark optical bench, bright beam segments, numbered sensors. Board; Space rotate; X shutter; Z undo.",
+    "acceptance": "Beam tracing terminates on loops; reflections match mirror orientation; blocked sensors cannot register through walls."
+  },
+  {
+    "id": "circuit-weaver",
+    "name": {
+      "en": "Circuit Weaver",
+      "zh": "电路织匠"
+    },
+    "pack": 4,
+    "genre": "puzzle",
+    "players": "1",
+    "mechanic": "Rotate conductive tiles to connect a source to sinks while keeping incompatible voltage networks separate. Solve eight circuit boards.",
+    "artAndControls": "Etched copper tracks, connector shapes, current pulses. Board; Space rotate; X inspect; Z undo.",
+    "acceptance": "Connectivity uses matching ports rather than light reflections; shorts are detected before victory; isolated decorative wires do not count."
+  },
+  {
+    "id": "tide-lock",
+    "name": {
+      "en": "Tide Lock",
+      "zh": "潮汐船闸"
+    },
+    "pack": 4,
+    "genre": "puzzle",
+    "players": "1",
+    "mechanic": "Operate sluices to move water between chambers and float cargo through gates at permitted water heights. Deliver cargo in six locks.",
+    "artAndControls": "Stone canal chambers, water-level markings, gate machinery. Board; Space open/close valve; X select cargo gate.",
+    "acceptance": "Water transfer conserves volume; cargo cannot cross closed gates or insufficient depth; all starting states are solvable."
+  },
+  {
+    "id": "phase-tiles",
+    "name": {
+      "en": "Phase Tiles",
+      "zh": "相位方格"
+    },
+    "pack": 4,
+    "genre": "puzzle",
+    "players": "1",
+    "mechanic": "Toggle a tile and its displayed neighborhood to match a target configuration. Later boards change neighborhood shapes and introduce locked cells.",
+    "artAndControls": "Textile-like luminous tiles, visible influence preview. Board; Space toggle; Z undo.",
+    "acceptance": "A toggle affects exactly the previewed set; supplied boards are generated from legal moves and have known solutions."
+  },
+  {
+    "id": "weightworks",
+    "name": {
+      "en": "Weightworks",
+      "zh": "天平工坊"
+    },
+    "pack": 4,
+    "genre": "puzzle",
+    "players": "1",
+    "mechanic": "Place limited weights on linked balances; torque and transfer mechanisms must align several gate indicators simultaneously. Solve six machines.",
+    "artAndControls": "Wooden scales, engraved masses, animated balance needles. Board; Space pick/place; X rotate tray; Z undo.",
+    "acceptance": "Torque depends on mass and lever distance; equal mass alone cannot incorrectly satisfy unequal arms."
+  },
+  {
+    "id": "fold-map",
+    "name": {
+      "en": "Fold Map",
+      "zh": "折叠地图"
+    },
+    "pack": 4,
+    "genre": "puzzle",
+    "players": "1",
+    "mechanic": "Fold a tiled map along marked creases so landmarks overlap in the required order while keeping forbidden areas separate. Solve eight maps.",
+    "artAndControls": "Illustrated parchment, fold shadows, patterned map backs. Board; Space fold; X choose axis; Z undo.",
+    "acceptance": "Folding uses explicit tile transforms and layer order; unfolded state restores exactly; all goals have legal fold sequences."
+  },
+  {
+    "id": "pattern-forge",
+    "name": {
+      "en": "Pattern Forge",
+      "zh": "图案锻造"
+    },
+    "pack": 4,
+    "genre": "puzzle",
+    "players": "1",
+    "mechanic": "Apply a small set of rotate, reflect, stamp, and cut operations to manufacture target silhouettes within an operation budget. Complete eight commissions.",
+    "artAndControls": "Workshop press, dies, cutout pieces and target stencil. Board; Space apply; X select tool; Z undo.",
+    "acceptance": "Transform composition matches the shown preview; cuts do not create unsupported cells; target comparison includes holes."
+  },
+  {
+    "id": "cipher-wheels",
+    "name": {
+      "en": "Cipher Wheels",
+      "zh": "密码齿轮"
+    },
+    "pack": 4,
+    "genre": "puzzle",
+    "players": "1",
+    "mechanic": "Turn coupled symbol wheels whose gear ratios change adjacent dials; align a target code without breaking limited locks. Solve eight mechanisms.",
+    "artAndControls": "Carved symbol rings, exposed coupling gears, positional markers. Board; Left/Right turn; Space select; Z undo.",
+    "acceptance": "Coupled ratios and wraparound are correct in both directions; solvability is established from known move sequences."
+  },
+  {
+    "id": "tangram-harbor",
+    "name": {
+      "en": "Tangram Harbor",
+      "zh": "拼形港湾"
+    },
+    "pack": 5,
+    "genre": "puzzle",
+    "players": "1",
+    "mechanic": "Rotate and place a finite set of polyomino cargo pieces into irregular ship holds, observing fragile and refrigerated zones. Fill eight holds.",
+    "artAndControls": "Painted cargo shapes, deck grain, zone symbols. Board; Space place; X rotate; Z undo.",
+    "acceptance": "Placement rejects overlap/out-of-bounds; every supplied hold has an exact cover; no falling-block timing."
+  },
+  {
+    "id": "pathweaver",
+    "name": {
+      "en": "Pathweaver",
+      "zh": "路径织者"
+    },
+    "pack": 5,
+    "genre": "puzzle",
+    "players": "1",
+    "mechanic": "Draw one continuous noncrossing path through ordered waypoints, using bridges only in their permitted direction. Solve eight path boards.",
+    "artAndControls": "Woven cloth paths, bridge icons, numbered knots. Arrows extend; Space confirm; Z retract.",
+    "acceptance": "Paths cannot revisit forbidden segments; crossings are allowed only on explicit bridges; full legal solutions are tested."
+  },
+  {
+    "id": "slime-split",
+    "name": {
+      "en": "Slime Split",
+      "zh": "分裂史莱姆"
+    },
+    "pack": 5,
+    "genre": "puzzle",
+    "players": "1",
+    "mechanic": "Split a slime into smaller masses to reach separate switches, then merge compatible pieces at an exit. Solve six rooms with size-dependent passages.",
+    "artAndControls": "Expressive jelly forms, size-marked tunnels, squash animation. Move; Space split; X switch/merge; Z undo.",
+    "acceptance": "Total slime mass is conserved; large pieces cannot pass small apertures; merging requires contact."
+  },
+  {
+    "id": "magnet-mosaic",
+    "name": {
+      "en": "Magnet Mosaic",
+      "zh": "磁极拼图"
+    },
+    "pack": 5,
+    "genre": "puzzle",
+    "players": "1",
+    "mechanic": "Move polarity-marked pieces by activating perimeter magnets; attraction and repulsion affect entire unobstructed rows or columns. Form eight mosaics.",
+    "artAndControls": "Ceramic magnets, plus/minus glyphs, force-line previews. Board; Space activate; X reverse polarity; Z undo.",
+    "acceptance": "Force ordering is deterministic; intervening solids block movement; pieces cannot merge through each other."
+  },
+  {
+    "id": "orchard-merge",
+    "name": {
+      "en": "Orchard Merge",
+      "zh": "合成果园"
+    },
+    "pack": 5,
+    "genre": "puzzle",
+    "players": "1",
+    "mechanic": "Slide fruit tiles; identical ripeness levels combine once per move, while orchard obstacles require planning. Reach a target harvest within each of six fixed layouts.",
+    "artAndControls": "Fruit growth stages, orchard fence cells, harvest basket. Arrows slide; Z undo.",
+    "acceptance": "A newly merged tile cannot merge again in the same move; blocked rows compress correctly; seeded spawns remain fair."
+  },
+  {
+    "id": "color-flood",
+    "name": {
+      "en": "Color Flood",
+      "zh": "彩色潮涌"
+    },
+    "pack": 5,
+    "genre": "puzzle",
+    "players": "1",
+    "mechanic": "Expand a connected region by selecting a color; complete each board within a move budget while navigating locked boundaries. Solve eight maps.",
+    "artAndControls": "Quilt islands, color-and-pattern coding, region edge highlight. Board; Space choose color; Z undo.",
+    "acceptance": "Only connected cells flood; unchanged-color moves do not consume budget; all budgets have verified solutions."
+  },
+  {
+    "id": "rope-unravel",
+    "name": {
+      "en": "Rope Unravel",
+      "zh": "绳结解环"
+    },
+    "pack": 5,
+    "genre": "puzzle",
+    "players": "1",
+    "mechanic": "Move graph nodes onto permitted pegs until edges no longer cross, preserving fixed edge lengths where indicated. Untangle eight structures.",
+    "artAndControls": "Nautical ropes, brass pegs, crossing highlights. Board; Space pick/drop; Z undo.",
+    "acceptance": "Segment intersection handles shared endpoints correctly; constrained ropes cannot exceed their marked lengths."
+  },
+  {
+    "id": "latin-garden",
+    "name": {
+      "en": "Latin Garden",
+      "zh": "拉丁花园"
+    },
+    "pack": 5,
+    "genre": "puzzle",
+    "players": "1",
+    "mechanic": "Place plant symbols so each row, column, and marked bed contains the required set exactly once. Solve eight increasingly constrained gardens.",
+    "artAndControls": "Garden beds, distinguishable plant silhouettes, pencil markers. Board; Space place; X cycle symbol; Z undo.",
+    "acceptance": "Locked clues remain immutable; validation checks every constraint; boards have at least one independently verified solution."
+  },
+  {
+    "id": "rooftop-hoops",
+    "name": {
+      "en": "Rooftop Hoops",
+      "zh": "天台投篮"
+    },
+    "pack": 6,
+    "genre": "sports",
+    "players": "1-2",
+    "mechanic": "Set shot angle and power, exploit backboard rebounds, and complete three challenge cards; optional alternating-turn score duel.",
+    "artAndControls": "Rooftop court, rim/backboard depth, ball rotation and city skyline. Aim.",
+    "acceptance": "Rim and backboard collide separately; scoring requires downward hoop crossing; one shot scores at most once."
+  },
+  {
+    "id": "pocket-striker",
+    "name": {
+      "en": "Pocket Striker",
+      "zh": "口袋前锋"
+    },
+    "pack": 6,
+    "genre": "sports",
+    "players": "1-2",
+    "mechanic": "Dribble a free ball, aim charged passes/shots, tackle within a recovery window, and win a short soccer match.",
+    "artAndControls": "Worn pitch, goal nets, team silhouettes and ball shadow. Dual/Move; primary kick; secondary tackle.",
+    "acceptance": "Ball possession is contestable; goals require goal-line crossing; AI cannot move faster or ignore tackle recovery."
+  },
+  {
+    "id": "sand-volley",
+    "name": {
+      "en": "Sand Volley",
+      "zh": "沙滩排球"
+    },
+    "pack": 6,
+    "genre": "sports",
+    "players": "1-2",
+    "mechanic": "Jump, bump, set, and spike with different contact windows; win a rally match against AI or a local opponent.",
+    "artAndControls": "Beach court, sagging net, sand impacts and airborne ball shadow. Dual; primary jump; secondary hit.",
+    "acceptance": "Net and court boundaries are physical; serves start fairly; contact count and side changes follow explicit rules."
+  },
+  {
+    "id": "ice-curling",
+    "name": {
+      "en": "Ice Curling",
+      "zh": "冰壶大师"
+    },
+    "pack": 6,
+    "genre": "sports",
+    "players": "1-2",
+    "mechanic": "Deliver stones with power and curl, sweep a limited distance to adjust friction, and score nearest-to-center stones over three ends.",
+    "artAndControls": "Pebbled ice, broom marks, concentric house and polished stones. Aim; X sweep.",
+    "acceptance": "Stone-to-stone collisions conserve plausible momentum; only the appropriate side scores; stationary stones settle."
+  },
+  {
+    "id": "mini-links",
+    "name": {
+      "en": "Mini Links",
+      "zh": "迷你果岭"
+    },
+    "pack": 6,
+    "genre": "sports",
+    "players": "1-2",
+    "mechanic": "Aim and charge golf shots over slopes, banks, hazards, and moving obstacles; complete six holes with a stroke budget.",
+    "artAndControls": "Miniature garden courses, contour marks, water and sand textures. Aim.",
+    "acceptance": "Cup capture requires suitable speed; hazards apply a consistent penalty and safe replacement; every hole is solvable."
+  },
+  {
+    "id": "harbor-regatta",
+    "name": {
+      "en": "Harbor Regatta",
+      "zh": "港湾帆赛"
+    },
+    "pack": 6,
+    "genre": "sports",
+    "players": "1",
+    "mechanic": "Steer and trim sails according to wind angle, tack upwind, and round buoys in order through three courses.",
+    "artAndControls": "Fabric sails, windsocks, wakes, harbor landmarks. Left/Right steer; Up/Down trim; Space tack assist.",
+    "acceptance": "Sailing directly into wind cannot provide full forward power; checkpoint order is enforced; no powered-thrust flight rules."
+  },
+  {
+    "id": "archery-range",
+    "name": {
+      "en": "Archery Range",
+      "zh": "弓箭靶场"
+    },
+    "pack": 6,
+    "genre": "sports",
+    "players": "1",
+    "mechanic": "Aim around wind and breathing drift, charge bow draw, and hit moving targets across three rounds with limited arrows.",
+    "artAndControls": "Forest range, target rings, visible wind ribbons and arrow arcs. Aim; X steady breath.",
+    "acceptance": "Arrow collision uses trajectory; expired arrows cannot score; target rings produce consistent boundary scores."
+  },
+  {
+    "id": "vault-champion",
+    "name": {
+      "en": "Vault Champion",
+      "zh": "撑杆挑战"
+    },
+    "pack": 6,
+    "genre": "sports",
+    "players": "1",
+    "mechanic": "Build a run-up, plant within a marked zone, manage pole compression, and release over progressively higher bars.",
+    "artAndControls": "Stadium track, flexible pole, bar contact animation. Left/Right run; Space plant/release; X tuck.",
+    "acceptance": "Pole planting outside the box fails fairly; bar contact is physical; valid technique clears each required height."
+  },
+  {
+    "id": "grove-guard",
+    "name": {
+      "en": "Grove Guard",
+      "zh": "林地守护"
+    },
+    "pack": 7,
+    "genre": "arcade",
+    "players": "1",
+    "mechanic": "Place complementary defenders along branching enemy paths, manage sunlight income, and adapt to armored versus fast intruders. Defend three gardens.",
+    "artAndControls": "Hand-shaped groves, roots, defender growth and explicit range circles. Board; Space build/select; X upgrade/sell.",
+    "acceptance": "Defenders respect range, line of sight, and cooldown; income cannot be generated by repeated sell/build cycles."
+  },
+  {
+    "id": "outpost-lines",
+    "name": {
+      "en": "Outpost Lines",
+      "zh": "前哨战线"
+    },
+    "pack": 7,
+    "genre": "puzzle",
+    "players": "1",
+    "mechanic": "Command a small squad with action points, cover, facing, and line of sight. Capture objectives across three turn-based missions.",
+    "artAndControls": "Tile outposts, low/high cover silhouettes, clean movement overlays. Board; Space select/confirm; X action; Enter end turn.",
+    "acceptance": "Illegal moves spend no points; attacks cannot pass solid cover; each mission has a verified winning sequence."
+  },
+  {
+    "id": "harbor-master",
+    "name": {
+      "en": "Harbor Master",
+      "zh": "港口总管"
+    },
+    "pack": 7,
+    "genre": "arcade",
+    "players": "1",
+    "mechanic": "Allocate berths, tugs, and unloading capacity to ships with draft and cargo restrictions. Fulfil three port schedules.",
+    "artAndControls": "Dock cranes, berth-depth markings, queued ship profiles. Board; Space assign; X service type.",
+    "acceptance": "Large ships cannot use shallow berths; resource reservations prevent double allocation; feasible schedules meet delivery goals."
+  },
+  {
+    "id": "caravan-trader",
+    "name": {
+      "en": "Caravan Trader",
+      "zh": "商队远行"
+    },
+    "pack": 7,
+    "genre": "puzzle",
+    "players": "1",
+    "mechanic": "Buy and sell goods between settlements while accounting for capacity, provisions, route risk, and visible market demand. Complete three trade contracts.",
+    "artAndControls": "Illustrated desert map, wagon inventory, town market stalls. Board; Space choose/trade; X adjust quantity.",
+    "acceptance": "Inventory and money conserve correctly; debt/food failure is explicit; contracts cannot demand unavailable quantities."
+  },
+  {
+    "id": "island-engineer",
+    "name": {
+      "en": "Island Engineer",
+      "zh": "海岛工程师"
+    },
+    "pack": 7,
+    "genre": "puzzle",
+    "players": "1",
+    "mechanic": "Build separate power and water networks, allocate limited generators/pumps, and keep homes supplied through three island scenarios.",
+    "artAndControls": "Coastal grids, animated utilities, distinct pipe/cable symbols. Board; Space place; X tool/rotate; Z undo before running.",
+    "acceptance": "Supply is calculated by connectivity and capacity; disconnected houses never count as serviced; shortages explain their cause."
+  },
+  {
+    "id": "reef-restorer",
+    "name": {
+      "en": "Reef Restorer",
+      "zh": "珊瑚修复师"
+    },
+    "pack": 7,
+    "genre": "puzzle",
+    "players": "1",
+    "mechanic": "Place coral species with different depth, light, and neighbor requirements; advance seasons and balance the ecosystem. Restore three reefs.",
+    "artAndControls": "Reef terraces, fish silhouettes, species-specific coral shapes. Board; Space plant; X species; Enter advance season.",
+    "acceptance": "Population updates are simultaneous; biodiversity goals require distinct viable species; carrying capacity prevents runaway growth."
+  },
+  {
+    "id": "fortress-siege",
+    "name": {
+      "en": "Fortress Siege",
+      "zh": "要塞攻城"
+    },
+    "pack": 7,
+    "genre": "sports",
+    "players": "1-2",
+    "mechanic": "Alternate artillery shots over destructible terrain, account for wind and limited ammunition, and disable rival forts across three battlefields.",
+    "artAndControls": "Cutaway earth strata, timber forts, crater debris and wind pennant. Aim; X ammunition choice.",
+    "acceptance": "Terrain destruction changes later collision paths; blast damage is distance-based; turns end even when a projectile leaves the map."
+  },
+  {
+    "id": "bee-colony",
+    "name": {
+      "en": "Bee Colony",
+      "zh": "蜜蜂王国"
+    },
+    "pack": 7,
+    "genre": "arcade",
+    "players": "1",
+    "mechanic": "Allocate workers between nectar, care, cooling, and storage while responding to weather and seasonal demand. Keep the hive healthy for three seasons.",
+    "artAndControls": "Honeycomb rooms, flower patches, worker routes and heat indicators. Board; Space assign; X role.",
+    "acceptance": "Worker counts are conserved; starvation/heat thresholds warn before failure; a balanced allocation survives each scenario."
+  },
+  {
+    "id": "pulse-forge",
+    "name": {
+      "en": "Pulse Forge",
+      "zh": "节拍锻炉"
+    },
+    "pack": 8,
+    "genre": "arcade",
+    "players": "1",
+    "mechanic": "Strike, hold, and release four kinds of rhythm notes to forge components across three authored charts. Accuracy and sustained notes determine the grade.",
+    "artAndControls": "Glowing anvils, descending stamped notes, distinct hold tails. Rhythm: Left, Down, Up, Right.",
+    "acceptance": "Each note scores once; early/late windows are symmetric; holds require both onset and duration; pause does not advance the chart."
+  },
+  {
+    "id": "echo-drums",
+    "name": {
+      "en": "Echo Drums",
+      "zh": "回声鼓阵"
+    },
+    "pack": 8,
+    "genre": "arcade",
+    "players": "1",
+    "mechanic": "Hear and see a rhythmic call, then reproduce its pad order and relative timing. Complete progressively longer phrases across three songs.",
+    "artAndControls": "Carved drums, animated cue rings, visual beat ruler. Rhythm: Left, Down, Up, Right.",
+    "acceptance": "Recall begins after the call; held pads do not produce repeats; visual-only play is sufficient; timing tolerance is explicit."
+  },
+  {
+    "id": "beat-weaver",
+    "name": {
+      "en": "Beat Weaver",
+      "zh": "节奏织机"
+    },
+    "pack": 8,
+    "genre": "puzzle",
+    "players": "1",
+    "mechanic": "Program a short step sequence for several instruments so combined beats satisfy visual rhythm targets while respecting mute and accent constraints. Solve eight patterns.",
+    "artAndControls": "Mechanical sequencer, stitched beat grid, per-instrument symbols. Program.",
+    "acceptance": "Evaluation considers beat positions and instrument identity; playback does not alter the pattern; each target has a valid arrangement."
+  },
+  {
+    "id": "conductor-cove",
+    "name": {
+      "en": "Conductor Cove",
+      "zh": "指挥港湾"
+    },
+    "pack": 8,
+    "genre": "arcade",
+    "players": "1",
+    "mechanic": "Adjust the tempo and phase of several repeating ferry launches so they pass narrow channels without conflict and arrive in synchronized windows. Complete three schedules.",
+    "artAndControls": "Clockwork harbor, circular phase clocks, clear channel reservations. Board; Space select; Left/Right tempo; Up/Down phase.",
+    "acceptance": "Frequency and phase affect distinct variables; repeating schedules remain collision-free across more than one cycle."
+  },
+  {
+    "id": "dance-duel",
+    "name": {
+      "en": "Dance Duel",
+      "zh": "舞步对决"
+    },
+    "pack": 8,
+    "genre": "arcade",
+    "players": "1-2",
+    "mechanic": "Perform directional step phrases while choosing defensive or aggressive finishing poses that counter the opponent’s visible stance. Win three rounds.",
+    "artAndControls": "Pixel dance floor, readable pose silhouettes, beat-linked lights. Dual/Rhythm.",
+    "acceptance": "Rhythm accuracy alone cannot bypass stance rules; both sides receive the same cue lead time; solo AI obeys timing windows."
+  },
+  {
+    "id": "shadow-watch",
+    "name": {
+      "en": "Shadow Watch",
+      "zh": "暗影巡行"
+    },
+    "pack": 8,
+    "genre": "action",
+    "players": "1",
+    "mechanic": "Observe patrol cones, use shadows and limited distractions, steal evidence, and escape three guarded locations.",
+    "artAndControls": "Noir courtyards, cone-shaped lantern light, cover silhouettes. Move; Space interact; X distract.",
+    "acceptance": "Vision uses occlusion; guards remember last-seen positions rather than track through walls; each mission has a stealth route."
+  },
+  {
+    "id": "lantern-signals",
+    "name": {
+      "en": "Lantern Signals",
+      "zh": "灯语引航"
+    },
+    "pack": 8,
+    "genre": "arcade",
+    "players": "1",
+    "mechanic": "Read ships’ symbol-coded signal requests and return the correct ordered lantern sequence before their approach window closes. Complete three watch shifts.",
+    "artAndControls": "Lighthouse balcony, ship silhouettes, shape-and-color lamps. Rhythm: arrows select lamp; Space send.",
+    "acceptance": "Correct order and timing both matter; wrong signals do not silently count; requests use visible symbols rather than language trivia."
+  },
+  {
+    "id": "time-sculptor",
+    "name": {
+      "en": "Time Sculptor",
+      "zh": "时光塑形师"
+    },
+    "pack": 8,
+    "genre": "puzzle",
+    "players": "1",
+    "mechanic": "Freeze selected moving objects while other objects continue, manage a limited stasis budget, and guide a courier through six machinery rooms.",
+    "artAndControls": "Suspended droplets, clockwork corridors, frozen-object outlines. Move; Space freeze target; X select target; Z retry room.",
+    "acceptance": "Frozen objects keep their positions but cannot accumulate hidden velocity; thawing resumes consistently; every room has a legal schedule."
+  },
+  {
+    "id": "lunar-lander",
+    "name": {
+      "en": "Lunar Lander",
+      "zh": "月面着陆"
+    },
+    "pack": 9,
+    "genre": "sports",
+    "players": "1",
+    "mechanic": "Rotate and thrust a fuel-limited craft, compensate for inertia, and touch down within angle and vertical-speed limits at three lunar sites.",
+    "artAndControls": "Cratered terrain, exhaust plume, landing legs and altitude markers. Left/Right rotate; Up thrust; Space short stabilizer.",
+    "acceptance": "Landing checks position, speed, and angle; fuel exhaustion leaves a controllable coast; no wrapping asteroid arena."
+  },
+  {
+    "id": "rescue-helicopter",
+    "name": {
+      "en": "Rescue Helicopter",
+      "zh": "救援直升机"
+    },
+    "pack": 9,
+    "genre": "action",
+    "players": "1",
+    "mechanic": "Hover against wind, lower a swinging winch, retrieve stranded people, and deliver them safely under fuel and load limits. Complete three rescues.",
+    "artAndControls": "Mountain ledges, rotating rotor, cable swing and passenger silhouettes. Move; Space winch; X release at base.",
+    "acceptance": "Winch load changes handling; attachment requires proximity and safe speed; passengers cannot teleport through terrain."
+  },
+  {
+    "id": "deep-diver",
+    "name": {
+      "en": "Deep Diver",
+      "zh": "深海潜行"
+    },
+    "pack": 9,
+    "genre": "action",
+    "players": "1",
+    "mechanic": "Manage buoyancy, oxygen, and carried weight while exploring connected underwater caverns and returning artifacts to the surface. Complete three dives.",
+    "artAndControls": "Layered seabed, bubbles, pressure depth marks and reef life. Move; Space adjust buoyancy; X collect/drop.",
+    "acceptance": "Oxygen recovery occurs only at valid air sources; weight affects buoyancy; each artifact has a feasible round trip."
+  },
+  {
+    "id": "workshop-welder",
+    "name": {
+      "en": "Workshop Welder",
+      "zh": "焊接工坊"
+    },
+    "pack": 9,
+    "genre": "arcade",
+    "players": "1",
+    "mechanic": "Trace seams with a welding tool while maintaining heat and speed within material-specific bands. Complete six repair jobs without burning through the workpiece.",
+    "artAndControls": "Metal grain, seam glow, heat discoloration and sparks. Move tool; Space weld; X cool.",
+    "acceptance": "Progress requires tool contact with the seam; overheating damages the actual segment; keyboard tracing can finish every job."
+  },
+  {
+    "id": "wildlife-photographer",
+    "name": {
+      "en": "Wildlife Photographer",
+      "zh": "野趣摄影师"
+    },
+    "pack": 9,
+    "genre": "arcade",
+    "players": "1",
+    "mechanic": "Approach animals without alarming them, frame required behaviors, focus, and capture limited shots for three field assignments.",
+    "artAndControls": "Woodland scenes, expressive animals, focus brackets and distant layers. Move; Space focus/shoot; X crouch.",
+    "acceptance": "Photo scoring checks subject, behavior, framing, and focus; repeated identical shots cannot satisfy distinct objectives."
+  },
+  {
+    "id": "telescope-tracker",
+    "name": {
+      "en": "Telescope Tracker",
+      "zh": "星野追踪"
+    },
+    "pack": 9,
+    "genre": "arcade",
+    "players": "1",
+    "mechanic": "Locate celestial targets, compensate for tracking drift, focus, and hold a stable exposure without streaking. Complete three observation nights.",
+    "artAndControls": "Observatory dome, star fields, diffraction marks and exposure meter. Arrows track; Space expose; X focus mode.",
+    "acceptance": "Exposure accumulates only while sufficiently centered and focused; interruption does not award a full image; all targets are reachable."
+  },
+  {
+    "id": "balloon-balancer",
+    "name": {
+      "en": "Balloon Balancer",
+      "zh": "热气球航行"
+    },
+    "pack": 9,
+    "genre": "sports",
+    "players": "1",
+    "mechanic": "Burn fuel or release ballast to change altitude, choose wind layers, and deliver cargo at three landing zones. Altitude changes direction indirectly.",
+    "artAndControls": "Fabric envelope, suspended basket, wind-layer clouds and ballast sacks. Up burner; Down vent; Space ballast.",
+    "acceptance": "Horizontal motion follows the occupied wind layer; ballast is finite; every route can be completed without powered steering."
+  },
+  {
+    "id": "robot-foundry",
+    "name": {
+      "en": "Robot Foundry",
+      "zh": "机器人车间"
+    },
+    "pack": 9,
+    "genre": "puzzle",
+    "players": "1",
+    "mechanic": "Program a bounded command sequence for a factory robot to pick parts, operate switches, and assemble a target product. Complete eight layouts with loops introduced later.",
+    "artAndControls": "Assembly line, robot gripper, command tape and station lights. Program.",
+    "acceptance": "Commands execute against real occupancy and orientation; loops are bounded; invalid actions fail clearly without duplicating parts."
+  },
+  {
+    "id": "reversi-grove",
+    "name": {
+      "en": "Reversi Grove",
+      "zh": "翻叶棋"
+    },
+    "pack": 10,
+    "genre": "puzzle",
+    "players": "1-2",
+    "mechanic": "Place leaf tokens to bracket and flip opponent lines on a board with a few fixed groves. Win a complete match against AI or another player.",
+    "artAndControls": "Wooden board, two distinct leaf shapes, animated flips. Board.",
+    "acceptance": "Only bracketed contiguous lines flip; forced pass and double-pass termination work; AI always chooses a legal move."
+  },
+  {
+    "id": "hex-conquest",
+    "name": {
+      "en": "Hex Conquest",
+      "zh": "六角征途"
+    },
+    "pack": 10,
+    "genre": "puzzle",
+    "players": "1-2",
+    "mechanic": "Expand by cloning to adjacent hexes or jumping farther at the cost of the original piece; landing converts neighboring rivals. Win by territory when neither side can move.",
+    "artAndControls": "Terraced hex islands, faction emblems, clone/jump previews. Board.",
+    "acceptance": "Clone and jump distances differ; source is removed only on a jump; terminal territory count is correct."
+  },
+  {
+    "id": "sum-dice",
+    "name": {
+      "en": "Sum Dice",
+      "zh": "骰点工坊"
+    },
+    "pack": 10,
+    "genre": "puzzle",
+    "players": "1-2",
+    "mechanic": "Roll a limited pool, allocate dice to contract slots, and choose whether to bank or risk another roll. Complete a three-round score challenge.",
+    "artAndControls": "Carved dice, contract cards, explicit remaining pool. Board; Space roll/assign; X bank.",
+    "acceptance": "Assigned dice cannot be reused; bust/bank transitions conserve scores; seeded rolls make full matches reproducible."
+  },
+  {
+    "id": "wordless-detective",
+    "name": {
+      "en": "Wordless Detective",
+      "zh": "无字侦探"
+    },
+    "pack": 10,
+    "genre": "puzzle",
+    "players": "1",
+    "mechanic": "Deduce a culprit from visual clues about clothing, position, and possessions, marking impossible candidates before making a final accusation. Solve six cases.",
+    "artAndControls": "Illustrated suspect portraits, icon clues, notebook deductions. Board; Space mark/select; X inspect; Enter accuse.",
+    "acceptance": "Every case has exactly one solution under its clues; deduction does not require English or Chinese wordplay."
+  },
+  {
+    "id": "tug-of-tides",
+    "name": {
+      "en": "Tug of Tides",
+      "zh": "潮汐拔河"
+    },
+    "pack": 10,
+    "genre": "sports",
+    "players": "1-2",
+    "mechanic": "Alternate pulling and recovery around visible wave forces; overstraining loses grip. Win three rope contests through stamina and timing rather than tapping speed.",
+    "artAndControls": "Dock teams, rope tension, wave impact meter and foot bracing. Dual; primary hold pull; secondary brace/recover.",
+    "acceptance": "Holding pull drains stamina; recovery restores it; both sides receive equal force calculations and timing windows."
+  },
+  {
+    "id": "cargo-duel",
+    "name": {
+      "en": "Cargo Duel",
+      "zh": "货运博弈"
+    },
+    "pack": 10,
+    "genre": "puzzle",
+    "players": "1-2",
+    "mechanic": "Draft shared cargo offers and commit limited shipping capacity to public contracts, balancing denial against future demand. Win a three-round trading contest.",
+    "artAndControls": "Cargo cards, shared market row, clearly separated player docks. Board.",
+    "acceptance": "Drafted items leave the shared market; capacity and contract resources cannot be double-spent; AI uses only public information."
+  },
+  {
+    "id": "constellation-duel",
+    "name": {
+      "en": "Constellation Duel",
+      "zh": "星座对弈"
+    },
+    "pack": 10,
+    "genre": "puzzle",
+    "players": "1-2",
+    "mechanic": "Claim edges between stars; completing triangular regions earns territory and sometimes a chained turn. Win when the finite star map is filled.",
+    "artAndControls": "Night-sky board, glowing claimed edges, faction-patterned regions. Board.",
+    "acceptance": "An edge is claimable once; triangle completion examines all adjacent regions; chain turns and final scores are exact."
+  }
+]

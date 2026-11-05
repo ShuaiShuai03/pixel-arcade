@@ -1,0 +1,121 @@
+✔ keys distinguish held and one-frame press even on repeat (0.505292ms)
+✔ touch and keyboard ownership cannot release each other (0.075542ms)
+✔ clearing input on blur releases pointer and presses (0.06125ms)
+✔ an accessible button pulse lasts one physics step without releasing a held key (0.05175ms)
+✔ Pinball launches and obeys gravity (1.103ms)
+✔ Pinball bumper collision reflects and scores once with cooldown (0.678084ms)
+✔ Pinball flippers return falling balls upward (0.210667ms)
+✔ Pinball drains three balls then freezes terminal state (0.471167ms)
+✔ Pinball three real launches eventually drain without input and retain finite physics (63.214875ms)
+✔ Pinball both active flippers sustain realistic finite play (64.54675ms)
+✔ Pinball lighting all bumpers awards a bonus and resets their lights (0.236541ms)
+✔ Pinball rollover pair earns bonus, pointer launches and controls flippers (0.588042ms)
+✔ Pinball active flipper cannot hit ball above its actual surface (0.073542ms)
+✔ Pinball provides gradual flipper rotation and multiplier progression (0.047917ms)
+✔ Pinball free flight matches gravity analytically and across tick rates (0.31575ms)
+✔ Pinball real drop-target contacts advance multiplier; ramp requires upward speed (0.117167ms)
+✔ Pinball ramp is a physical sensor, never a position warp (0.056042ms)
+✔ Pinball passive bumper conserves tangential momentum and dissipates normal energy (0.08525ms)
+✔ Pinball collision impulse obeys relative restitution and preserves tangent (0.083416ms)
+✔ Pinball passive reflection cannot add kinetic energy and separating contacts do nothing (0.086291ms)
+✔ Pinball fast ball cannot tunnel across a bumper or rail (0.323ms)
+✔ Pinball three legal launches and discrete flipper presses reach objectives at 30/60/120Hz (207.818333ms)
+✔ Pinball raised target stays solid during scoring cooldown (0.119084ms)
+✔ Pinball both flipper motors respond during legal launch-lane travel (0.316417ms)
+✔ keyboard and button restart retain best and create fresh games (2.771167ms)
+✔ finished result follows language changes without losing score (1.081625ms)
+✔ pause updates HUD immediately and resume preserves the run (0.548666ms)
+✔ blur releases held keys and long frames are capped (0.396875ms)
+✔ late module resolution cannot overwrite a newer route (0.25ms)
+✔ a press survives a frame without a physics tick and fires only once during catch-up (0.800292ms)
+✔ language changes release controls whose touch buttons are replaced (0.33425ms)
+✔ the shelf loads only visible previews and navigation shares their in-flight load (1.066875ms)
+✔ a failed preview load can be retried by opening the game (2.352541ms)
+✔ secondary touches cannot steer or release the active canvas gesture (0.428708ms)
+✔ right click does not fire a canvas action (0.197917ms)
+✔ unsupported fullscreen expands the player and Escape restores its normal layout (1.002792ms)
+✔ denied fullscreen falls back and navigation restores the page (0.242917ms)
+✔ fullscreen returns keyboard focus to an active game when entering and leaving (0.18275ms)
+✔ opposite touch groups retain independent pointer ownership (0.207875ms)
+✔ keyboard activation of a touch control produces one deliberate action (0.133292ms)
+✔ simulation advances equally on 30, 60, 120 and 144 Hz displays (0.994291ms)
+✔ a long stall has a bounded catch-up and never produces a large physics step (0.081875ms)
+✔ reset discards time from the previous run or pause (0.054125ms)
+✔ ending a game stops catch-up immediately and discards remaining time (0.0605ms)
+✔ invalid elapsed values cannot poison subsequent updates (0.054792ms)
+✔ snow: swept landing chooses first crossed surface, regardless of platform order (0.733041ms)
+✔ snow: sweeping does not land on a platform entered after crossing its height (0.0685ms)
+✔ snow: six chambers teach a separate deliberate kick and held jump never repeats (2.984083ms)
+✔ snow: release does not inject mid-air energy into a fixed ballistic jump (0.761083ms)
+✔ snow: a frozen foe stays harmless and alive until an explicit kick (2.021083ms)
+✔ snow: legal movement, snow and kicks clear all six chambers (1, 60 Hz) (93.230209ms)
+✔ snow: legal movement, snow and kicks clear all six chambers (19, 60 Hz) (65.627291ms)
+✔ snow: legal movement, snow and kicks clear all six chambers (1, 120 Hz) (128.067458ms)
+✔ snow: legal movement, snow and kicks clear all six chambers (19, 120 Hz) (118.298084ms)
+✔ snow: idle loses once; restart and alternating dt stay finite (17.280625ms)
+✔ snow physics: ballistic gravity integrates identically at 30, 60 and 120 Hz (0.198292ms)
+✔ snow physics: walking off support falls only for the unsupported part of the step (0.076541ms)
+✔ snow physics: solid ledge undersides stop upward jumps without adding energy (0.103708ms)
+✔ snow physics: rolling friction and wall restitution cannot add horizontal energy (0.261667ms)
+✔ snow physics: a rolling ball falls into lower lanes without hovering (0.158166ms)
+✔ snow physics: ordinary thrown pellets follow gravity rather than hovering (0.123291ms)
+✔ snow physics: braking has bounded acceleration and never teleports the player (0.169167ms)
+✔ snow: Warden telegraphs a bounded leap, then exposes its frost armor on landing (40.296084ms)
+✔ snow physics: a swept solid side cannot be tunneled through (0.06725ms)
+✔ snow: idle frozen bodies block walking without shoving, killing or auto-launching (1.407041ms)
+✔ snow: a living contact removes one heart without killing the foe or teleporting the hero (1.192875ms)
+✔ snow: movement and ballistic jumping agree at 60 and 120 Hz (1.180459ms)
+✔ snow: a deliberate edge jump uses short coyote time once (1.554625ms)
+✔ snow: a jump pressed just before landing is buffered and fires once (2.436292ms)
+✔ snow: pointer-only touching cannot generate an attack and drawing never mutates simulation (1.976417ms)
+✔ snow: chamber timeout ends the run explicitly instead of silently teleporting to a reset (34.680083ms)
+✔ breaker brick layouts have increasing durability (0.619417ms)
+✔ breaker launches, steers paddle and bounces walls (1.341584ms)
+✔ breaker destroys brick, reflects and scores (0.235041ms)
+✔ breaker paddle saves ball and misses cost lives ending once (0.23ms)
+✔ breaker last stage clears into victory, collects powerups (0.092791ms)
+✔ breaker game supports pointer, draw and prolonged input (388.885791ms)
+✔ breaker side, ceiling, armoured hits and upgrade variants are stable (0.154291ms)
+✔ breaker spawns a falling upgrade every sixth destroyed brick (0.130167ms)
+✔ legal pointer play clears all three brick fields on two seeds (607.2575ms)
+✔ breaker fields have different geometry, reactor bricks and drifting final rows (0.188ms)
+✔ breaker centred passive contact adds no sideways momentum and damping survives the bounce (0.072208ms)
+✔ breaker emergency catch has finite charges and reactor destruction damages neighbours (0.230417ms)
+✔ breaker paddle and ball displacement agree at 30, 60 and 120 Hz (2.577375ms)
+✔ breaker stationary wall and paddle contacts preserve tangential momentum without invented speed (0.074875ms)
+✔ breaker drag expires without adding energy and pointer has finite paddle speed (0.063292ms)
+✔ breaker curved passive paddle conserves speed and reflects away from its actual surface (0.17925ms)
+✔ breaker motor work is accounted for in the moving paddle reference frame (0.065834ms)
+✔ breaker swept stepping catches fast projectiles once and moving bricks transfer their normal velocity (0.159709ms)
+✔ breaker contact results match at 30, 60 and 120 Hz (1.095792ms)
+✔ breaker contacts the visible paddle endcap and a fresh game resets all motor state (0.115958ms)
+✔ breaker wide actuator cannot teleport the paddle or invent unbounded motor work (0.061333ms)
+✔ breaker emergency catch preserves the contact position as the gripper moves (0.044375ms)
+✔ breaker ball respects the visible ceiling inner edge (0.031292ms)
+✔ breaker gripper retains its ball inside the walls while the paddle retracts (1.121125ms)
+ℹ tests 95
+ℹ suites 0
+ℹ pass 95
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1056.300083
+ℹ start of coverage report
+ℹ --------------------------------------------------------------------------------------------------------------------
+ℹ file                | line % | branch % | funcs % | uncovered lines
+ℹ --------------------------------------------------------------------------------------------------------------------
+ℹ src                 |        |          |         |
+ℹ  games              |        |          |         |
+ℹ   pinball-pocket.js |  97.06 |    86.18 |  100.00 | 107-112 117-124
+ℹ   snowball-siege.js |  97.67 |    93.92 |   96.88 | 283-284 640-642 717-719 730-732 756-757 793-797 852-854 897-899
+ℹ   starbreaker.js    |  97.78 |    95.98 |   94.12 | 65-71 383-385
+ℹ  shared             |        |          |         |
+ℹ   input.js          | 100.00 |   100.00 |  100.00 |
+ℹ   platform.js       |  71.28 |    60.71 |   78.57 | 7-8 28-29 72-94
+ℹ   simulation.js     | 100.00 |   100.00 |  100.00 |
+ℹ   utils.js          | 100.00 |   100.00 |   60.00 |
+ℹ --------------------------------------------------------------------------------------------------------------------
+ℹ all files           |  96.49 |    91.86 |   91.35 |
+ℹ --------------------------------------------------------------------------------------------------------------------
+ℹ end of coverage report

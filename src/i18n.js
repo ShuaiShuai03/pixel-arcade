@@ -74,7 +74,7 @@ export const copy = {
   bestLabel: ['Best', '最高分'],
   search: ['Find a game…', '搜索游戏…'],
   fullscreen: ['Full screen', '全屏游戏'],
-  fullscreenError: ['Full screen is not available in this browser.', '当前浏览器不支持全屏。'],
+  exitFullscreen: ['Exit full screen', '退出全屏'],
   preview: ['Game preview', '游戏预览'],
   noAccount: ['No sign-in. No download. Just play.', '无需登录或下载，直接开玩。'],
 };

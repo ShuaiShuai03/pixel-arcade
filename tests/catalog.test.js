@@ -14,6 +14,9 @@ test('release contains twenty unique loadable games with bilingual instructions'
   for (const entry of catalog) {
     const { meta, createGame } = await loadGame(entry.id);
     assert.equal(meta.id, entry.id);
+    assert.deepEqual(entry.name, meta.name, `${entry.id}: shelf and player names agree`);
+    assert.equal(entry.genre, meta.genre);
+    assert.equal(entry.players, meta.players);
     assert.equal(typeof createGame, 'function');
     for (const pair of [meta.name, meta.description, ...meta.keys.map((k) => k.label)]) {
       assert.ok(pair.en?.trim());
