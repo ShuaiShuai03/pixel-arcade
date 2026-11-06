@@ -62,7 +62,8 @@
     "results": {
       "shelf": "Pixel Parkour is the first card (./public/parkour/index.html?lang=en), the count reads 39, and Orbit Gardener and Comet Catcher cards are listed.",
       "orbit-gardener": "Start then hold Left: the garden 1 prompt advanced from 'Hold Left to gather the seed' to 'reach the bed'.",
-      "comet-catcher": "Start then hold Right for 1 s: the drawn net moved from x 240 to x 363 on contract 1."
+      "comet-catcher": "Start then hold Right for 1 s: the drawn net moved from x 240 to x 363 on contract 1.",
+      "pixel-parkour": "A real click on the first card opened public/parkour/index.html?lang=en, showing the Pixel Parkour title screen."
     },
     "screenshots": ["published-orbit.jpg", "published-comet.jpg"]
   }
