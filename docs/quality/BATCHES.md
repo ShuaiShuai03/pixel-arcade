@@ -12,7 +12,7 @@ At the user's direction, at most **three games** may be under development and ac
 
 ## Completed batch 13
 
-Orbit Gardener and Comet Catcher passed initial development, independent review, and browser acceptance, bringing the accepted total to 39, Pixel Parkour included. Mimic Vault, first scheduled here, was released with batch 12. Pixel Parkour is now the first card on the shelf and opens its own page. All 115 focused tests, 28 shared regressions and five scoped catalog checks pass. A prompt-following driver won all 24 Orbit Gardener gardens back to back. A driver that reads only the prompt and the drawn canvas won Comet Catcher's final contract. Both games were played to losses and with touch buttons on Chinese phone layouts. See the [batch 13 evidence](batch-13/ACCEPTANCE.md).
+Orbit Gardener and Comet Catcher passed initial development, independent review, and browser acceptance, bringing the accepted total to 39, Pixel Parkour included. Mimic Vault, first scheduled here, was released with batch 12. Pixel Parkour is now the first card on the shelf and opens its own page. All 115 focused tests, 28 shared regressions and five scoped catalog checks pass. A prompt-following driver won all 24 Orbit Gardener gardens back to back. A driver that reads only the prompt and the drawn canvas won Comet Catcher's final contract. Both games were played to losses and with touch buttons on Chinese phone layouts. See the [batch 13 evidence](batch-13/ACCEPTANCE.md). Commit `54357f2` is live. All seven checked assets match, and both published games and the Pixel Parkour card accepted real input. See the [deployment receipt](batch-13/deployment.json).
 
 ## Completed batch 12
 
