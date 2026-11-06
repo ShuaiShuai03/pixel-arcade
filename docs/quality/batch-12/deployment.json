@@ -1,0 +1,81 @@
+{
+  "date": "2026-11-06",
+  "commit": "fb03d0e0b43718c212d819ac5496cc5c1a329711",
+  "url": "https://shuaishuai03.github.io/pixel-arcade/",
+  "workflow": {
+    "runId": 42176458557,
+    "url": "https://github.com/ShuaiShuai03/pixel-arcade/actions/runs/42176458557",
+    "conclusion": "success",
+    "jobs": {
+      "build": "success",
+      "deploy": "success",
+      "report-build-status": "success"
+    },
+    "deploymentReportedSuccessAt": "2026-11-06T06:46:01Z"
+  },
+  "assets": [
+    {
+      "path": "index.html",
+      "bytes": 9421,
+      "sha256": "b660ce3e50c66ade22d92971dc42aa72295778a8e411e91429d1b35a7e007768",
+      "matchesLocal": true
+    },
+    {
+      "path": "src/catalog.js",
+      "bytes": 3020,
+      "sha256": "374df69d25bcc96110206471e5a06e3156c042ef5aa2b9de9fcea87633e357ac",
+      "matchesLocal": true
+    },
+    {
+      "path": "src/app.js",
+      "bytes": 23703,
+      "sha256": "989d47870c8b4a89d7b9667e0bddcc3c3764c6ece29a506524a1b697d63d6ec5",
+      "matchesLocal": true
+    },
+    {
+      "path": "src/shared/platform.js",
+      "bytes": 3326,
+      "sha256": "7606bed4fc9b7754b0a6029879cf6c9889d71c481a2dd8bd931562fdb715ac51",
+      "matchesLocal": true
+    },
+    {
+      "path": "src/games/magnet-marauder.js",
+      "bytes": 55605,
+      "sha256": "e7d7d36596250a846d289a021ddbde9693833db96039770a5208f49cafbec6d7",
+      "matchesLocal": true
+    },
+    {
+      "path": "src/games/echo-hunter.js",
+      "bytes": 78938,
+      "sha256": "e7d9f55dfb9507466c54e0f5eb6e386decd9870873f0f763a9c00f6b6c204e9c",
+      "matchesLocal": true
+    },
+    {
+      "path": "src/games/frost-forge.js",
+      "bytes": 53385,
+      "sha256": "ea4c8529cf1be176674e88d13aaedc98e9b3c8947480317e65cdd32fb1294a97",
+      "matchesLocal": true
+    },
+    {
+      "path": "src/games/mimic-vault.js",
+      "bytes": 42841,
+      "sha256": "22fe11aaddeaae73efdebe1c79c96338f12a33ccb6f732fcffe77371b6dc2b74",
+      "matchesLocal": true
+    }
+  ],
+  "publishedInput": {
+    "method": "Headless Chrome over DevTools, trusted keyboard events on the published site.",
+    "results": {
+      "magnet-marauder": "Start then Left: the chamber 1 prompt advanced from the walk-to-metal lesson to the pull/throw prompt.",
+      "echo-hunter": "Space pinged (Noise meter filled one step; \"No echoes here\" shown).",
+      "frost-forge": "Start then Right: the workshop 1 prompt advanced and the engine clock ran.",
+      "mimic-vault": "Start then Right: room 1 prompt changed from [Space] to [Arrows]."
+    },
+    "screenshots": [
+      "published-magnet.jpg",
+      "published-echo.jpg",
+      "published-frost.jpg",
+      "published-mimic.jpg"
+    ]
+  }
+}

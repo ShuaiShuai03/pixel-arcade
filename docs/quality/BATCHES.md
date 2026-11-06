@@ -2,17 +2,21 @@
 
 At the user's direction, at most **three games** may be under development and acceptance testing at one time. Do not begin the next batch until all games in the active batch satisfy the gates below. The collection target is 50 games, including Pixel Parkour (reduced from 100 at the user's direction on 2026-11-05). Roster themes are not work assignments.
 
-## Active batch 13
+## Active batch 14
 
-| Game           | Implementation owner | Independent reviewer | Current state                                |
-| -------------- | -------------------- | -------------------- | -------------------------------------------- |
-| Mimic Vault    | `owner-mimic`        | `review-mimic`       | Accepted early; released with batch 12       |
-| Orbit Gardener | `owner-orbit`        | `review-orbit`       | 24 gardens; fixing review findings           |
-| Comet Catcher  | `owner-comet`        | `review-comet`       | 22 contracts; fixing a final physics finding |
+| Game           | Implementation owner | Independent reviewer | Current state                                     |
+| -------------- | -------------------- | -------------------- | ------------------------------------------------- |
+| Conveyor Chef  | `owner-chef`         | `review-chef`        | 22 shifts; approved, browser acceptance next      |
+| Snowball Siege | `owner-snow`         | to be assigned       | Rebuild as an original 1–2 player snow platformer |
+| Firefly Trail  | not started          | not started          | Queued                                            |
+
+## Completed batch 13
+
+Orbit Gardener and Comet Catcher passed initial development, independent review, and browser acceptance, bringing the accepted total to 39, Pixel Parkour included. Mimic Vault, first scheduled here, was released with batch 12. Pixel Parkour is now the first card on the shelf and opens its own page. All 115 focused tests, 28 shared regressions and five scoped catalog checks pass. A prompt-following driver won all 24 Orbit Gardener gardens back to back. A driver that reads only the prompt and the drawn canvas won Comet Catcher's final contract. Both games were played to losses and with touch buttons on Chinese phone layouts. See the [batch 13 evidence](batch-13/ACCEPTANCE.md).
 
 ## Completed batch 12
 
-Magnet Marauder, Echo Hunter, and Frost Forge passed initial development, independent review, and browser acceptance. Mimic Vault, scheduled for batch 13, finished in the same window and is released with them, bringing the accepted total to 37. A new user rule requires at least 20 levels in level-based games. All four meet it: they have 20–25 levels each, with level select and saved progress through the new `env.progress` host interface. All 303 focused tests, 28 shared regressions and five scoped catalog checks pass. Magnet Marauder was won through all 25 chambers' final level by a driver that reads only the prompt and the drawn canvas. Mimic Vault was won through all 22 rooms by following its prompts. Echo Hunter and Frost Forge were played across early, middle and late levels to wins and losses. See the [batch 12 evidence](batch-12/ACCEPTANCE.md).
+Magnet Marauder, Echo Hunter, and Frost Forge passed initial development, independent review, and browser acceptance. Mimic Vault, scheduled for batch 13, finished in the same window and is released with them, bringing the accepted total to 37. A new user rule requires at least 20 levels in level-based games. All four meet it: they have 20–25 levels each, with level select and saved progress through the new `env.progress` host interface. All 303 focused tests, 28 shared regressions and five scoped catalog checks pass. Magnet Marauder was won through all 25 chambers' final level by a driver that reads only the prompt and the drawn canvas. Mimic Vault was won through all 22 rooms by following its prompts. Echo Hunter and Frost Forge were played across early, middle and late levels to wins and losses. See the [batch 12 evidence](batch-12/ACCEPTANCE.md). Commit `fb03d0e` is live. All eight checked assets match, and the four published games accepted real input. See the [deployment receipt](batch-12/deployment.json).
 
 ## Completed batch 11
 

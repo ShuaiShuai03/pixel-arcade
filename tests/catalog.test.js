@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { catalog, loadGame } from '../src/catalog.js';
+import { existsSync } from 'node:fs';
+import { catalog, featured, loadGame } from '../src/catalog.js';
 import { harness, input, mockContext, seeded } from './harness.js';
 
 function finiteTree(value, path = 'state') {
@@ -8,9 +9,19 @@ function finiteTree(value, path = 'state') {
   else if (value && typeof value === 'object')
     for (const [key, child] of Object.entries(value)) finiteTree(child, `${path}.${key}`);
 }
-test('release contains thirty-six unique loadable games with bilingual instructions', async () => {
-  assert.equal(catalog.length, 36);
-  assert.equal(new Set(catalog.map((g) => g.id)).size, 36);
+test('Pixel Parkour is listed first as a featured game with its own page and card picture', () => {
+  assert.equal(featured[0].id, 'pixel-parkour');
+  assert.ok(featured[0].name.en && featured[0].name.zh);
+  for (const game of featured) {
+    assert.ok(!catalog.some((g) => g.id === game.id), `${game.id} is not also a module`);
+    assert.ok(['1', '1-2', '2'].includes(game.players));
+    for (const path of [game.href, game.image])
+      assert.ok(existsSync(new URL(`../${path.slice(2)}`, import.meta.url)), `${path} exists`);
+  }
+});
+test('release contains thirty-eight unique loadable games with bilingual instructions', async () => {
+  assert.equal(catalog.length, 38);
+  assert.equal(new Set(catalog.map((g) => g.id)).size, 38);
   for (const entry of catalog) {
     const { meta, createGame } = await loadGame(entry.id);
     assert.equal(meta.id, entry.id);

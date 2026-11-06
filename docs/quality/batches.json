@@ -1,7 +1,7 @@
 {
   "maxActiveGames": 3,
-  "activeBatch": 13,
-  "acceptedGames": 37,
+  "activeBatch": 14,
+  "acceptedGames": 39,
   "batches": [
     {
       "number": 1,
@@ -74,13 +74,15 @@
     {
       "number": 13,
       "games": ["mimic-vault", "orbit-gardener", "comet-catcher"],
-      "status": "in_progress",
-      "acceptedEarly": ["mimic-vault"]
+      "status": "complete",
+      "acceptedEarly": ["mimic-vault"],
+      "alsoReleased": ["pixel-parkour featured listing"]
     },
     {
       "number": 14,
       "games": ["conveyor-chef", "firefly-trail", "rail-switch"],
-      "status": "queued"
+      "status": "in_progress",
+      "alsoInProgress": ["snowball-siege rebuild"]
     },
     {
       "number": 15,

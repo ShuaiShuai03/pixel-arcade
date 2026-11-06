@@ -1,0 +1,44 @@
+{
+  "date": "2026-11-06",
+  "status": "complete",
+  "workspace": "Checks ran in a clean detached worktree of HEAD fb03d0e plus exactly the batch 13 files, so the in-progress Snowball Siege rebuild and Conveyor Chef are not included.",
+  "checks": {
+    "focused game tests with coverage": {
+      "command": "node --experimental-test-coverage (2 games) --test 4 test files",
+      "exitCode": 0,
+      "passed": 115,
+      "failed": 0,
+      "coverageLines": { "orbit-gardener": 100.0, "comet-catcher": 100.0 },
+      "coverageBranches": { "orbit-gardener": 98.6, "comet-catcher": 98.21 },
+      "log": "coverage.txt"
+    },
+    "shared input, simulation and platform lifecycle": {
+      "command": "node --test tests/input.test.js tests/simulation.test.js tests/platform-lifecycle.test.js",
+      "exitCode": 0,
+      "passed": 28,
+      "failed": 0,
+      "log": "shared-tests.txt"
+    },
+    "scoped catalog tests": {
+      "command": "node --test --test-name-pattern='release contains|Pixel Parkour|^(orbit|comet)' tests/catalog.test.js",
+      "exitCode": 0,
+      "passed": 5,
+      "failed": 0,
+      "log": "catalog-tests.txt"
+    },
+    "full catalog tests": {
+      "command": "node --test tests/catalog.test.js",
+      "exitCode": 0,
+      "passed": 40,
+      "failed": 0
+    },
+    "static check": { "command": "npm run check", "exitCode": 0, "log": "static-check.txt" },
+    "format check": { "command": "npm run format:check", "exitCode": 0, "log": "format-check.txt" },
+    "build": { "command": "npm run build", "exitCode": 0, "log": "build.txt" },
+    "diff check": { "command": "git diff --check", "exitCode": 0 }
+  },
+  "catalog": "Two entries added; release assertion raised from 36 to 38 JavaScript games. A featured list places Pixel Parkour first with its own page link and card picture.",
+  "hostChanges": "src/app.js shows featured entries before the catalog, links them to their own page with the current language, and draws a card picture when one is given (falling back to the coloured label). The platform lifecycle test fixture gains the featured export.",
+  "reviewStatus": "Both games independently approved on the recorded hashes, with no open findings.",
+  "uncommittedExcluded": "The Snowball Siege rebuild (in progress) and Conveyor Chef (approved, waiting for browser acceptance) are not part of this release."
+}

@@ -1,0 +1,58 @@
+{
+  "date": "2026-11-06",
+  "browser": "The user's stable Google Chrome, driven through the official Claude in Chrome extension in its own tab-group window. Comet Catcher's earlier contract 12-13 and contract 22 runs used headless Chrome over the DevTools protocol, before the user's browser rule ruled that out. Held keys were synthetic in-page keydown/keyup events; held touch buttons were pointer events on the real touch buttons; Start, language, full-window and Play again were real mouse clicks. Only visible DOM text and canvas pixels were read; no game state was read or injected.",
+  "status": "complete",
+  "stateInjection": false,
+  "savedProgressSeeding": "Later levels were reached by writing the host's own saved-progress preference (localStorage pixel-arcade-v1 levels[id]), which is what a returning player has.",
+  "phoneLayouts": "The Chrome window could not be resized, so phone layouts were checked in a same-origin 390x844 portrait frame and an 844x390 landscape frame.",
+  "viewports": [
+    [2504, 1254],
+    [390, 844],
+    [844, 390]
+  ],
+  "games": [
+    {
+      "id": "orbit-gardener",
+      "sourceSha256": "a6b3efaa6799729a20ab0c95cbd564a8c37a4648d84b7f974e80da0a4160ea31",
+      "levels": 24,
+      "observed": [
+        "A driver that follows only the status-line prompt won all 24 gardens back to back with hull 3 for 15400.",
+        "Idle play lost garden 1 with 'Night fell on garden 1 before it was restored.'; keys on the loss screen changed nothing.",
+        "Chinese portrait layout (390x844): the touch buttons alone collected the seed, planted it and restored garden 1; idle play reached the Chinese loss screen, and Play again restarted garden 1 with hull 3."
+      ],
+      "screenshots": [
+        "orbit-24-win.jpg",
+        "orbit-loss.jpg",
+        "orbit-zh.jpg",
+        "orbit-phone-zh-touch.png"
+      ]
+    },
+    {
+      "id": "comet-catcher",
+      "sourceSha256": "8faca7b8a08c875d1aa542d53e28f4d8a76be193808cd5d7287defe54660a688",
+      "levels": 22,
+      "observed": [
+        "A driver that reads only the prompt and the drawn net, marker and bin arrow won contract 22 for 260: 'Every contract is fulfilled. The sky is safe!'.",
+        "A continuous run from contract 1 cleared contracts 1-3 in Chrome; headless runs advanced from contract 12 to 13.",
+        "Idle play lost in Chinese with '天文台的尝试次数用完了'; input was frozen afterwards.",
+        "Chinese landscape full-window layout (844x390): touch controls sat in side columns, and holding the right-hand touch button moved the net from the centre to the bin."
+      ],
+      "screenshots": [
+        "comet-22-win.jpg",
+        "comet-loss-zh.jpg",
+        "comet-zh.jpg",
+        "comet-landscape-zh-touch.png"
+      ]
+    },
+    {
+      "id": "pixel-parkour",
+      "observed": [
+        "Pixel Parkour is the first card, with its gameplay picture, and the shelf count reads 39.",
+        "Clicking the card opened public/parkour/index.html?lang=zh, and the Chinese title menu ran with no console errors."
+      ],
+      "screenshots": ["parkour-from-shelf.jpg"]
+    }
+  ],
+  "console": "One exception, NotFoundError from setPointerCapture, came from a synthetic touch event with a pointer id that had no real pointer behind it; touches with a real pointer id worked. No other errors were seen.",
+  "limitations": "Physical phones, touch hardware, other browsers and audio were not tested."
+}

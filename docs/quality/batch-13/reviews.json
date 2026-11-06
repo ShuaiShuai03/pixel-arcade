@@ -1,0 +1,89 @@
+{
+  "date": "2026-11-06",
+  "phase": "complete",
+  "finalCollectionReview": false,
+  "levelRule": "Level-based games need at least 20 authored levels with level select through env.progress.",
+  "records": [
+    {
+      "game": "orbit-gardener",
+      "owner": "owner-orbit",
+      "reviewer": "review-orbit",
+      "verdict": "approved",
+      "approvedSha256": {
+        "src/games/orbit-gardener.js": "a6b3efaa6799729a20ab0c95cbd564a8c37a4648d84b7f974e80da0a4160ea31",
+        "tests/orbit-gardener.test.js": "b2e60064eaf2dab82819b968166e16d60db76b5a72b59c403e53e005cd0ba97f",
+        "tests/orbit-gardener-quality.test.js": "a4668f1f20075a69d2b5e427bc4a7439fc64d087a7a35adc2a6c1bc1209bf984"
+      },
+      "findings": [
+        {
+          "id": "orbit-crude-pulse",
+          "status": "closed",
+          "observation": "A crude pulsing policy no longer wins; it stays within the crude-policy limit."
+        },
+        {
+          "id": "orbit-prompt-into-debris",
+          "status": "closed",
+          "observation": "Prompts no longer steer a follower into debris."
+        },
+        {
+          "id": "orbit-depth",
+          "status": "closed",
+          "observation": "Later gardens add distinct challenges instead of repeating early layouts."
+        },
+        {
+          "id": "orbit-bot-honesty",
+          "status": "closed",
+          "observation": "Quality bots act only on the visible prompt and public input."
+        },
+        {
+          "id": "orbit-layout",
+          "status": "closed",
+          "observation": "Canvas text and HUD fit without overlap."
+        },
+        {
+          "id": "orbit-hold-still-into-rock",
+          "status": "closed",
+          "observation": "Following a 'stop' prompt can no longer leave the ship parked in the path of a rock."
+        }
+      ]
+    },
+    {
+      "game": "comet-catcher",
+      "owner": "owner-comet",
+      "reviewer": "review-comet",
+      "verdict": "approved",
+      "approvedSha256": {
+        "src/games/comet-catcher.js": "8faca7b8a08c875d1aa542d53e28f4d8a76be193808cd5d7287defe54660a688",
+        "tests/comet-catcher.test.js": "63bd7b48df45ee5770005818f2acd93798db092373134764a03d53a5cc2b20a2",
+        "tests/comet-catcher-quality.test.js": "afa536928c88843c5409d445090ac55d5108dfea530b674e2e87ded55d2fe0d5"
+      },
+      "findings": [
+        {
+          "id": "comet-cooling-copy",
+          "status": "closed",
+          "observation": "Cooling text matches the real cooling rule."
+        },
+        {
+          "id": "comet-bounce-tunnel",
+          "status": "closed",
+          "observation": "Bounced comets can no longer pass through the net; contact is swept."
+        },
+        {
+          "id": "comet-bin-guide",
+          "status": "closed",
+          "observation": "The bin guide arrow is drawn when the prompt refers to it."
+        },
+        {
+          "id": "comet-unlocked-clamp",
+          "status": "closed",
+          "observation": "Level select clamps saved progress to the authored contracts."
+        },
+        {
+          "id": "comet-roll-off-teleport",
+          "status": "closed",
+          "observation": "A comet rolling off an uphill net leaves from the rim instead of jumping position."
+        }
+      ]
+    }
+  ]
+}

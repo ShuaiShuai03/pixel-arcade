@@ -1,0 +1,13 @@
+✔ Pixel Parkour is listed first as a featured game with its own page and card picture (0.626291ms)
+✔ release contains thirty-eight unique loadable games with bilingual instructions (23.133083ms)
+✔ orbit-invaders: seeded mixed input remains finite, draws and terminates at most once (156.009667ms)
+✔ comet-catcher: seeded mixed input remains finite, draws and terminates at most once (8.593167ms)
+✔ orbit-gardener: seeded mixed input remains finite, draws and terminates at most once (8.321334ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 5
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 243.062667

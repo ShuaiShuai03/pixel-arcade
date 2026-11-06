@@ -1,4 +1,4 @@
-import { catalog, loadGame } from './catalog.js';
+import { catalog, featured, loadGame } from './catalog.js';
 import { copy } from './i18n.js';
 import {
   readPreferences,
@@ -130,7 +130,7 @@ function updateLanguage() {
 }
 function renderShelf() {
   previewObserver?.disconnect();
-  const list = filterGames(catalog, $('game-search').value, filter),
+  const list = filterGames([...featured, ...catalog], $('game-search').value, filter),
     grid = $('game-grid');
   grid.replaceChildren();
   $('game-count').textContent =
@@ -138,7 +138,7 @@ function renderShelf() {
   $('no-results').hidden = list.length > 0;
   for (const game of list) {
     const link = make('a', 'game-card');
-    link.href = `#play/${game.id}`;
+    link.href = game.href ? `${game.href}?lang=${preferences.lang}` : `#play/${game.id}`;
     link.dataset.game = game.id;
     link.setAttribute(
       'aria-label',
@@ -188,7 +188,8 @@ function renderShelf() {
     context.font = 'bold 30px monospace';
     context.textAlign = 'center';
     context.fillText(localized(game.name), 240, 165);
-    if (previewObserver) previewObserver.observe(preview);
+    if (game.image) drawImagePreview(preview, game.image);
+    else if (previewObserver) previewObserver.observe(preview);
     else void drawPreview(preview);
   }
 }
@@ -203,6 +204,12 @@ function loadModule(id) {
     .finally(() => pendingModules.delete(id));
   pendingModules.set(id, promise);
   return promise;
+}
+function drawImagePreview(preview, src) {
+  const image = new Image();
+  image.onload = () => preview.getContext('2d').drawImage(image, 0, 0, 480, 320);
+  // On error the labeled colour fallback stays.
+  image.src = src;
 }
 async function drawPreview(preview) {
   const { game: id, language: lang } = preview.dataset;

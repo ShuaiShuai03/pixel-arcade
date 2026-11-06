@@ -35,5 +35,20 @@ export const catalog = [
   ['frost-forge', 'Frost Forge', '霜火工坊', 'action', '1', '#9fd3e6'],
   ['echo-hunter', 'Echo Hunter', '回声猎手', 'action', '1', '#5fc9b8'],
   ['mimic-vault', 'Mimic Vault', '幻影宝库', 'puzzle', '1', '#c9b8e6'],
+  ['comet-catcher', 'Comet Catcher', '彗星捕手', 'arcade', '1', '#f2b46b'],
+  ['orbit-gardener', 'Orbit Gardener', '轨道园丁', 'arcade', '1', '#9be08a'],
 ].map(([id, en, zh, genre, players, color]) => ({ id, name: { en, zh }, genre, players, color }));
 export const loadGame = (id) => import(`./games/${id}.js`);
+
+// Games hosted on their own page (not a JS module). They are listed before the catalog.
+export const featured = [
+  {
+    id: 'pixel-parkour',
+    name: { en: 'Pixel Parkour', zh: '像素跑酷' },
+    genre: 'action',
+    players: '1',
+    color: '#3b2d5c',
+    href: './public/parkour/index.html',
+    image: './public/parkour/card.jpg',
+  },
+];

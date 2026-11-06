@@ -199,6 +199,7 @@ async function fixture({
   const location = { hash: '#home' };
   const names = [
     'catalog',
+    'featured',
     'loadGame',
     'copy',
     ...Object.keys(platform),
@@ -215,6 +216,7 @@ async function fixture({
   ];
   const values = [
     catalog,
+    [],
     loadGame,
     copy,
     ...Object.values(platform),
