@@ -1,0 +1,96 @@
+{
+  "date": "2026-11-05",
+  "browser": "Installed stable Google Chrome 156/157 (headless, temporary profile) driven over the DevTools protocol with trusted keyboard, mouse and touch events, plus the Claude desktop app's built-in browser pane (Chromium) for Magnet Marauder's tap, language, phone and select checks. Visible DOM text and screenshots were read; no game state was read or injected; Playwright was not used.",
+  "status": "complete",
+  "stateInjection": false,
+  "savedProgressSeeding": "Later levels were reached by writing the host's own saved-progress preference (localStorage pixel-arcade-v1 levels[id]), which is what a returning player has; game state was never touched. Seeded progress was removed from the built-in pane afterwards.",
+  "viewports": [
+    [1440, 900],
+    [390, 844],
+    [375, 812],
+    [844, 390]
+  ],
+  "games": [
+    {
+      "id": "magnet-marauder",
+      "sourceSha256": "e7d7d36596250a846d289a021ddbde9693833db96039770a5208f49cafbec6d7",
+      "levels": 25,
+      "observed": [
+        "A pixel-reading driver that follows the prompt and the red lock bracket cleared chambers 1 to 16 back to back in 145 s, then won chamber 25 on the first attempt for 2180: 'All 25 chambers cleared: the foundry is yours!'.",
+        "Idle play lost chamber 1 with 'Enemies wrecked the machinery. Hit them before their wind-up ends.'; arrows and X on the loss screen changed nothing; Play again restarted chamber 1 with full machines.",
+        "P paused and resumed. The host pauses whenever the page is hidden, as designed.",
+        "Chinese portrait phone: HUD, prompts and the six touch buttons are translated; the touch Left button moved the chamber highlight and Repel started chamber 24.",
+        "Chamber select (9x3 grid) shows no text over any cell in English desktop or Chinese phone layouts.",
+        "Landscape fullscreen places the controls in side columns.",
+        "Earlier 3-chamber builds produced the findings listed in reviews.json; an earlier select layout overlapped cell 25 in English and was fixed."
+      ],
+      "minorOpen": [
+        "While the chamber chooser is open the status line still shows the chamber 1 lesson instead of announcing the chooser."
+      ],
+      "screenshots": [
+        "magnet-25-win.jpg",
+        "magnet-run-c17.jpg",
+        "magnet-25-loss.jpg",
+        "magnet-25-select-en.jpg",
+        "magnet-25-select-zh-phone.png",
+        "magnet-25-landscape.jpg"
+      ],
+      "screenshotsInspected": true
+    },
+    {
+      "id": "echo-hunter",
+      "sourceSha256": "e7d9f55dfb9507466c54e0f5eb6e386decd9870873f0f763a9c00f6b6c204e9c",
+      "levels": 20,
+      "observed": [
+        "A driver that reads the drawn wall tiles, pings sparingly and follows the prompt cleared caverns 1 to 3.",
+        "Cavern 20 opened from the chooser with saved progress; the driver recovered 3 of 5 beacon beetles before crawlers ended the run, and the loss screen froze input.",
+        "Chinese portrait touch ping showed the chase prompt; landscape fullscreen placed controls in side columns."
+      ],
+      "minorOpen": ["The cavern chooser is not announced in the status line."],
+      "screenshots": [
+        "echo-chooser-20.jpg",
+        "echo-cavern20-end.jpg",
+        "echo-final-loss.jpg",
+        "echo-final-phone-touch.jpg",
+        "echo-final-landscape.jpg"
+      ],
+      "screenshotsInspected": true
+    },
+    {
+      "id": "frost-forge",
+      "sourceSha256": "ea4c8529cf1be176674e88d13aaedc98e9b3c8947480317e65cdd32fb1294a97",
+      "levels": 22,
+      "observed": [
+        "Workshop 1 repaired from a fresh start and workshop 8 repaired after choosing it in the select screen.",
+        "Workshop 16 was played to an engine-seize loss by a slow driver; Play again then started the furthest unlocked workshop, as designed.",
+        "Idle play on workshop 1 lost with 'The engine froze solid. Warm parts faster next time.' and input stayed frozen.",
+        "Chinese portrait touch and landscape fullscreen layouts work."
+      ],
+      "screenshots": [
+        "frost-select.jpg",
+        "frost-22-start.jpg",
+        "frost-final-loss.jpg",
+        "frost-final-phone-touch.jpg",
+        "frost-final-landscape.jpg"
+      ],
+      "screenshotsInspected": true
+    },
+    {
+      "id": "mimic-vault",
+      "sourceSha256": "22fe11aaddeaae73efdebe1c79c96338f12a33ccb6f732fcffe77371b6dc2b74",
+      "levels": 22,
+      "observed": [
+        "A prompt-following driver won all 22 rooms (5400), continuing through the vault menu after host pauses; the win screen froze input.",
+        "Chinese portrait touch continued at room 22; landscape fullscreen placed controls in side columns."
+      ],
+      "screenshots": [
+        "mimic-final-win.jpg",
+        "mimic-final-phone-touch.jpg",
+        "mimic-final-landscape.jpg"
+      ],
+      "screenshotsInspected": true
+    }
+  ],
+  "consoleErrors": 0,
+  "notTested": "Physical devices, other browsers and audio quality."
+}

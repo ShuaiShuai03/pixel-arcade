@@ -1,20 +1,22 @@
 # Three-game quality batches
 
-At the user's direction, at most **three games** may be under development and acceptance testing at one time. Do not begin the next batch until all games in the active batch satisfy the gates below. The 100-game target includes Pixel Parkour. Roster themes are not work assignments.
+At the user's direction, at most **three games** may be under development and acceptance testing at one time. Do not begin the next batch until all games in the active batch satisfy the gates below. The collection target is 50 games, including Pixel Parkour (reduced from 100 at the user's direction on 2026-11-05). Roster themes are not work assignments.
 
-## Active batch 12
+## Active batch 13
 
-| Game            | Implementation owner | Independent reviewer | Current state                     |
-| --------------- | -------------------- | -------------------- | --------------------------------- |
-| Magnet Marauder | `owner-magnet`       | pending              | No queued files; new module build |
-| Echo Hunter     | pending              | pending              | Queued                            |
-| Frost Forge     | pending              | pending              | Queued                            |
+| Game           | Implementation owner | Independent reviewer | Current state                                |
+| -------------- | -------------------- | -------------------- | -------------------------------------------- |
+| Mimic Vault    | `owner-mimic`        | `review-mimic`       | Accepted early; released with batch 12       |
+| Orbit Gardener | `owner-orbit`        | `review-orbit`       | 24 gardens; fixing review findings           |
+| Comet Catcher  | `owner-comet`        | `review-comet`       | 22 contracts; fixing a final physics finding |
 
-Magnet Marauder development began after Dash Duelist was accepted, while Tether Twins and Vine Warden were still in acceptance, so no more than three games were in development or testing at once.
+## Completed batch 12
+
+Magnet Marauder, Echo Hunter, and Frost Forge passed initial development, independent review, and browser acceptance. Mimic Vault, scheduled for batch 13, finished in the same window and is released with them, bringing the accepted total to 37. A new user rule requires at least 20 levels in level-based games. All four meet it: they have 20–25 levels each, with level select and saved progress through the new `env.progress` host interface. All 303 focused tests, 28 shared regressions and five scoped catalog checks pass. Magnet Marauder was won through all 25 chambers' final level by a driver that reads only the prompt and the drawn canvas. Mimic Vault was won through all 22 rooms by following its prompts. Echo Hunter and Frost Forge were played across early, middle and late levels to wins and losses. See the [batch 12 evidence](batch-12/ACCEPTANCE.md).
 
 ## Completed batch 11
 
-Dash Duelist, Tether Twins, and Vine Warden passed initial development, independent review, and browser acceptance, bringing the accepted total to 33. All 152 focused tests, 27 shared regressions and four scoped catalog checks pass. All three were built new. Dash Duelist was played by a driver that reads only the prompt and the drawn canvas; Tether Twins and Vine Warden by following their prompts and markers. Browser play changed the design of two games: Vine Warden's lanes, third plot and cues, and Tether Twins' layout and copy. See the [batch 11 evidence](batch-11/ACCEPTANCE.md). Publication verification follows the final integration checks.
+Dash Duelist, Tether Twins, and Vine Warden passed initial development, independent review, and browser acceptance, bringing the accepted total to 33. All 152 focused tests, 27 shared regressions and four scoped catalog checks pass. All three were built new. Dash Duelist was played by a driver that reads only the prompt and the drawn canvas; Tether Twins and Vine Warden by following their prompts and markers. Browser play changed the design of two games: Vine Warden's lanes, third plot and cues, and Tether Twins' layout and copy. See the [batch 11 evidence](batch-11/ACCEPTANCE.md). Commit `be08376` is live. All nine checked assets match, and the three published games accepted real input. See the [deployment receipt](batch-11/deployment.json).
 
 ## Completed batch 10
 
@@ -68,7 +70,7 @@ The authoritative schedule and accepted-game list are in [batches.json](batches.
 
 ## Required final review
 
-Once all 100 games are developed and initially accepted, run a second independent review of every game in groups of no more than three. Each result must identify the reviewed revision, tests and browser evidence, findings, remediation, and final verdict. Fix and re-review all actionable findings before recording a pass. Changes to shared code require rechecking affected games. The project remains incomplete until all 100 games pass this final review. Track this separate gate in `finalReview` in [batches.json](batches.json).
+Once all 50 games are developed and initially accepted, run a second independent review of every game in groups of no more than three. Each result must identify the reviewed revision, tests and browser evidence, findings, remediation, and final verdict. Fix and re-review all actionable findings before recording a pass. Changes to shared code require rechecking affected games. The project remains incomplete until all 50 games pass this final review. Track this separate gate in `finalReview` in [batches.json](batches.json).
 
 ## Acceptance gates for each game
 

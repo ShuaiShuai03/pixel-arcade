@@ -1,0 +1,84 @@
+{
+  "date": "2026-11-05",
+  "commit": "be08376f731777a9fb401f204c9278a3ede125c1",
+  "url": "https://shuaishuai03.github.io/pixel-arcade/",
+  "workflow": {
+    "runId": 42117329953,
+    "url": "https://github.com/ShuaiShuai03/pixel-arcade/actions/runs/42117329953",
+    "conclusion": "success",
+    "jobs": {
+      "build": "success",
+      "deploy": "success",
+      "report-build-status": "success"
+    },
+    "logsInspected": true,
+    "deploymentReportedSuccessAt": "2026-11-05T21:58:21Z"
+  },
+  "assets": [
+    {
+      "path": "index.html",
+      "bytes": 9421,
+      "sha256": "b660ce3e50c66ade22d92971dc42aa72295778a8e411e91429d1b35a7e007768",
+      "matchesLocal": true
+    },
+    {
+      "path": "src/catalog.js",
+      "bytes": 2708,
+      "sha256": "beb0830090324610f724abe4fdbc2df6930b0371def23dddf9787b9bfb1fed52",
+      "matchesLocal": true
+    },
+    {
+      "path": "src/app.js",
+      "bytes": 23386,
+      "sha256": "6fc8fbaa4c101f3a1a771b63579c1c2610ca2c2578c825e131d362377d53a890",
+      "matchesLocal": true
+    },
+    {
+      "path": "src/games/dash-duelist.js",
+      "bytes": 34573,
+      "sha256": "c51b3b6e79c6d6a6e793724eea7f8abaea6e761349efd6c707ad568bd85e6cec",
+      "matchesLocal": true
+    },
+    {
+      "path": "src/games/tether-twins.js",
+      "bytes": 40362,
+      "sha256": "e40c6b96b252835c51c9d6c6645a9f6ba2721aa7718202e0de834add94678372",
+      "matchesLocal": true
+    },
+    {
+      "path": "src/games/vine-warden.js",
+      "bytes": 40211,
+      "sha256": "90dbef7ab3a5e137dbb16a04d546f29fa2d21de7302fc305e8c177d792f88216",
+      "matchesLocal": true
+    },
+    {
+      "path": "README.md",
+      "bytes": 5832,
+      "sha256": "4ceacf434a173b5db6ed39b108eb65464b5ebe00effc05dd6454bc1f06324559",
+      "matchesLocal": true
+    },
+    {
+      "path": "docs/quality/batch-11/ACCEPTANCE.md",
+      "bytes": 5817,
+      "sha256": "88dea2e36f32a2399f344ec9da70a5b7b15d86adc37c1603fe3911d35912c073",
+      "matchesLocal": true
+    },
+    {
+      "path": "tests/catalog.test.js",
+      "bytes": 3960,
+      "sha256": "6cf7b462a80476ad36c69e0769072e70c0127a0f7f8a6c123edb45ff57efb7ac",
+      "matchesLocal": true
+    }
+  ],
+  "publishedChecks": {
+    "browser": "Installed stable Google Chrome 156 (headless) over the DevTools protocol; trusted input only, no state injection.",
+    "observed": [
+      "Dash Duelist: X spent a dash charge (Dash 3 to Dash 2).",
+      "Tether Twins: X switched to Blue and walking onto the plate opened gate A.",
+      "Vine Warden: Up then Space planted a seed ('Planted! It blooms in 6s').",
+      "The game shelf lists 32 games."
+    ],
+    "screenshots": ["published-duel.jpg", "published-tether.jpg", "published-vine.jpg"],
+    "screenshotsInspected": true
+  }
+}

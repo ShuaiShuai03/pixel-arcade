@@ -12,10 +12,16 @@ export function readPreferences(storage) {
       ([k, v]) => /^[a-z0-9-]+$/.test(k) && Number.isFinite(v) && v >= 0,
     ),
   );
+  const levels = Object.fromEntries(
+    Object.entries(value.levels || {}).filter(
+      ([k, v]) => /^[a-z0-9-]+$/.test(k) && Number.isInteger(v) && v >= 1 && v <= 999,
+    ),
+  );
   return {
     lang: value.lang === 'zh' ? 'zh' : 'en',
     sound: value.sound === true,
     scores,
+    levels,
     recent: Array.isArray(value.recent)
       ? value.recent.filter((v) => typeof v === 'string' && /^[a-z0-9-]+$/.test(v)).slice(0, 8)
       : [],
@@ -40,6 +46,14 @@ export function recordResult(preferences, id, score) {
     },
     recent: [id, ...preferences.recent.filter((v) => v !== id)].slice(0, 8),
   };
+}
+// Highest level a player has unlocked in a level-based game (1-based); never decreases.
+export function recordLevel(preferences, id, level) {
+  if (!/^[a-z0-9-]+$/.test(id) || !Number.isInteger(level) || level < 1 || level > 999)
+    return preferences;
+  const levels = preferences.levels || {};
+  if ((levels[id] || 1) >= level) return preferences;
+  return { ...preferences, levels: { ...levels, [id]: level } };
 }
 export function filterGames(games, query, filter) {
   const q = query.toLowerCase().trim();

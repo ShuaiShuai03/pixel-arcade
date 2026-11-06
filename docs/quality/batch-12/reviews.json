@@ -1,0 +1,166 @@
+{
+  "date": "2026-11-05",
+  "phase": "complete",
+  "finalCollectionReview": false,
+  "levelRule": "Level-based games need at least 20 authored levels with level select through env.progress (user rule added during this batch).",
+  "records": [
+    {
+      "game": "magnet-marauder",
+      "owner": "owner-magnet",
+      "reviewer": "review-magnet",
+      "verdict": "approved",
+      "approvedSha256": {
+        "src/games/magnet-marauder.js": "e7d7d36596250a846d289a021ddbde9693833db96039770a5208f49cafbec6d7",
+        "tests/magnet-marauder.test.js": "c16b47b698400e936ece462caed8a5023a0d412643a9a9bd1900e274b3e36198",
+        "tests/magnet-marauder-quality.test.js": "94b38bb84eef3dc69fddc0ce9d662f9743f02ee6cf17e7283db295ddfd129cde"
+      },
+      "findings": [
+        {
+          "id": "magnet-hold-space-prompt",
+          "status": "closed",
+          "observation": "Prompt now says to hold Space and names the throw key."
+        },
+        {
+          "id": "magnet-loss-cause-copy",
+          "status": "closed",
+          "observation": "Loss text names the real cause instead of blaming the player's metal."
+        },
+        {
+          "id": "magnet-prompt-lag",
+          "status": "closed",
+          "observation": "A prompt-literal bot lagged the lock; X now fires while locked and the lock is sticky inside a wider cone."
+        },
+        {
+          "id": "magnet-blocked-line",
+          "status": "closed",
+          "observation": "A grey slash marks a blocked line of fire and the prompt says to sidestep."
+        },
+        {
+          "id": "magnet-casual-difficulty",
+          "status": "closed",
+          "observation": "Machine HP 14 and longer wind-ups; casual and slow policies meet the gates."
+        },
+        {
+          "id": "magnet-20-levels",
+          "status": "closed",
+          "observation": "Expanded from 3 to 25 chambers with a select screen and saved progress."
+        },
+        {
+          "id": "magnet-select-overlap",
+          "status": "closed",
+          "observation": "English select text overlapped cell 25; grid is now 9x3 with text below, guarded by a no-overlap test in both languages."
+        }
+      ]
+    },
+    {
+      "game": "echo-hunter",
+      "owner": "owner-echo",
+      "reviewer": "review-echo",
+      "verdict": "approved",
+      "approvedSha256": {
+        "src/games/echo-hunter.js": "e7d9f55dfb9507466c54e0f5eb6e386decd9870873f0f763a9c00f6b6c204e9c",
+        "tests/echo-hunter.test.js": "b078efe174dafc14c204cf6d6e57a7e2eee3aa065ebadf7579b5e22f9f41418e",
+        "tests/echo-hunter-quality.test.js": "a0f089c574b39097c4491968443d72face42d7ef98652741b5a1267685055836"
+      },
+      "findings": [
+        {
+          "id": "echo-empty-ping-guidance",
+          "status": "closed",
+          "observation": "Empty pings and cooldown give feedback; the ping budget is shown."
+        },
+        {
+          "id": "echo-prompt-priority",
+          "status": "closed",
+          "observation": "The chase prompt for a found outline now outranks the loud-ping warning."
+        },
+        {
+          "id": "echo-escape-arrow",
+          "status": "closed",
+          "observation": "An escape arrow and a 40 px trigger guide the exit; cavern 3 lane widened."
+        },
+        {
+          "id": "echo-walls-copy",
+          "status": "closed",
+          "observation": "getState returned a live walls array; it now returns a copy."
+        },
+        {
+          "id": "echo-20-levels",
+          "status": "closed",
+          "observation": "20 caverns with a chooser and saved progress."
+        },
+        {
+          "id": "echo-chooser-status",
+          "status": "open-minor",
+          "observation": "The chooser is not announced in the status line."
+        }
+      ]
+    },
+    {
+      "game": "frost-forge",
+      "owner": "owner-frost",
+      "reviewer": "review-frost",
+      "verdict": "approved",
+      "approvedSha256": {
+        "src/games/frost-forge.js": "ea4c8529cf1be176674e88d13aaedc98e9b3c8947480317e65cdd32fb1294a97",
+        "tests/frost-forge.test.js": "833e21112ff5737d18e24f960d9feadfb71ed58231a02f2731ac3733f33478da",
+        "tests/frost-forge-quality.test.js": "1506ce5ae29cadc400341949685e7aa623d4c5fa4ebea24a7b4b66700a073bd2"
+      },
+      "findings": [
+        {
+          "id": "frost-overshoot",
+          "status": "closed",
+          "observation": "Parts overshot the take band while juggling; bands now last on the intended pad."
+        },
+        {
+          "id": "frost-prompt-literal",
+          "status": "closed",
+          "observation": "A prompt-literal bot won 2-20/30; the prompt subject is now sticky and Space takes it."
+        },
+        {
+          "id": "frost-false-wait",
+          "status": "closed",
+          "observation": "No wait prompt when nothing is warming."
+        },
+        {
+          "id": "frost-pad-livelock",
+          "status": "closed",
+          "observation": "Adjacent set-point pads could livelock; pad choice is now stable."
+        },
+        {
+          "id": "frost-20-levels",
+          "status": "closed",
+          "observation": "22 workshops with set-point pads, X torch thawing frozen sockets, piston and a select screen."
+        }
+      ]
+    },
+    {
+      "game": "mimic-vault",
+      "owner": "owner-mimic",
+      "reviewer": "review-mimic",
+      "verdict": "approved",
+      "approvedSha256": {
+        "src/games/mimic-vault.js": "22fe11aaddeaae73efdebe1c79c96338f12a33ccb6f732fcffe77371b6dc2b74",
+        "tests/mimic-vault.test.js": "614b5d9be4a918f1220c08c8772254e558399fd4ecb62ed079bfbe30311a6e42",
+        "tests/mimic-vault-quality.test.js": "63d2e75d2755b3535cd8687e05678d7a4f544266400a64e6fd59ed2c94acf081"
+      },
+      "findings": [
+        {
+          "id": "mimic-plate-stall",
+          "status": "closed",
+          "observation": "Prompt stalled when stepping off a plate; room 13 plate moved."
+        },
+        {
+          "id": "mimic-drawn-line",
+          "status": "closed",
+          "observation": "The drawn prompt line holds at least 0.5 s and carries key tags."
+        },
+        {
+          "id": "mimic-frozen-walls",
+          "status": "closed",
+          "observation": "Wall data is frozen and copied."
+        },
+        { "id": "mimic-copy", "status": "closed", "observation": "Intro tip now names a key." }
+      ]
+    }
+  ]
+}

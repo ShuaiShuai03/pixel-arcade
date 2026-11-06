@@ -1,41 +1,7 @@
 {
   "maxActiveGames": 3,
-  "activeBatch": 12,
-  "acceptedGames": [
-    "snowball-siege",
-    "pinball-pocket",
-    "starbreaker",
-    "paddle-duel",
-    "meteor-drift",
-    "pixel-rally",
-    "ember-knights",
-    "bomb-garden",
-    "dungeon-dash",
-    "sky-raiders",
-    "iron-bastion",
-    "orbit-invaders",
-    "river-hop",
-    "neon-snake",
-    "bubble-pop",
-    "blockfall",
-    "gem-match",
-    "minefield",
-    "crate-keeper",
-    "memory-grove",
-    "pixel-parkour",
-    "lantern-climber",
-    "gravity-courier",
-    "grapnel-gorge",
-    "wallrunner-relay",
-    "clockwork-bridge",
-    "glider-ridge",
-    "burrow-rescue",
-    "raft-rush",
-    "shield-sentinel",
-    "dash-duelist",
-    "tether-twins",
-    "vine-warden"
-  ],
+  "activeBatch": 13,
+  "acceptedGames": 37,
   "batches": [
     {
       "number": 1,
@@ -102,12 +68,14 @@
     {
       "number": 12,
       "games": ["magnet-marauder", "echo-hunter", "frost-forge"],
-      "status": "in_progress"
+      "status": "complete",
+      "alsoReleased": ["mimic-vault"]
     },
     {
       "number": 13,
       "games": ["mimic-vault", "orbit-gardener", "comet-catcher"],
-      "status": "queued"
+      "status": "in_progress",
+      "acceptedEarly": ["mimic-vault"]
     },
     {
       "number": 14,
@@ -220,7 +188,7 @@
     "startsAfterAllGamesDeveloped": true,
     "maxActiveGames": 3,
     "status": "pending",
-    "requiredGameCount": 100,
+    "requiredGameCount": 50,
     "passedGames": [],
     "records": []
   }

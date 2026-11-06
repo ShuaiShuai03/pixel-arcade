@@ -1,0 +1,13 @@
+✔ release contains thirty-six unique loadable games with bilingual instructions (22.803625ms)
+✔ magnet-marauder: seeded mixed input remains finite, draws and terminates at most once (26.267958ms)
+✔ frost-forge: seeded mixed input remains finite, draws and terminates at most once (61.828834ms)
+✔ echo-hunter: seeded mixed input remains finite, draws and terminates at most once (13.860666ms)
+✔ mimic-vault: seeded mixed input remains finite, draws and terminates at most once (9.2215ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 5
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 174.868125

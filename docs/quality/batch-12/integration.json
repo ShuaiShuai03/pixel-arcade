@@ -1,0 +1,41 @@
+{
+  "date": "2026-11-05",
+  "status": "complete",
+  "checks": {
+    "focused game tests with coverage": {
+      "command": "node --experimental-test-coverage (4 games) --test 8 test files",
+      "exitCode": 0,
+      "passed": 303,
+      "failed": 0,
+      "coverageLines": {
+        "magnet-marauder": 100.0,
+        "echo-hunter": 99.49,
+        "frost-forge": 99.67,
+        "mimic-vault": 99.68
+      },
+      "log": "coverage.txt"
+    },
+    "shared input, simulation and platform lifecycle": {
+      "command": "node --test tests/input.test.js tests/simulation.test.js tests/platform-lifecycle.test.js",
+      "exitCode": 0,
+      "passed": 28,
+      "failed": 0,
+      "log": "shared-tests.txt"
+    },
+    "scoped catalog tests": {
+      "command": "node --test --test-name-pattern='release contains|^(magnet|echo|frost|mimic)' tests/catalog.test.js",
+      "exitCode": 0,
+      "passed": 5,
+      "failed": 0,
+      "log": "catalog-tests.txt"
+    },
+    "static check": { "command": "npm run check", "exitCode": 0, "log": "static-check.txt" },
+    "format check": { "command": "npm run format:check", "exitCode": 0, "log": "format-check.txt" },
+    "build": { "command": "npm run build", "exitCode": 0, "log": "build.txt" },
+    "diff check": { "command": "git diff --check", "exitCode": 0 }
+  },
+  "catalog": "Four entries added; release assertion raised from 32 to 36 JavaScript games.",
+  "hostChanges": "env.progress.unlocked()/unlock(n) backed by a validated, never-decreasing per-game level preference (src/app.js, src/shared/platform.js recordLevel) with a lifecycle regression test; GAME-CONTRACT.md gains the level-based rule.",
+  "reviewStatus": "All four games independently approved on the recorded hashes; two minor chooser-status items remain open.",
+  "uncommittedExcluded": "Orbit Gardener and Comet Catcher (batch 13, in review) are not part of this release."
+}

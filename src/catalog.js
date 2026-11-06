@@ -31,5 +31,9 @@ export const catalog = [
   ['dash-duelist', 'Dash Duelist', '瞬步决斗', 'action', '1', '#d98a6a'],
   ['tether-twins', 'Tether Twins', '牵绳双子', 'action', '1-2', '#7fb7e6'],
   ['vine-warden', 'Vine Warden', '藤蔓守卫', 'action', '1', '#86c06c'],
+  ['magnet-marauder', 'Magnet Marauder', '磁力奇兵', 'action', '1', '#b8b0a4'],
+  ['frost-forge', 'Frost Forge', '霜火工坊', 'action', '1', '#9fd3e6'],
+  ['echo-hunter', 'Echo Hunter', '回声猎手', 'action', '1', '#5fc9b8'],
+  ['mimic-vault', 'Mimic Vault', '幻影宝库', 'puzzle', '1', '#c9b8e6'],
 ].map(([id, en, zh, genre, players, color]) => ({ id, name: { en, zh }, genre, players, color }));
 export const loadGame = (id) => import(`./games/${id}.js`);

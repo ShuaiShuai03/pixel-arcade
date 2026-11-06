@@ -1,6 +1,6 @@
 # Pixel Arcade
 
-A pixel-art island with **32 original browser games**, plus **Pixel Parkour**. Play free on a keyboard or touch screen, in English or Simplified Chinese.
+A pixel-art island with **36 original browser games**, plus **Pixel Parkour**. Play free on a keyboard or touch screen, in English or Simplified Chinese.
 
 **[Play Pixel Arcade](https://shuaishuai03.github.io/pixel-arcade/)**
 
@@ -34,7 +34,7 @@ No account, downloads, ads, analytics, or CDN dependencies. Personal bests and l
 
 The collection uses original code and artwork inspired by classic game mechanics. It does not include the assets or characters of commercial arcade games.
 
-The collection is being expanded and refined in batches of at most three games. Thirty-three games have passed initial acceptance; [batch 11](docs/quality/batch-11/ACCEPTANCE.md) adds Dash Duelist, Tether Twins, and Vine Warden. The [quality schedule](docs/quality/BATCHES.md) tracks the 100-game target and the required second independent review after development is complete.
+The collection is being expanded and refined in batches of at most three games. Thirty-seven games have passed initial acceptance; [batch 12](docs/quality/batch-12/ACCEPTANCE.md) adds Magnet Marauder, Echo Hunter, Frost Forge, and Mimic Vault. Level-based games have at least 20 levels. The [quality schedule](docs/quality/BATCHES.md) tracks the 50-game target and the required second independent review after development is complete.
 
 ## Controls
 

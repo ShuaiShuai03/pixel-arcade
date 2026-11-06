@@ -3,6 +3,7 @@ import { copy } from './i18n.js';
 import {
   readPreferences,
   savePreferences,
+  recordLevel,
   recordResult,
   filterGames,
   normalizeHash,
@@ -350,6 +351,14 @@ function newInstance(module) {
     t: translator.t,
     sound: (name) => audio.play(name),
     end: (result) => endRun({ ...result, message: translator.capture(result.message) }),
+    // Level-based games: highest unlocked level (1-based) and a way to raise it.
+    progress: {
+      unlocked: () => (preferences.levels || {})[module.meta.id] || 1,
+      unlock: (level) => {
+        preferences = recordLevel(preferences, module.meta.id, level);
+        persist();
+      },
+    },
   };
   return { module, meta: module.meta, env, game: module.createGame(env), result: null };
 }

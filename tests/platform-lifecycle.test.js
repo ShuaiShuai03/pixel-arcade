@@ -561,3 +561,15 @@ test('two-player games without a dedicated touch layout keep solo controls hidde
   await f.click('language-toggle');
   assert.equal(f.element('touch-controls').hidden, true);
 });
+
+test('level progress is validated, stored per game and never decreases', async () => {
+  const { readPreferences, recordLevel } = await import('../src/shared/platform.js');
+  const store = { v: JSON.stringify({ levels: { good: 4, 'Bad Id': 3, neg: 0, frac: 2.5 } }) };
+  const prefs = readPreferences({ getItem: () => store.v });
+  assert.deepEqual(prefs.levels, { good: 4 });
+  assert.equal(recordLevel(prefs, 'good', 3), prefs);
+  assert.equal(recordLevel(prefs, 'good', 5).levels.good, 5);
+  assert.equal(recordLevel(prefs, 'new-game', 2).levels['new-game'], 2);
+  assert.equal(recordLevel(prefs, 'good', 1000), prefs);
+  assert.equal(recordLevel(prefs, 'BAD', 2), prefs);
+});

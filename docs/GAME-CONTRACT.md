@@ -17,3 +17,7 @@ Shared optional helpers from `../shared/utils.js`: `clamp`, `rectsOverlap`, `dis
 Each owner writes `tests/<id>.test.js` using Node test/assert. Write meaningful tests BEFORE game implementation, run to see failure then implement: movement/board rules, collisions, scoring, win/loss, restart via new instance, seeded long simulation, draw smoke with proxy ctx from `tests/harness.js`. Target 80%+ coverage; do not settle for import-only tests. No console errors, NaN, unbounded arrays, immediate unavoidable deaths or unwinnable levels. Include sufficient game depth: designed progression, multiple levels or score escalation, feedback, clear objectives. Quality over code golf.
 
 Ownership: edit ONLY assigned game modules and tests unless explicitly delegated. Do not modify shared files, package.json, catalog, shell, build/deployment, or other games. Do not commit/push. Report tests and limitations to parent.
+
+## Level-based games
+
+A level-based game (rooms, stages, caverns, chambers, workshops, puzzles) must ship **at least 20 levels** with a gentle teaching curve. The host provides `env.progress.unlocked()` (highest unlocked level, 1-based, default 1) and `env.progress.unlock(n)` (raises it; never lowers). Use them to offer a level select or continue, so players never replay cleared levels after leaving. Keep level definitions data-driven, and give every level a scripted legal-solution test.
