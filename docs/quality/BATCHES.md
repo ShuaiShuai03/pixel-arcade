@@ -12,7 +12,7 @@ At the user's direction, at most **three games** may be under development and ac
 
 ## Completed batch 14
 
-Conveyor Chef and Firefly Trail passed initial development, independent review, and browser acceptance, bringing the accepted total to 41, Pixel Parkour included. Conveyor Chef has 22 shifts and Firefly Trail has 24 meadows, each with level select and saved progress. All 141 focused tests, 28 shared regressions and four scoped catalog checks pass. A prompt-following driver won all 22 Conveyor Chef shifts and played Firefly Trail through its final meadow to the win screen on the approved build. Both games were played to losses, and touch play was checked on phone layouts. The Snowball Siege rebuild and Rail Switch carry over to batch 15. See the [batch 14 evidence](batch-14/ACCEPTANCE.md).
+Conveyor Chef and Firefly Trail passed initial development, independent review, and browser acceptance, bringing the accepted total to 41, Pixel Parkour included. Conveyor Chef has 22 shifts and Firefly Trail has 24 meadows, each with level select and saved progress. All 141 focused tests, 28 shared regressions and four scoped catalog checks pass. A prompt-following driver won all 22 Conveyor Chef shifts and played Firefly Trail through its final meadow to the win screen on the approved build. Both games were played to losses, and touch play was checked on phone layouts. The Snowball Siege rebuild and Rail Switch carry over to batch 15. See the [batch 14 evidence](batch-14/ACCEPTANCE.md). Commit `2d1cba3` is live. All five checked assets match, and both published games accepted real input. See the [deployment receipt](batch-14/deployment.json).
 
 ## Completed batch 13
 

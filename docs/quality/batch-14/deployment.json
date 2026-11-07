@@ -1,0 +1,55 @@
+{
+  "date": "2026-11-07",
+  "commit": "2d1cba3",
+  "url": "https://shuaishuai03.github.io/pixel-arcade/",
+  "workflow": {
+    "runId": 42332394511,
+    "url": "https://github.com/ShuaiShuai03/pixel-arcade/actions/runs/42332394511",
+    "conclusion": "success",
+    "jobs": { "build": "success", "deploy": "success", "report-build-status": "success" },
+    "completedAt": "2026-11-07T03:11:57Z"
+  },
+  "assets": [
+    {
+      "path": "index.html",
+      "bytes": 9421,
+      "sha256": "b660ce3e50c66ade22d92971dc42aa72295778a8e411e91429d1b35a7e007768",
+      "matchesLocal": true
+    },
+    {
+      "path": "src/catalog.js",
+      "bytes": 3697,
+      "sha256": "df71e541307ebd6579f3ec39173ba60d708ae15f574ff38193fbb5e5e9f5a841",
+      "matchesLocal": true
+    },
+    {
+      "path": "src/app.js",
+      "bytes": 24072,
+      "sha256": "f968ec9582f04b3461d9cd81aba7286ecd0e449754acb14fbc3e86171b111d33",
+      "matchesLocal": true
+    },
+    {
+      "path": "src/games/conveyor-chef.js",
+      "bytes": 77272,
+      "sha256": "2299b80bd9965f1ad4d24446558142d400331bd1a1b90867a82678cb498766ed",
+      "matchesLocal": true,
+      "matchesApproved": true
+    },
+    {
+      "path": "src/games/firefly-trail.js",
+      "bytes": 58351,
+      "sha256": "a3ef2a8d1624906b848cda7a121b4bb75cbdcaeb14dcc093eb7e8ae59a440784",
+      "matchesLocal": true,
+      "matchesApproved": true
+    }
+  ],
+  "publishedInput": {
+    "method": "The user's Chrome through the official Claude in Chrome extension; Start was a real click, keys were synthetic in-page keydown/keyup events, and only the status line and canvas pixels were read.",
+    "observed": [
+      "Firefly Trail: Start opened meadow 1; Space changed the prompt to 'Arrows draw, Space closes, X cancels', and holding Right for 1.2 s changed 1673 canvas pixels as the lantern drew its trail.",
+      "Conveyor Chef: Start opened shift 1 of 22; Space away from a station answered 'Nothing in reach: stand next to a station.', and holding Left for 0.9 s changed 1140 canvas pixels as the chef moved."
+    ],
+    "screenshots": ["published-chef.png"]
+  },
+  "notes": "Assets were fetched with a cache-busting query string. The Snowball Siege rebuild remains unreleased; the published Snowball Siege is the batch 1 version."
+}
