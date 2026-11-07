@@ -10,7 +10,7 @@ At the user's direction, at most **three games** may be under development and ac
 | Stacksmith        | `owner-stack`        | to be assigned       | In development                                  |
 | Traffic Conductor | `owner-traffic`      | to be assigned       | In development                                  |
 
-The rebuilt Snowball Siege, an original one- or two-player snow platformer with 30 floors and three bosses, passed ten rounds of independent review and browser acceptance and replaces the batch 1 version. The accepted total stays at 43. See the [batch 16 Snowball Siege evidence](batch-16/ACCEPTANCE.md).
+The rebuilt Snowball Siege, an original one- or two-player snow platformer with 30 floors and three bosses, passed ten rounds of independent review and browser acceptance and replaces the batch 1 version. The accepted total stays at 43. See the [batch 16 Snowball Siege evidence](batch-16/ACCEPTANCE.md). Commit `2f579ee` is live; all four checked assets match, and the published game accepted real input. See the [deployment receipt](batch-16/deployment.json).
 
 ## Completed batch 15
 

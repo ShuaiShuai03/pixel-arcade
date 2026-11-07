@@ -1,0 +1,47 @@
+{
+  "date": "2026-11-07",
+  "commit": "2f579ee",
+  "url": "https://shuaishuai03.github.io/pixel-arcade/",
+  "workflow": {
+    "runId": 42351462342,
+    "url": "https://github.com/ShuaiShuai03/pixel-arcade/actions/runs/42351462342",
+    "conclusion": "success",
+    "jobs": { "build": "success", "deploy": "success", "report-build-status": "success" },
+    "completedAt": "2026-11-07T07:29:31Z"
+  },
+  "assets": [
+    {
+      "path": "index.html",
+      "bytes": 9421,
+      "sha256": "b660ce3e50c66ade22d92971dc42aa72295778a8e411e91429d1b35a7e007768",
+      "matchesCommit": true
+    },
+    {
+      "path": "src/catalog.js",
+      "bytes": 3848,
+      "sha256": "1ffbeae84ed3259706607a9efbbbbfe33dc45932e515b19907499303a92c2d00",
+      "matchesCommit": true
+    },
+    {
+      "path": "src/app.js",
+      "bytes": 24072,
+      "sha256": "f968ec9582f04b3461d9cd81aba7286ecd0e449754acb14fbc3e86171b111d33",
+      "matchesCommit": true
+    },
+    {
+      "path": "src/games/snowball-siege.js",
+      "bytes": 112264,
+      "sha256": "413d015b77e9713a4ae97a514e0ca1e15ac50dac35ddd2d0e49c209ead24a9c2",
+      "matchesCommit": true,
+      "matchesApproved": true
+    }
+  ],
+  "publishedInput": {
+    "method": "The user's Chrome through the official Claude in Chrome extension; Start was a real click, keys were synthetic in-page keydown/keyup events, and only the status line and canvas pixels were read.",
+    "observed": [
+      "Snowball Siege: Start opened floor 1 of 30 with the 1 player / 2 players choice shown; holding Left for 0.6 s moved the hero from x=228 to x=160 and the prompt advanced from 'Walk ← under the foe's plank' to 'W / Up / Space: jump up through planks'."
+    ],
+    "screenshots": ["published-snow.png"]
+  },
+  "notes": "Assets were fetched with a cache-busting query string and compared with the committed files."
+}
