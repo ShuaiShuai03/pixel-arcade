@@ -1,0 +1,66 @@
+{
+  "date": "2026-11-07",
+  "phase": "complete",
+  "finalCollectionReview": false,
+  "levelRule": "Level-based games need at least 20 authored levels with level select through env.progress.",
+  "records": [
+    {
+      "game": "traffic-conductor",
+      "owner": "owner-traffic",
+      "reviewer": "review-traffic",
+      "rounds": 4,
+      "verdict": "approved",
+      "approvedSha256": {
+        "src/games/traffic-conductor.js": "f02a8ca30e648d38e3f5fbf3c907a9bf0c24d50b10dd2c32324a05a67feef837",
+        "tests/traffic-conductor.test.js": "23426ac485e55e218e812e9bae5326ad11a1b592c6fb370579fab8b62aa14296",
+        "tests/traffic-conductor-quality.test.js": "31d47c4a45898eeec4a72cc307d56184c280b8850dc949fa17e4316a1808da3f"
+      },
+      "hashCheck": "The reviewer recorded the hashes at the start and the end of the final round; they were unchanged.",
+      "findings": [
+        {
+          "id": "traffic-signal-safety",
+          "severity": "high",
+          "status": "closed",
+          "observation": "Round 1 found opposing turns entering the junction in the same tick and overlapping, and pedestrians still crossing after their stage ended while vehicles got green. Round 2 found a committed slow bus entering on red after its phase changed. After the fixes, 2400 fuzzed follower runs with noise (120 seeds x 20 levels), 14 seeds x 20 levels of overlap checks and 160 runs at 30, 60 and 120 Hz with odd frame steps, keys and pointer showed no entry on red, no overlap, no pedestrian on green and no contradictory greens."
+        },
+        {
+          "id": "traffic-depth",
+          "severity": "high",
+          "status": "closed",
+          "observation": "In round 1 a tuned fixed-time plan that never reads the road beat 17 of 18 levels from level 3. Later rounds found crude policies clearing too often (Space once every 6 s won 40% on level 10, mashing 30% on level 17). Now 24 crude policies at n=40 clear at most 25% on every level from 3, idle and X spam never win, a tuned fixed plan clears 50% or more on only 3 of 18 levels and none of 14-20, longest-queue is at most 18% and longest-wait at most 48% (level 15)."
+        },
+        {
+          "id": "traffic-strike-rules",
+          "severity": "medium",
+          "status": "closed",
+          "observation": "Gridlock ended a shift without counting as a strike, and several strikes could land within a fraction of a second. Gridlock is now a strike, strikes have a cooldown, and every strike is explained on screen."
+        },
+        {
+          "id": "traffic-fairness",
+          "severity": "medium",
+          "status": "closed",
+          "observation": "A permissive left turner could wait about 19 s on green against steady oncoming traffic and block an ambulance, and a literal prompt follower at 0.5 s delay could lose to an ambulance. The longest left-turn stall is now about 10 s, a literal follower clears 2400 of 2400 runs at 0, 0.25 and 0.5 s delay, and a skilled no-prompt player wins at least 50% on every level from 3 to 20 at n=40 (levels 6 and 13 exactly 50%)."
+        },
+        {
+          "id": "traffic-frame-rate",
+          "severity": "medium",
+          "status": "closed",
+          "observation": "The prompt controller re-evaluated on a timer fed with frame time, so a level 8 schedule was cleared by the follower at 30 and 120 Hz but lost at 60 Hz. It now re-evaluates every 12 simulation steps; across 1200 runs at 30, 60 and 120 Hz delivered counts differ by at most 1, and load-time schedule validation covers all three rates."
+        },
+        {
+          "id": "traffic-hud-clamp",
+          "severity": "low",
+          "status": "closed",
+          "observation": "The delivered counter could read past the quota (21/20) during the shift-cleared banner; it is now clamped."
+        }
+      ],
+      "openNotes": [
+        "Random schedule draws fall back to the authored schedule on about 30% of loads on levels 8, 9 and 12.",
+        "The quality test file takes about 83 s on its own.",
+        "Four of 2400 follower runs took one prompt-led strike and still cleared; lag 0.25 is not among the load-time validator lags.",
+        "2 of 1200 frame-rate runs (levels 18 and 20) were not clean or disagreed by more than one vehicle.",
+        "The source is about 2720 lines, over the 800-line soft ceiling."
+      ]
+    }
+  ]
+}

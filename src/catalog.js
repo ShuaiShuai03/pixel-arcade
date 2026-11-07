@@ -42,6 +42,7 @@ export const catalog = [
   ['rail-switch', 'Rail Switch', '铁轨调度', 'arcade', '1', '#c98f5a'],
   ['tilt-lab', 'Tilt Lab', '倾斜实验室', 'arcade', '1', '#7fd3e6'],
   ['stacksmith', 'Stacksmith', '叠塔工匠', 'arcade', '1', '#d9a35b'],
+  ['traffic-conductor', 'Traffic Conductor', '路口指挥官', 'arcade', '1', '#5fae6e'],
 ].map(([id, en, zh, genre, players, color]) => ({ id, name: { en, zh }, genre, players, color }));
 export const loadGame = (id) => import(`./games/${id}.js`);
 

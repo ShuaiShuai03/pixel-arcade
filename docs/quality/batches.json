@@ -1,7 +1,7 @@
 {
   "maxActiveGames": 3,
-  "activeBatch": 16,
-  "acceptedGames": 44,
+  "activeBatch": 17,
+  "acceptedGames": 45,
   "batches": [
     {
       "number": 1,
@@ -97,14 +97,24 @@
     {
       "number": 16,
       "games": ["snowball-siege rebuild", "stacksmith", "traffic-conductor"],
-      "status": "in_progress",
-      "notes": "The Snowball Siege rebuild and Stacksmith were accepted and released ahead of Traffic Conductor; see batch-16/ACCEPTANCE.md and batch-16/stacksmith/ACCEPTANCE.md.",
-      "released": ["snowball-siege rebuild", "stacksmith"]
+      "status": "complete",
+      "notes": "The Snowball Siege rebuild and Stacksmith were released ahead of Traffic Conductor, which completed the batch.",
+      "released": ["snowball-siege rebuild", "stacksmith", "traffic-conductor"],
+      "acceptance": [
+        "batch-16/ACCEPTANCE.md",
+        "batch-16/stacksmith/ACCEPTANCE.md",
+        "batch-16/traffic-conductor/ACCEPTANCE.md"
+      ],
+      "deployment": [
+        "batch-16/deployment.json",
+        "batch-16/stacksmith/deployment.json",
+        "batch-16/traffic-conductor/deployment.json"
+      ]
     },
     {
       "number": 17,
       "games": ["mirror-lab", "circuit-weaver", "tide-lock"],
-      "status": "queued"
+      "status": "in_progress"
     },
     {
       "number": 18,

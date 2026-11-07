@@ -2,17 +2,21 @@
 
 At the user's direction, at most **three games** may be under development and acceptance testing at one time. Do not begin the next batch until all games in the active batch satisfy the gates below. The collection target is 50 games, including Pixel Parkour (reduced from 100 at the user's direction on 2026-11-05). Roster themes are not work assignments.
 
-## Active batch 16
+## Active batch 17
 
-| Game              | Implementation owner | Independent reviewer | Current state                                   |
-| ----------------- | -------------------- | -------------------- | ----------------------------------------------- |
-| Snowball Siege    | `owner-snow`         | `review-snow`        | Rebuild accepted and released (batch 16 record) |
-| Stacksmith        | `owner-stack`        | `review-stack`       | Accepted and released (batch 16 record)         |
-| Traffic Conductor | `owner-traffic`      | `review-traffic`     | Fixing review findings                          |
+| Game           | Implementation owner | Independent reviewer | Current state  |
+| -------------- | -------------------- | -------------------- | -------------- |
+| Mirror Lab     | `owner-mirror`       | `review-mirror`      | In development |
+| Circuit Weaver | `owner-circuit`      | `review-circuit`     | In development |
+| Tide Lock      | `owner-tide`         | `review-tide`        | In development |
 
-The rebuilt Snowball Siege, an original one- or two-player snow platformer with 30 floors and three bosses, passed ten rounds of independent review and browser acceptance and replaces the batch 1 version. The accepted total stays at 43. See the [batch 16 Snowball Siege evidence](batch-16/ACCEPTANCE.md). Commit `2f579ee` is live; all four checked assets match, and the published game accepted real input. See the [deployment receipt](batch-16/deployment.json).
+## Completed batch 16
+
+The rebuilt Snowball Siege, an original one- or two-player snow platformer with 30 floors and three bosses, passed ten rounds of independent review and browser acceptance and replaces the batch 1 version. See the [batch 16 Snowball Siege evidence](batch-16/ACCEPTANCE.md). Commit `2f579ee` is live; all four checked assets match, and the published game accepted real input. See the [deployment receipt](batch-16/deployment.json).
 
 Stacksmith, a harbour-crane stacking game with real balance physics and 22 jobs, passed five rounds of independent review and browser acceptance, bringing the accepted total to 44. See the [Stacksmith evidence](batch-16/stacksmith/ACCEPTANCE.md). Commit `4c07456` is live after a Pages redeploy; all four checked assets match, and the published game accepted real input. See the [deployment receipt](batch-16/stacksmith/deployment.json).
+
+Traffic Conductor, a signal-timing game with 20 shifts, ambulances, pedestrians and linked junctions, passed four rounds of independent review and browser acceptance, bringing the accepted total to 45. A prompt-following driver won all 20 shifts in English without a strike, a Chinese shift was played to a loss, and touch play was checked on a phone layout. See the [Traffic Conductor evidence](batch-16/traffic-conductor/ACCEPTANCE.md).
 
 ## Completed batch 15
 

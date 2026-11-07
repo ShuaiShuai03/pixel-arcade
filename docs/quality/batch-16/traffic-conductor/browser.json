@@ -1,0 +1,29 @@
+{
+  "date": "2026-11-07",
+  "browser": "The user's stable Google Chrome, driven through the official Claude in Chrome extension in its own tab-group window. Keys were synthetic in-page keydown/keyup events; touch buttons were pointer events on the real touch buttons; Start, language, shift tiles and Play again were real mouse clicks. Only visible DOM text and canvas pixels were read; no game state was read or injected.",
+  "status": "complete",
+  "stateInjection": false,
+  "phoneLayouts": "Checked in a same-origin 390-wide portrait frame on the page.",
+  "servedSourceCheck": "The SHA-256 of the served src/games/traffic-conductor.js was computed in the page and matched f02a8ca3.",
+  "games": [
+    {
+      "id": "traffic-conductor",
+      "sourceSha256": "f02a8ca30e648d38e3f5fbf3c907a9bf0c24d50b10dd2c32324a05a67feef837",
+      "levels": 20,
+      "observed": [
+        "A driver that reads only the status-line prompt played shifts 1 to 20 in English back to back in about 22 minutes and reached 'Nicely played! Every junction is running smoothly - well conducted!' (score 20784) without taking a strike, using 242 key presses including junction selection on the two-junction shifts.",
+        "Chinese shift select listed all 20 shifts after the win.",
+        "Chinese: idling on shift 3 first took a strike, then lost with the ambulance banner '救护车在东向道路等待超过 3 秒，本班结束！' and the end screen '第 3 班救护车被耽误，你被换下岗位。'; arrow, Space and X on the loss screen changed nothing.",
+        "Chinese phone frame, 371 px wide with no horizontal overflow: the touch arrows moved the shift cursor to shift 1, the 信号 button started it, and touch taps alone following the prompt cleared it (20/20, no strikes).",
+        "R during shift 2 in the phone frame returned to shift select; Play again on the loss screen also returned to shift select."
+      ],
+      "screenshots": [
+        "../screenshots/traffic-20-win-en.jpg",
+        "../screenshots/traffic-select-zh.jpg",
+        "../screenshots/traffic-loss-zh.jpg",
+        "../screenshots/traffic-phone-zh-touch.png"
+      ]
+    }
+  ],
+  "limitations": "Physical phones, other browsers, tapping junctions on the canvas and audio were not tested. Console output was not captured in this session."
+}
