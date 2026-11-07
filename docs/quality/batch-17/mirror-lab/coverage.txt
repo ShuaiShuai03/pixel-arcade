@@ -1,0 +1,100 @@
+✔ a literal prompt follower clears every room from the start at 30, 60 and 120 Hz in both languages (504.463958ms)
+✔ followers with fast (0.15-0.35 s) and slow (0.4-0.6 s) reactions clear every room from the start in every run (910.345584ms)
+✔ a follower clears every room from at least 10 random scrambles, with no livelock and never a lost room (747.267666ms)
+✔ a follower never loses a budget room, even after wasting turns, because the prompt asks for an undo (151.857917ms)
+✔ the prompt names its move, and the text, the arrow and the highlighted cell always agree (27.85425ms)
+✔ the prompt only changes when the player acts or a room changes, so it never flickers, and it fits the canvas (36.699292ms)
+✔ English and Chinese runs play out identically (26.41625ms)
+✔ idle never wins a room (4.67825ms)
+✔ from room 3 on, mashing, random keys, X and undo spam and rotate-everything sweeps each win at most a quarter of runs (17513.493458ms)
+ℹ mashSpaceFast      wins of 40 in rooms 3-22: 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+ℹ mashSpaceSlow      wins of 40 in rooms 3-22: 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+ℹ randomKeys         wins of 40 in rooms 3-22: 1 3 2 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+ℹ quickRandom        wins of 40 in rooms 3-22: 9 10 9 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+ℹ xAndUndo           wins of 40 in rooms 3-22: 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+ℹ rotateAllRows      wins of 40 in rooms 3-22: 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+ℹ rotateAllColumns   wins of 40 in rooms 3-22: 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+ℹ rotateAllBackwards wins of 40 in rooms 3-22: 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+✔ the blind "turn whichever mirror lights more sensors" heuristic beats at most half the rooms and none of the last third (240.090834ms)
+ℹ firstGain beat rooms: 1
+ℹ firstGainSafe beat rooms: 1
+ℹ bestGain beat rooms: 1
+ℹ bestGainSafe beat rooms: 1
+✔ the optimal turn counts form a difficulty curve with no room needing fewer than the first (0.154875ms)
+ℹ optimal turns per room: 1 2 2 2 2 4 4 4 5 5 5 6 6 5 6 6 6 7 8 8 9 10
+ℹ ordered rooms 6, budget rooms 8
+✔ a batch-literal follower (press the arrow exactly N times, then re-read) clears every room, from the start and from scrambles (62.958666ms)
+✔ rooms 1 to 5 are the recorded tutorials; from room 6 on every room has at least 9 switches, all of them live (0.098584ms)
+✔ the informed random turner (random real switch, walk, turn, look for a second) wins at most 10 of 40 on every room from room 6 (5884.530208ms)
+ℹ informed random turner, rooms 6-22, wins of 40: 5 4 3 3 0 0 0 0 4 0 0 0 0 0 0 0 0
+✔ the beam-aware hill climber beats at most half the rooms and none of rooms 16 to 22 (2078.033417ms)
+ℹ beam-aware hill climber wins of 40 per room: 40 40 40 40 40 1 7 0 7 1 3 9 4 3 2 0 0 0 0 0 0 0
+✔ touch targets stay large on a 390 px wide phone and every action has a touch route (0.228792ms)
+✔ a phone player can finish a room with taps alone: tap to select, tap again to turn (0.93425ms)
+✔ meta describes the game in both languages with working touch controls (0.636375ms)
+✔ there are at least 20 rooms, each within the bench size, bilingual and with the recorded optimum (40.818625ms)
+✔ the rooms teach distinct ideas: ordered sensors, crystals, shutters, splitters, locks, decoys and budgets (0.43975ms)
+✔ the difficulty curve rises: later thirds need more turns than earlier thirds (0.088333ms)
+✔ the reflection table is right for every mirror type and every incoming direction (0.048917ms)
+✔ a beam bends exactly as the mirror orientation says, from all four directions (0.284708ms)
+✔ walls, the emitter, closed shutters and the bench edge stop the beam (0.08875ms)
+✔ a sensor behind a wall can never register, in any setting of the bench (0.069916ms)
+✔ a sensor passes the beam on, so one beam can light a whole row of them (0.46125ms)
+✔ a crystal absorbs the beam, counts as lit and spoils the room (0.074708ms)
+✔ a splitter passes the beam on and reflects a second one (0.098583ms)
+✔ tracing terminates on loops and reports them (7.193125ms)
+✔ ordered sensors register only for a beam that has already passed the lower numbers (0.196042ms)
+✔ rowsAt shows the current setting of every mirror, splitter and shutter (0.129417ms)
+✔ parseRoom rejects malformed rooms (0.355125ms)
+✔ every room is solvable and a scripted shortest solution clears it in the game (9.9615ms)
+✔ solution paths satisfy an independent replay of the board at every step (0.236709ms)
+✔ advise names a nearest useful switch and recovers after a wrong turn (0.088666ms)
+✔ the prompt line, its arrow and the highlighted cell agree in both languages (0.23225ms)
+✔ the hint recovers after undo and after a restart (0.256458ms)
+✔ arrows and WASD move the cursor one cell, clamp at the edges and ignore ambiguous presses (0.162375ms)
+✔ Space turns the mirror under the cursor, X flips only shutters, locked and empty cells refuse (0.345625ms)
+✔ tapping a cell selects it and tapping it again turns it (0.128917ms)
+✔ undo restores the exact previous state and an empty history reports it (0.179625ms)
+✔ Q restarts the room, keeps the score and counts the restart (0.093625ms)
+✔ invalid, zero or negative time never reads input, never moves the beam and never ends the game (0.096917ms)
+✔ getState returns copies that cannot change the game (0.09525ms)
+✔ a cleared room waits for the beam to settle, banks its score and moves on by itself or on Space (0.343583ms)
+✔ extra turns cost score and the score never goes below the floor (0.201583ms)
+✔ running out of turns in a budget room is a loss that freezes the game (0.40075ms)
+✔ the last turn of a budget may still win the room (0.397167ms)
+✔ clearing the last room wins the game once with the full score and then freezes (0.681208ms)
+✔ a full run from room 1 reaches the win with a perfect score (7.228333ms)
+✔ room select opens when progress is saved and starts the chosen room (0.217375ms)
+✔ room select by tap: the first tap selects, the second starts, locked rooms and gaps are ignored (0.169542ms)
+✔ progress is read safely: no store, junk values and a throwing store all start at room 1 (0.363458ms)
+✔ clearing a room unlocks the next one but never beyond the last (0.611084ms)
+✔ the same timed key schedule gives the identical result at 30, 60 and 120 Hz (2.761292ms)
+✔ uneven frame times keep the game finite and bounded (6.859041ms)
+✔ the undo history and turn counter stay bounded however long a player mashes (9.075ms)
+✔ every room draws in both languages and every state without errors (122.221834ms)
+✔ menu, clear, loss and win screens draw in both languages (1.975458ms)
+✔ crystals flash and sensors spark while the beam plays; sparks stay bounded (6.800584ms)
+✔ the prompt number is the length of the first leg along its arrow, from every cell of every room (1.001083ms)
+✔ the rooms are deeply frozen and their records carry only what the game uses (0.088209ms)
+✔ a saved progress of Infinity or a huge number opens room select at the last room (0.131916ms)
+✔ the status line counts only the sensors the beam has reached on screen (0.138125ms)
+ℹ tests 64
+ℹ suites 0
+ℹ pass 64
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 28241.55075
+ℹ start of coverage report
+ℹ ----------------------------------------------------------------------
+ℹ file                  | line % | branch % | funcs % | uncovered lines
+ℹ ----------------------------------------------------------------------
+ℹ src                   |        |          |         | 
+ℹ  games                |        |          |         | 
+ℹ   mirror-lab-rooms.js | 100.00 |   100.00 |  100.00 | 
+ℹ   mirror-lab.js       | 100.00 |    99.56 |  100.00 | 
+ℹ ----------------------------------------------------------------------
+ℹ all files             | 100.00 |    99.56 |  100.00 | 
+ℹ ----------------------------------------------------------------------
+ℹ end of coverage report

@@ -4,11 +4,13 @@ At the user's direction, at most **three games** may be under development and ac
 
 ## Active batch 17
 
-| Game           | Implementation owner | Independent reviewer | Current state  |
-| -------------- | -------------------- | -------------------- | -------------- |
-| Mirror Lab     | `owner-mirror`       | `review-mirror`      | In development |
-| Circuit Weaver | `owner-circuit`      | `review-circuit`     | In development |
-| Tide Lock      | `owner-tide`         | `review-tide`        | In development |
+| Game           | Implementation owner | Independent reviewer | Current state                           |
+| -------------- | -------------------- | -------------------- | --------------------------------------- |
+| Mirror Lab     | `owner-mirror`       | `review-mirror`      | Accepted and released (batch 17 record) |
+| Circuit Weaver | `owner-circuit`      | `review-circuit`     | Fixing review findings                  |
+| Tide Lock      | `owner-tide`         | `review-tide`        | In development                          |
+
+Mirror Lab, a laser-and-mirror puzzle with 22 rooms, passed two rounds of independent review and browser acceptance, bringing the accepted total to 46. A prompt-following driver solved all 22 rooms in Chinese at the optimal score, a budget room was played to a loss in English, and touch play was checked on a phone layout. See the [Mirror Lab evidence](batch-17/mirror-lab/ACCEPTANCE.md).
 
 ## Completed batch 16
 

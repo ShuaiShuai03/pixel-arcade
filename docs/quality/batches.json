@@ -1,7 +1,7 @@
 {
   "maxActiveGames": 3,
   "activeBatch": 17,
-  "acceptedGames": 45,
+  "acceptedGames": 46,
   "batches": [
     {
       "number": 1,
@@ -114,7 +114,9 @@
     {
       "number": 17,
       "games": ["mirror-lab", "circuit-weaver", "tide-lock"],
-      "status": "in_progress"
+      "status": "in_progress",
+      "notes": "Mirror Lab was accepted and released ahead of Circuit Weaver and Tide Lock; see batch-17/mirror-lab/ACCEPTANCE.md.",
+      "released": ["mirror-lab"]
     },
     {
       "number": 18,

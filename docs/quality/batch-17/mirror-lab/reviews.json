@@ -1,0 +1,54 @@
+{
+  "date": "2026-11-07",
+  "phase": "complete",
+  "finalCollectionReview": false,
+  "levelRule": "Level-based games need at least 20 authored levels with level select through env.progress.",
+  "records": [
+    {
+      "game": "mirror-lab",
+      "owner": "owner-mirror",
+      "reviewer": "review-mirror",
+      "rounds": 2,
+      "verdict": "approved",
+      "approvedSha256": {
+        "src/games/mirror-lab.js": "f3999576e342afd0fb3cd80ac7eee04d42a4db6048a104be3e94c16ba1bb7427",
+        "src/games/mirror-lab-rooms.js": "2f5819686e2e2c7ceaf81480524e0bb2461288fb3320fbe8bbbf963a7baa7bd9",
+        "tests/mirror-lab.test.js": "d326e352b6d7e153a76eafbfe489cef7d27e8695fc7a96be1bf9ae58c0e10cbc",
+        "tests/mirror-lab-quality.test.js": "f0a40dce5315cdd73c67f747f4694d6a2609382fca52fb8d7715405b18cb5944"
+      },
+      "hashCheck": "The reviewer recorded the hashes at the start and the end of each round; they were unchanged.",
+      "findings": [
+        {
+          "id": "mirror-prompt-steps",
+          "severity": "high",
+          "status": "closed",
+          "observation": "The move prompt gave the Manhattan distance to the target while the arrow named only one leg, so a follower pressing the arrow exactly N times overshot and stalled on 16 of 22 rooms. The number is now the length of the leg along the arrow; a batch-literal follower clears every room."
+        },
+        {
+          "id": "mirror-depth",
+          "severity": "high",
+          "status": "closed",
+          "observation": "Rooms had 2 to 12 switches, several inert, and an informed random turner won 16 to 40 of 40 on most rooms 3-15. Rooms 6-22 were rebuilt with 9-12 live switches and exactly one solved setting each, with budgets of optimal +1 or +2 on eight rooms. Informed random now wins at most 5 of 40 from room 6, a beam-aware greedy at most 12 of 60 at 300 s and none of rooms 16-22, and random walk with undo at most 10 of 40 at 300 s. Rooms 1-5 are recorded tutorials."
+        },
+        {
+          "id": "mirror-beam-greedy",
+          "severity": "medium",
+          "status": "closed",
+          "observation": "A greedy that steers the beam toward the next unlit sensor beat rooms 1-10 almost always; after the redesign it is at most 20% on rooms 6-22 at 300 s and 0 on 16-22."
+        },
+        {
+          "id": "mirror-low-items",
+          "severity": "low",
+          "status": "closed",
+          "observation": "The status line now counts the animated lit sensors, Infinity progress clamps to 22, dead fields and parameters were removed, room data is deep-frozen and moved to its own module."
+        }
+      ],
+      "openNotes": [
+        "Rooms 1-5 are tutorials and are brute-forceable in seconds; the step from 2 turns (room 5) to 4 turns (room 6) is steep.",
+        "Undo refunds turns; budgets still hold because a random walk with undo rarely reaches the single solved setting (room 9 is 10 of 40 at 300 s, exactly the bar, and is not a budget room).",
+        "Room 14 needs 5 turns after room 13's 6.",
+        "The main module is 957 lines, over the 800-line soft ceiling, plus 279 lines of room data."
+      ]
+    }
+  ]
+}

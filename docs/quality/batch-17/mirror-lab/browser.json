@@ -1,0 +1,31 @@
+{
+  "date": "2026-11-07",
+  "browser": "The user's stable Google Chrome, driven through the official Claude in Chrome extension in its own tab-group window. Keys were synthetic in-page keydown/keyup events; touch buttons were pointer events on the real touch buttons; Start, language, room tiles and Play again were real mouse clicks. Only visible DOM text and canvas pixels were read; no game state was read or injected.",
+  "status": "complete",
+  "stateInjection": false,
+  "phoneLayouts": "Checked in a same-origin 390-wide portrait frame on the page.",
+  "servedSourceCheck": "The SHA-256 of the served src/games/mirror-lab.js and src/games/mirror-lab-rooms.js were computed in the page and matched f3999576 and 2f581968.",
+  "games": [
+    {
+      "id": "mirror-lab",
+      "sourceSha256": {
+        "src/games/mirror-lab.js": "f3999576e342afd0fb3cd80ac7eee04d42a4db6048a104be3e94c16ba1bb7427",
+        "src/games/mirror-lab-rooms.js": "2f5819686e2e2c7ceaf81480524e0bb2461288fb3320fbe8bbbf963a7baa7bd9"
+      },
+      "levels": 22,
+      "observed": [
+        "A driver that reads only the status-line prompt, with a 0.25 s reaction delay and pressing each named arrow exactly the stated number of times, played rooms 1 to 22 in Chinese back to back in under 4 minutes and reached '完成得漂亮！全部房间通关，实验台归你了！' with the maximum score of 2200, so every room was solved in its optimal number of turns.",
+        "English room select listed all 22 rooms after the win.",
+        "English: on budget room 13 (7 turns) a wrong turn immediately changed the prompt to 'Too few moves left: press Z to undo'; spending all 7 turns ended the run with 'Out of turns in room 13. Try it again.'; arrows, Space, Z and Q on the loss screen changed nothing. Play again returned to room select.",
+        "English phone frame, 371 px wide with no horizontal overflow: the touch arrows and Turn button selected room 1, and touch taps alone following the prompt cleared rooms 1 to 3. On room 4 the Undo touch button reverted a turn (Turns 1 to 0) and Reset restored the room."
+      ],
+      "screenshots": [
+        "../screenshots/mirror-22-win-zh.jpg",
+        "../screenshots/mirror-select-en.jpg",
+        "../screenshots/mirror-loss-en.jpg",
+        "../screenshots/mirror-phone-en-touch.png"
+      ]
+    }
+  ],
+  "limitations": "Physical phones, other browsers, tapping cells on the canvas, the shutter key by hand and audio were not tested; console output was not captured."
+}
