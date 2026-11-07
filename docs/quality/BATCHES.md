@@ -16,7 +16,7 @@ The rebuilt Snowball Siege, an original one- or two-player snow platformer with 
 
 Stacksmith, a harbour-crane stacking game with real balance physics and 22 jobs, passed five rounds of independent review and browser acceptance, bringing the accepted total to 44. See the [Stacksmith evidence](batch-16/stacksmith/ACCEPTANCE.md). Commit `4c07456` is live after a Pages redeploy; all four checked assets match, and the published game accepted real input. See the [deployment receipt](batch-16/stacksmith/deployment.json).
 
-Traffic Conductor, a signal-timing game with 20 shifts, ambulances, pedestrians and linked junctions, passed four rounds of independent review and browser acceptance, bringing the accepted total to 45. A prompt-following driver won all 20 shifts in English without a strike, a Chinese shift was played to a loss, and touch play was checked on a phone layout. See the [Traffic Conductor evidence](batch-16/traffic-conductor/ACCEPTANCE.md).
+Traffic Conductor, a signal-timing game with 20 shifts, ambulances, pedestrians and linked junctions, passed four rounds of independent review and browser acceptance, bringing the accepted total to 45. A prompt-following driver won all 20 shifts in English without a strike, a Chinese shift was played to a loss, and touch play was checked on a phone layout. See the [Traffic Conductor evidence](batch-16/traffic-conductor/ACCEPTANCE.md). Commit `f907662` is live; all four checked assets match, and the published game accepted real input. See the [deployment receipt](batch-16/traffic-conductor/deployment.json).
 
 ## Completed batch 15
 

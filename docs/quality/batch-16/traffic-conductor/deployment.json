@@ -1,0 +1,47 @@
+{
+  "date": "2026-11-07",
+  "commit": "f907662",
+  "url": "https://shuaishuai03.github.io/pixel-arcade/",
+  "workflow": {
+    "runId": 42384785682,
+    "url": "https://github.com/ShuaiShuai03/pixel-arcade/actions/runs/42384785682",
+    "conclusion": "success",
+    "jobs": { "build": "success", "deploy": "success", "report-build-status": "success" },
+    "completedAt": "2026-11-07T15:07:24Z"
+  },
+  "assets": [
+    {
+      "path": "index.html",
+      "bytes": 9421,
+      "sha256": "b660ce3e50c66ade22d92971dc42aa72295778a8e411e91429d1b35a7e007768",
+      "matchesCommit": true
+    },
+    {
+      "path": "src/catalog.js",
+      "bytes": 4013,
+      "sha256": "60a3d5fbb91e828170db554fe8ec714ee29a28c0b7584fe4436ec8188d3554ae",
+      "matchesCommit": true
+    },
+    {
+      "path": "src/app.js",
+      "bytes": 24072,
+      "sha256": "f968ec9582f04b3461d9cd81aba7286ecd0e449754acb14fbc3e86171b111d33",
+      "matchesCommit": true
+    },
+    {
+      "path": "src/games/traffic-conductor.js",
+      "bytes": 82500,
+      "sha256": "f02a8ca30e648d38e3f5fbf3c907a9bf0c24d50b10dd2c32324a05a67feef837",
+      "matchesCommit": true,
+      "matchesApproved": true
+    }
+  ],
+  "publishedInput": {
+    "method": "The user's Chrome through the official Claude in Chrome extension; Start was a real click, keys were synthetic in-page keydown/keyup events, and only the status line and canvas pixels were read.",
+    "observed": [
+      "Traffic Conductor: Start opened shift 1 of 20; when the prompt read 'Press Space: let the east-west queue go', one Space press changed it to 'The signal is changing - wait for the green' and the canvas showed the north-south signal leaving green."
+    ],
+    "screenshots": ["../screenshots/published-traffic.jpg"]
+  },
+  "notes": "Assets were fetched with a cache-busting query string and compared with the committed files."
+}
