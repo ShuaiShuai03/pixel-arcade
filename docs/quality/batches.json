@@ -1,7 +1,7 @@
 {
   "maxActiveGames": 3,
   "activeBatch": 16,
-  "acceptedGames": 43,
+  "acceptedGames": 44,
   "batches": [
     {
       "number": 1,
@@ -98,8 +98,8 @@
       "number": 16,
       "games": ["snowball-siege rebuild", "stacksmith", "traffic-conductor"],
       "status": "in_progress",
-      "notes": "The Snowball Siege rebuild was accepted and released first; see batch-16/ACCEPTANCE.md. Stacksmith and Traffic Conductor are in development.",
-      "released": ["snowball-siege rebuild"]
+      "notes": "The Snowball Siege rebuild and Stacksmith were accepted and released ahead of Traffic Conductor; see batch-16/ACCEPTANCE.md and batch-16/stacksmith/ACCEPTANCE.md.",
+      "released": ["snowball-siege rebuild", "stacksmith"]
     },
     {
       "number": 17,

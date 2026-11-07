@@ -1,0 +1,57 @@
+{
+  "date": "2026-11-07",
+  "phase": "complete",
+  "finalCollectionReview": false,
+  "records": [
+    {
+      "game": "stacksmith",
+      "owner": "owner-stack",
+      "reviewer": "review-stack",
+      "rounds": 5,
+      "verdict": "approved",
+      "approvedSha256": {
+        "src/games/stacksmith.js": "4a8dc2b0699a0c7f38d01cf8a0d806ebcb5ea92a6653e0603edeaca87cbcaf06",
+        "tests/stacksmith.test.js": "24a6434b9c42c142c35cb04c780b4a06ded1fc58c5516ffaceb29a16b8e8d721",
+        "tests/stacksmith-quality.test.js": "3955dd74cf6f868f74a6490068d7b874d4006ae6b593a447a4c445774e8503ad"
+      },
+      "findings": [
+        {
+          "id": "stack-depth-silhouette",
+          "severity": "high",
+          "status": "closed",
+          "observation": "A no-prompt policy that reads the drawn silhouette and drops on calm won 17 of 22 levels. Goals are now kind-specific with pictured loads and mass labels, queues are scrambled with swap allowances, two late levels contain real order traps, sea sway and wind make late drops a timing task, and the landing aid shows on windy and rocking jobs only in the drop state. A kind-matching reader now wins 10 levels at 50% or more and 1 of levels 15-22."
+        },
+        {
+          "id": "stack-false-collapse",
+          "severity": "medium",
+          "status": "closed",
+          "observation": "'The tower fell' showed when material merely ran out; a separate 'Not enough material left' reason and text now cover that case."
+        },
+        {
+          "id": "stack-goal-alpha",
+          "severity": "medium",
+          "status": "closed",
+          "observation": "Goal pictures, the target ghost and the mass labels were drawn fully opaque or nearly invisible because drawLoad reset globalAlpha; they now draw at 0.22, 0.35 and 0.9 with draw tests."
+        },
+        {
+          "id": "stack-l19-lost-tries",
+          "severity": "high",
+          "status": "closed",
+          "observation": "A literal follower lost tries on level 19 depending on the start phase. The drop prompt now waits until the trolley has stopped for 0.7 s and a swing forecast keeps the landing on the mark for 0.6 s ahead; random-start followers lose no tries on any level at 0, 0.25 or 0.5 s lag."
+        },
+        {
+          "id": "stack-hidden-goal",
+          "severity": "medium",
+          "status": "closed",
+          "observation": "A required weight on level 21 had no goal picture; every plan step now has a visible goal, asserted for all 22 levels."
+        }
+      ],
+      "openNotes": [
+        "On sea levels the drop prompt is available for about 0.6-0.7 s roughly every 3.2 s, so careful play can take up to about 15 s per load.",
+        "A kind-matching reader that also trusts the drop-state landing aid wins 17 levels; the bar applies to plain reading.",
+        "Sleep can hold a block within about 0.5 px of its tipping point.",
+        "The source is about 2280 lines, over the 800-line soft ceiling; generated level data accounts for much of it."
+      ]
+    }
+  ]
+}

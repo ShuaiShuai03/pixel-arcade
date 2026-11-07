@@ -1,0 +1,36 @@
+✔ keys distinguish held and one-frame press even on repeat (0.402458ms)
+✔ touch and keyboard ownership cannot release each other (0.069458ms)
+✔ clearing input on blur releases pointer and presses (0.061083ms)
+✔ an accessible button pulse lasts one physics step without releasing a held key (0.061209ms)
+✔ keyboard and button restart retain best and create fresh games (2.304542ms)
+✔ finished result follows language changes without losing score (1.298875ms)
+✔ pause updates HUD immediately and resume preserves the run (0.414167ms)
+✔ blur releases held keys and long frames are capped (0.383875ms)
+✔ late module resolution cannot overwrite a newer route (0.275042ms)
+✔ a press survives a frame without a physics tick and fires only once during catch-up (0.521333ms)
+✔ language changes release controls whose touch buttons are replaced (0.212167ms)
+✔ the shelf loads only visible previews and navigation shares their in-flight load (0.704416ms)
+✔ a failed preview load can be retried by opening the game (2.073667ms)
+✔ secondary touches cannot steer or release the active canvas gesture (0.347459ms)
+✔ right click does not fire a canvas action (0.144541ms)
+✔ unsupported fullscreen expands the player and Escape restores its normal layout (0.68225ms)
+✔ denied fullscreen falls back and navigation restores the page (0.164625ms)
+✔ fullscreen returns keyboard focus to an active game when entering and leaving (0.115584ms)
+✔ opposite touch groups retain independent pointer ownership (0.183167ms)
+✔ keyboard activation of a touch control produces one deliberate action (0.101833ms)
+✔ opted-in two-player touch controls replace solo buttons and keep independent input (0.201542ms)
+✔ two-player games without a dedicated touch layout keep solo controls hidden (0.54575ms)
+✔ level progress is validated, stored per game and never decreases (0.251417ms)
+✔ simulation advances equally on 30, 60, 120 and 144 Hz displays (0.881ms)
+✔ a long stall has a bounded catch-up and never produces a large physics step (0.082416ms)
+✔ reset discards time from the previous run or pause (0.055667ms)
+✔ ending a game stops catch-up immediately and discards remaining time (0.070875ms)
+✔ invalid elapsed values cannot poison subsequent updates (0.064583ms)
+ℹ tests 28
+ℹ suites 0
+ℹ pass 28
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 57.124542

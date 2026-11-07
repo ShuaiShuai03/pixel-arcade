@@ -1,0 +1,3 @@
+npm notice run pixel-arcade@1.0.0 build
+npm notice run node tools/build.mjs
+Static site built in dist/

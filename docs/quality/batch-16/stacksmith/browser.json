@@ -1,0 +1,31 @@
+{
+  "date": "2026-11-07",
+  "browser": "The user's stable Google Chrome, driven through the official Claude in Chrome extension in its own tab-group window. Held keys were synthetic in-page keydown/keyup events; touch buttons were pointer events on the real touch buttons; Start, language, Play again and Resume were real mouse clicks. Only visible DOM text and canvas pixels were read; no game state was read or injected.",
+  "status": "complete",
+  "stateInjection": false,
+  "phoneLayouts": "Checked in a same-origin 390-wide portrait frame on the page.",
+  "servedSourceCheck": "The SHA-256 of the served src/games/stacksmith.js was computed in the page and matched 4a8dc2b0.",
+  "games": [
+    {
+      "id": "stacksmith",
+      "sourceSha256": "4a8dc2b0699a0c7f38d01cf8a0d806ebcb5ea92a6653e0603edeaca87cbcaf06",
+      "levels": 22,
+      "observed": [
+        "A driver that reads only the status-line prompt played jobs 1 to 22 in English back to back and reached 'Nicely played! Every job is built. The harbour is proud of you!' without losing a try, swapping loads six times on the order-trap jobs. The slowest job (16, Windy Wall) took about 64 s.",
+        "Chinese job select listed all 22 job names.",
+        "Chinese: blind drops on job 3 first lost a try with '吊载不够了，再试一次', then ran out of tries with '机会用完了，塔没有立住，再试一次！'; arrow, Space and X on the loss screen changed nothing.",
+        "Chinese phone frame, 371 px wide with no horizontal overflow: touch buttons 左移 右移 放下 换载 alone selected job 1 and cleared it.",
+        "Job 21: the faint goal pictures carry readable 21t, 16t and 4t labels; the 21t label slightly overlaps the edge of the narrow weight outline but stays legible.",
+        "No console errors apart from the known synthetic-pointer capture exceptions."
+      ],
+      "screenshots": [
+        "../screenshots/stack-22-win-en.png",
+        "../screenshots/stack-select-zh.png",
+        "../screenshots/stack-loss-zh.png",
+        "../screenshots/stack-phone-zh-touch.png",
+        "../screenshots/stack-21-labels.png"
+      ]
+    }
+  ],
+  "limitations": "Physical phones, other browsers and audio were not tested."
+}

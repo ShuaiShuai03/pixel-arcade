@@ -1,0 +1,43 @@
+{
+  "date": "2026-11-07",
+  "status": "complete",
+  "workspace": "Checks ran in a clean detached worktree of HEAD 5be5337 plus exactly the Stacksmith files and its catalog entry.",
+  "checks": {
+    "focused game tests with coverage": {
+      "command": "node --experimental-test-coverage --test-coverage-include='src/games/stacksmith.js' --test 2 test files",
+      "exitCode": 0,
+      "passed": 72,
+      "failed": 0,
+      "coverageLines": { "stacksmith": 99.65 },
+      "coverageBranches": { "stacksmith": 97.33 },
+      "log": "coverage.txt"
+    },
+    "shared input, simulation and platform lifecycle": {
+      "command": "node --test tests/input.test.js tests/simulation.test.js tests/platform-lifecycle.test.js",
+      "exitCode": 0,
+      "passed": 28,
+      "failed": 0,
+      "log": "shared-tests.txt"
+    },
+    "scoped catalog tests": {
+      "command": "node --test --test-name-pattern='release contains|Pixel Parkour|^stacksmith' tests/catalog.test.js",
+      "exitCode": 0,
+      "passed": 3,
+      "failed": 0,
+      "log": "catalog-tests.txt"
+    },
+    "full catalog tests": {
+      "command": "node --test tests/catalog.test.js",
+      "exitCode": 0,
+      "passed": 45,
+      "failed": 0
+    },
+    "static check": { "command": "npm run check", "exitCode": 0, "log": "static-check.txt" },
+    "format check": { "command": "npm run format:check", "exitCode": 0, "log": "format-check.txt" },
+    "build": { "command": "npm run build", "exitCode": 0, "log": "build.txt" },
+    "diff check": { "command": "git diff --check", "exitCode": 0 }
+  },
+  "catalog": "One entry added (Stacksmith, 1 player); the release assertion rises from 42 to 43 JavaScript games.",
+  "hostChanges": "None.",
+  "uncommittedExcluded": "Traffic Conductor (in review) and a stray untracked greedy.mjs in the repository root are not part of this release."
+}
