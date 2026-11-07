@@ -1,0 +1,59 @@
+{
+  "date": "2026-11-07",
+  "phase": "complete",
+  "finalCollectionReview": false,
+  "levelRule": "Level-based games need at least 20 authored levels with level select through env.progress.",
+  "records": [
+    {
+      "game": "snowball-siege",
+      "kind": "rebuild of an accepted batch 1 game",
+      "owner": "owner-snow",
+      "reviewer": "review-snow",
+      "rounds": 10,
+      "verdict": "approved",
+      "approvedSha256": {
+        "src/games/snowball-siege.js": "413d015b77e9713a4ae97a514e0ca1e15ac50dac35ddd2d0e49c209ead24a9c2",
+        "tests/snowball-siege.test.js": "ceb9e0019a8d5e20340c2fe33556cfec49d5e13f36302f385144ed9a64f66ce9",
+        "tests/snowball-siege-quality.test.js": "f88ae007f2603a278bd3149431e766f4ee3eff9f90efed341353ec227c384acd"
+      },
+      "findings": [
+        {
+          "id": "snow-physics",
+          "status": "closed",
+          "observation": "Collisions, jumps, one-way planks, rolling snowballs and boss hitboxes were rebuilt and audited; nine first-round physics and rules findings closed in round 2."
+        },
+        {
+          "id": "snow-prompt-livelocks",
+          "severity": "medium",
+          "status": "closed",
+          "observation": "Several rounds found prompts that cycled without progress or led into damage (same-height planks, walls, unreachable planks, waiting for foes that never move, flip-flops at slower reaction times). After round 9, a literal prompt follower that dodges when told to clears every non-boss floor at least 18 of 20 times at 0 and 0.25 s reaction delay, within the lives-lost bars."
+        },
+        {
+          "id": "snow-imp-fire",
+          "severity": "medium",
+          "status": "closed",
+          "observation": "Browser acceptance found that floor 9 could not be cleared by following prompts: the imp warning named no action. A directional dodge prompt now aims away from where the ember will land, and snowing an imp cancels its windup."
+        },
+        {
+          "id": "snow-depth",
+          "severity": "medium",
+          "status": "closed",
+          "observation": "A blind pulsing bot cleared floor 6 in 56 of 100 runs; floors 6 and 7 were reworked. Crude bots now clear at most 15% at n=40 on the sampled floors; floor 9 pulse is 29 of 100 and floor 17 pulse 19 of 100."
+        },
+        {
+          "id": "snow-imp-cancel-test",
+          "severity": "low",
+          "status": "closed",
+          "observation": "The imp-cancel test now fails if the snowed-imp start guard or the stun window is removed."
+        }
+      ],
+      "openNotes": [
+        "Boss floors 10, 20 and 30 are cleared by the fast and slow bots (30/30/29 and 27/30/29) but not reliably by a literal prompt follower without boss tactics.",
+        "About 5% of dodge prompts start pointing toward a wall, ledge or foe within 40 px.",
+        "Floors 25 and 29 share near-identical terrain with different foes, start and vents.",
+        "Floor 9's blind pulse rate (29%) is above the 25% flag but under the 50% gate.",
+        "The source is about 3300 lines, over the 800-line soft ceiling."
+      ]
+    }
+  ]
+}

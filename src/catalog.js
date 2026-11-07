@@ -1,5 +1,5 @@
 export const catalog = [
-  ['snowball-siege', 'Snowball Siege', '雪球攻城', 'action', '1', '#76c5c9'],
+  ['snowball-siege', 'Snowball Siege', '雪球攻城', 'action', '1-2', '#76c5c9'],
   ['ember-knights', 'Ember Knights', '余烬骑士', 'action', '1-2', '#dc8b58'],
   ['bomb-garden', 'Bomb Garden', '炸弹花园', 'action', '1-2', '#8bb57f'],
   ['iron-bastion', 'Iron Bastion', '钢铁堡垒', 'action', '1', '#a4af83'],

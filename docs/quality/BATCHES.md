@@ -4,11 +4,13 @@ At the user's direction, at most **three games** may be under development and ac
 
 ## Active batch 16
 
-| Game              | Implementation owner | Independent reviewer | Current state                                                        |
-| ----------------- | -------------------- | -------------------- | -------------------------------------------------------------------- |
-| Snowball Siege    | `owner-snow`         | `review-snow`        | Rebuild carried over from batch 15; all-floor prompt fixes in review |
-| Stacksmith        | not started          | not started          | Queued                                                               |
-| Traffic Conductor | not started          | not started          | Queued                                                               |
+| Game              | Implementation owner | Independent reviewer | Current state                                   |
+| ----------------- | -------------------- | -------------------- | ----------------------------------------------- |
+| Snowball Siege    | `owner-snow`         | `review-snow`        | Rebuild accepted and released (batch 16 record) |
+| Stacksmith        | `owner-stack`        | to be assigned       | In development                                  |
+| Traffic Conductor | `owner-traffic`      | to be assigned       | In development                                  |
+
+The rebuilt Snowball Siege, an original one- or two-player snow platformer with 30 floors and three bosses, passed ten rounds of independent review and browser acceptance and replaces the batch 1 version. The accepted total stays at 43. See the [batch 16 Snowball Siege evidence](batch-16/ACCEPTANCE.md).
 
 ## Completed batch 15
 

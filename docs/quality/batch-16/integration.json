@@ -1,0 +1,44 @@
+{
+  "date": "2026-11-07",
+  "status": "complete",
+  "workspace": "Checks ran in a clean detached worktree of HEAD d3cd363 plus exactly the Snowball Siege rebuild files and its catalog entry change.",
+  "checks": {
+    "focused game tests with coverage": {
+      "command": "node --experimental-test-coverage --test-coverage-include='src/games/snowball-siege.js' --test 2 test files",
+      "exitCode": 0,
+      "passed": 114,
+      "failed": 0,
+      "coverageLines": { "snowball-siege": 99.76 },
+      "coverageBranches": { "snowball-siege": 97.97 },
+      "log": "coverage.txt"
+    },
+    "shared input, simulation and platform lifecycle": {
+      "command": "node --test tests/input.test.js tests/simulation.test.js tests/platform-lifecycle.test.js",
+      "exitCode": 0,
+      "passed": 28,
+      "failed": 0,
+      "log": "shared-tests.txt"
+    },
+    "scoped catalog tests": {
+      "command": "node --test --test-name-pattern='release contains|Pixel Parkour|^snowball' tests/catalog.test.js",
+      "exitCode": 0,
+      "passed": 3,
+      "failed": 0,
+      "log": "catalog-tests.txt"
+    },
+    "full catalog tests": {
+      "command": "node --test tests/catalog.test.js",
+      "exitCode": 0,
+      "passed": 44,
+      "failed": 0
+    },
+    "static check": { "command": "npm run check", "exitCode": 0, "log": "static-check.txt" },
+    "format check": { "command": "npm run format:check", "exitCode": 0, "log": "format-check.txt" },
+    "build": { "command": "npm run build", "exitCode": 0, "log": "build.txt" },
+    "diff check": { "command": "git diff --check", "exitCode": 0 }
+  },
+  "catalog": "The Snowball Siege entry changes from 1 player to 1-2 players to match the rebuilt game's meta; the game count stays at 42 JavaScript games.",
+  "hostChanges": "None.",
+  "reviewStatus": "Independently approved on the recorded hashes after ten review rounds; remaining notes are low severity and listed in reviews.json.",
+  "uncommittedExcluded": "Stacksmith and Traffic Conductor (in development) and a stray untracked greedy.mjs in the repository root are not part of this release."
+}

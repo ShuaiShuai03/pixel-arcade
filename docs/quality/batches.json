@@ -98,7 +98,8 @@
       "number": 16,
       "games": ["snowball-siege rebuild", "stacksmith", "traffic-conductor"],
       "status": "in_progress",
-      "notes": "The Snowball Siege rebuild carries over again, still in independent review."
+      "notes": "The Snowball Siege rebuild was accepted and released first; see batch-16/ACCEPTANCE.md. Stacksmith and Traffic Conductor are in development.",
+      "released": ["snowball-siege rebuild"]
     },
     {
       "number": 17,

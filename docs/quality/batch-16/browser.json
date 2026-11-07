@@ -1,0 +1,35 @@
+{
+  "date": "2026-11-07",
+  "browser": "The user's stable Google Chrome, driven through the official Claude in Chrome extension in its own tab-group window. Held keys were synthetic in-page keydown/keyup events; held touch buttons and floor taps were pointer events on the real touch buttons and canvas; Start, mode, language and Play again were real mouse clicks. Only visible DOM text and canvas pixels were read; no game state was read or injected.",
+  "status": "complete",
+  "stateInjection": false,
+  "savedProgressSeeding": "Later floors were opened from the floor-select screen after earlier runs had unlocked them through the host's own saved progress.",
+  "phoneLayouts": "The Chrome window could not be resized, so the phone layout was checked in a same-origin 390-wide portrait frame on the page.",
+  "servedSourceCheck": "Before the final runs the SHA-256 of the served src/games/snowball-siege.js was computed in the page and matched 413d015b.",
+  "games": [
+    {
+      "id": "snowball-siege",
+      "sourceSha256": "413d015b77e9713a4ae97a514e0ca1e15ac50dac35ddd2d0e49c209ead24a9c2",
+      "levels": 30,
+      "observed": [
+        "A driver that reads only the status-line prompt and canvas colours cleared floors 1 to 9 in English back to back, losing one life on floor 6 and earning it back, then stopped at the floor 10 boss.",
+        "In an earlier run on the same build, the driver cleared floor 9 in 7 s with no lives lost, beat the floor 10 Kiln Golem boss after losing four lives, and ran out of lives early on floor 11. The loss screen read 'Out of lives on floor 11. Roll more snowballs, dodge more fire.' and keys on it changed nothing.",
+        "Two-player co-op showed separate lives ('Lives P1 5 P2 5'); P1's A moved only the first hero 54 px left and P2's Right arrow moved only the second hero 54 px right. Heroes block each other when walking into one another.",
+        "Chinese phone frame, 371 px wide with no horizontal overflow: touch buttons 左 右 下 跳 投雪 moved the floor cursor, tapping floor 1's cell started it, and the touch buttons cleared floor 1. One Down + Jump drop used the keyboard Jump, because a second simultaneous synthetic pointer cannot be captured (see limitations).",
+        "Earlier acceptance on the previous build found the floor 9 imp-fire blocker that review round 9 then fixed."
+      ],
+      "notes": [
+        "The floor-select prompt says 'Arrows: pick a floor. Space: start' even on the touch layout, where tapping a floor is the way to start.",
+        "Prompts name keyboard keys (for example 'X or J') on the touch layout as well."
+      ],
+      "screenshots": [
+        "snow-coop-en.png",
+        "snow-phone-zh-touch.png",
+        "snow-loss-en-floor11.png",
+        "../batch-15/screenshots/snow-loss-en-floor9.png"
+      ]
+    }
+  ],
+  "console": "The only console exceptions were NotFoundError from setPointerCapture on synthetic second pointers with no real pointer behind them.",
+  "limitations": "Floors 11 to 30 and the bosses on floors 20 and 30 were not played in the browser; they are covered by the reviewed bot and follower sweeps. Real multi-touch (Down + Jump with two fingers), physical phones, other browsers and audio were not tested."
+}
