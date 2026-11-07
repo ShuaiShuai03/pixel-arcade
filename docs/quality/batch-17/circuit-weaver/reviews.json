@@ -1,0 +1,68 @@
+{
+  "date": "2026-11-07",
+  "phase": "complete",
+  "finalCollectionReview": false,
+  "levelRule": "Level-based games need at least 20 authored levels with level select through env.progress.",
+  "records": [
+    {
+      "game": "circuit-weaver",
+      "owner": "owner-circuit",
+      "reviewer": "review-circuit",
+      "rounds": 5,
+      "verdict": "approved",
+      "approvedSha256": {
+        "src/games/circuit-weaver.js": "32215f3e6eb79dff967b11259582790d0bc2978fddf2fe75eebc7bd834083250",
+        "src/games/circuit-weaver-engine.js": "8270a5ad3bb644bad236cd4a115f12fe77175ebc48123fd10ca86cc6fe3b45b9",
+        "src/games/circuit-weaver-boards.js": "2df0a6b65a9164babeda72b1aadf3912626f3d285637a6db7952521e706ab873",
+        "src/games/circuit-weaver-draw.js": "509354aad6d26445cbc6db7d66f09c04627a0090a45a581c6aa6df432da838ac",
+        "tests/circuit-weaver.test.js": "96c07148c71d1fe4bfb62335d1f8eedd838d4eefbca6f289e483a6d0fe8f6d74",
+        "tests/circuit-weaver-quality.test.js": "b5aa0f564bf53deb016a4aad47119bb2eb54bca5b63e76134548a2a38f9d4b52"
+      },
+      "hashCheck": "The reviewer recorded the hashes at the start and the end of the final rounds. Two rounds were voided because the owner edited files mid-review; the final set was re-verified after each change.",
+      "findings": [
+        {
+          "id": "circuit-depth",
+          "severity": "high",
+          "status": "closed",
+          "observation": "Early boards had 3-6 live tiles, so an informed random turner solved boards 3-8 52-100% of the time, and a port-pair hill-climber solved 19 of 24 boards including 17-20. Boards were regenerated: boards 3-8 have 8-13 live turnable tiles, 15 boards carry budgets, and late boards resist greedy play. Informed random and mash now win at most 10% per board from board 3, port-pair greedy wins at least half the runs only on boards 1-9 and 12, and none of 17-24 above 12%."
+        },
+        {
+          "id": "circuit-undo-probing",
+          "severity": "medium",
+          "status": "closed",
+          "observation": "A hill-climber that tries a turn and undoes it when the score drops solved board 20 99 of 100 times and board 17 56%, because undo refunds the budget. Boards 17, 20, 21 and 22 were regenerated against it; it now wins at most 13% on boards 17-24."
+        },
+        {
+          "id": "circuit-shorts",
+          "severity": "medium",
+          "status": "closed",
+          "observation": "Shorts were essentially unreachable, so the voltage-separation rule never bit. Open boards 6, 7, 11, 14, 15 and 16 now short after one natural wrong turn; sealed late boards need two."
+        },
+        {
+          "id": "circuit-hint-latency",
+          "severity": "medium",
+          "status": "closed",
+          "observation": "The hint re-solved on every cursor move and took up to 331 ms on board 15. The solver now prunes unreachable lamps and caches by tile arrangement; worst in-play latency is under 2 ms."
+        },
+        {
+          "id": "circuit-prompt-text",
+          "severity": "medium",
+          "status": "closed",
+          "observation": "176 of 269 move prompts named an ambiguous landmark; they now fall back to row and column (0 ambiguous). Board tips were never shown and now appear for the first 6 s. The prompt was missing from the host status line and is now its last segment."
+        },
+        {
+          "id": "circuit-low-items",
+          "severity": "low",
+          "status": "closed",
+          "observation": "Stale short flag after undo, unbounded undo stack, a second wiring on board 9, Infinity progress, mutable exported data, open-board wirings that exceeded the budget, and a 1313-line file (now four modules) were all fixed."
+        }
+      ],
+      "openNotes": [
+        "For up to 6 s at each board start the narrow host status line shows the banner and tip, and the prompt is clipped by the shared ellipsis style; the prompt stays on the canvas and in the DOM text.",
+        "Undo refunds the turn budget; late boards resist free probing by design, earlier boards do not.",
+        "Port-pair greedy solves boards 1-9 every time; they are accepted as tutorial and combination boards.",
+        "Shorts on sealed late boards need two wrong turns and are rare (0.002-0.76% of random states)."
+      ]
+    }
+  ]
+}

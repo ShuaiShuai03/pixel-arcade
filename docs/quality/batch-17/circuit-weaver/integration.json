@@ -1,0 +1,62 @@
+{
+  "date": "2026-11-07",
+  "status": "complete",
+  "workspace": "Checks ran in a clean detached worktree of HEAD a689c27 plus exactly the six Circuit Weaver files and its catalog entry.",
+  "checks": {
+    "focused game tests with coverage": {
+      "command": "node --experimental-test-coverage --test-coverage-include='src/games/circuit-weaver*.js' --test tests/circuit-weaver.test.js tests/circuit-weaver-quality.test.js",
+      "exitCode": 0,
+      "passed": 64,
+      "failed": 0,
+      "coverageLines": {
+        "circuit-weaver": 100,
+        "circuit-weaver-engine": 100,
+        "circuit-weaver-boards": 100,
+        "circuit-weaver-draw": 100
+      },
+      "coverageBranches": {
+        "circuit-weaver": 98.79,
+        "circuit-weaver-engine": 100,
+        "circuit-weaver-boards": 100,
+        "circuit-weaver-draw": 98.62
+      },
+      "log": "coverage.txt"
+    },
+    "shared input, simulation and platform lifecycle": {
+      "command": "node --test tests/input.test.js tests/simulation.test.js tests/platform-lifecycle.test.js",
+      "exitCode": 0,
+      "passed": 28,
+      "failed": 0,
+      "log": "shared-tests.txt"
+    },
+    "scoped catalog tests": {
+      "command": "node --test --test-name-pattern='release contains|Pixel Parkour|^circuit' tests/catalog.test.js",
+      "exitCode": 0,
+      "passed": 3,
+      "failed": 0,
+      "log": "catalog-tests.txt"
+    },
+    "static check": {
+      "command": "npm run check",
+      "exitCode": 0,
+      "log": "static-check.txt"
+    },
+    "format check": {
+      "command": "npm run format:check",
+      "exitCode": 0,
+      "log": "format-check.txt"
+    },
+    "build": {
+      "command": "npm run build",
+      "exitCode": 0,
+      "log": "build.txt"
+    },
+    "diff check": {
+      "command": "git diff --check",
+      "exitCode": 0
+    }
+  },
+  "catalog": "One entry added (Circuit Weaver, 1 player, puzzle); the release assertion rises from 45 to 46 JavaScript games.",
+  "hostChanges": "None.",
+  "uncommittedExcluded": "Tide Lock (in development) and a stray untracked greedy.mjs are not part of this release."
+}

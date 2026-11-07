@@ -1,0 +1,34 @@
+{
+  "date": "2026-11-07",
+  "browser": "The user's stable Google Chrome, driven through the official Claude in Chrome extension in its own tab-group window. Keys were synthetic in-page keydown/keyup events; touch buttons were pointer events on the real touch buttons; Start, language, board tiles and Play again were real mouse clicks. Only visible DOM text and canvas pixels were read; no game state was read or injected.",
+  "status": "complete",
+  "stateInjection": false,
+  "phoneLayouts": "Checked in a same-origin 390-wide portrait frame on the page.",
+  "servedSourceCheck": "The SHA-256 of all four served circuit-weaver modules was computed in the page and matched 32215f3e, 8270a5ad, 2df0a6b6 and 509354aa.",
+  "games": [
+    {
+      "id": "circuit-weaver",
+      "sourceSha256": {
+        "src/games/circuit-weaver.js": "32215f3e6eb79dff967b11259582790d0bc2978fddf2fe75eebc7bd834083250",
+        "src/games/circuit-weaver-engine.js": "8270a5ad3bb644bad236cd4a115f12fe77175ebc48123fd10ca86cc6fe3b45b9",
+        "src/games/circuit-weaver-boards.js": "2df0a6b65a9164babeda72b1aadf3912626f3d285637a6db7952521e706ab873",
+        "src/games/circuit-weaver-draw.js": "509354aad6d26445cbc6db7d66f09c04627a0090a45a581c6aa6df432da838ac"
+      },
+      "levels": 24,
+      "observed": [
+        "A driver that reads only the status-line prompt, with a 0.2 s reaction delay, played boards 1 to 24 in English back to back in under 5 minutes and reached 'Nicely played! Every board is wired and humming!' with the maximum score of 3840 and no fuse blown. On one board the optimal route passed briefly through a 3 V + 9 V short, which the banner reported before the next turn cleared it.",
+        "Chinese board select listed all 24 boards.",
+        "Chinese: spending the 18-turn budget of board 10 three times blew the three fuses and ended the run with '\u4e09\u6839\u4fdd\u9669\u4e1d\u90fd\u70e7\u65ad\u4e86\uff0c\u518d\u8bd5\u4e00\u6b21\uff01'; arrows, Space, Z and X on the loss screen changed nothing, and Play again returned to board select.",
+        "Chinese phone frame, 371 px wide with no horizontal overflow: the touch arrows and Turn button selected board 1, and touch taps alone following the prompt cleared boards 1 to 3. On board 4 the Undo touch button reverted a turn and Inspect showed the network line on the canvas.",
+        "At 390 px the English header read 'Open ends: 4 \u00b7 Press Space to turn t\u2026', keeping the verb and key visible after the tip; during the first seconds of a board the tip pushes the prompt out of the clipped header while the canvas footer still shows it."
+      ],
+      "screenshots": [
+        "../screenshots/circuit-24-win-en.jpg",
+        "../screenshots/circuit-select-zh.jpg",
+        "../screenshots/circuit-loss-zh.jpg",
+        "../screenshots/circuit-phone-zh-touch.png"
+      ]
+    }
+  ],
+  "limitations": "Physical phones, other browsers, tapping tiles on the canvas and audio were not tested; console output was not captured."
+}
