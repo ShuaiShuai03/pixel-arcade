@@ -12,7 +12,7 @@ At the user's direction, at most **three games** may be under development and ac
 
 Mirror Lab, a laser-and-mirror puzzle with 22 rooms, passed two rounds of independent review and browser acceptance, bringing the accepted total to 46. A prompt-following driver solved all 22 rooms in Chinese at the optimal score, a budget room was played to a loss in English, and touch play was checked on a phone layout. See the [Mirror Lab evidence](batch-17/mirror-lab/ACCEPTANCE.md). Commit `1562ac8` is live after a Pages redeploy; all five checked assets match, and the published game accepted real input. See the [deployment receipt](batch-17/mirror-lab/deployment.json).
 
-Circuit Weaver, a copper-tile wiring puzzle with 24 boards, voltages, shorts and fuses, passed five rounds of independent review and browser acceptance, bringing the accepted total to 47. A prompt-following driver wired all 24 boards in English at the maximum score, a budget board was played to a loss in Chinese, and touch play was checked on a phone layout. See the [Circuit Weaver evidence](batch-17/circuit-weaver/ACCEPTANCE.md).
+Circuit Weaver, a copper-tile wiring puzzle with 24 boards, voltages, shorts and fuses, passed five rounds of independent review and browser acceptance, bringing the accepted total to 47. A prompt-following driver wired all 24 boards in English at the maximum score, a budget board was played to a loss in Chinese, and touch play was checked on a phone layout. See the [Circuit Weaver evidence](batch-17/circuit-weaver/ACCEPTANCE.md). Commit `66c26b5` is live; all seven checked assets match, and the published game accepted real input. See the [deployment receipt](batch-17/circuit-weaver/deployment.json).
 
 ## Completed batch 16
 
