@@ -12,7 +12,7 @@ At the user's direction, at most **three games** may be under development and ac
 
 ## Completed batch 15
 
-Rail Switch and Tilt Lab passed initial development, independent review, and browser acceptance, bringing the accepted total to 43, Pixel Parkour included. Rail Switch has 20 timetables and Tilt Lab has 22 labs, each with level select and saved progress. All 150 focused tests, 28 shared regressions and four scoped catalog checks pass. A prompt-following driver ran all 20 Rail Switch timetables in English and all 22 Tilt Lab labs in Chinese to their win screens. Both games were played to losses, and touch play was checked on phone layouts. The Snowball Siege rebuild carries over to batch 16. See the [batch 15 evidence](batch-15/ACCEPTANCE.md).
+Rail Switch and Tilt Lab passed initial development, independent review, and browser acceptance, bringing the accepted total to 43, Pixel Parkour included. Rail Switch has 20 timetables and Tilt Lab has 22 labs, each with level select and saved progress. All 150 focused tests, 28 shared regressions and four scoped catalog checks pass. A prompt-following driver ran all 20 Rail Switch timetables in English and all 22 Tilt Lab labs in Chinese to their win screens. Both games were played to losses, and touch play was checked on phone layouts. The Snowball Siege rebuild carries over to batch 16. See the [batch 15 evidence](batch-15/ACCEPTANCE.md). Commit `5f1fec5` is live. All five checked assets match, and both published games accepted real input. See the [deployment receipt](batch-15/deployment.json).
 
 ## Completed batch 14
 

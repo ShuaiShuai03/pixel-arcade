@@ -1,0 +1,55 @@
+{
+  "date": "2026-11-07",
+  "commit": "5f1fec5",
+  "url": "https://shuaishuai03.github.io/pixel-arcade/",
+  "workflow": {
+    "runId": 42348592457,
+    "url": "https://github.com/ShuaiShuai03/pixel-arcade/actions/runs/42348592457",
+    "conclusion": "success",
+    "jobs": { "build": "success", "deploy": "success", "report-build-status": "success" },
+    "completedAt": "2026-11-07T06:48:50Z"
+  },
+  "assets": [
+    {
+      "path": "index.html",
+      "bytes": 9421,
+      "sha256": "b660ce3e50c66ade22d92971dc42aa72295778a8e411e91429d1b35a7e007768",
+      "matchesCommit": true
+    },
+    {
+      "path": "src/catalog.js",
+      "bytes": 3846,
+      "sha256": "05707156775dcba36b9a84f33d0dd887d0093b35b2eb848a1b05a0ad218f54da",
+      "matchesCommit": true
+    },
+    {
+      "path": "src/app.js",
+      "bytes": 24072,
+      "sha256": "f968ec9582f04b3461d9cd81aba7286ecd0e449754acb14fbc3e86171b111d33",
+      "matchesCommit": true
+    },
+    {
+      "path": "src/games/rail-switch.js",
+      "bytes": 73092,
+      "sha256": "93677e02d751e1025624ec325e094138cdfd0d05efcebd1a9cb1ec5bd289ed5a",
+      "matchesCommit": true,
+      "matchesApproved": true
+    },
+    {
+      "path": "src/games/tilt-lab.js",
+      "bytes": 64326,
+      "sha256": "54e8579bad867818b6ef6b7cabd96d614e03bcefa1d4dd186748256f6120c638",
+      "matchesCommit": true,
+      "matchesApproved": true
+    }
+  ],
+  "publishedInput": {
+    "method": "The user's Chrome through the official Claude in Chrome extension; Start was a real click, keys were synthetic in-page keydown/keyup events, and only the status line and canvas pixels were read.",
+    "observed": [
+      "Rail Switch: Start opened timetable 1 of 20; Space flipped junction A and the prompt changed from 'Press Space: flip A to ↓ for the blue train' to 'Junctions are set - watch the blue train'. Repeated test presses toggled the junction back and produced strikes with the cause shown ('Strike! A train reached the wrong platform').",
+      "Tilt Lab: Start opened lab 1 of 22; holding Right for 0.9 s set the tilt readout to +8.2 and the marble rolled right."
+    ],
+    "screenshots": ["published-tilt.png"]
+  },
+  "notes": "Assets were fetched with a cache-busting query string and compared with the committed files. The Snowball Siege rebuild remains unreleased."
+}
