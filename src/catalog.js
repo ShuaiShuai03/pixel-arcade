@@ -37,6 +37,8 @@ export const catalog = [
   ['mimic-vault', 'Mimic Vault', '幻影宝库', 'puzzle', '1', '#c9b8e6'],
   ['comet-catcher', 'Comet Catcher', '彗星捕手', 'arcade', '1', '#f2b46b'],
   ['orbit-gardener', 'Orbit Gardener', '轨道园丁', 'arcade', '1', '#9be08a'],
+  ['conveyor-chef', 'Conveyor Chef', '传送带厨房', 'arcade', '1-2', '#f08a5d'],
+  ['firefly-trail', 'Firefly Trail', '萤火轨迹', 'arcade', '1', '#ffe27a'],
 ].map(([id, en, zh, genre, players, color]) => ({ id, name: { en, zh }, genre, players, color }));
 export const loadGame = (id) => import(`./games/${id}.js`);
 

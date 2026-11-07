@@ -1,7 +1,7 @@
 {
   "maxActiveGames": 3,
-  "activeBatch": 14,
-  "acceptedGames": 39,
+  "activeBatch": 15,
+  "acceptedGames": 41,
   "batches": [
     {
       "number": 1,
@@ -80,108 +80,111 @@
     },
     {
       "number": 14,
-      "games": ["conveyor-chef", "firefly-trail", "rail-switch"],
-      "status": "in_progress",
-      "alsoInProgress": ["snowball-siege rebuild"]
+      "games": ["conveyor-chef", "firefly-trail"],
+      "status": "complete",
+      "acceptance": "batch-14/ACCEPTANCE.md",
+      "deployment": "batch-14/deployment.json",
+      "carriedOver": ["snowball-siege rebuild", "rail-switch"]
     },
     {
       "number": 15,
-      "games": ["tilt-lab", "stacksmith", "traffic-conductor"],
-      "status": "queued"
+      "games": ["snowball-siege rebuild", "rail-switch", "tilt-lab"],
+      "status": "in_progress",
+      "notes": "The Snowball Siege rebuild carries over from batch 14, where it was still in independent review."
     },
     {
       "number": 16,
-      "games": ["mirror-lab", "circuit-weaver", "tide-lock"],
+      "games": ["stacksmith", "traffic-conductor", "mirror-lab"],
       "status": "queued"
     },
     {
       "number": 17,
-      "games": ["phase-tiles", "weightworks", "fold-map"],
+      "games": ["circuit-weaver", "tide-lock", "phase-tiles"],
       "status": "queued"
     },
     {
       "number": 18,
-      "games": ["pattern-forge", "cipher-wheels", "tangram-harbor"],
+      "games": ["weightworks", "fold-map", "pattern-forge"],
       "status": "queued"
     },
     {
       "number": 19,
-      "games": ["pathweaver", "slime-split", "magnet-mosaic"],
+      "games": ["cipher-wheels", "tangram-harbor", "pathweaver"],
       "status": "queued"
     },
     {
       "number": 20,
-      "games": ["orchard-merge", "color-flood", "rope-unravel"],
+      "games": ["slime-split", "magnet-mosaic", "orchard-merge"],
       "status": "queued"
     },
     {
       "number": 21,
-      "games": ["latin-garden", "rooftop-hoops", "pocket-striker"],
+      "games": ["color-flood", "rope-unravel", "latin-garden"],
       "status": "queued"
     },
     {
       "number": 22,
-      "games": ["sand-volley", "ice-curling", "mini-links"],
+      "games": ["rooftop-hoops", "pocket-striker", "sand-volley"],
       "status": "queued"
     },
     {
       "number": 23,
-      "games": ["harbor-regatta", "archery-range", "vault-champion"],
+      "games": ["ice-curling", "mini-links", "harbor-regatta"],
       "status": "queued"
     },
     {
       "number": 24,
-      "games": ["grove-guard", "outpost-lines", "harbor-master"],
+      "games": ["archery-range", "vault-champion", "grove-guard"],
       "status": "queued"
     },
     {
       "number": 25,
-      "games": ["caravan-trader", "island-engineer", "reef-restorer"],
+      "games": ["outpost-lines", "harbor-master", "caravan-trader"],
       "status": "queued"
     },
     {
       "number": 26,
-      "games": ["fortress-siege", "bee-colony", "pulse-forge"],
+      "games": ["island-engineer", "reef-restorer", "fortress-siege"],
       "status": "queued"
     },
     {
       "number": 27,
-      "games": ["echo-drums", "beat-weaver", "conductor-cove"],
+      "games": ["bee-colony", "pulse-forge", "echo-drums"],
       "status": "queued"
     },
     {
       "number": 28,
-      "games": ["dance-duel", "shadow-watch", "lantern-signals"],
+      "games": ["beat-weaver", "conductor-cove", "dance-duel"],
       "status": "queued"
     },
     {
       "number": 29,
-      "games": ["time-sculptor", "lunar-lander", "rescue-helicopter"],
+      "games": ["shadow-watch", "lantern-signals", "time-sculptor"],
       "status": "queued"
     },
     {
       "number": 30,
-      "games": ["deep-diver", "workshop-welder", "wildlife-photographer"],
+      "games": ["lunar-lander", "rescue-helicopter", "deep-diver"],
       "status": "queued"
     },
     {
       "number": 31,
-      "games": ["telescope-tracker", "balloon-balancer", "robot-foundry"],
+      "games": ["workshop-welder", "wildlife-photographer", "telescope-tracker"],
       "status": "queued"
     },
     {
       "number": 32,
-      "games": ["reversi-grove", "hex-conquest", "sum-dice"],
+      "games": ["balloon-balancer", "robot-foundry", "reversi-grove"],
       "status": "queued"
     },
     {
       "number": 33,
-      "games": ["wordless-detective", "tug-of-tides", "cargo-duel"],
+      "games": ["hex-conquest", "sum-dice", "wordless-detective"],
       "status": "queued"
     },
     {
       "number": 34,
-      "games": ["constellation-duel"],
+      "games": ["tug-of-tides", "cargo-duel", "constellation-duel"],
       "status": "queued"
     }
   ],

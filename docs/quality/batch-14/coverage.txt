@@ -1,0 +1,179 @@
+✔ quality: every shift has a scripted legal solution that clears it cleanly through public input (1209.597208ms)
+✔ quality: scripted solutions hold at 30 and 120 Hz too (642.901292ms)
+✔ quality: solo station reach times are feasible: every station is a short walk from the others (6.826041ms)
+✔ quality: a prompt-and-drawn-state policy at 0.15-0.35 s wins at least 27 of 30 on every shift at 60 Hz (17086.37475ms)
+✔ quality: the same policy wins at least 27 of 30 at 30 and 120 Hz on five shifts (10457.1175ms)
+✔ quality: a slower 0.4-0.6 s policy with jitter wins at least 24 of 30 on every shift at 60 Hz (18562.506792ms)
+✔ quality: the slower policy also wins at least 24 of 30 at 30 and 120 Hz on five shifts (11461.480708ms)
+✔ quality: a casual player (0.5-0.8 s, now and then distracted) wins at least 24 of 30 on every shift (20118.056083ms)
+✔ quality: random keys, mashing, hold-and-spam, a blind pulse and blind station tours each win at most half the runs on every shift (145551.735166ms)
+✔ quality: following the prompts never costs a refusal, a burnt dish or a lost customer, even for slow readers (21969.316625ms)
+✔ quality: X is central: a follower that never presses it fails every shift that has a junction (1625.762458ms)
+✔ quality: the drawn prompt line names keys, holds for 0.5 s, rarely flips back and teaches each idea (7365.938333ms)
+✔ quality: each shift opens with its tip in the status line, in both languages (0.923417ms)
+✔ quality: the shift select shows no text over a cell or another text, in English and Chinese (2.537833ms)
+✔ quality: HUD bands do not overlap, text is 14-16 px, and chefs, stations and dishes are 16 px or more (384.9015ms)
+✔ quality: touch controls are complete and bilingual, solo and co-op (0.203334ms)
+✔ quality: the whole campaign played in order unlocks each shift once and ends in one win (570.58075ms)
+✔ quality: coming back later offers the select screen and continues from the unlocked shift (41.943708ms)
+✔ quality: wasting ingredients ends the shift at once with an explicit out-of-stock reason (22.28325ms)
+✔ quality: a player who never acts loses fairly at every frame rate, once, and the end stays frozen (53.27775ms)
+✔ quality: the state is identical at 30, 60 and 120 Hz when input is aligned to 1/30 s (111.097208ms)
+✔ quality: co-op: each chef can clear a shift alone with their own keys, and two chefs together do too (175.051958ms)
+✔ quality: the final-shift win and the failure message are explicit and bilingual (62.212833ms)
+✔ quality: every kind of ingredient is used and the campaign introduces each station in turn (0.227959ms)
+✔ meta: a bilingual 1-2 player arcade entry with complete controls (1.536792ms)
+✔ data: 22 authored shifts with consistent kitchens (2.603167ms)
+✔ routes: the board and stove are only on a route when the dish needs them (0.295833ms)
+✔ verdicts: raw, burnt, unchopped and wrong dishes are rejected with a reason; matches score (0.20525ms)
+✔ time: invalid dt is inert and a press during it is not kept for later (3.410792ms)
+✔ interact: Space drops one item per press; holding it cannot duplicate (7.888375ms)
+✔ interact: crates explain why nothing came out (1.794417ms)
+✔ belts: dishes ride at the stated speed, one per tile, and wait in a queue (6.9085ms)
+✔ junctions: X flips the nearest one; a dish commits to an exit when it reaches the centre (6.008625ms)
+✔ board: Space starts chopping, which only advances while a chef is close (6.268875ms)
+✔ board: dishes that need no chopping pass through; strays can be cleared with Space (1.396583ms)
+✔ stove: cooks alone, turns green, warns, then burns and spits the dish out (17.470333ms)
+✔ stove: Space takes the dish out in the green window and it is served (2.933042ms)
+✔ stove: taking a dish out early sends it raw and the window refuses it with a reason (2.852208ms)
+✔ stove: cooked and burnt dishes pass a second stove untouched (0.876042ms)
+✔ tickets: each scores once, by speed; expiry and rejects cost satisfaction (0.971541ms)
+✔ tickets: multi-part tickets fill part by part and score only when complete (1.229334ms)
+✔ shifts end explicitly: an unreachable target loses at once, a reachable one clears (1.047375ms)
+✔ the last shift ends the run with one win and no extra fanfare from the game (0.269542ms)
+✔ select: shows only when more than shift 1 is open, validates progress and never starts a locked shift (0.830958ms)
+✔ clearing a shift unlocks the next with unlock(n+1) and replays never lower it (0.086417ms)
+✔ co-op: two chefs with separate keys share one kitchen; Space and X are for the solo chef only (1.111ms)
+✔ co-op: simultaneous presses alternate which chef goes first (0.194292ms)
+✔ chefs: walls, stations and the screen edge are solid; diagonals are not faster (3.092208ms)
+✔ random play never breaks the world: finite numbers, bounded lists, no overlapping dishes (538.228833ms)
+✔ terminals: the end fires once, the game stays frozen, and a new instance starts fresh (9.307125ms)
+✔ state: getState returns copies, is JSON-safe and offers no cheat API (0.288542ms)
+✔ sounds: ingredients, serving, refusals and shift clears are announced once (1.877917ms)
+✔ prompts: the marker names its key per mode, in both languages, for every kind (0.232167ms)
+✔ planner: the prompt follows the kitchen: feed, preset, chop, cook, pull, clear (3.772334ms)
+✔ bin: the belt ends in the bin until X sends it to the window; a burnt dish thrown away costs nothing (3.287541ms)
+✔ prompts move on at once when the action they asked for is done (1.641458ms)
+✔ prompts do not send the chef away from a dish that is about to burn (0.3085ms)
+✔ draw: every shift renders in both languages and modes with finite coordinates and no exceptions (105.754459ms)
+✔ stock-out counts the best set of tickets, not the first ones in order (0.218625ms)
+✔ stock-out: a ticket that can no longer be supplied ends the shift at once with the missing ingredient (0.333875ms)
+per-meadow wins, fast: 1:30 2:30 3:30 4:30 5:30 6:30 7:30 8:30 9:30 10:30 11:30 12:30 13:30 14:30 15:30 16:30 17:30 18:30 19:30 20:30 21:30 22:30 23:30 24:30
+per-meadow wins, slow: 1:30 2:30 3:30 4:30 5:30 6:30 7:30 8:30 9:30 10:30 11:30 12:30 13:30 14:30 15:30 16:30 17:30 18:30 19:30 20:30 21:30 22:30 23:30 24:30
+per-meadow wins, casual: 1:30 2:30 3:30 4:30 5:30 6:24 7:30 8:30 9:30 10:30 11:29 12:30 13:29 14:30 15:30 16:29 17:30 18:29 19:28 20:30 21:30 22:29 23:26 24:30
+campaign wins (0.15,0.35): 29/30
+campaign wins (0.4,0.6): 29/30
+contacts from anywhere: {"0":0,"0.25":0,"0.5":5} of {"0":141,"0.25":141,"0.5":141}
+crude wins/10 in 90 s:
+random     0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+mash       0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+holdspam   0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+circle     0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+pulse      2 1 0 0 0 1 0 2 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+free-play wins out of 2 per meadow:
+cautious box                 222221220000000000000000
+box without dodging          222222220000000000000000
+one giant loop               220222220000000000002000
+big margin, no wait          222220020000000000000000
+greedy box inside the limit  222222222202200020202002
+✔ a delayed player (0.15-0.35 s) using only the drawn state clears every meadow in at least 27 of 30 runs at 30, 60 and 120 Hz (29987.619292ms)
+✔ a slow player (0.4-0.6 s with jitter) clears every meadow in at least 24 of 30 runs at 30, 60 and 120 Hz (44047.647291ms)
+✔ a casual player (0.5-0.8 s, now and then distracted, dropping keys) clears every meadow in at least 24 of 30 runs (70762.493083ms)
+✔ frame-rate sweep: five meadows at each rate with 30 seeds, fast and slow players (66503.078667ms)
+✔ the whole 24-meadow campaign is won in at least 27 of 30 fast runs and 24 of 30 slow runs (75817.599667ms)
+✔ every meadow has a scripted legal solution: a zero-lag planner replays through public keys (1044.544584ms)
+✔ perturbed input (dropped keys, irregular frame times) still clears representative meadows (9662.380958ms)
+✔ prompts name keys, are held at least half a second and rarely flip straight back (1192.702792ms)
+✔ a literal prompt follower that never looks at a moth is never led into a hit or a cut, at 0, 0.25 and 0.5 s of lag, in any meadow or frame rate (10164.725292ms)
+✔ a follower that honours every wait in full clears the long-wait meadows with at least 5 s of dawn to spare (22401.778ms)
+✔ a prompt follower dropped in anywhere is never led into a sting or a cut at 0 and 0.25 s of lag, and almost never at 0.5 s (32789.543792ms)
+✔ the prompt line changes at most three times in any second (four at half a second of lag), wait and back-away included (7095.461833ms)
+✔ crude policies win at most half the runs in every meadow: random keys, mashing, spam, holding one way, circling and the pulse policy (41387.560083ms)
+✔ the same crude policies stay at or under half with a 300 s budget (dawn, then the lights, run out) (24925.269208ms)
+✔ free-play bots that ignore the prompt and guide win at most half the runs on at least 15 meadows and on at most half of the late ones (22691.941917ms)
+✔ the drawn prompt line names a key, matches the state and fits the bottom band (168.049ms)
+✔ metadata is complete, bilingual and the touch layout covers every action (1.178667ms)
+✔ there are at least 20 authored meadows with consistent, bilingual data (0.474167ms)
+✔ every tip fits the 480 px bottom band at a conservative 0.6 em per character (0.177834ms)
+✔ every scripted loop encloses its fireflies with room to spare, and the loops reach the quota (0.942375ms)
+✔ the first meadows teach one idea at a time, then combine, then master (0.170792ms)
+✔ geometry helpers: containment, crossings, distances and areas (0.099416ms)
+✔ invalid frame times are inert and never consume a press (0.892666ms)
+✔ the same aligned input gives identical full state at 30, 60 and 120 Hz (478.200208ms)
+✔ movement is free-form: eight directions at one speed, held keys only, WASD too (0.924667ms)
+✔ the lantern stays inside the field and flowers block it without trapping it (1.270584ms)
+✔ Space begins a trail where the lantern stands and X cancels it without penalty (0.283333ms)
+✔ the trail fades: points older than the meadow fade time disappear, oldest first (3.53025ms)
+✔ Space closes a loop by real polygon containment: only fireflies inside are caught (1.239833ms)
+✔ a concave loop does not capture a firefly sitting in its notch (0.138042ms)
+✔ too-small loops and closing lines that cross the trail are refused and keep the trail (0.121708ms)
+✔ crossing your own trail closes the loop right there and catches what is inside (2.897ms)
+✔ a moth touching the trail cuts it; the cut is swept so even a very fast moth cannot tunnel (0.651584ms)
+✔ a moth that misses the trail leaves it alone (0.941208ms)
+✔ a moth stinging the lantern costs a light once, then grants a grace period (0.657583ms)
+✔ a fast moth cannot tunnel through the lantern either (0.382417ms)
+✔ stinging while drawing also cuts the trail (0.173375ms)
+✔ catching the quota clears the meadow once, scores it, unlocks the next and then loads it (1.621292ms)
+✔ one loop around several fireflies scores a combo bonus (2.251334ms)
+✔ an empty loop says so and costs nothing (0.759375ms)
+✔ terminal win: the last meadow ends the game once, frozen, with a single host-played jingle (50.290917ms)
+✔ terminal loss by dawn: ends once, silent on the final update, frozen, restart is fresh (4.712875ms)
+✔ terminal loss by moths: the fatal sting is silent, ends the game once and freezes it (57.162ms)
+✔ progress: with only meadow 1 open (or no progress API) the game starts at once (0.137125ms)
+✔ progress.unlocked() is floored and validated (0.096ms)
+✔ a later start offers continue and a select menu; the world waits behind it (0.2005ms)
+✔ clearing a meadow raises unlock to the next one and never past the last (16.859ms)
+✔ drawing the select menu: no text overlaps a cell, in English and Chinese (5.407583ms)
+✔ the guide walks the player: ring, start, dots, close (1.04575ms)
+✔ starting away from the ring is free drawing, with its own prompt (0.149417ms)
+✔ crossing loops say so; the idle prompt appears when no loop is left (0.229541ms)
+✔ a moth lane on the way turns the prompt into a wait, then lets go again (154.960875ms)
+✔ prompt lines are replaced only after half a second unless urgent or forced by an action (0.237625ms)
+✔ dawn: the timer counts down and the meadow is lost when it runs out (3.885667ms)
+✔ the status is bilingual and names the meadow, the prompt and the firefly count (0.11075ms)
+✔ getState is JSON-safe, detached and offers no cheat API (0.282208ms)
+✔ sounds: a trail begins with move, a catch rings coin, a cut and a sting use hit, never win or lose (1.801084ms)
+✔ long seeded chaos stays finite and bounded in every meadow (1352.200791ms)
+✔ drawing: every phase renders; text is 14-16 px, on the canvas and inside the HUD bands (26.2805ms)
+✔ drawing: the HUD bands do not overlap and the top counters do not collide (4.788042ms)
+✔ drawing: actors are at least 16 px and the guide is drawn where the prompt points (4.416333ms)
+✔ drawing: previews, feedback marks, the stung lantern and terminals render (3.409166ms)
+✔ drawing: a game in progress, frozen and in the menu all render without throwing (103.727542ms)
+✔ the light reaches only so far: the covered and spread areas are measured honestly (0.364958ms)
+✔ wide loops fizzle: the trail is spent, nothing is caught, and fading the tail cannot shrink the loop (2.398166ms)
+✔ a crossing that would close a wide loop is ignored (2.266166ms)
+✔ the stalker shadows the lantern along its lane at its own speed and never leaves the lane (267.706708ms)
+✔ a stalker meeting the lantern stings it like any moth (0.413792ms)
+✔ moth hit radii match the drawn bodies (3.033208ms)
+✔ a cut costs a light unless the lantern is still shielded, and the third light ends the night (0.255416ms)
+✔ a clean meadow earns a bonus, and spare dawn counts double (1.267875ms)
+✔ flowers are never entered, even at a pinch between two of them (69.124791ms)
+✔ drawing: the trail fades to nothing, flashes use even-odd and every verdict has a shape (0.741375ms)
+✔ a prompt line is on screen for at least half a second at any frame rate, counted from its first drawn frame (11.334958ms)
+✔ the half-second hold starts when the line is first drawn, not when an action inside the update set it (0.083958ms)
+✔ late fireflies come in pairs that no single loop inside the light reaches (hawk corridor excepted) (0.246208ms)
+✔ crossing that would close a wide loop marks the spot and says so (1.373209ms)
+✔ when neither walking nor standing is safe the prompt says to back away, towards a safe spot (1.084833ms)
+✔ a stalker that parked beside the way sends the lantern back to draw it off again (21.61225ms)
+✔ closeCheck stays cheap with a long trail (1.188292ms)
+✔ wait and back-away never trade places faster than half a second, and a held line keeps its own target (0.577917ms)
+ℹ tests 141
+ℹ suites 0
+ℹ pass 141
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 460722.687292
+ℹ start of coverage report
+ℹ -------------------------------------------------------------------
+ℹ file               | line % | branch % | funcs % | uncovered lines
+ℹ -------------------------------------------------------------------
+ℹ src                |        |          |         | 
+ℹ  games             |        |          |         | 
+ℹ   conveyor-chef.js |  99.96 |    97.38 |  100.00 | 1219
+ℹ   firefly-trail.js |  99.08 |    97.91 |   99.22 | 
+ℹ -------------------------------------------------------------------
+ℹ all files          |  99.57 |    97.59 |   99.66 | 
+ℹ -------------------------------------------------------------------
+ℹ end of coverage report

@@ -2,13 +2,17 @@
 
 At the user's direction, at most **three games** may be under development and acceptance testing at one time. Do not begin the next batch until all games in the active batch satisfy the gates below. The collection target is 50 games, including Pixel Parkour (reduced from 100 at the user's direction on 2026-11-05). Roster themes are not work assignments.
 
-## Active batch 14
+## Active batch 15
 
-| Game           | Implementation owner | Independent reviewer | Current state                                     |
-| -------------- | -------------------- | -------------------- | ------------------------------------------------- |
-| Conveyor Chef  | `owner-chef`         | `review-chef`        | 22 shifts; approved, browser acceptance next      |
-| Snowball Siege | `owner-snow`         | to be assigned       | Rebuild as an original 1–2 player snow platformer |
-| Firefly Trail  | not started          | not started          | Queued                                            |
+| Game           | Implementation owner | Independent reviewer | Current state                                                    |
+| -------------- | -------------------- | -------------------- | ---------------------------------------------------------------- |
+| Snowball Siege | `owner-snow`         | `review-snow`        | Rebuild carried over from batch 14; final prompt fixes in review |
+| Rail Switch    | not started          | not started          | Queued                                                           |
+| Tilt Lab       | not started          | not started          | Queued                                                           |
+
+## Completed batch 14
+
+Conveyor Chef and Firefly Trail passed initial development, independent review, and browser acceptance, bringing the accepted total to 41, Pixel Parkour included. Conveyor Chef has 22 shifts and Firefly Trail has 24 meadows, each with level select and saved progress. All 141 focused tests, 28 shared regressions and four scoped catalog checks pass. A prompt-following driver won all 22 Conveyor Chef shifts and played Firefly Trail through its final meadow to the win screen on the approved build. Both games were played to losses, and touch play was checked on phone layouts. The Snowball Siege rebuild and Rail Switch carry over to batch 15. See the [batch 14 evidence](batch-14/ACCEPTANCE.md).
 
 ## Completed batch 13
 

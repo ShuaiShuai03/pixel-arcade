@@ -1,0 +1,44 @@
+{
+  "date": "2026-11-07",
+  "status": "complete",
+  "workspace": "Checks ran in a clean detached worktree of HEAD 19b2223 plus exactly the batch 14 files, so the in-progress Snowball Siege rebuild is not included.",
+  "checks": {
+    "focused game tests with coverage": {
+      "command": "node --experimental-test-coverage (2 games) --test 4 test files",
+      "exitCode": 0,
+      "passed": 141,
+      "failed": 0,
+      "coverageLines": { "conveyor-chef": 99.96, "firefly-trail": 99.08 },
+      "coverageBranches": { "conveyor-chef": 97.38, "firefly-trail": 97.91 },
+      "log": "coverage.txt"
+    },
+    "shared input, simulation and platform lifecycle": {
+      "command": "node --test tests/input.test.js tests/simulation.test.js tests/platform-lifecycle.test.js",
+      "exitCode": 0,
+      "passed": 28,
+      "failed": 0,
+      "log": "shared-tests.txt"
+    },
+    "scoped catalog tests": {
+      "command": "node --test --test-name-pattern='release contains|Pixel Parkour|^(conveyor|firefly)' tests/catalog.test.js",
+      "exitCode": 0,
+      "passed": 4,
+      "failed": 0,
+      "log": "catalog-tests.txt"
+    },
+    "full catalog tests": {
+      "command": "node --test tests/catalog.test.js",
+      "exitCode": 0,
+      "passed": 42,
+      "failed": 0
+    },
+    "static check": { "command": "npm run check", "exitCode": 0, "log": "static-check.txt" },
+    "format check": { "command": "npm run format:check", "exitCode": 0, "log": "format-check.txt" },
+    "build": { "command": "npm run build", "exitCode": 0, "log": "build.txt" },
+    "diff check": { "command": "git diff --check", "exitCode": 0 }
+  },
+  "catalog": "Two entries added (Conveyor Chef for 1-2 players, Firefly Trail for 1); the release assertion rises from 38 to 40 JavaScript games.",
+  "hostChanges": "None.",
+  "reviewStatus": "Both games independently approved on the recorded hashes; remaining notes are low severity and listed in reviews.json.",
+  "uncommittedExcluded": "The Snowball Siege rebuild (in review) and a stray untracked greedy.mjs test bot in the repository root are not part of this release."
+}

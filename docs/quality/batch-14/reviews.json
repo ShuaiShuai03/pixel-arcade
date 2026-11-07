@@ -1,0 +1,82 @@
+{
+  "date": "2026-11-07",
+  "phase": "complete",
+  "finalCollectionReview": false,
+  "levelRule": "Level-based games need at least 20 authored levels with level select through env.progress.",
+  "records": [
+    {
+      "game": "conveyor-chef",
+      "owner": "owner-chef",
+      "reviewer": "review-chef",
+      "rounds": 4,
+      "verdict": "approved",
+      "approvedSha256": {
+        "src/games/conveyor-chef.js": "2299b80bd9965f1ad4d24446558142d400331bd1a1b90867a82678cb498766ed",
+        "tests/conveyor-chef.test.js": "9331a48e7ab24ea878ddd0a0783c2b0fa46b0300dd2996726d3b306d95efab67",
+        "tests/conveyor-chef-quality.test.js": "5461bdce1c355f14b53fa1d9101703f42bf8ac8befd8abc113aa5984441791ad"
+      },
+      "findings": [
+        {
+          "id": "chef-false-stock-loss",
+          "status": "closed",
+          "observation": "A fuzz run over 22 shifts x 30 seeds found 219 stock losses and 0 false ones (5 false on shift 22 the round before). The stock check now computes the exact best ticket cover when the greedy count predicts a loss."
+        },
+        {
+          "id": "chef-true-stock-loss-timing",
+          "status": "closed",
+          "observation": "Real stock losses still fire promptly (for example shift 3 with three tomatoes wasted ends at 28-30 s), while shifts with one or two items wasted can still be cleared."
+        }
+      ],
+      "openNotes": [
+        "The source file is about 2300 lines, over the 800-line soft ceiling, in line with other level-heavy games.",
+        "The prompt line effectively solves each shift for a player who follows it; a follower that never presses X still loses every junction shift.",
+        "Browser note: the green reach bar marks the prompted station, but Space uses whichever station is nearest, so a chef standing off-centre between two crates can take from the wrong one."
+      ]
+    },
+    {
+      "game": "firefly-trail",
+      "owner": "owner-firefly",
+      "reviewer": "review-firefly",
+      "rounds": 4,
+      "verdict": "approved",
+      "approvedSha256": {
+        "src/games/firefly-trail.js": "a3ef2a8d1624906b848cda7a121b4bb75cbdcaeb14dcc093eb7e8ae59a440784",
+        "tests/firefly-trail.test.js": "d466ab3ab9d467f89e86c80067cb1e9d70121c41592867b7e2837520db07bc74",
+        "tests/firefly-trail-quality.test.js": "12d62e96178bf9926be4ec625be70ff39e770e1e73663d69094b0e3ea89af6ad"
+      },
+      "findings": [
+        {
+          "id": "firefly-crude-bot",
+          "status": "closed",
+          "observation": "A bot that ignores the guide and prompts no longer clears most late meadows; a greedy bot clears 8 of the 16 late meadows."
+        },
+        {
+          "id": "firefly-prompt-into-sting",
+          "status": "closed",
+          "observation": "Following prompts no longer leads into a sting: 0 stings in 1941 literal-follower runs at lag 0 and 0.25 across 14 moth meadows and 30/60/120 Hz."
+        },
+        {
+          "id": "firefly-trail-check-cost",
+          "status": "closed",
+          "observation": "The trail self-crossing check no longer costs about 10 ms per frame on long trails."
+        },
+        {
+          "id": "firefly-pair-loops-and-wide-close",
+          "status": "closed",
+          "observation": "Fly pairs that one loop could catch were moved apart, and a loop too wide to close gets a warning."
+        },
+        {
+          "id": "firefly-wait-flee-flicker",
+          "status": "closed",
+          "observation": "Wait and back-away can no longer swap within 0.5 s; no wait/flee ping-pong shorter than 0.5 s on meadows 11, 18, 23 and 24. The worst count was 3 wait/flee-related changes in one second (meadow 23 stalker lure), accepted because every lower cap tried delayed a warning into a sting, a cut or a deadlock."
+        }
+      ],
+      "openNotes": [
+        "At lag 0.25 the reviewer saw 3 lantern cuts in about 650 literal-follower runs (meadows 17 and 23); no stings.",
+        "Meadow 11 shows a 0.2 s walk line between two real waits, shorter than a reaction time.",
+        "Longest forced wait is 8.7 s on meadow 19, 12.1 s on 23 and 9.3 s on 24; dawn margins stay above 15 s.",
+        "Casual-player wins are lowest on meadow 6 (24/30) and meadow 23 (26/30)."
+      ]
+    }
+  ]
+}

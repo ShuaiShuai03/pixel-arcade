@@ -1,0 +1,54 @@
+{
+  "date": "2026-11-07",
+  "browser": "The user's stable Google Chrome, driven through the official Claude in Chrome extension in its own tab-group window. Held keys were synthetic in-page keydown/keyup events; held touch buttons were pointer events on the real touch buttons; Start, language, Play again and level-select clicks were real mouse clicks or in-page key presses. Only visible DOM text and canvas pixels were read; no game state was read or injected.",
+  "status": "complete",
+  "stateInjection": false,
+  "savedProgressSeeding": "Later levels were opened from the level-select screen after earlier runs had unlocked them through the host's own saved progress.",
+  "phoneLayouts": "The Chrome window could not be resized, so phone layouts were checked in a same-origin 390-wide portrait frame on the page.",
+  "servedSourceCheck": "Before the final Firefly Trail runs, the SHA-256 of the served src/games/firefly-trail.js was computed in the page and matched the approved hash, and the module was fetched from the network rather than the cache.",
+  "games": [
+    {
+      "id": "conveyor-chef",
+      "sourceSha256": "2299b80bd9965f1ad4d24446558142d400331bd1a1b90867a82678cb498766ed",
+      "levels": 22,
+      "observed": [
+        "A driver that reads only the status-line prompt and the drawn kitchen won all 22 shifts; the last shift ended at 80% satisfaction with '所有班次都完成了，这间厨房属于你！'.",
+        "An idle shift ended in a loss; the win and loss screens ignored input, and Play again opened a clean shift-select screen.",
+        "English two-player phone layout: both chefs moved independently from their own touch buttons.",
+        "Every shift lost during the runs was traced to the test driver, not the game."
+      ],
+      "notes": [
+        "The green reach bar marks the prompted station, but Space uses whichever station is nearest, so a chef standing a few pixels off-centre between two crates can take from the wrong one. The game follows its documented rule; recorded, not fixed."
+      ],
+      "screenshots": [
+        "chef-22-win-zh.png",
+        "chef-select-zh.png",
+        "chef-loss-zh.jpg",
+        "chef-phone-en-coop.png"
+      ]
+    },
+    {
+      "id": "firefly-trail",
+      "sourceSha256": "a3ef2a8d1624906b848cda7a121b4bb75cbdcaeb14dcc093eb7e8ae59a440784",
+      "levels": 24,
+      "observed": [
+        "Approved build: a prompt-following driver played meadows 19 to 24 back to back and reached the win screen ('完成得漂亮！', score 5202) with no lost light. Clear times were 34 s on meadow 19 (dawn 64 s), 56 s on 23 (dawn 110 s) and 38 s on 24 (dawn 76 s). The status log showed no wait/flee back-and-forth.",
+        "Approved build: idle play on meadow 1 lost with 'Dawn broke over meadow 1 before the quota was met.'; arrow, Space and X on the loss screen changed nothing, and Play again returned to meadow select.",
+        "Round-3 build (e7129bc3, same layout and rendering; round 4 changed only prompt timing): the Chinese driver cleared meadows 2 to 24 and reached the win screen; the English select screen listed all 24 meadows and meadow 18 was cleared in English; an English dawn loss and restart worked.",
+        "Round-3 build, phone frame at 386 px wide with no horizontal overflow, in English and Chinese: touch labels were translated, and the touch buttons alone cleared meadow 1."
+      ],
+      "notes": [
+        "The shelf language switched from Chinese to English after the final win, without a click from the test; the open win screen re-rendered in English correctly."
+      ],
+      "screenshots": [
+        "firefly-24-win-zh.png",
+        "firefly-24-win-en-r4.png",
+        "firefly-loss-en-r4.png",
+        "firefly-select-en.png",
+        "firefly-phone-en-touch.png"
+      ]
+    }
+  ],
+  "console": "No console errors on the approved Firefly Trail runs. Earlier sessions saw only NotFoundError from setPointerCapture on synthetic touches with no real pointer behind them.",
+  "limitations": "Physical phones, touch hardware, other browsers and audio were not tested. Snowball Siege's rebuild is still in review and is not part of this release."
+}
