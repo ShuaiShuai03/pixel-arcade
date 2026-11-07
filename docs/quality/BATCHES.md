@@ -12,7 +12,7 @@ At the user's direction, at most **three games** may be under development and ac
 
 The rebuilt Snowball Siege, an original one- or two-player snow platformer with 30 floors and three bosses, passed ten rounds of independent review and browser acceptance and replaces the batch 1 version. The accepted total stays at 43. See the [batch 16 Snowball Siege evidence](batch-16/ACCEPTANCE.md). Commit `2f579ee` is live; all four checked assets match, and the published game accepted real input. See the [deployment receipt](batch-16/deployment.json).
 
-Stacksmith, a harbour-crane stacking game with real balance physics and 22 jobs, passed five rounds of independent review and browser acceptance, bringing the accepted total to 44. See the [Stacksmith evidence](batch-16/stacksmith/ACCEPTANCE.md).
+Stacksmith, a harbour-crane stacking game with real balance physics and 22 jobs, passed five rounds of independent review and browser acceptance, bringing the accepted total to 44. See the [Stacksmith evidence](batch-16/stacksmith/ACCEPTANCE.md). Commit `4c07456` is live after a Pages redeploy; all four checked assets match, and the published game accepted real input. See the [deployment receipt](batch-16/stacksmith/deployment.json).
 
 ## Completed batch 15
 
