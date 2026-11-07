@@ -2,13 +2,17 @@
 
 At the user's direction, at most **three games** may be under development and acceptance testing at one time. Do not begin the next batch until all games in the active batch satisfy the gates below. The collection target is 50 games, including Pixel Parkour (reduced from 100 at the user's direction on 2026-11-05). Roster themes are not work assignments.
 
-## Active batch 15
+## Active batch 16
 
-| Game           | Implementation owner | Independent reviewer | Current state                                                    |
-| -------------- | -------------------- | -------------------- | ---------------------------------------------------------------- |
-| Snowball Siege | `owner-snow`         | `review-snow`        | Rebuild carried over from batch 14; final prompt fixes in review |
-| Rail Switch    | not started          | not started          | Queued                                                           |
-| Tilt Lab       | not started          | not started          | Queued                                                           |
+| Game              | Implementation owner | Independent reviewer | Current state                                                        |
+| ----------------- | -------------------- | -------------------- | -------------------------------------------------------------------- |
+| Snowball Siege    | `owner-snow`         | `review-snow`        | Rebuild carried over from batch 15; all-floor prompt fixes in review |
+| Stacksmith        | not started          | not started          | Queued                                                               |
+| Traffic Conductor | not started          | not started          | Queued                                                               |
+
+## Completed batch 15
+
+Rail Switch and Tilt Lab passed initial development, independent review, and browser acceptance, bringing the accepted total to 43, Pixel Parkour included. Rail Switch has 20 timetables and Tilt Lab has 22 labs, each with level select and saved progress. All 150 focused tests, 28 shared regressions and four scoped catalog checks pass. A prompt-following driver ran all 20 Rail Switch timetables in English and all 22 Tilt Lab labs in Chinese to their win screens. Both games were played to losses, and touch play was checked on phone layouts. The Snowball Siege rebuild carries over to batch 16. See the [batch 15 evidence](batch-15/ACCEPTANCE.md).
 
 ## Completed batch 14
 

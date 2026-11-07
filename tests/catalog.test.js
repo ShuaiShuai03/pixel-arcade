@@ -19,9 +19,9 @@ test('Pixel Parkour is listed first as a featured game with its own page and car
       assert.ok(existsSync(new URL(`../${path.slice(2)}`, import.meta.url)), `${path} exists`);
   }
 });
-test('release contains forty unique loadable games with bilingual instructions', async () => {
-  assert.equal(catalog.length, 40);
-  assert.equal(new Set(catalog.map((g) => g.id)).size, 40);
+test('release contains forty-two unique loadable games with bilingual instructions', async () => {
+  assert.equal(catalog.length, 42);
+  assert.equal(new Set(catalog.map((g) => g.id)).size, 42);
   for (const entry of catalog) {
     const { meta, createGame } = await loadGame(entry.id);
     assert.equal(meta.id, entry.id);

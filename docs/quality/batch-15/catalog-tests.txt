@@ -1,0 +1,12 @@
+✔ Pixel Parkour is listed first as a featured game with its own page and card picture (0.64675ms)
+✔ release contains forty-two unique loadable games with bilingual instructions (35.203833ms)
+✔ rail-switch: seeded mixed input remains finite, draws and terminates at most once (23.845084ms)
+✔ tilt-lab: seeded mixed input remains finite, draws and terminates at most once (20.453375ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 132.521916

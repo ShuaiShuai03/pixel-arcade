@@ -39,6 +39,8 @@ export const catalog = [
   ['orbit-gardener', 'Orbit Gardener', '轨道园丁', 'arcade', '1', '#9be08a'],
   ['conveyor-chef', 'Conveyor Chef', '传送带厨房', 'arcade', '1-2', '#f08a5d'],
   ['firefly-trail', 'Firefly Trail', '萤火轨迹', 'arcade', '1', '#ffe27a'],
+  ['rail-switch', 'Rail Switch', '铁轨调度', 'arcade', '1', '#c98f5a'],
+  ['tilt-lab', 'Tilt Lab', '倾斜实验室', 'arcade', '1', '#7fd3e6'],
 ].map(([id, en, zh, genre, players, color]) => ({ id, name: { en, zh }, genre, players, color }));
 export const loadGame = (id) => import(`./games/${id}.js`);
 

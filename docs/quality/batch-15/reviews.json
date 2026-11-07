@@ -1,0 +1,107 @@
+{
+  "date": "2026-11-07",
+  "phase": "complete",
+  "finalCollectionReview": false,
+  "levelRule": "Level-based games need at least 20 authored levels with level select through env.progress.",
+  "records": [
+    {
+      "game": "rail-switch",
+      "owner": "owner-rail",
+      "reviewer": "review-rail",
+      "rounds": 4,
+      "verdict": "approved",
+      "approvedSha256": {
+        "src/games/rail-switch.js": "93677e02d751e1025624ec325e094138cdfd0d05efcebd1a9cb1ec5bd289ed5a",
+        "tests/rail-switch.test.js": "32dfcfb0915c2d0c5d40aaf4cfbbe2a6e31e2ad16dc16fa44a3acfcac0f04187",
+        "tests/rail-switch-quality.test.js": "fef5601717faa49460d8876b4e420f077ccac7a3517f61511da5359a9c88b28c"
+      },
+      "findings": [
+        {
+          "id": "rail-greedy-depth",
+          "severity": "high",
+          "status": "closed",
+          "observation": "A no-prompt bot that sends the nearest train along the shortest route won 11 of 20 levels. After the levels were rebuilt with tighter headways, routes where the shortest path collides, varied quotas and seeded departure jitter, it wins more than half the runs on only levels 1, 2, 3, 5 and 9, and none from level 10 on."
+        },
+        {
+          "id": "rail-spawn-into-oncoming",
+          "severity": "medium",
+          "status": "closed",
+          "observation": "A train could spawn into an oncoming train. A portal now holds a train while another one heading at it would meet it before it clears the first segment; random play shows no crash within 0.5 s of a spawn."
+        },
+        {
+          "id": "rail-strike-cause",
+          "severity": "medium",
+          "status": "closed",
+          "observation": "Strikes now show their cause in English and Chinese (head-on, rear-end, crossing, wrong platform, late). A looping train shows a countdown in its last 30 s, and the 2-minute limit is explained."
+        },
+        {
+          "id": "rail-jitter-prompt-crash",
+          "severity": "medium",
+          "status": "closed",
+          "observation": "Departure jitter could lead a perfect prompt follower into collisions (14 of 3000 runs). Level load now ghost-runs the authored routes on the jittered timetable and redraws on any strike; a 150-seed audit gives 3000/3000 wins with 0 strikes, and 0% of loads fall back to the authored timetable."
+        },
+        {
+          "id": "rail-spare-hud",
+          "severity": "low",
+          "status": "closed",
+          "observation": "The HUD shows how many more trains can be lost, clamped at 0 (Chrome acceptance had seen -1 on a loss)."
+        }
+      ],
+      "openNotes": [
+        "The source is about 2100 lines, over the 800-line soft ceiling, mostly level data.",
+        "Level 18 is a deliberate breather on long two-way single track with wide flip windows.",
+        "A follower that waits for the screen after every key wins 56/60 at 0.5 s lag and 33/60 at 1.0 s; the 1 s tolerance holds only for a follower that pipelines its keypresses."
+      ]
+    },
+    {
+      "game": "tilt-lab",
+      "owner": "owner-tilt",
+      "reviewer": "review-tilt",
+      "rounds": 3,
+      "verdict": "approved",
+      "approvedSha256": {
+        "src/games/tilt-lab.js": "54e8579bad867818b6ef6b7cabd96d614e03bcefa1d4dd186748256f6120c638",
+        "tests/tilt-lab.test.js": "230e850a6ff2d93daa4c1ac70f80957c128bc231fb14d15ba50f1c67d9065de1",
+        "tests/tilt-lab-quality.test.js": "23a97fd7e182b3770524919e4a5ef6ee9f212d599ee0f74b3a704ef481797d05"
+      },
+      "findings": [
+        {
+          "id": "tilt-crude-depth",
+          "severity": "medium",
+          "status": "closed",
+          "observation": "Random tilting cleared labs 3, 13 and 15 in more than half its runs. After twelve labs were redesigned, random and slow-random play clear at most 9 of 40 runs on any lab after the lab 1 tutorial; idle, hold, mash and cycle policies clear nothing."
+        },
+        {
+          "id": "tilt-visible-timing",
+          "severity": "medium",
+          "status": "closed",
+          "observation": "Timed gates now show a burning fuse, plates show a charge bar and a hold prompt for the whole charge, and a prompt says when to wait for a moving block. A literal follower at 0.5 s lag no longer falls on lab 16 (it had fallen in 40 of 60 runs)."
+        },
+        {
+          "id": "tilt-distinct-labs",
+          "severity": "medium",
+          "status": "closed",
+          "observation": "Lab 18 was a reskin of lab 13 and several labs shared a template; they were redesigned with 12-69 reachable roll states each."
+        },
+        {
+          "id": "tilt-bridge-tolerance",
+          "severity": "medium",
+          "status": "closed",
+          "observation": "Narrow bridges allowed only 0.07-0.23 degrees of cross-tilt. Guard rails now stop cross-tilt falls on the bridge labs, and a follower with random cross-tilt noise crosses them in 60 of 60 runs."
+        },
+        {
+          "id": "tilt-loss-banner",
+          "severity": "low",
+          "status": "closed",
+          "observation": "After a loss the canvas banner read 'Lab cleared!'; it now reads 'Out of lives' / '生命用完'."
+        }
+      ],
+      "openNotes": [
+        "Labs 14 and 20 have small roll graphs (about 10 and 8 states), and lab 14's random clear rate is about 22%, close to the 25% flag.",
+        "Lab 22 is the most sensitive lab to stray key presses.",
+        "The source is about 1900 lines, over the 800-line soft ceiling.",
+        "There are no multi-marble labs."
+      ]
+    }
+  ]
+}

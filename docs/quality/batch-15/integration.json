@@ -1,0 +1,44 @@
+{
+  "date": "2026-11-07",
+  "status": "complete",
+  "workspace": "Checks ran in a clean detached worktree of HEAD 8273bce plus exactly the batch 15 files, so the in-progress Snowball Siege rebuild is not included.",
+  "checks": {
+    "focused game tests with coverage": {
+      "command": "node --experimental-test-coverage (2 games) --test 4 test files",
+      "exitCode": 0,
+      "passed": 150,
+      "failed": 0,
+      "coverageLines": { "rail-switch": 99.63, "tilt-lab": 99.95 },
+      "coverageBranches": { "rail-switch": 99.19, "tilt-lab": 99.48 },
+      "log": "coverage.txt"
+    },
+    "shared input, simulation and platform lifecycle": {
+      "command": "node --test tests/input.test.js tests/simulation.test.js tests/platform-lifecycle.test.js",
+      "exitCode": 0,
+      "passed": 28,
+      "failed": 0,
+      "log": "shared-tests.txt"
+    },
+    "scoped catalog tests": {
+      "command": "node --test --test-name-pattern='release contains|Pixel Parkour|^(rail|tilt)' tests/catalog.test.js",
+      "exitCode": 0,
+      "passed": 4,
+      "failed": 0,
+      "log": "catalog-tests.txt"
+    },
+    "full catalog tests": {
+      "command": "node --test tests/catalog.test.js",
+      "exitCode": 0,
+      "passed": 44,
+      "failed": 0
+    },
+    "static check": { "command": "npm run check", "exitCode": 0, "log": "static-check.txt" },
+    "format check": { "command": "npm run format:check", "exitCode": 0, "log": "format-check.txt" },
+    "build": { "command": "npm run build", "exitCode": 0, "log": "build.txt" },
+    "diff check": { "command": "git diff --check", "exitCode": 0 }
+  },
+  "catalog": "Two entries added (Rail Switch and Tilt Lab, 1 player each); the release assertion rises from 40 to 42 JavaScript games.",
+  "hostChanges": "None.",
+  "reviewStatus": "Both games independently approved on the recorded hashes; remaining notes are low severity and listed in reviews.json.",
+  "uncommittedExcluded": "The Snowball Siege rebuild (in review), its pending catalog change to 1-2 players, and a stray untracked greedy.mjs in the repository root are not part of this release."
+}

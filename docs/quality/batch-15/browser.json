@@ -1,0 +1,50 @@
+{
+  "date": "2026-11-07",
+  "browser": "The user's stable Google Chrome, driven through the official Claude in Chrome extension in its own tab-group window. Held keys were synthetic in-page keydown/keyup events; held touch buttons were pointer events on the real touch buttons; Start, language and Play again were real mouse clicks. Only visible DOM text and canvas pixels were read; no game state was read or injected.",
+  "status": "complete",
+  "stateInjection": false,
+  "phoneLayouts": "The Chrome window could not be resized, so phone layouts were checked in a same-origin 390-wide portrait frame on the page.",
+  "servedSourceCheck": "Before each final run the SHA-256 of the served game module was computed in the page and matched the reviewed hash.",
+  "games": [
+    {
+      "id": "rail-switch",
+      "sourceSha256": "93677e02d751e1025624ec325e094138cdfd0d05efcebd1a9cb1ec5bd289ed5a",
+      "levels": 20,
+      "observed": [
+        "On a3e98690 (identical except the Spare clamp): a driver that reads only the status-line prompt played timetables 1 to 20 in English back to back and reached 'Nicely played! Every timetable is run - the yard is spotless!' with 0 strikes of its own. The new level 8 layout with two passing loops rendered correctly.",
+        "Chinese: idle play lost timetable 4 with '第 4 张时刻表发生三次失误，编组场停运。'; the strike cause '失误！列车开到了错误的站台' was on screen; arrow, Space and X on the loss screen changed nothing; Play again opened the level select.",
+        "Chinese phone frame, 371 px wide with no horizontal overflow: touch buttons 左 右 上 下 扳道 路线 alone cleared timetable 1 with 0 strikes.",
+        "Final build 93677e02: the Chinese loss screen shows Spare 0 (余量 0), no longer -1."
+      ],
+      "screenshots": [
+        "rail-20-win-en.png",
+        "rail-select-zh.png",
+        "rail-loss-zh.png",
+        "rail-phone-zh-touch.png"
+      ]
+    },
+    {
+      "id": "tilt-lab",
+      "sourceSha256": "54e8579bad867818b6ef6b7cabd96d614e03bcefa1d4dd186748256f6120c638",
+      "levels": 22,
+      "observed": [
+        "On a7a89556 (identical except the loss banner text): a driver that reads only the status-line prompt played labs 1 to 22 in Chinese back to back and reached '完成得漂亮！所有实验都完成了，弹珠安然到家！' without losing a marble. The plate-charging and wait-for-the-block prompts appeared.",
+        "English level select listed all 22 labs with names and tips.",
+        "English: blind tilting on lab 3 ran out of lives ('The marble ran out of lives. Try again!'); input on the loss screen changed nothing; Play again opened the level select.",
+        "English phone frame, 371 px wide with no horizontal overflow: touch buttons Left, Right, Up, Down and Level alone cleared lab 1.",
+        "No console errors."
+      ],
+      "notes": [
+        "The loss screen on a7a89556 showed 'Lab cleared!' in the canvas banner behind the overlay. On the final build 54e8579b, served and hash-checked in the page, blind tilting on lab 3 lost again and the banner now reads 'Out of lives'."
+      ],
+      "screenshots": [
+        "tilt-22-win-zh.png",
+        "tilt-select-en.png",
+        "tilt-loss-en.png",
+        "tilt-phone-en-touch.png"
+      ]
+    }
+  ],
+  "console": "No console errors during the Rail Switch and Tilt Lab runs.",
+  "limitations": "Physical phones, touch hardware, other browsers and audio were not tested. The Snowball Siege rebuild is still in development and is not part of this release."
+}
