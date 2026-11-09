@@ -1,0 +1,59 @@
+{
+  "game": "blockfall",
+  "date": "2026-11-09",
+  "reviewedRevision": "5ef589b plus the rework in this commit",
+  "owner": "owner-block",
+  "reviewer": "final-block",
+  "rounds": 1,
+  "process": "Lean final review at the user's request: the known 3-level shortfall went straight to a retrofit, followed by one independent review round, one clean-worktree test run and a short browser check.",
+  "verdict": "pass",
+  "approvedSha256": {
+    "src/games/blockfall.js": "7465099abf96fb0c6cc451f6f1947448fa324822c941363e0aefbb63bac6f678",
+    "src/games/blockfall-board.js": "4f74950c7fadaca7c316c8d1b73bb47cc85cd623341ada3264cd01f488258c6d",
+    "src/games/blockfall-draw.js": "8c4f1fb4bce740087505607b792d141c22da19ebb87793d979d27926667368ab",
+    "src/games/blockfall-levels.js": "1810683c89766164007cf5f77d3d3f3aa402ef3e757efb06f251adbd85fcaca6",
+    "src/games/blockfall-menu.js": "751e6b86e73c5a454e6267a7833aa3dc524f1d7806ef0cd8d2c7176ee6693e13",
+    "src/games/blockfall-rules.js": "24c76eee4f86934d9133ca8dd1a7046acd6b0d5b8d86c9b57acbd7df2927f1f6",
+    "src/games/blockfall-text.js": "4be53d2dcc3370a0cc033291beda87ebda6d2c1f0d306790e6d3c9a03fd769e3",
+    "tests/blockfall.test.js": "015a9349c4abc88ee7c16220968df7988e518a7c385192d23c5a6c1834f5635d",
+    "tests/blockfall-quality.test.js": "f4b2c88f8fc451c57743b69f159354204957eed08c83ce4d95c4b8b0863fed53"
+  },
+  "tests": {
+    "command": "node --experimental-test-coverage --test-coverage-include='src/games/blockfall*.js' --test tests/blockfall.test.js tests/blockfall-quality.test.js",
+    "passed": 52,
+    "failed": 0,
+    "lineCoverage": 99.71,
+    "log": "blockfall-coverage.txt"
+  },
+  "independentProbes": "The reviewer's own reaction-limited bot, reading only public state, cleared 120 of 120 runs at 0.25 s and 119 of 120 at 0.35 s (20 levels, 6 seeds, 60 Hz), most levels in 3-25 s. Ninety blind patterns (idle, mash, random keys and 72 hold-plus-alternate timings) won at most 1.7% of any level from 3. An exhaustive search with the game's own rotation and clearing rules found every fixed-supply level solvable: levels 6, 11, 14 and 17 need 3, 4, 7 and 9 of their 8, 11, 13 and 15 pieces. Burst levels never depend on luck because the 7-bag always deals an I piece and hold is available. Fuzz with hostile dt and pointer values, determinism at 30, 60 and 120 Hz, broken progress stores and EN/ZH text fit all passed.",
+  "findings": [
+    {
+      "id": "R1",
+      "severity": "blocking",
+      "status": "fixed",
+      "observation": "Only 3 districts in a partial table, with no select or continue. There are now 20 data-driven districts with four goal kinds (clear lines, burst several rows with one piece, dig out marked rubble, finish with a fixed piece supply), gravity from 0.80 to 0.30 s per row, accurate EN/ZH tips, a district select and env.progress continue."
+    },
+    {
+      "id": "R2",
+      "severity": "medium",
+      "status": "fixed",
+      "observation": "Every district opens with a 2.4 s reading pause with gravity and input frozen and no overlay over the well; the 875-line file is split into seven modules with a quality test file covering per-level clears, blind bars, a reaction-limited bot, determinism, hostile input, broken stores and terminal state."
+    }
+  ],
+  "openNotes": [
+    "A piece resting flush against a wall cannot rotate toward that wall (16 cases); rotating the other way works and lock delay leaves time to nudge away.",
+    "On district 3 one misplaced piece can clear a preset row and shorten the shaft, so the 4-row burst needs a rebuild; X retries the district.",
+    "Rubble districts 13 and 16 are slow for a heuristic bot; human play is unmeasured."
+  ],
+  "browser": {
+    "method": "Official Claude in Chrome extension, local server; real clicks on Start, Play again, the language switch and the touch buttons, synthetic in-page keys; only DOM text and the canvas were read.",
+    "servedSha256Prefixes": "7465099a 4f74950c 8c4f1fb4 1810683c 751e6b86 24c76eee 4be53d2d",
+    "observed": [
+      "Chinese: Start opened district 1 of 20 (基础区, clear 4 lines) with the tip in the right panel and the well uncovered; Space hard-dropped pieces and the score rose.",
+      "Chinese loss: stacking to the top ended the run with the explanation 第1区：方块已堆到井顶。; Play again restarted district 1.",
+      "English 390 px phone frame (388 px inner, no horizontal overflow): eight touch buttons; Left moved the piece, Turn rotated it and Drop placed it (score 34).",
+      "Not covered in the browser: a district win and the district select, which appears only after a first clear; the reviewer's bots and the quality tests cover both."
+    ],
+    "screenshots": ["screenshots/blockfall-loss-zh.jpg", "screenshots/blockfall-phone-en.png"]
+  }
+}

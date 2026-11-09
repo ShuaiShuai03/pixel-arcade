@@ -16,6 +16,9 @@ Phase Tiles completed batch 18 and the 50-game target, Pixel Parkour included. T
 | Neon Snake     | Passed in one round: 20 levels, countdown starts ([record](final-review/neon-snake.json))                 |
 | Starbreaker    | Passed in one round: 20 fields, docked launch ([record](final-review/starbreaker.json))                   |
 | Orbit Invaders | Passed in one round: 20 levels, aimed crossfire ([record](final-review/orbit-invaders.json))              |
+| River Hop      | Retrofitting to 20+ levels (3 stages)                                                                     |
+| Meteor Drift   | Retrofitting to 20+ levels (5 waves)                                                                      |
+| Blockfall      | Passed in one round: 20 districts, four goal kinds ([record](final-review/blockfall.json))                |
 
 ## Completed batch 18
 

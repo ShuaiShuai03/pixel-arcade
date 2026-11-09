@@ -30,7 +30,7 @@ Effort: S = level data only, M = data plus some mechanics or tests, L = structur
 | iron-bastion     |             24 | `FIELDS`                |   M    | done (final review) |
 | orbit-invaders   |             20 | `LEVELS`                |   M    | done (final review) |
 | bubble-pop       |              3 | `CAVERNS` (partial)     |   M    | queued              |
-| blockfall        |              3 | `DISTRICTS` (partial)   |   M    | queued              |
+| blockfall        |             20 | `LEVELS`                |   M    | done (final review) |
 | gem-match        |              3 | per-stage goal logic    |   M    | queued              |
 | minefield        |              3 | field builder branches  |   M    | queued              |
 | memory-grove     |              3 | 3 rule types            |   M    | queued              |
