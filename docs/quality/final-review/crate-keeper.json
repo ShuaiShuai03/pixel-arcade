@@ -1,0 +1,70 @@
+{
+  "game": "crate-keeper",
+  "date": "2026-11-09",
+  "reviewedRevision": "badaaf3 plus the rework in this commit",
+  "owner": "owner-crate",
+  "reviewer": "final-crate",
+  "rounds": 1,
+  "process": "Lean final review at the user's request: the known 8-level shortfall went straight to a retrofit, followed by one independent review round. Its two MEDIUM findings were fixed and verified by re-running the reviewer's own probes (undo, reset, menu and determinism), one clean-worktree run and the browser check, without a second review round.",
+  "verdict": "pass",
+  "approvedSha256": {
+    "src/games/crate-keeper.js": "0d56c50519bb17abcdb29a85ebff71faffd010bd3f9cdf02b658bda743ca171e",
+    "src/games/crate-keeper-solver.js": "8a83386ba3cd98ece41a023de3522a10251aa99fc19e145423270de7f0c7a0af",
+    "src/games/crate-keeper-levels.js": "5bcbb2bc1db7c7aadc2b081d2ad0276d82e26a9ea440f4948088c9a243c3392e",
+    "src/games/crate-keeper-menu.js": "13eb161a5e7bde8a52bb81cbc083953c4902bec3bba862ebcbe7834c4a0e260c",
+    "src/games/crate-keeper-draw.js": "b3a63943aaf26003a747260f9002b7db100881b3fe84fcb7b1c94b8ff766776f",
+    "tests/crate-keeper.test.js": "3f6db92c9462c93ab6cd821ab19f652cc8e3e1b5c2a913f56e2a1d0b1c03acfc",
+    "tests/crate-keeper-quality.test.js": "e54d648dc63abd9e9e7a74f71756f99ae63a7b3ca8455a6097cdcf1ed2e8ead2"
+  },
+  "tests": {
+    "command": "node --experimental-test-coverage --test-coverage-include='src/games/crate-keeper*.js' --test tests/crate-keeper.test.js tests/crate-keeper-quality.test.js",
+    "passed": 41,
+    "failed": 0,
+    "lineCoverage": 99.76,
+    "log": "crate-keeper-coverage.txt"
+  },
+  "independentProbes": "The reviewer's own solver confirmed all 20 rooms solvable with every par push-optimal (1, 4, 6, 9, 9, 10, 13, 13, 15, 16, 17, 19, 20, 22, 24, 24, 26, 26, 27, 31); its public-state bot cleared all 20 at par. A rotation and reflection check found no duplicate room shells and none resembled a classic layout. Blind patterns cleared nothing from room 2. The dead-square marker had no false positives; about 14,000 mid-puzzle hint searches peaked at 93 ms without reaching the node cap. On the final files the reviewer's undo, reset, menu and determinism probes reported 0 failures, and opening the menu then pressing Enter kept the room's moves.",
+  "findings": [
+    {
+      "id": "R1",
+      "severity": "blocking",
+      "status": "fixed",
+      "observation": "Only 8 rooms and no select or continue. There are now 20 original, solver-proven rooms (one to five crates) with push-optimal par, EN/ZH tips, a room select and env.progress continue; the 796-line file is split into five modules with undo, reset, a hint search and a dead-square marker."
+    },
+    {
+      "id": "M1",
+      "severity": "medium",
+      "status": "fixed",
+      "observation": "Review finding: walking was tedious, with one tile per key press or tap (69-145 keys on rooms 10-19). Held directions now repeat after 0.25 s every 0.14 s, deterministically across frame rates, and tapping a reachable floor tile walks there along a shortest path without pushing, each step undoable."
+    },
+    {
+      "id": "M2",
+      "severity": "medium",
+      "status": "fixed",
+      "observation": "Review finding: reset had no confirmation and the room menu could only be left by reloading a room, so one tap could wipe a long room. Reset is now an undo step, and M or a tap on the menu title closes the menu without reloading; choosing the current room keeps its progress."
+    },
+    {
+      "id": "L1",
+      "severity": "low",
+      "status": "fixed",
+      "observation": "Room 20 is marked cleared after the final win, room scores scale with par instead of flattening at 100 on long rooms, and the HUD explains par as the fewest pushes."
+    }
+  ],
+  "openNotes": [
+    "The side panel lists Esc as a way to close the room menu, but the host uses Esc to pause; M and the title tap close it.",
+    "The rooms come from a search over random layouts, so some look generated rather than hand-designed, and several tips are generic.",
+    "Hold-to-repeat was confirmed with the keyboard in the browser; touch buttons use the same held-input path but were only pressed briefly."
+  ],
+  "browser": {
+    "method": "Official Claude in Chrome extension, local server; real clicks on Start, the board, the room select and the touch buttons, synthetic in-page keys; only DOM text and the canvas were read.",
+    "servedSha256Prefixes": "0d56c505 8a83386b 5bcbb2bc 13eb161a b3a63943",
+    "observed": [
+      "Chinese: Start opened room 1 of 20 (收货码头) with the footer 'Z撤销 · H提示 · X重置 · M选关'.",
+      "Tap-to-walk: a tap on a far floor tile walked the keeper 4 steps without pushing; holding Left for 0.9 s repeated 4 more steps to the wall.",
+      "X reset the room to 0 steps and Z restored all 8; pushing the crate onto its dock completed room 1 and Enter opened room 2.",
+      "In room 2, M opened the room select (room 1 cleared, room 2 current, 'M返回') and M closed it with progress intact.",
+      "Chinese 390 px phone frame (388 px inner, no horizontal overflow): the select opened at the saved room, a tap started room 2, and the Right touch button moved the keeper."
+    ],
+    "screenshots": ["screenshots/crate-keeper-win-zh.jpg", "screenshots/crate-keeper-phone-zh.png"]
+  }
+}

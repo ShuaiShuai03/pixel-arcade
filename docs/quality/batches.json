@@ -241,7 +241,8 @@
       "blockfall",
       "meteor-drift",
       "river-hop",
-      "minefield"
+      "minefield",
+      "crate-keeper"
     ],
     "records": [
       "final-review/snowball-siege.json",
@@ -255,7 +256,8 @@
       "final-review/blockfall.json",
       "final-review/meteor-drift.json",
       "final-review/river-hop.json",
-      "final-review/minefield.json"
+      "final-review/minefield.json",
+      "final-review/crate-keeper.json"
     ]
   }
 }

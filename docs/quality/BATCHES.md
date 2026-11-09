@@ -20,7 +20,7 @@ Phase Tiles completed batch 18 and the 50-game target, Pixel Parkour included. T
 | Meteor Drift   | Passed in one round: 22 sectors, fixed ammo ([record](final-review/meteor-drift.json))                    |
 | Blockfall      | Passed in one round: 20 districts, four goal kinds ([record](final-review/blockfall.json))                |
 | Gem Match      | Retrofitting to 20+ levels (3 stages)                                                                     |
-| Crate Keeper   | Retrofitting to 20+ levels (8 levels)                                                                     |
+| Crate Keeper   | Passed in one round: 20 solver-proven rooms ([record](final-review/crate-keeper.json))                    |
 | Minefield      | Passed in one round: 20 fields, no guessing ([record](final-review/minefield.json))                       |
 
 ## Completed batch 18
