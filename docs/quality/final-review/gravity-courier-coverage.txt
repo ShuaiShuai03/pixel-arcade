@@ -1,0 +1,25 @@
+ℹ tests 56
+ℹ suites 0
+ℹ pass 56
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 18018.968083
+ℹ start of coverage report
+ℹ -----------------------------------------------------------------------------
+ℹ file                         | line % | branch % | funcs % | uncovered lines
+ℹ -----------------------------------------------------------------------------
+ℹ src                          |        |          |         |
+ℹ  games                       |        |          |         |
+ℹ   gravity-courier-draw.js    | 100.00 |   100.00 |  100.00 |
+ℹ   gravity-courier-menu.js    | 100.00 |   100.00 |  100.00 |
+ℹ   gravity-courier-physics.js |  99.20 |    97.71 |  100.00 | 26 242
+ℹ   gravity-courier-rooms.js   | 100.00 |   100.00 |  100.00 |
+ℹ   gravity-courier-step.js    |  98.50 |    95.20 |  100.00 | 164-167
+ℹ   gravity-courier-text.js    | 100.00 |    95.83 |  100.00 |
+ℹ   gravity-courier.js         | 100.00 |   100.00 |  100.00 |
+ℹ -----------------------------------------------------------------------------
+ℹ all files                    |  99.51 |    97.68 |  100.00 |
+ℹ -----------------------------------------------------------------------------
+ℹ end of coverage report

@@ -250,7 +250,8 @@
       "pinball-pocket",
       "dungeon-dash",
       "bubble-pop",
-      "lantern-climber"
+      "lantern-climber",
+      "gravity-courier"
     ],
     "records": [
       "final-review/snowball-siege.json",
@@ -273,7 +274,8 @@
       "final-review/pinball-pocket.json",
       "final-review/dungeon-dash.json",
       "final-review/bubble-pop.json",
-      "final-review/lantern-climber.json"
+      "final-review/lantern-climber.json",
+      "final-review/gravity-courier.json"
     ]
   }
 }

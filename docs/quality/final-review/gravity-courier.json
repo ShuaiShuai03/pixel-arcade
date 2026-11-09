@@ -1,0 +1,61 @@
+{
+  "game": "gravity-courier",
+  "date": "2026-11-09",
+  "reviewedRevision": "3ac3740 plus the rework in this commit",
+  "owner": "owner-gravity",
+  "reviewer": "final-gravity",
+  "rounds": 1,
+  "process": "Lean final review at the user's request: the known 3-room shortfall went straight to a retrofit, followed by one independent review round. It passed; three cheap LOW fixes (unlock at delivery, flip buffer edge, chamber 17 safe speed) were verified by re-running the reviewer's own terminal, flip-buffer and determinism probes, one clean-worktree run and the browser check, without a second review round.",
+  "verdict": "pass",
+  "approvedSha256": {
+    "src/games/gravity-courier.js": "085bd1d74c71f980c7789e67f391c2dac866c9aedfe3d1e1adb18192823e42a1",
+    "src/games/gravity-courier-rooms.js": "7bbf29a1ea32d4899ea02c78c4048730239d339239cda5c20f1db2c961f6ba39",
+    "src/games/gravity-courier-physics.js": "4c5f842c17fac81038fa56ccd02cb903179887911116764eb6937dcb0676c40f",
+    "src/games/gravity-courier-step.js": "bee451b9fde3b610ac9bce2ab650113c95058041e7b746fc2aaa45f07be69f78",
+    "src/games/gravity-courier-draw.js": "d462e305d8b479f946f5e00a06140f9afb584943a1b237d146a02ea1277dcfce",
+    "src/games/gravity-courier-text.js": "3131114dd9b5e25722913eadbe96480e592d5affef64771000e58a9063828bd4",
+    "src/games/gravity-courier-menu.js": "d9fa6022abdfbadf432648e499b0a8cd77d72d40901880b044b6fba22caad0bf",
+    "tests/gravity-courier.test.js": "8397f5d2c80b9cf1b5be22caa26f47bdb3af1729b1bd14265e0e6ba2b31e4dfe",
+    "tests/gravity-courier-quality.test.js": "d1f56980e7938a15ab980c25a0e428d813a6b0fc5c9bde453602685e6e16ebc8"
+  },
+  "tests": {
+    "command": "node --experimental-test-coverage --test-coverage-include='src/games/gravity-courier*.js' --test tests/gravity-courier.test.js tests/gravity-courier-quality.test.js",
+    "passed": 56,
+    "failed": 0,
+    "lineCoverage": 99.51,
+    "log": "gravity-courier-coverage.txt"
+  },
+  "independentProbes": "The reviewer's own pilot (state seen 0.25-0.35 s late, replaying its own commands to estimate the present, with perception noise and decision jitter) cleared 120 of 120 chamber runs at each delay, mastery chambers taking 8-13.5 s with at most one damaging hit on average. Blind play (idle, mash, random keys and 28 timed patterns, 40 seeds) cleared 0% of chambers 3-20, and idling never loses. 120 random input schedules ended identically at 30, 60 and 120 Hz; tunnelling, fuzz, terminal and progress-store probes found no violation. On the final files the same probes showed the unlock saved once at delivery, no dropped second flip at any delay, and 60 of 60 schedules still deterministic.",
+  "findings": [
+    {
+      "id": "R1",
+      "severity": "blocking",
+      "status": "fixed",
+      "observation": "Only 3 rooms in a partial table, with no select or continue. There are now 20 data-driven chambers (teaching 1-6, combination 7-14, mastery 15-20) with polarity posts, floor and ceiling docks, strong and weak field zones shown as text, heavy and glass parcels, windows and gates, accurate EN/ZH tips, a chamber select and env.progress continue; flips pressed during a repack are buffered, and the 880-line file is split into seven modules."
+    },
+    {
+      "id": "L1",
+      "severity": "low",
+      "status": "fixed",
+      "observation": "Review findings: progress was saved only when X entered the next chamber, a second flip pressed within about 20 ms of a flip could be dropped, and chamber 17's safe speed equalled the terminal horizontal speed so side walls never mattered. Progress now unlocks at delivery, the flip buffer equals the cooldown, and chamber 17's safe speed is 100."
+    }
+  ],
+  "openNotes": [
+    "The curve is fair but gentle for a player who anticipates well: mastery chambers cost a competent pilot little extra time or damage.",
+    "A human at about 0.35 s who cannot anticipate the field reversal was not modelled."
+  ],
+  "browser": {
+    "method": "Official Claude in Chrome extension, local server; real clicks on Start and the touch buttons, synthetic in-page keys; only DOM text and the canvas were read.",
+    "servedSha256Prefixes": "085bd1d7 7bbf29a1 4c5f842c bee451b9 d462e305 3131114d d9fa6022",
+    "observed": [
+      "English: Start opened chamber 1 of 20 (Polarity Post) with the field shown as text (↓180), the safe speed, spares, and SOURCE and DELIVER pads unobscured.",
+      "Win: X collected the parcel, Space reversed the field to the ceiling rail (an unbraked landing cost two pack pips, as the tip warns), Right and a small Left aligned with the pad, and X delivered (DELIVERED · X FOR NEXT CHAMBER).",
+      "English 390 px phone frame (388 px inner, no horizontal overflow): touch buttons Left, Right, Reverse field and Handle / Next; the chamber select already showed chamber 2 unlocked without pressing X, confirming the unlock at delivery.",
+      "Not covered in the browser: a loss; the reviewer's terminal probe and the quality tests cover it."
+    ],
+    "screenshots": [
+      "screenshots/gravity-courier-win-en.jpg",
+      "screenshots/gravity-courier-phone-en.png"
+    ]
+  }
+}
