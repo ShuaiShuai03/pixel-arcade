@@ -229,7 +229,11 @@
     "maxActiveGames": 3,
     "status": "in_progress",
     "requiredGameCount": 50,
-    "passedGames": ["snowball-siege", "ember-knights"],
-    "records": ["final-review/snowball-siege.json", "final-review/ember-knights.json"]
+    "passedGames": ["snowball-siege", "ember-knights", "sky-raiders"],
+    "records": [
+      "final-review/snowball-siege.json",
+      "final-review/ember-knights.json",
+      "final-review/sky-raiders.json"
+    ]
   }
 }

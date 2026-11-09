@@ -1,0 +1,29 @@
+ℹ tests 166
+ℹ suites 0
+ℹ pass 166
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 238641.582
+ℹ start of coverage report
+ℹ -------------------------------------------------------------------------
+ℹ file                     | line % | branch % | funcs % | uncovered lines
+ℹ -------------------------------------------------------------------------
+ℹ src                      |        |          |         |
+ℹ  games                   |        |          |         |
+ℹ   sky-raiders-ai.js      | 100.00 |    97.96 |  100.00 |
+ℹ   sky-raiders-draw.js    | 100.00 |    97.27 |  100.00 |
+ℹ   sky-raiders-hazards.js | 100.00 |   100.00 |  100.00 |
+ℹ   sky-raiders-menu.js    | 100.00 |   100.00 |  100.00 |
+ℹ   sky-raiders-physics.js |  97.30 |    93.72 |  100.00 | 217-219
+ℹ   sky-raiders-scenery.js | 100.00 |    98.48 |  100.00 |
+ℹ   sky-raiders-sectors.js | 100.00 |   100.00 |  100.00 |
+ℹ   sky-raiders-sprites.js | 100.00 |    91.11 |  100.00 |
+ℹ   sky-raiders-step.js    | 100.00 |    98.28 |  100.00 |
+ℹ   sky-raiders-text.js    | 100.00 |   100.00 |  100.00 |
+ℹ   sky-raiders.js         | 100.00 |    98.45 |  100.00 |
+ℹ -------------------------------------------------------------------------
+ℹ all files                |  99.61 |    96.98 |  100.00 |
+ℹ -------------------------------------------------------------------------
+ℹ end of coverage report

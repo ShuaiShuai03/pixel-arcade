@@ -1,0 +1,84 @@
+{
+  "game": "sky-raiders",
+  "date": "2026-11-09",
+  "reviewedRevision": "2739506 plus the rework in this commit",
+  "owner": "owner-sky, then owner-sky2 after a session restart",
+  "reviewer": "final-sky (round 1), final-sky2 (round 2)",
+  "rounds": 2,
+  "verdict": "pass",
+  "approvedSha256": {
+    "src/games/sky-raiders.js": "9e590a9fff4d049dcef6d9157420f54131d49088a10d1262bf6af3b096f1603b",
+    "src/games/sky-raiders-ai.js": "9cfcccac17484a6b8ff491c12e1298e43b54c3d913835fc76464dc314a372bc7",
+    "src/games/sky-raiders-draw.js": "8927e5705dee0235640bfd11642fcb034002f2defbecdf1cae9bbb306945bb82",
+    "src/games/sky-raiders-hazards.js": "e3aa95ec4a109071b5936ea0e62ced990545437ebec6a03439d14387ddab7a7e",
+    "src/games/sky-raiders-menu.js": "c3327d51de5b6ac8da9411cad7020ad03c97fcac29dbb93dd86f5cbac59255ff",
+    "src/games/sky-raiders-physics.js": "353b20aaf8da0d418313210d0c1d6c168b63778bd6331dd219b3be279f40cb4c",
+    "src/games/sky-raiders-scenery.js": "f15907aaae66fe201a052ecb28a01d6714d4561106b5fb3b414be9ead2b36f90",
+    "src/games/sky-raiders-sectors.js": "254f88d758454d46acaad7485c5343e976f8f1c8ff3d4a81635c4a0c3b65811f",
+    "src/games/sky-raiders-sprites.js": "e69d149e9e08aec9323323ba5e259beaeb7e63ba61b1b700f1a134b58f54d0d7",
+    "src/games/sky-raiders-step.js": "a426433da9bce4a5d6dee7e70f0fbbf85d4159e62aaaf0137c540e3a6dd0993f",
+    "src/games/sky-raiders-text.js": "e01094173e431f340f93459c1f12f3bf1b9b1b7cecfc5b99bcd8079491ff02e6",
+    "tests/sky-raiders.test.js": "52ac6dd9fd451d6881ecb02f22206d0e61ba6a84e3b23a97ea1484cf313ca245",
+    "tests/sky-raiders-quality.test.js": "5f45e83f76607528c5e8093462fd9c8f381537d114fed59b6dacd5f0bad6d23f"
+  },
+  "tests": {
+    "command": "node --experimental-test-coverage --test-coverage-include='src/games/sky-raiders*.js' --test tests/sky-raiders.test.js tests/sky-raiders-quality.test.js",
+    "passed": 166,
+    "failed": 0,
+    "lineCoverage": 99.61,
+    "log": "sky-raiders-coverage.txt"
+  },
+  "independentProbes": "The reviewer's own reaction-limited bot, reading only public state, cleared 1324 of 1344 sector runs across all 24 sectors at 30, 60 and 120 Hz with 0.25 s and 0.35 s delay (0.5 hits per run), and won 9 of 12 full 24-sector campaigns. Eleven blind policies, pointer sweep included, won 0 of 264 runs each on sectors 3-24; a park-and-track bot won 1 of 264. From random states, a 0.5 s reaction always leaves an escape from every strike zone. 16,000 swept-bullet trials had no miss; 20,000 impacts conserved momentum without energy gain; 475 trace snapshots matched across 30, 60 and 120 Hz; 200 fuzz runs (2.88 million steps, hostile dt and pointer values) broke no invariant.",
+  "findings": [
+    {
+      "id": "B1",
+      "severity": "blocking",
+      "status": "fixed",
+      "observation": "Only 6 sectors and no select or continue. There are now 24 data-driven sectors (teaching 1-8, combination 9-16, mastery 17-24) with carrier, wasp and dread carriers, eight fire patterns, aimed lane, column, grid and cross strike zones and accurate bilingual lessons, plus a sector select and env.progress continue; broken and throwing stores clamp safely."
+    },
+    {
+      "id": "M1",
+      "severity": "medium",
+      "status": "fixed",
+      "observation": "Hulls could interpenetrate by up to 2 px and stay stuck. A whole-hull minimum-axis separation split by inverse mass now follows the impulse solver; the round-1 repro, 3000 random two-body runs and 144 in-game ramming runs show no overlap, and the pilot never leaves the play area."
+    },
+    {
+      "id": "M2",
+      "severity": "medium",
+      "status": "fixed",
+      "observation": "Added tests/sky-raiders-quality.test.js: reaction-limited clears, blind-policy and park-and-track bounds, trace determinism across frame rates, env.end payloads in EN and ZH, fuzz, the real InputState and touch path, and broken progress stores."
+    },
+    {
+      "id": "L1",
+      "severity": "low",
+      "status": "fixed",
+      "observation": "Parking in one lane and holding fire won every run. Strike zones aimed at the pilot's heading now punish a stationary lane; park-and-track wins at most 8% of any sector from sector 3, and parking at the top loses within 26 s."
+    },
+    {
+      "id": "L2-L4",
+      "severity": "low",
+      "status": "fixed",
+      "observation": "Dead code removed (the charge pod now drops), the help text explains the W, + and K pods in EN and ZH, and the 1,476-line file is split into eleven modules of at most 371 lines."
+    }
+  ],
+  "openNotes": [
+    "Crowded pile-ups of three bodies around a pilot pinned at a wall can leave up to 0.21 px of overlap for up to 0.8 s in synthetic tests (5 of 900); in-game ramming showed none.",
+    "The full suite takes about 4-5 minutes, above the few-minutes target.",
+    "The widest English HUD line is about 463 of 480 px, tight if the host font is wider than the reviewer's estimate.",
+    "Strike zones cause about half the hits a late-sector player takes; the reviewer judged them avoidable with a 0.5 s reaction.",
+    "The pointer only works in the sector select; flight uses keys or the touch buttons."
+  ],
+  "browser": {
+    "method": "Official Claude in Chrome extension, local server; real clicks on Start, Play again, the language switch and the touch buttons, synthetic in-page keys; only DOM text and the canvas were read.",
+    "servedSha256Prefixes": "9e590a9f 9cfcccac 8927e570 e3aa95ec c3327d51 353b20aa f15907aa 254f88d7 e69d149e a426433d e0109417",
+    "observed": [
+      "English: Start opened sector 1 of 24 (Cloudbreak); held arrow and Space keys moved and fired the interceptor and the score rose.",
+      "English loss: left idle, incoming fire exhausted the shields and the loss screen explained it; Play again restarted sector 1 with the score reset.",
+      "Chinese: the idle run ended with the localized loss message (敌方炮火耗尽了护盾).",
+      "Chinese 390 px phone frame (388 px inner, no horizontal overflow): real presses on the touch buttons moved the ship right, fired (heat rose) and spent an interception charge (3 to 2) whose ring expanded on screen.",
+      "The console showed no errors or warnings after a fresh load.",
+      "Not covered in the browser: a full sector win and the sector select, which appears only after a first clear; both are covered by the reviewer's bots and the quality tests."
+    ],
+    "screenshots": ["screenshots/sky-raiders-loss-en.jpg", "screenshots/sky-raiders-phone-zh.png"]
+  }
+}

@@ -8,36 +8,36 @@ Each retrofit goes through the normal gates: owner build, independent review, re
 
 Effort: S = level data only, M = data plus some mechanics or tests, L = structural rework.
 
-| Game             | Current levels | Data                             | Effort | Status              |
-| ---------------- | -------------: | -------------------------------- | :----: | ------------------- |
-| crate-keeper     |              8 | `LEVELS`, solver exists          |   S    | queued              |
-| wallrunner-relay |              3 | `COURSES`                        |   S    | queued              |
-| clockwork-bridge |              3 | `MACHINES`                       |   S    | queued              |
-| glider-ridge     |              3 | `COURSE_DATA`                    |   S    | queued              |
-| burrow-rescue    |              3 | `SECTORS`                        |   S    | queued              |
-| raft-rush        |              3 | `SECTION_DATA`                   |   S    | queued              |
-| shield-sentinel  |   3 + Guardian | `WAVES`                          |   S    | queued              |
-| dash-duelist     |              3 | `RIVALS`                         |   S    | queued              |
-| tether-twins     |              3 | `ROOMS`                          |   S    | queued              |
-| vine-warden      |              3 | `PLOTS`                          |   S    | queued              |
-| river-hop        |              3 | `STAGES`                         |   S    | queued              |
-| snowball-siege   |             30 | `FLOORS`                         |   M    | done (batch 16)     |
-| starbreaker      |              3 | hard-coded brick patterns        |   M    | queued              |
-| meteor-drift     |              5 | wave if-chain                    |   M    | queued              |
-| ember-knights    |             20 | `STAGES`                         |   M    | done (final review) |
-| bomb-garden      |              6 | `GARDENS`/`LAYOUTS`              |   M    | queued              |
-| sky-raiders      |              6 | `SECTORS` plus per-level drawing |   M    | queued              |
-| iron-bastion     |              3 | inline plans                     |   M    | queued              |
-| orbit-invaders   |              4 | fleet if-chain                   |   M    | queued              |
-| bubble-pop       |              3 | `CAVERNS` (partial)              |   M    | queued              |
-| blockfall        |              3 | `DISTRICTS` (partial)            |   M    | queued              |
-| gem-match        |              3 | per-stage goal logic             |   M    | queued              |
-| minefield        |              3 | field builder branches           |   M    | queued              |
-| memory-grove     |              3 | 3 rule types                     |   M    | queued              |
-| gravity-courier  |              3 | `COURIER_ROOMS`                  |   M    | queued              |
-| grapnel-gorge    |              3 | inline `plans`                   |   M    | queued              |
-| dungeon-dash     |              5 | per-room branches                |   L    | queued              |
-| neon-snake       |              3 | ~23 per-level branches           |   L    | queued              |
+| Game             | Current levels | Data                      | Effort | Status              |
+| ---------------- | -------------: | ------------------------- | :----: | ------------------- |
+| crate-keeper     |              8 | `LEVELS`, solver exists   |   S    | queued              |
+| wallrunner-relay |              3 | `COURSES`                 |   S    | queued              |
+| clockwork-bridge |              3 | `MACHINES`                |   S    | queued              |
+| glider-ridge     |              3 | `COURSE_DATA`             |   S    | queued              |
+| burrow-rescue    |              3 | `SECTORS`                 |   S    | queued              |
+| raft-rush        |              3 | `SECTION_DATA`            |   S    | queued              |
+| shield-sentinel  |   3 + Guardian | `WAVES`                   |   S    | queued              |
+| dash-duelist     |              3 | `RIVALS`                  |   S    | queued              |
+| tether-twins     |              3 | `ROOMS`                   |   S    | queued              |
+| vine-warden      |              3 | `PLOTS`                   |   S    | queued              |
+| river-hop        |              3 | `STAGES`                  |   S    | queued              |
+| snowball-siege   |             30 | `FLOORS`                  |   M    | done (batch 16)     |
+| starbreaker      |              3 | hard-coded brick patterns |   M    | queued              |
+| meteor-drift     |              5 | wave if-chain             |   M    | queued              |
+| ember-knights    |             20 | `STAGES`                  |   M    | done (final review) |
+| bomb-garden      |              6 | `GARDENS`/`LAYOUTS`       |   M    | queued              |
+| sky-raiders      |             24 | `SECTORS`                 |   M    | done (final review) |
+| iron-bastion     |              3 | inline plans              |   M    | queued              |
+| orbit-invaders   |              4 | fleet if-chain            |   M    | queued              |
+| bubble-pop       |              3 | `CAVERNS` (partial)       |   M    | queued              |
+| blockfall        |              3 | `DISTRICTS` (partial)     |   M    | queued              |
+| gem-match        |              3 | per-stage goal logic      |   M    | queued              |
+| minefield        |              3 | field builder branches    |   M    | queued              |
+| memory-grove     |              3 | 3 rule types              |   M    | queued              |
+| gravity-courier  |              3 | `COURIER_ROOMS`           |   M    | queued              |
+| grapnel-gorge    |              3 | inline `plans`            |   M    | queued              |
+| dungeon-dash     |              5 | per-room branches         |   L    | queued              |
+| neon-snake       |              3 | ~23 per-level branches    |   L    | queued              |
 
 Not level-based (no retrofit needed): pinball-pocket (one table), paddle-duel (single match), pixel-rally (one continuous course), lantern-climber (one continuous tower). Pixel Parkour is a separate project.
 
