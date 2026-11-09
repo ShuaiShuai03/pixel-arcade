@@ -1,0 +1,81 @@
+{
+  "game": "snowball-siege",
+  "date": "2026-11-09",
+  "reviewedRevision": "abbf9c9 plus the fixes in this commit",
+  "reviewer": "final-snowball",
+  "rounds": 3,
+  "verdict": "pass",
+  "approvedSha256": {
+    "src/games/snowball-siege.js": "54c7511d7b3dcb31d70059945b56784b5a705a3d1149a13e6b77d81b917ddd2d",
+    "tests/snowball-siege.test.js": "2f03644cfe77d26f424accae6b5b317b9951c811d143b59dba44964b69623817",
+    "tests/snowball-siege-quality.test.js": "2a5ebf52f2acf8102e335b32c6f2c5cc2b5cb5e004854f04ad1268dffeda0d34"
+  },
+  "tests": {
+    "command": "node --experimental-test-coverage --test-coverage-include='src/games/snowball-siege*.js' --test tests/snowball-siege.test.js tests/snowball-siege-quality.test.js",
+    "passed": 120,
+    "failed": 0,
+    "lineCoverage": 99.76,
+    "log": "snowball-siege-coverage.txt"
+  },
+  "independentProbes": "1,440 fuzz runs with 3.87M simulation steps over all 30 floors, solo and co-op, at 30-144 Hz with hostile dt and pointer values: no exception, non-finite value, wall embedding, unsupported grounding or damage without a nearby hazard. A prompt-following bot cleared 296 of 300 floor runs. Mutation spot-checks on the new tests killed 12 of 13 mutants.",
+  "findings": [
+    {
+      "id": "F1",
+      "severity": "medium",
+      "status": "fixed",
+      "observation": "Power-up help said speed, range and heavy snow last until you are hurt; they expire after 15 s. The texts are now built from RULES and tested."
+    },
+    {
+      "id": "F2",
+      "severity": "low",
+      "status": "fixed",
+      "observation": "Bounce wording was off by one; balls break on the 4th hit, heroes included."
+    },
+    {
+      "id": "F3",
+      "severity": "low",
+      "status": "fixed",
+      "observation": "A ball pinned between a hero and a wall was placed inside the wall; it now shatters."
+    },
+    {
+      "id": "F4",
+      "severity": "low",
+      "status": "fixed",
+      "observation": "An unreachable Furnace Queen spawn branch was removed."
+    },
+    {
+      "id": "F5",
+      "severity": "low",
+      "status": "fixed",
+      "observation": "Terminal assertions were conditional. New unconditional tests cover an idle loss in EN and ZH, a floor-30 win and a store that throws."
+    },
+    {
+      "id": "F6",
+      "severity": "low",
+      "status": "fixed",
+      "observation": "A throwing progress store crashed createGame or a floor clear; both calls are now guarded."
+    },
+    {
+      "id": "F7",
+      "severity": "low",
+      "status": "fixed",
+      "observation": "The floor menu prompt named only keys; it now says a tap on a floor starts it (a first rewording that claimed a second tap was itself caught and corrected)."
+    }
+  ],
+  "openNotes": [
+    "No test proves a shot dies at a wall face before its range ends; the reviewer's 42,385-sample probe found the game correct.",
+    "Falling balls can clip a tile next to a vent slot by up to 3.2 px (cosmetic).",
+    "Powers and the shield expire without a warning blink.",
+    "The source file is 3,335 lines."
+  ],
+  "browser": {
+    "method": "Official Claude in Chrome extension, local server; real clicks on Start, the language switch and the touch buttons, synthetic in-page keys; only DOM text and the canvas were read.",
+    "servedSha256Prefix": "54c7511d",
+    "observed": [
+      "Chinese: Start opened floor 1; Right, X and Up changed the prompt line and moved the hero; the description shows the corrected bounce text.",
+      "English 390 px phone frame (371 px inner, no horizontal overflow): real taps on Left, Jump and Snow moved the hero and flipped the prompt arrow.",
+      "The console showed no errors or warnings during either session."
+    ],
+    "screenshots": ["screenshots/snowball-siege-zh.jpg", "screenshots/snowball-siege-phone-en.png"]
+  }
+}

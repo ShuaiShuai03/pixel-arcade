@@ -227,9 +227,9 @@
     "required": true,
     "startsAfterAllGamesDeveloped": true,
     "maxActiveGames": 3,
-    "status": "pending",
+    "status": "in_progress",
     "requiredGameCount": 50,
-    "passedGames": [],
-    "records": []
+    "passedGames": ["snowball-siege"],
+    "records": ["final-review/snowball-siege.json"]
   }
 }

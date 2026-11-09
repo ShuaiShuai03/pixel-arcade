@@ -9,8 +9,8 @@ export const meta = {
   players: '1-2',
   touch: true,
   description: {
-    en: 'Clear 30 single-screen floors of the Cinder Keep, alone or with a friend (two players share the screen, with their own lives and keys). Throw snow: four hits pack an enemy into a snowball, but a half-coated enemy thaws and breaks free. Walk into a snowball to roll it: it defeats everything it touches, bounces off walls four times, and shoves other snowballs into motion for chain bonuses. Jump up through planks, press Down + Jump to drop through them, grab fruit and power-ups, finish before the Ember Wraith hunts you, and beat three bosses with snowballs made from their minions.',
-    zh: '清除烬石要塞的30层单屏关卡，可单人或双人同屏合作（各自的生命和按键）。投雪：命中四次把敌人裹成雪球，但只裹一半的敌人会融化脱身。走向雪球就能把它推动：滚动的雪球会击败路上的一切，撞墙反弹四次，还会撞动其他雪球形成连锁加分。可以从木板下方跳上去，按下加跳跃穿过木板；拾取水果和增益道具，赶在余烬幽灵出现前通关，并用三名首领召唤的小怪做成雪球来击败它们。',
+    en: 'Clear 30 single-screen floors of the Cinder Keep, alone or with a friend (two players share the screen, with their own lives and keys). Throw snow: four hits pack an enemy into a snowball, but a half-coated enemy thaws and breaks free. Walk into a snowball to roll it: it defeats everything it touches, bounces off walls and heroes and breaks on the fourth hit, and shoves other snowballs into motion for chain bonuses. Jump up through planks, press Down + Jump to drop through them, grab fruit and power-ups, finish before the Ember Wraith hunts you, and beat three bosses with snowballs made from their minions.',
+    zh: '清除烬石要塞的30层单屏关卡，可单人或双人同屏合作（各自的生命和按键）。投雪：命中四次把敌人裹成雪球，但只裹一半的敌人会融化脱身。走向雪球就能把它推动：滚动的雪球会击败路上的一切，撞墙或撞到英雄会反弹，第四次撞击时碎裂，还会撞动其他雪球形成连锁加分。可以从木板下方跳上去，按下加跳跃穿过木板；拾取水果和增益道具，赶在余烬幽灵出现前通关，并用三名首领召唤的小怪做成雪球来击败它们。',
   },
   keys: [
     { label: { en: 'Move', zh: '移动' }, keys: 'A D / ← →' },
@@ -811,23 +811,23 @@ export const POWERS = freeze(['speed', 'range', 'power', 'shield']);
 export const POWER_INFO = freeze({
   speed: {
     name: { en: 'Speed up', zh: '加速' },
-    en: 'Speed up: run 25% faster until you are hurt',
-    zh: '加速：跑得更快，直到被击中',
+    en: `Speed up: run 25% faster for ${RULES.powerTime} s or until you are hurt`,
+    zh: `加速：跑得更快，持续${RULES.powerTime}秒或直到被击中`,
   },
   range: {
     name: { en: 'Long shot', zh: '远射' },
-    en: 'Long shot: snow flies 50% farther until you are hurt',
-    zh: '远射：雪球飞得更远，直到被击中',
+    en: `Long shot: snow flies 50% farther for ${RULES.powerTime} s or until hurt`,
+    zh: `远射：雪球飞得更远，持续${RULES.powerTime}秒或直到被击中`,
   },
   power: {
     name: { en: 'Heavy snow', zh: '重雪' },
-    en: 'Heavy snow: two layers per hit until you are hurt',
-    zh: '重雪：每发加两层，直到被击中',
+    en: `Heavy snow: two layers per hit for ${RULES.powerTime} s or until hurt`,
+    zh: `重雪：每发加两层，持续${RULES.powerTime}秒或直到被击中`,
   },
   shield: {
     name: { en: 'Shield', zh: '护盾' },
-    en: 'Shield: harmless for 5 seconds',
-    zh: '护盾：5秒内不受伤',
+    en: `Shield: harmless for ${RULES.shieldTime} seconds`,
+    zh: `护盾：${RULES.shieldTime}秒内不受伤`,
   },
 });
 export const BOSSES = freeze({
@@ -1465,7 +1465,8 @@ function ballContacts(s, emit) {
       b.x = b.vx > 0 ? h.x + h.w : h.x - b.w;
       b.bounces++;
       learn(s, 'bounce');
-      if (b.bounces >= RULES.ballBounces) shatter(s, b, emit);
+      // pinned between a hero and a wall there is no room left: the ball breaks instead of sinking in
+      if (b.bounces >= RULES.ballBounces || inWall(s.grid, b)) shatter(s, b, emit);
       break;
     }
     if (b.dead) continue;
@@ -1803,7 +1804,7 @@ function queenTick(s, b) {
     b.n++;
     const cap = MINION_CAP + (b.phase > 2 ? 1 : 0);
     if (b.n % 2 === 1 && minionCount(s) < cap) {
-      queueMinion(s, b.n % 2 ? 'jumper' : 'thrower', farVent(s));
+      queueMinion(s, 'jumper', farVent(s));
       b.cd = 1.6;
       return;
     }
@@ -2109,7 +2110,7 @@ function menuStep(s, dt, input, emit) {
 // ---------------------------------------------------------------------------------------------
 
 export const PROMPTS = freeze({
-  menu: ['Arrows: pick a floor. Space: start', '方向键选楼层，空格开始'],
+  menu: ['Arrows + Space, or tap a floor to start', '方向键+空格，或直接点按楼层开始'],
   cleared: ['Floor clear! Next floor soon', '过关！即将进入下一层'],
   warn: ['Hurry! Ember Wraith in {n}s', '快！余烬幽灵{n}秒后出现'],
   chase: ['Wraith hunts you: finish or run', '幽灵在追你：快通关或躲开'],
@@ -2122,7 +2123,7 @@ export const PROMPTS = freeze({
   throw: ['{throw}: throw snow, 4 hits = snowball', '{throw}：投雪，命中4次成雪球'],
   ball: ['Walk into a snowball to roll it', '走向雪球就能把它推走'],
   drop: ['Down + Jump: drop through a plank', '按下 + 跳跃：穿过木板下落'],
-  wall: ['Rolling balls bounce off walls 4 times', '滚动的雪球撞墙反弹4次'],
+  wall: ['Rolling balls bounce, then break on the 4th hit', '滚动的雪球会反弹，第4次撞击时碎裂'],
   chain: ['Roll a ball into a ball for chains', '让雪球撞雪球可连锁加分'],
   hopper: ['Hoppers crouch first: snow them then', '跳蛙起跳前会蹲下：趁机投雪'],
   moth: ['Moths bob in a lane: throw when level', '蛾子上下飘：对齐时投雪'],
@@ -3294,10 +3295,26 @@ export function render(ctx, s, env) {
 // Public game
 // ---------------------------------------------------------------------------------------------
 
+// Progress is a convenience: a broken store must never stop the game.
+function readUnlocked(progress) {
+  try {
+    return progress?.unlocked?.();
+  } catch {
+    return 1;
+  }
+}
+function saveUnlocked(progress, floor) {
+  try {
+    progress?.unlock?.(floor);
+  } catch {
+    // keep playing; the floor simply is not remembered
+  }
+}
+
 export function createGame(env) {
   const s = newState(env.random, env.mode === 2 ? 2 : 1);
   s.menuClock = 0;
-  let unlocked = Math.max(1, Math.min(FLOORS.length, Math.floor(env.progress?.unlocked?.()) || 1));
+  let unlocked = Math.max(1, Math.min(FLOORS.length, Math.floor(readUnlocked(env.progress)) || 1));
   if (unlocked > 1) openMenu(s, unlocked);
   let ended = false;
   const emit = (name) => env.sound(name);
@@ -3306,7 +3323,7 @@ export function createGame(env) {
       advance(s, dt, input, emit);
       if (s.unlockTo > unlocked) {
         unlocked = s.unlockTo;
-        env.progress?.unlock?.(unlocked);
+        saveUnlocked(env.progress, unlocked);
       }
       if (s.phase === 'playing' || ended) return;
       ended = true;

@@ -2604,3 +2604,75 @@ test('power-ups are named and explained in both languages', () => {
     assert.equal(s.msg, null, 'the explanation appears only the first time');
   }
 });
+
+// ---------------------------------------------------------------------------------------------
+// Final-review regressions
+// ---------------------------------------------------------------------------------------------
+
+test('a ball pinned between a hero and a wall breaks instead of sinking into the wall', () => {
+  const s = live(2);
+  const wallFace = s.grid[0].length * T; // right edge of the grid, refined below
+  const row = RULES.rows - 2;
+  let face = 0;
+  for (let c = 1; c < RULES.cols; c++)
+    if (tileAt(s.grid, c, row) === '#') {
+      face = c * T;
+      break;
+    }
+  assert.ok(face > 0 && face < wallFace, 'floor 2 has an inner wall on the lowest row');
+  standOnGround(s, face - 31);
+  const ball = ballAt(s, face - 27, GROUND_TOP - 22, {});
+  ball.mode = 'roll';
+  ball.vx = -162;
+  ball.bounces = 1;
+  tick(s);
+  assert.ok(ball.dead || ball.x + ball.w <= face + 0.01, 'the ball never ends inside the wall');
+});
+
+test('power-up and shield texts name the real durations in both languages', () => {
+  for (const kind of ['speed', 'range', 'power']) {
+    assert.ok(POWER_INFO[kind].en.includes(`${RULES.powerTime} s`), kind);
+    assert.ok(POWER_INFO[kind].zh.includes(`${RULES.powerTime}秒`), kind);
+  }
+  assert.ok(POWER_INFO.shield.en.includes(`${RULES.shieldTime} seconds`));
+  assert.ok(POWER_INFO.shield.zh.includes(`${RULES.shieldTime}秒`));
+  assert.match(PROMPTS.wall[0], new RegExp(`${RULES.ballBounces}th hit`));
+});
+
+test('an idle player loses on floor 1 through the public game: one end, the right floor, frozen after', () => {
+  for (const lang of ['en', 'zh']) {
+    const h = harness({ seed: 4, lang });
+    const g = createGame(h.env);
+    for (let t = 0; t < 400 && !h.ends.length; t += 1 / 60) g.update(1 / 60, input([]));
+    assert.equal(h.ends.length, 1);
+    assert.equal(h.ends[0].won, false);
+    assert.match(h.ends[0].message, lang === 'en' ? /floor 1\./ : /第1层/);
+    assert.equal(g.getState().phase, 'lost');
+    const frozen = JSON.stringify(g.getState());
+    for (let i = 0; i < 300; i++) g.update(1 / 60, input(['ArrowRight', 'KeyX'], ['ArrowUp']));
+    assert.equal(h.ends.length, 1);
+    assert.equal(JSON.stringify(g.getState()), frozen);
+    assert.equal(h.sounds.filter((n) => n === 'lose' || n === 'win').length, 1);
+  }
+});
+
+test('a throwing or junk progress store never stops the game', () => {
+  const throwing = harness({ seed: 2 });
+  throwing.env.progress = {
+    unlocked: () => {
+      throw new Error('storage blocked');
+    },
+    unlock: () => {
+      throw new Error('storage blocked');
+    },
+  };
+  const g = createGame(throwing.env);
+  assert.equal(g.getState().floor, 1);
+  for (let i = 0; i < 600; i++) g.update(1 / 60, input(['ArrowRight']));
+  assert.equal(g.getState().phase, 'playing');
+  for (const value of [NaN, 'x', -4, 2.7, Infinity, null]) {
+    const h = harness();
+    h.env.progress = { unlocked: () => value, unlock() {} };
+    assert.doesNotThrow(() => createGame(h.env).update(1 / 60, input([])));
+  }
+});

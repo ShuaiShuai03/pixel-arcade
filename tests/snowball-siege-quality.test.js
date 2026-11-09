@@ -1783,3 +1783,37 @@ test('quality: a snowed imp does not start a windup, and an imp whose windup was
   assert.equal(imp.state, 'walk', 'the stun window holds for a second');
   assert.equal(s.hz.length, 0, 'no fire during the window');
 });
+
+test('quality: beating the Furnace Queen on floor 30 ends the run exactly once, as a win, and freezes it', () => {
+  const r = runFloor({ floor: 30, seed: 1, hz: 60, delay: [0.02, 0.04], maxSeconds: 600 });
+  assert.equal(r.h.ends.length, 1, 'the run ended');
+  assert.equal(r.h.ends[0].won, true);
+  assert.equal(r.g.getState().phase, 'won');
+  const frozen = JSON.stringify(r.g.getState());
+  for (let i = 0; i < 300; i++) r.g.update(1 / 60, input(['ArrowRight', 'KeyX'], ['ArrowUp']));
+  assert.equal(r.h.ends.length, 1);
+  assert.equal(JSON.stringify(r.g.getState()), frozen);
+  assert.equal(r.h.sounds.filter((n) => n === 'win' || n === 'lose').length, 1);
+});
+
+test('quality: a store that throws on unlock never stops a floor from clearing', () => {
+  const r = runFloor({
+    floor: 1,
+    seed: 2,
+    make: (env) => {
+      env.progress = {
+        unlocked: () => 1,
+        unlock: () => {
+          throw new Error('storage blocked');
+        },
+      };
+      return createGame(env);
+    },
+  });
+  assert.ok(r.cleared, 'floor 1 cleared with a throwing store');
+  assert.doesNotThrow(() => {
+    for (let i = 0; i < 240; i++) r.g.update(1 / 60, input([]));
+  });
+  assert.equal(r.h.ends.length, 0);
+  assert.equal(r.g.getState().floor, 2, 'the next floor still loads');
+});

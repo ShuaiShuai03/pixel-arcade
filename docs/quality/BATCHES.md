@@ -4,7 +4,13 @@ At the user's direction, at most **three games** may be under development and ac
 
 ## All 50 games initially accepted
 
-Phase Tiles completed batch 18 and the 50-game target, Pixel Parkour included. The [required final review](#required-final-review) of every game comes next.
+Phase Tiles completed batch 18 and the 50-game target, Pixel Parkour included. The [required final review](#required-final-review) of every game is under way, three games at a time.
+
+| Game           | Final review                                                           |
+| -------------- | ---------------------------------------------------------------------- |
+| Snowball Siege | Passed after three rounds ([record](final-review/snowball-siege.json)) |
+| Ember Knights  | Fixing findings: one held key wins; 6 stages, needs 20                 |
+| Bomb Garden    | Fixing findings: 6 gardens, needs 20                                   |
 
 ## Completed batch 18
 
