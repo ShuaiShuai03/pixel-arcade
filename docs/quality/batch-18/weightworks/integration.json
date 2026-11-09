@@ -1,0 +1,62 @@
+{
+  "date": "2026-11-09",
+  "status": "complete",
+  "workspace": "Checks ran in a clean detached worktree of HEAD 75f1b18 plus exactly the six Weightworks files and its catalog entry.",
+  "checks": {
+    "focused game tests with coverage": {
+      "command": "node --experimental-test-coverage --test-coverage-include='src/games/weightworks*.js' --test tests/weightworks.test.js tests/weightworks-quality.test.js",
+      "exitCode": 0,
+      "passed": 59,
+      "failed": 0,
+      "coverageLines": {
+        "weightworks": 100,
+        "weightworks-engine": 100,
+        "weightworks-draw": 100,
+        "weightworks-machines": 100
+      },
+      "coverageBranches": {
+        "weightworks": 99.11,
+        "weightworks-engine": 99.08,
+        "weightworks-draw": 100,
+        "weightworks-machines": 100
+      },
+      "log": "coverage.txt"
+    },
+    "shared input, simulation and platform lifecycle": {
+      "command": "node --test tests/input.test.js tests/simulation.test.js tests/platform-lifecycle.test.js",
+      "exitCode": 0,
+      "passed": 28,
+      "failed": 0,
+      "log": "shared-tests.txt"
+    },
+    "scoped catalog tests": {
+      "command": "node --test --test-name-pattern='release contains|Pixel Parkour|^weightworks' tests/catalog.test.js",
+      "exitCode": 0,
+      "passed": 3,
+      "failed": 0,
+      "log": "catalog-tests.txt"
+    },
+    "static check": {
+      "command": "npm run check",
+      "exitCode": 0,
+      "log": "static-check.txt"
+    },
+    "format check": {
+      "command": "npm run format:check",
+      "exitCode": 0,
+      "log": "format-check.txt"
+    },
+    "build": {
+      "command": "npm run build",
+      "exitCode": 0,
+      "log": "build.txt"
+    },
+    "diff check": {
+      "command": "git diff --check",
+      "exitCode": 0
+    }
+  },
+  "catalog": "One entry added (Weightworks, 1 player, puzzle); the release assertion rises from 47 to 48 JavaScript games.",
+  "hostChanges": "None.",
+  "uncommittedExcluded": "Phase Tiles (in review) and a stray untracked greedy.mjs are not part of this release."
+}

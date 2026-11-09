@@ -1,0 +1,34 @@
+{
+  "date": "2026-11-09",
+  "browser": "The user's stable Google Chrome, driven through the official Claude in Chrome extension in its own tab-group window. Keys were synthetic in-page keydown/keyup events; touch buttons, Start, the language switch, menu cells on the canvas and Play again were real mouse clicks. Only visible DOM text and the drawn canvas were read; no game state was read or injected.",
+  "status": "complete",
+  "stateInjection": false,
+  "phoneLayouts": "Checked in a same-origin 390-wide portrait frame on the page (371 px inner width, no horizontal overflow).",
+  "servedSourceCheck": "The SHA-256 of all four served weightworks modules was computed in the page and matched b31102f7, 93254ea1, 36fcddcc and 47567538.",
+  "games": [
+    {
+      "id": "weightworks",
+      "sourceSha256": {
+        "src/games/weightworks.js": "b31102f7551395e2a2533b0e8ee3f8fa5b2ca661df7936c55d89920f7e72559e",
+        "src/games/weightworks-engine.js": "93254ea10a84e022bbe983ec44a3ae4e2cc028c62c681525977d9c2e209e9e59",
+        "src/games/weightworks-draw.js": "36fcddccf6401e1d8e7ba1bd354e5823cd218784010e2aa957294d4b72ef2b3f",
+        "src/games/weightworks-machines.js": "475675389c2b24a3154d8fdbd5aac7734113e9db3bd7c41ac55d7f4180665cbe"
+      },
+      "levels": 24,
+      "observed": [
+        "A driver that reads only the Chinese status line, with a 0.35 s reaction delay and pressing an arrow or X exactly as many times as the line says, played machines 1 to 24 back to back in 4 minutes 23 seconds and reached '完成得漂亮！ 全部机器已平衡，工坊归你了！' with the maximum score of 2400. It never needed an undo, and it never had to repeat an action.",
+        "English machine select listed all 24 machines; one tap on machine 5 selected it and a second tap entered it.",
+        "English: spending machine 5's five moves by placing and lifting a mass in place showed 'Too few moves left: press Z to undo' from the third move. Without an undo the run ended 6.5 s after the last move with 'Out of moves on machine 5. Try it again.' Z, arrows, X, Space and Q on the loss screen changed nothing, and Play again returned to machine select.",
+        "English phone frame: real taps on the touch buttons alone, following the prompt, cleared machines 1 and 2. On machine 2 the Undo button took back a placement and Reset restored the machine.",
+        "At 371 px the host header clips the end of the prompt; the full prompt stays on the canvas."
+      ],
+      "screenshots": [
+        "../screenshots/weightworks-24-win-zh.jpg",
+        "../screenshots/weightworks-select-en.jpg",
+        "../screenshots/weightworks-loss-en.jpg",
+        "../screenshots/weightworks-phone-en-touch.png"
+      ]
+    }
+  ],
+  "limitations": "Physical phones, other browsers, tapping pegs on the canvas and audio were not tested; the loss countdown was not photographed; console output was not captured."
+}

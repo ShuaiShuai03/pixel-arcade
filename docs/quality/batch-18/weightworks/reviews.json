@@ -1,0 +1,69 @@
+{
+  "date": "2026-11-09",
+  "phase": "complete",
+  "finalCollectionReview": false,
+  "levelRule": "Level-based games need at least 20 authored levels with level select through env.progress.",
+  "records": [
+    {
+      "game": "weightworks",
+      "owner": "owner-weight",
+      "reviewer": "review-weight",
+      "rounds": 2,
+      "verdict": "approved",
+      "approvedSha256": {
+        "src/games/weightworks.js": "b31102f7551395e2a2533b0e8ee3f8fa5b2ca661df7936c55d89920f7e72559e",
+        "src/games/weightworks-engine.js": "93254ea10a84e022bbe983ec44a3ae4e2cc028c62c681525977d9c2e209e9e59",
+        "src/games/weightworks-draw.js": "36fcddccf6401e1d8e7ba1bd354e5823cd218784010e2aa957294d4b72ef2b3f",
+        "src/games/weightworks-machines.js": "475675389c2b24a3154d8fdbd5aac7734113e9db3bd7c41ac55d7f4180665cbe",
+        "tests/weightworks.test.js": "cf2d32e148952a38f221438023a350584598d65992cd81d5fc10f4dcaa0f088a",
+        "tests/weightworks-quality.test.js": "b17a7dcc9a65910e8eba7a745b200ada25a53c530ab98542f86e91f0b1ec17eb"
+      },
+      "hashCheck": "The reviewer recorded all six hashes at the start and the end of each round; both rounds' records were identical, and the served modules matched in Chrome.",
+      "findings": [
+        {
+          "id": "weight-false-tip",
+          "severity": "medium",
+          "status": "closed",
+          "observation": "Machine 20's tip said every beam ends level, but two beams must lean right. It now reads 'Two beams lean right, one hangs level: read each lamp'."
+        },
+        {
+          "id": "weight-tip-wording",
+          "severity": "low",
+          "status": "closed",
+          "observation": "Machine 18's tip ('move the right one first') was meaningless and machine 7's tip omitted that moving a placed slider costs two moves. Both were rewritten."
+        },
+        {
+          "id": "weight-ambiguous-prompts",
+          "severity": "low",
+          "status": "closed",
+          "observation": "152 rotate prompts on the optimal path named a mass of the same weight as the one already selected, and vertical move prompts named a peg they did not reach. Sliders are now named with their rail, a plain mass is called plain when needed, and vertical steps name only the beam."
+        },
+        {
+          "id": "weight-early-budgets",
+          "severity": "low",
+          "status": "closed",
+          "observation": "Machines 3 and 4 had no budget, so an informed random placer reached 28% at 240 s. They now have optimum + 3; it wins 0 of 60 on each."
+        },
+        {
+          "id": "weight-loss-window",
+          "severity": "low",
+          "status": "closed",
+          "observation": "An exhausted, unsolved machine was lost 1.2 s after the needles rested, so a 1.5 s reader always lost. A visible 6 s countdown now runs, any undo or reset cancels it, and idle still loses."
+        },
+        {
+          "id": "weight-dead-code",
+          "severity": "low",
+          "status": "closed",
+          "observation": "Unused options, an unread cap flag, unreachable no-solution advice and stale generator markers were removed."
+        }
+      ],
+      "openNotes": [
+        "Late machines have 240 to 20,160 complete placements with exactly one solved; since undo refunds moves, a patient exhaustive search can solve them. The reviewer's no-prompt bots (greedy with climbing, 2-ply with restarts, depth 3-5 look-ahead) beat at most 12 of 24 machines and none of 14-24.",
+        "Beam A on machine 20 is satisfied in every complete placement, so the machine plays as two gates.",
+        "Optimal move counts rise only from 1 to 8; the search size does not rise monotonically.",
+        "Machines 1 and 2 are easy by design: random play wins 25 of 100 on machine 1 and mashing 69 and 12 of 100 on machines 1 and 2.",
+        "Text fit was checked with a width model, not measured fonts; at 371 px the host header clips the prompt, which stays in full on the canvas."
+      ]
+    }
+  ]
+}

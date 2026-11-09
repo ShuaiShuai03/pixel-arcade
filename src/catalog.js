@@ -46,6 +46,7 @@ export const catalog = [
   ['mirror-lab', 'Mirror Lab', '镜光实验室', 'puzzle', '1', '#7a6fd6'],
   ['circuit-weaver', 'Circuit Weaver', '电路织匠', 'puzzle', '1', '#c8873a'],
   ['tide-lock', 'Tide Lock', '潮汐船闸', 'puzzle', '1', '#3a7ca5'],
+  ['weightworks', 'Weightworks', '天平工坊', 'puzzle', '1', '#a8763e'],
 ].map(([id, en, zh, genre, players, color]) => ({ id, name: { en, zh }, genre, players, color }));
 export const loadGame = (id) => import(`./games/${id}.js`);
 

@@ -1,7 +1,7 @@
 {
   "maxActiveGames": 3,
   "activeBatch": 18,
-  "acceptedGames": 48,
+  "acceptedGames": 49,
   "batches": [
     {
       "number": 1,
@@ -132,7 +132,8 @@
       "number": 18,
       "games": ["phase-tiles", "weightworks"],
       "status": "in_progress",
-      "notes": "Tide Lock brought the accepted total to 48, so two games reach the 50-game target; Fold Map, first scheduled here, is not needed for the target."
+      "notes": "Tide Lock brought the accepted total to 48, so two games reach the 50-game target; Fold Map, first scheduled here, is not needed for the target. Weightworks was accepted and released ahead of Phase Tiles; see batch-18/weightworks/ACCEPTANCE.md.",
+      "released": ["weightworks"]
     },
     {
       "number": 19,
