@@ -1,0 +1,72 @@
+{
+  "date": "2026-11-09",
+  "commit": "e48595f",
+  "url": "https://shuaishuai03.github.io/pixel-arcade/",
+  "workflow": {
+    "runId": 42561780332,
+    "url": "https://github.com/ShuaiShuai03/pixel-arcade/actions/runs/42561780332",
+    "conclusion": "success",
+    "jobs": {
+      "build": "success",
+      "deploy": "success",
+      "report-build-status": "success"
+    },
+    "completedAt": "2026-11-09T04:26:19Z"
+  },
+  "assets": [
+    {
+      "path": "index.html",
+      "bytes": 9421,
+      "sha256": "b660ce3e50c66ade22d92971dc42aa72295778a8e411e91429d1b35a7e007768",
+      "matchesCommit": true
+    },
+    {
+      "path": "src/catalog.js",
+      "bytes": 4396,
+      "sha256": "dee79214a8d19ab662de176766793065389766cbdf200e4aa5dbe4ccf9eca2ee",
+      "matchesCommit": true
+    },
+    {
+      "path": "src/app.js",
+      "bytes": 24072,
+      "sha256": "f968ec9582f04b3461d9cd81aba7286ecd0e449754acb14fbc3e86171b111d33",
+      "matchesCommit": true
+    },
+    {
+      "path": "src/games/phase-tiles-boards.js",
+      "bytes": 12891,
+      "sha256": "60bd8bc6965260d7aa114488d004db2ac90cb0af7c91a08a85649278a3358f21",
+      "matchesCommit": true,
+      "matchesApproved": true
+    },
+    {
+      "path": "src/games/phase-tiles-draw.js",
+      "bytes": 10589,
+      "sha256": "aba765aff320189abdde491bb36afa7f059fc4b8dc91e575d5cb833ebcdcd41b",
+      "matchesCommit": true,
+      "matchesApproved": true
+    },
+    {
+      "path": "src/games/phase-tiles-rules.js",
+      "bytes": 11167,
+      "sha256": "5f77d459e37f666172fdd9089c2c2c1495c91bd2382f833fc7868a8a9645d9f3",
+      "matchesCommit": true,
+      "matchesApproved": true
+    },
+    {
+      "path": "src/games/phase-tiles.js",
+      "bytes": 15462,
+      "sha256": "2c81d92053c41a54062c99279af6169ff2f49796114b6b115dffce40f80c2de1",
+      "matchesCommit": true,
+      "matchesApproved": true
+    }
+  ],
+  "publishedInput": {
+    "method": "The user's Chrome through the official Claude in Chrome extension; Start was a real click, keys were real key presses sent by the extension, and only the status line and canvas pixels were read.",
+    "observed": [
+      "Phase Tiles: Start opened board 1 of 26 with 'Move ← 1 to row 3, col 1'; Left changed it to 'Move ↓ 1 to row 3, col 1', Down to 'Space: press this tile', and one Space matched the target ('Board clear! Next board coming', score 100)."
+    ],
+    "screenshots": ["../screenshots/published-phase.jpg"]
+  },
+  "notes": "Assets were fetched with a cache-busting query string and compared with the committed files."
+}
