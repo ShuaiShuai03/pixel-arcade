@@ -239,7 +239,8 @@
       "neon-snake",
       "orbit-invaders",
       "blockfall",
-      "meteor-drift"
+      "meteor-drift",
+      "river-hop"
     ],
     "records": [
       "final-review/snowball-siege.json",
@@ -251,7 +252,8 @@
       "final-review/neon-snake.json",
       "final-review/orbit-invaders.json",
       "final-review/blockfall.json",
-      "final-review/meteor-drift.json"
+      "final-review/meteor-drift.json",
+      "final-review/river-hop.json"
     ]
   }
 }

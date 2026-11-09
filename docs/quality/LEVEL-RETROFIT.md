@@ -20,7 +20,7 @@ Effort: S = level data only, M = data plus some mechanics or tests, L = structur
 | dash-duelist     |              3 | `RIVALS`                |   S    | queued              |
 | tether-twins     |              3 | `ROOMS`                 |   S    | queued              |
 | vine-warden      |              3 | `PLOTS`                 |   S    | queued              |
-| river-hop        |              3 | `STAGES`                |   S    | queued              |
+| river-hop        |             20 | `LEVELS`                |   S    | done (final review) |
 | snowball-siege   |             30 | `FLOORS`                |   M    | done (batch 16)     |
 | starbreaker      |             20 | `LEVELS`                |   M    | done (final review) |
 | meteor-drift     |             22 | `LEVELS`                |   M    | done (final review) |

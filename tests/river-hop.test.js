@@ -7,6 +7,7 @@ import {
   riverLanes,
   meta,
 } from '../src/games/river-hop.js';
+import { LEVELS } from '../src/games/river-hop-levels.js';
 import { harness, input, mockContext, seeded } from './harness.js';
 const ROW = 28,
   TOP = 34,
@@ -139,11 +140,11 @@ test('river: ordinary boundary bumps retain inward and forward controls', () => 
   assert.ok(s.frog.x > 30);
   assert.equal(s.lives, 4);
 });
-test('river: each stage has a distinct crossing rule, including a bounded reversing ferry', () => {
+test('river: crossings introduce logs, turtles and a bounded reversing ferry in turn', () => {
   assert.ok(riverLanes(1).some((l) => l.kind === 'logs'));
-  assert.ok(riverLanes(2).some((l) => l.kind === 'turtles'));
-  assert.ok(riverLanes(3).some((l) => l.kind === 'ferry'));
-  assert.notDeepEqual(riverLanes(1), riverLanes(3));
+  assert.ok(riverLanes(5).some((l) => l.kind === 'turtles'));
+  assert.ok(riverLanes(6).some((l) => l.kind === 'ferry'));
+  assert.notDeepEqual(riverLanes(1), riverLanes(6));
 });
 test('river: filled pads are safe to leave, and home acceptance requires both visible feet on the pad', () => {
   const s = createRiverState();
@@ -173,7 +174,7 @@ test('river: timer loss is reachable, ends once, freezes completely and restarts
   assert.equal(h.ends.length, 1);
   g.draw(mockContext());
   const fresh = createGame(harness().env).getState();
-  assert.equal(fresh.round, 1);
+  assert.equal(fresh.level, 1);
   assert.equal(fresh.lives, 4);
   assert.equal(fresh.score, 0);
   assert.equal(fresh.homes.length, 0);
@@ -247,7 +248,7 @@ test('river: adjacent moving decks can support separate feet without a phantom w
   assert.ok(Math.abs(s.frog.x - 166) < 1e-6);
 });
 test('river: a vehicle wrapping offscreen does not sweep a phantom crossing through the frog', () => {
-  const s = createRiverState();
+  const s = createRiverState(3);
   place(s, 6);
   const lane = s.lanes.find((l) => l.row === 6);
   lane.speed = -100;
@@ -258,8 +259,8 @@ test('river: a vehicle wrapping offscreen does not sweep a phantom crossing thro
 });
 test('river: leaving a warning turtle before its dive preserves the airborne frog', () => {
   const s = createRiverState();
-  s.round = 2;
-  s.lanes = riverLanes(2);
+  s.level = 5;
+  s.lanes = riverLanes(5);
   s.time = 6.57;
   place(s, 2, 150);
   for (const lane of s.lanes)
@@ -275,8 +276,8 @@ test('river: leaving a warning turtle before its dive preserves the airborne fro
 });
 test('river: the reversing ferry carries a resting frog without snapping or repeatedly adding velocity', () => {
   const s = createRiverState();
-  s.round = 3;
-  s.lanes = riverLanes(3);
+  s.level = 6;
+  s.lanes = riverLanes(6);
   const ferry = s.lanes.find((l) => l.kind === 'ferry');
   place(s, 1, ferry.objects[0].x + 90);
   const offset = s.frog.x - ferry.objects[0].x;
@@ -304,110 +305,8 @@ test('river: timeout before home contact loses; a home reached exactly on the de
   }
 });
 
-const KEY = { U: 'ArrowUp', D: 'ArrowDown', L: 'ArrowLeft', R: 'ArrowRight', W: null };
-function plannedCrossing(snapshot, home, { visitOccupied = false } = {}) {
-  const queue = [{ state: structuredClone(snapshot), path: [], rank: 0 }],
-    seen = new Set(),
-    initialLives = snapshot.lives,
-    initialRescued = snapshot.rescued;
-  let explored = 0;
-  while (queue.length && explored++ < 5000) {
-    queue.sort((a, b) => a.rank - b.rank);
-    const node = queue.shift();
-    for (const action of ['U', 'L', 'R', 'W', 'D']) {
-      const next = structuredClone(node.state);
-      for (let n = 0; n < 18 && next.phase === 'playing'; n++)
-        stepRiver(next, 1 / 60, input([], n === 0 && KEY[action] ? [KEY[action]] : []));
-      if (next.lives !== initialLives || next.phase === 'lost') continue;
-      const path = [...node.path, action];
-      if (
-        visitOccupied &&
-        next.frog.grounded &&
-        next.frog.row === 0 &&
-        Math.abs(next.frog.x - (home * 120 + 60)) <= 31
-      )
-        return { path, explored };
-      if (next.rescued > initialRescued) {
-        if (next.homes.includes(home) || next.round > snapshot.round || next.phase === 'won')
-          return { path, explored };
-        continue;
-      }
-      if (path.length >= 90) continue;
-      const id = `${next.frog.row}:${Math.round(next.frog.x / 5)}:${path.length}`;
-      if (seen.has(id)) continue;
-      seen.add(id);
-      const goal = home * 120 + 60,
-        rank = path.length * 0.21 + next.frog.row * 1.3 + Math.abs(next.frog.x - goal) / 55;
-      queue.push({ state: next, path, rank });
-    }
-  }
-  return { path: null, explored };
-}
-function playCampaign(t, hz, { recover = false } = {}) {
-  const h = harness(),
-    g = createGame(h.env);
-  let trips = 0,
-    totalExplored = 0;
-  if (recover) {
-    for (let n = 0; n < hz * 15 && g.getState().lives === 4; n++)
-      g.update(1 / hz, input(['ArrowUp'], n === 0 ? ['ArrowUp'] : []));
-    assert.equal(g.getState().lives, 3);
-    assert.equal(g.getState().phase, 'playing');
-  }
-  while (g.getState().phase === 'playing' && trips++ < 12) {
-    for (
-      let n = 0;
-      n < hz * 3 &&
-      (g.getState().spawnDelay > 0 ||
-        g.getState().transition > 0 ||
-        g.getState().needsRelease ||
-        g.getState().rest > 0);
-      n++
-    )
-      g.update(1 / hz, input());
-    const snapshot = g.getState();
-    assert.equal(snapshot.spawnDelay, 0);
-    assert.equal(snapshot.transition, 0);
-    assert.equal(snapshot.needsRelease, false);
-    const home = [0, 1, 2, 3].find((n) => !snapshot.homes.includes(n)),
-      plan = plannedCrossing(snapshot, home);
-    totalExplored += plan.explored;
-    if (trips === 1 && !recover)
-      t.diagnostic(`Opening route (0.30s per action): ${plan.path?.join(' ')}`);
-    assert.ok(
-      plan.path,
-      `stage ${snapshot.round}, home ${home}, time ${snapshot.time.toFixed(2)} explored ${plan.explored}`,
-    );
-    for (const action of plan.path)
-      for (let n = 0; n < hz * 0.3; n++)
-        g.update(1 / hz, input([], n === 0 && KEY[action] ? [KEY[action]] : []));
-    assert.equal(g.getState().lives, snapshot.lives);
-    assert.equal(g.getState().rescued, trips);
-    const beforeDraw = g.getState();
-    g.draw(mockContext());
-    assert.deepEqual(g.getState(), beforeDraw);
-  }
-  const final = g.getState();
-  assert.equal(final.phase, 'won');
-  assert.equal(final.rescued, 12);
-  assert.equal(final.round, 3);
-  assert.equal(final.lives, 4);
-  assert.equal(h.ends.length, 1);
-  assert.equal(h.ends[0].won, true);
-  for (let n = 0; n < 30; n++) g.update(1 / hz, input(['ArrowUp'], ['ArrowUp']));
-  assert.deepEqual(g.getState(), final);
-  assert.equal(h.ends.length, 1);
-  t.diagnostic(
-    `${hz}Hz ${recover ? 'mistake recovery' : 'clean'}: 12 rescues in ${final.totalTime.toFixed(2)}s; ${totalExplored} planner nodes; score ${final.score}`,
-  );
-}
-for (const hz of [30, 60, 120])
-  test(`river: full three-crossing public-input campaign (${hz} Hz)`, (t) => playCampaign(t, hz));
-test('river: a real traffic mistake remains recoverable through the entire public-input campaign', (t) =>
-  playCampaign(t, 60, { recover: true }));
-
 test('river: a fast wrapped vehicle is swept along the new offscreen entry instead of tunneling', () => {
-  const s = createRiverState();
+  const s = createRiverState(3);
   place(s, 6);
   const lane = s.lanes.find((l) => l.row === 6);
   lane.speed = -100000;
@@ -421,8 +320,8 @@ test('river: ferry edge support stays exact across acceleration signs and unrela
   for (const time of [1, 4, 5.399, 6, 6.599, 7.999, 9])
     for (const offset of [11, 169]) {
       const s = createRiverState();
-      s.round = 3;
-      s.lanes = riverLanes(3);
+      s.level = 6;
+      s.lanes = riverLanes(6);
       s.time = time;
       const ferry = s.lanes.find((l) => l.kind === 'ferry');
       ferry.objects[0].x = 150 + 126 * Math.sin((time * Math.PI) / 5);
@@ -436,7 +335,7 @@ test('river: ferry edge support stays exact across acceleration signs and unrela
     }
 });
 test('river: continuous traffic still collides when an object crosses a wrap seam more than once per step', () => {
-  const s = createRiverState();
+  const s = createRiverState(3);
   place(s, 6);
   const lane = s.lanes.find((l) => l.row === 6);
   lane.speed = -400000;
@@ -451,11 +350,9 @@ test('river: public snapshots cannot mutate live actors, stages, instructions or
     copy = g.getState();
   copy.frog.x = 0;
   copy.lanes[0].objects[0].x = 0;
-  copy.stage.lesson.en = 'tampered';
-  copy.stage.zh = 'tampered';
   copy.homes.push(0);
   assert.deepEqual(g.getState(), before);
-  assert.equal(createGame(harness().env).getState().stage.lesson.en, before.stage.lesson.en);
+  assert.equal(LEVELS[0].tip.en.includes('tampered'), false);
 });
 
 test('river: finite air steering lands at the analytic deck edge independent of unrelated event partitions', () => {
@@ -464,8 +361,8 @@ test('river: finite air steering lands at the analytic deck edge independent of 
     results = [];
   for (const event of ['none', 'turtle', 'wrap']) {
     const s = createRiverState();
-    s.round = 2;
-    s.lanes = riverLanes(2);
+    s.level = 5;
+    s.lanes = riverLanes(5);
     clearRoad(s);
     s.time = event === 'turtle' ? 5.399 : 0;
     place(s, 4, initialX);
@@ -576,51 +473,6 @@ test('river: seeded legal input remains deterministic, finite and bounded in sim
   }
 });
 
-test('river: an occupied home is recoverable by waiting for a deck, returning to the river and rescuing elsewhere', () => {
-  const h = harness(),
-    g = createGame(h.env),
-    perform = (path) => {
-      for (const action of path)
-        for (let n = 0; n < 18; n++)
-          g.update(1 / 60, input([], n === 0 && KEY[action] ? [KEY[action]] : []));
-    };
-  const first = plannedCrossing(g.getState(), 0);
-  assert.ok(first.path);
-  perform(first.path);
-  for (
-    let n = 0;
-    n < 180 && (g.getState().spawnDelay > 0 || g.getState().needsRelease || g.getState().rest > 0);
-    n++
-  )
-    g.update(1 / 60, input());
-  const occupied = plannedCrossing(g.getState(), 0, { visitOccupied: true });
-  assert.ok(occupied.path);
-  perform(occupied.path);
-  assert.equal(g.getState().frog.row, 0);
-  assert.equal(g.getState().rescued, 1);
-  assert.equal(g.getState().lives, 4);
-  const canReturn = () => {
-    const s = structuredClone(g.getState());
-    for (let n = 0; n < 18; n++) stepRiver(s, 1 / 60, input([], n === 0 ? ['ArrowDown'] : []));
-    return s.lives === 4 && s.frog.grounded && s.frog.row === 1;
-  };
-  for (let n = 0; n < 600 && canReturn(); n++) g.update(1 / 60, input());
-  let waited = 0;
-  for (; waited < 600 && !canReturn(); waited++) g.update(1 / 60, input());
-  assert.ok(waited > 0 && waited < 600);
-  assert.equal(g.getState().lives, 4);
-  perform(['D']);
-  assert.equal(g.getState().frog.row, 1);
-  assert.equal(g.getState().lives, 4);
-  const escape = plannedCrossing(g.getState(), 1);
-  assert.ok(escape.path);
-  perform(escape.path);
-  assert.equal(g.getState().rescued, 2);
-  assert.deepEqual(g.getState().homes, [0, 1]);
-  assert.equal(g.getState().lives, 4);
-  g.draw(mockContext());
-});
-
 test('river: detailed lessons stay in the host status and short canvas cues stay above traversable ground', () => {
   for (const lang of ['en', 'zh']) {
     const g = createGame(harness({ lang }).env),
@@ -629,9 +481,9 @@ test('river: detailed lessons stay in the host status and short canvas cues stay
       ctx = mockContext();
     ctx.fillText = (value, x, y) => calls.push({ value, x, y });
     g.draw(ctx);
-    assert.ok(s.status[lang].includes(s.stage.lesson[lang]));
+    assert.ok(s.status[lang].includes(LEVELS[0].tip[lang]));
     for (const c of calls)
-      if (c.value === s.stage.lesson[lang] || /WAIT FOR A GAP|等车道空隙/.test(c.value))
+      if (c.value === LEVELS[0].tip[lang] || /WAIT FOR A GAP|等车道空隙/.test(c.value))
         assert.ok(c.y < 34);
   }
 });

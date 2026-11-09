@@ -1,0 +1,59 @@
+{
+  "game": "river-hop",
+  "date": "2026-11-09",
+  "reviewedRevision": "60a3bca plus the rework in this commit",
+  "owner": "owner-river",
+  "reviewer": "final-river",
+  "rounds": 1,
+  "process": "Lean final review at the user's request: the known 3-stage shortfall went straight to a retrofit, followed by one independent review round, one clean-worktree test run and a short browser check.",
+  "verdict": "pass",
+  "approvedSha256": {
+    "src/games/river-hop.js": "890f9d977fe0fb5cb5f16407a07153157c7b4c8e268520a741f920cf3c2a7559",
+    "src/games/river-hop-levels.js": "9be5549ac097ceabdd3f586aa6eef477589ed9da628e70b2c90184140b15212a",
+    "src/games/river-hop-step.js": "57b7eb135e436eacbe99c10d849196215994ce1eed203b9cc9667ca5aef9d824",
+    "src/games/river-hop-draw.js": "01dbbc29e1e00ed22d0d88e4a6f622e9fd7f2b7100a1530cda0afcae5f3de592",
+    "src/games/river-hop-text.js": "244b0eb71d72597532ef58884e05489175902c7729fe678c6e5b5e2930d0a58b",
+    "src/games/river-hop-menu.js": "b8fa386b2f256cef9bc706e32c921b33cc322dffcd9c130a9cee95c054565554",
+    "tests/river-hop.test.js": "278adeb8f4ce44e5e33568782796445add4c86ce8dbdf95a10b5fea931980bd8",
+    "tests/river-hop-quality.test.js": "3ddefa31563a457f6a7fb2c94f33add1f21fbd423fb39f043911a351daf33d44"
+  },
+  "tests": {
+    "command": "node --experimental-test-coverage --test-coverage-include='src/games/river-hop*.js' --test tests/river-hop.test.js tests/river-hop-quality.test.js",
+    "passed": 53,
+    "failed": 0,
+    "lineCoverage": 98.66,
+    "log": "river-hop-coverage.txt"
+  },
+  "independentProbes": "The reviewer's own reaction-limited bot, which reads only delayed public state and does not use the ferry model, cleared 160 of 160 crossings at both 0.25 s and 0.35 s (8 seeds, 60 Hz) and 119 of 120 at 30 and 120 Hz, and won 12 of 12 full 20-crossing campaigns. Thirty-seven blind patterns (idle, mash, random holds, hold-up, timed taps and alternations) cleared 0% of every crossing from 3. Turtles show a 1.2 s striped, arrowed warning before diving; hold-to-repeat hops every 0.32 s at every frame rate; Enter, Space and taps start a crossing from the select. Fuzz with hostile dt and pointer values, determinism at 30, 60 and 120 Hz, broken progress stores and EN/ZH text fit all passed.",
+  "findings": [
+    {
+      "id": "R1",
+      "severity": "blocking",
+      "status": "fixed",
+      "observation": "Only 3 stages and no select or continue. There are now 20 data-driven crossings (teaching 1-7, combination 8-14, mastery 15-20) with logs, diving turtles, a cable ferry and trucks, each with a canvas cue and an accurate EN/ZH tip, plus a crossing select and env.progress continue."
+    },
+    {
+      "id": "R2",
+      "severity": "medium",
+      "status": "fixed",
+      "observation": "An idle frog loses nothing in the first 20 s of crossing 1, only a short cue is drawn over the board, and the 1,149-line file is split into six modules with a quality test file covering per-crossing clears, blind bars, a reaction-limited bot, determinism, hostile input, broken stores and terminal state."
+    }
+  ],
+  "openNotes": [
+    "Ferry crossings (6, 12, 17, 20) cause most lost frogs for a bot that extrapolates the ferry; players must read its slow-down at the ends.",
+    "Mastery crossings are only mildly harder than the middle ones, and the combination band is not harder than the teaching band.",
+    "Holding Up together with a side key gives no hop until one is released.",
+    "The select labels crossing 20 NEXT even after the whole river is won."
+  ],
+  "browser": {
+    "method": "Official Claude in Chrome extension, local server; real clicks on Start, Play again, the language switch and the touch buttons, synthetic in-page keys; only DOM text and the canvas were read.",
+    "servedSha256Prefixes": "890f9d97 9be5549a 57b7eb13 01dbbc29 244b0eb7 b8fa386b",
+    "observed": [
+      "Chinese: Start opened crossing 1 of 20 (草地浅滩) with the cue drawn above the river and the frog clear; a tap of Up hopped one lane (score 10).",
+      "Chinese loss: hopping up blindly lost all four frogs and the loss screen advised waiting on the grass and watching the turtle arrows; Play again restarted crossing 1.",
+      "English 390 px phone frame (388 px inner, no horizontal overflow): the Up touch button hopped the frog (score 10); the long status line stays on one line (nowrap, 12 px) and is clipped rather than wrapping.",
+      "Not covered in the browser: a crossing win and the crossing select, which appears only after a first clear; the reviewer's bot and the quality tests cover both."
+    ],
+    "screenshots": ["screenshots/river-hop-loss-zh.jpg", "screenshots/river-hop-phone-en.png"]
+  }
+}
