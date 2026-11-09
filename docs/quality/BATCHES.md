@@ -30,7 +30,7 @@ Phase Tiles completed batch 18 and the 50-game target, Pixel Parkour included. T
 | Bubble Pop      | Passed in one round: 20 caverns, symbol bubbles ([record](final-review/bubble-pop.json))                  |
 | Lantern Climber | Passed in one round: deeper tower, four rail climbs ([record](final-review/lantern-climber.json))         |
 | Gravity Courier | Passed in one round: 20 chambers, field reversal ([record](final-review/gravity-courier.json))            |
-| Grapnel Gorge   | Retrofitting to 20+ levels (3 courses)                                                                    |
+| Grapnel Gorge   | Passed in one round: 20 routes, still-stand hooks ([record](final-review/grapnel-gorge.json))             |
 
 ## Completed batch 18
 

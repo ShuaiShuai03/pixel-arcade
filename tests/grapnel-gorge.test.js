@@ -25,6 +25,35 @@ const poseBody = (q, w, l, rate, a) => ({
   vy: a.vy + rate * Math.cos(q) - l * w * Math.sin(q),
   ground: false,
 });
+
+// A fixed two-cairn canyon with a rounded cairn corner at (280, 258): physics fixtures must not
+// depend on the shipped route table.
+function cornerRoute() {
+  const anchor = (id, x, y) => ({ id, x, y, amplitudeX: 0, amplitudeY: 0, frequency: 0, phase: 0 });
+  const pads = [
+    { id: 0, x: 12, y: 252, w: 116 },
+    { id: 1, x: 218, y: 258, w: 62 },
+    { id: 2, x: 386, y: 246, w: 82, exit: true },
+  ];
+  const anchors = [anchor(0, 151, 78), anchor(1, 324, 71)];
+  const rocks = [{ x: 274, y: 36, w: 23, h: 101, kind: 'overhang' }];
+  return {
+    id: 'corner-fixture',
+    name: { en: 'Corner', zh: '拐角' },
+    lesson: { en: 'Fixture', zh: '测试' },
+    pads,
+    anchors,
+    rocks,
+    relics: [],
+    solids: [
+      { x: 0, y: 0, w: 480, h: 36, kind: 'ceiling' },
+      { x: 0, y: 30, w: 12, h: 300, kind: 'wall' },
+      { x: 468, y: 30, w: 12, h: 300, kind: 'wall' },
+      ...rocks,
+      ...pads.map((p) => ({ ...p, h: 400 - p.y, kind: 'cairn' })),
+    ],
+  };
+}
 export function fixture({
   theta = 0.6,
   omega = 0.7,
@@ -215,14 +244,14 @@ test('Grapnel hook rays and continuously swept ropes honor visible rocks', () =>
     null,
   );
 });
-test('Grapnel the three authored routes differ in anchors, obstruction and safe rests', () => {
-  const [a, b, c] = [1, 2, 3].map(routePlan);
+test('Grapnel the authored routes differ in anchors, obstruction and safe rests', () => {
+  const [a, b, c] = [1, 2, 4].map(routePlan);
   assert.equal(a.anchors.length, 1);
   assert.equal(a.pads.length, 2);
   assert.equal(b.anchors.length, 2);
   assert.equal(b.pads.length, 3);
   assert.ok(b.rocks.length);
-  assert.ok(c.anchors.some((a) => a.amplitudeX) && c.anchors.some((a) => a.amplitudeY));
+  assert.ok(c.anchors.some((x) => x.amplitudeX) && c.anchors.some((x) => x.amplitudeY));
   for (const route of [a, b, c]) {
     assert.ok(route.pads.at(-1).exit);
     for (const p of route.pads)
@@ -463,8 +492,7 @@ test('Grapnel actual relic entry time is ordered before water, with fatal contac
 
 test('Grapnel a taut rope and rounded cairn corner can rest together and reel without dropping time', () => {
   const s = createGrapnelState();
-  s.level = 2;
-  s.route = routePlan(2);
+  s.route = cornerRoute();
   s.checkpoint = 1;
   s.visited = [0, 1];
   s.player = { x: 286.9644704484431, y: 257.2956198662915, vx: 0, vy: 0, ground: false };
@@ -551,8 +579,7 @@ test('Grapnel nearly parallel rope and corner constraints release without NaN or
 });
 test('Grapnel a rounded joint transitions to free motion or flat support under continued reeling', () => {
   const s = createGrapnelState();
-  s.level = 2;
-  s.route = routePlan(2);
+  s.route = cornerRoute();
   s.checkpoint = 1;
   s.visited = [0, 1];
   s.player = { x: 286.9644704484431, y: 257.2956198662915, vx: 0, vy: 0, ground: false };

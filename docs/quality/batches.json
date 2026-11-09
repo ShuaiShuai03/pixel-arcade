@@ -251,7 +251,8 @@
       "dungeon-dash",
       "bubble-pop",
       "lantern-climber",
-      "gravity-courier"
+      "gravity-courier",
+      "grapnel-gorge"
     ],
     "records": [
       "final-review/snowball-siege.json",
@@ -275,7 +276,8 @@
       "final-review/dungeon-dash.json",
       "final-review/bubble-pop.json",
       "final-review/lantern-climber.json",
-      "final-review/gravity-courier.json"
+      "final-review/gravity-courier.json",
+      "final-review/grapnel-gorge.json"
     ]
   }
 }

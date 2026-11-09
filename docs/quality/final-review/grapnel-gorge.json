@@ -1,0 +1,72 @@
+{
+  "game": "grapnel-gorge",
+  "date": "2026-11-10",
+  "reviewedRevision": "5f03a9f plus the rework in this commit",
+  "owner": "owner-grapnel",
+  "reviewer": "final-grapnel",
+  "rounds": 1,
+  "process": "Lean final review at the user's request: the known 3-course shortfall went straight to a retrofit, followed by one independent review round. Its BLOCKING blind-play finding and two MEDIUM findings were fixed and verified by re-running the reviewer's own blind, pilot, floor-scan, determinism and fuzz scripts, one clean-worktree run and the browser check, without a second review round.",
+  "verdict": "pass",
+  "approvedSha256": {
+    "src/games/grapnel-gorge.js": "448f2af35e594c50dd7381caf73ff343a8a3e3874b920e83215e70f892456333",
+    "src/games/grapnel-gorge-contact.js": "44708f78ddd6cc09b5f6e7a7dce1d98000ab284bf54236003541478715a2f26f",
+    "src/games/grapnel-gorge-core.js": "60d99b05aff81593a9322823825f2a409cee58453a33cf10ce589e52b81fed46",
+    "src/games/grapnel-gorge-draw.js": "a29a2aeee3687cb958c04ba5616696e41f0406da7e75ff6a8d0c679064d97112",
+    "src/games/grapnel-gorge-levels.js": "4cc6e6bea3624a3a9dbfdcce31a4f6cada699f5459431cfbc4def30f87347beb",
+    "src/games/grapnel-gorge-math.js": "7645710d96dce15ac799007da99f630c94909913ca7e0d1c97dff0d5bf49d5c4",
+    "src/games/grapnel-gorge-menu.js": "9800eb51cbbfdea0b2b98c5128a72d780cff05d824be34923317d2a7fc16f4e7",
+    "src/games/grapnel-gorge-step.js": "18aa8eed206633f3084fbcefc2dc6c1971aa26ec811ec6d0bc152263bd69a84a",
+    "tests/grapnel-gorge.test.js": "322e4260031c9fbac3b7f880a399a7d44109a0c3dc744f456603178d26f3148c",
+    "tests/grapnel-gorge-quality.test.js": "a7606f5052dca7dcfa45a3a3d9d9a619f7c733eeead1dea1c117de47b6a709ae"
+  },
+  "tests": {
+    "command": "node --experimental-test-coverage --test-coverage-include='src/games/grapnel-gorge*.js' --test tests/grapnel-gorge.test.js tests/grapnel-gorge-quality.test.js",
+    "passed": 71,
+    "failed": 0,
+    "lineCoverage": 98.26,
+    "log": "grapnel-gorge-coverage.txt"
+  },
+  "independentProbes": "On the final files the reviewer's reaction-limited climber (public state, 0.35 s delay, no prediction) cleared mastery routes 15-20 in 104 of 120 runs (86.7%), losing about 1.1 lives per cleared route, while at 0.25 s it cleared 399 of 400 runs over all 20 routes. Seventeen blind families (idle, mash, random and timed hold, alternate and hook patterns, including the former hold Right+Up and tap exploit at 1.0-1.4 s) won 1.0% overall with the worst family at 6.9%; route 9 alone won 0 of 510. A fine scan of 11,914 standing hooks found no floor penetration beyond 0.002 px. Sixty scripts matched to 0.000 px across 30, 60 and 120 Hz, the hostile-input fuzz was clean, and broken progress stores were safe. In the review round the stall guard never froze play unfairly, rescue never double-spent a life, and anchor taps selected only eligible anchors.",
+  "findings": [
+    {
+      "id": "R1",
+      "severity": "blocking",
+      "status": "fixed",
+      "observation": "Only 3 courses built from inline plans, with no select or continue. There are now 20 data-driven routes (teaching 1-7, combination 8-14, mastery 15-20) with rope-cutting rocks, moving rails, long gaps and narrow cairns, accurate EN/ZH tips, a route select and env.progress continue; a stall guard ends a wedge hang, rescue-pause taps are queued, anchors can be tapped, and the 1,774-line file is split into eight modules."
+    },
+    {
+      "id": "B1",
+      "severity": "blocking",
+      "status": "fixed",
+      "observation": "Review finding: holding Right and Up while tapping Space every 1.3 s cleared 45.8% of routes 3-20. A hook from a cairn now needs the climber standing still (a visible bilingual notice explains a refusal), a mid-air hook is refused after falling below the lowest cairn top, and middle and exit cairns narrow by tier."
+    },
+    {
+      "id": "M1",
+      "severity": "medium",
+      "status": "fixed",
+      "observation": "Review finding: mastery cost the climber almost no lives and rocks acted as free auto-releases. Mastery routes now use faster, wider rails (route 16 needs two swings, route 18 a lower rail), and a rock cutting a hanging rope costs a life, with corrected tips on routes 2, 6 and 9."
+    },
+    {
+      "id": "M2",
+      "severity": "medium",
+      "status": "fixed",
+      "observation": "Review finding: hooking while standing under a moving anchor could sink the climber 7 px into the cairn and drop them through it. A penetration resolver now pushes the climber out along the face normal and books the energy change, with tests on routes 4, 15, 16, 18 and 19."
+    }
+  ],
+  "openNotes": [
+    "Mastery clears sit just above the target (86.7% at 0.35 s); routes 16 and 19 are the hardest.",
+    "Hooking requires standing still, so touch players release the walk button before tapping Hook.",
+    "Routes have at most three cairns; the canvas leaves no room for longer chains."
+  ],
+  "browser": {
+    "method": "Official Claude in Chrome extension, local server; real clicks on Start and the touch buttons, synthetic in-page keys; only DOM text and the canvas were read.",
+    "servedSha256Prefixes": "448f2af3 44708f78 60d99b05 a29a2aee 4cc6e6be 7645710d 9800eb51 18aa8eed",
+    "observed": [
+      "English: Start opened route 1 of 20 (Copper Arch) with 5 lives and the winch meter; standing still, Space hooked the marked anchor and the rope and landing guide appeared.",
+      "Holding Left and pressing Space showed 'Stand still to hook: let go of Left and Right, then press Space.'",
+      "English 390 px phone frame (388 px inner, no horizontal overflow): nine touch buttons (Walk left, Walk right, Target, Hook / release, Reel in, Pay out, Rescue −1 life, Next route) with the route opening unobscured.",
+      "Not covered in the browser: a route win and a loss; the reviewer's climber and the quality tests cover them."
+    ],
+    "screenshots": ["screenshots/grapnel-gorge-en.jpg", "screenshots/grapnel-gorge-phone-en.png"]
+  }
+}

@@ -35,7 +35,7 @@ Effort: S = level data only, M = data plus some mechanics or tests, L = structur
 | minefield        |             20 | `LEVELS`         |   M    | done (final review) |
 | memory-grove     |             20 | `LEVELS`         |   M    | done (final review) |
 | gravity-courier  |             20 | `COURIER_ROOMS`  |   M    | done (final review) |
-| grapnel-gorge    |              3 | inline `plans`   |   M    | queued              |
+| grapnel-gorge    |             20 | `LEVELS`         |   M    | done (final review) |
 | dungeon-dash     |             20 | `LEVELS`         |   L    | done (final review) |
 | neon-snake       |             20 | `LEVELS`         |   L    | done (final review) |
 
