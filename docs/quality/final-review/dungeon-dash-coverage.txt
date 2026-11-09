@@ -1,0 +1,25 @@
+ℹ tests 46
+ℹ suites 0
+ℹ pass 46
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 21155.758541
+ℹ start of coverage report
+ℹ -------------------------------------------------------------------------
+ℹ file                     | line % | branch % | funcs % | uncovered lines
+ℹ -------------------------------------------------------------------------
+ℹ src                      |        |          |         |
+ℹ  games                   |        |          |         |
+ℹ   dungeon-dash-draw.js   | 100.00 |    98.37 |  100.00 |
+ℹ   dungeon-dash-foes.js   | 100.00 |    92.54 |  100.00 |
+ℹ   dungeon-dash-levels.js | 100.00 |   100.00 |  100.00 |
+ℹ   dungeon-dash-menu.js   | 100.00 |   100.00 |  100.00 |
+ℹ   dungeon-dash-rules.js  | 100.00 |    97.87 |   97.14 |
+ℹ   dungeon-dash-world.js  | 100.00 |    96.25 |  100.00 |
+ℹ   dungeon-dash.js        | 100.00 |   100.00 |  100.00 |
+ℹ -------------------------------------------------------------------------
+ℹ all files                | 100.00 |    97.59 |   99.11 |
+ℹ -------------------------------------------------------------------------
+ℹ end of coverage report

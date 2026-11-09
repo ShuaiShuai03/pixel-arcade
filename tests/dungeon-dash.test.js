@@ -4,546 +4,300 @@ import {
   createGame,
   createDungeonState,
   stepDungeon,
-  buildRoom,
+  buildLevel,
   weaponSegment,
+  meta,
 } from '../src/games/dungeon-dash.js';
-import { harness, input, mockContext, seeded } from './harness.js';
-function flood(tiles, start = [2, 11]) {
-  const seen = new Set([start.join(',')]),
-    q = [start];
-  for (let k = 0; k < q.length; k++)
-    for (const [dx, dy] of [
-      [1, 0],
-      [-1, 0],
-      [0, 1],
-      [0, -1],
-    ]) {
-      const x = q[k][0] + dx,
-        y = q[k][1] + dy,
-        key = `${x},${y}`;
-      if (tiles[y]?.[x] === 0 && !seen.has(key)) {
-        seen.add(key);
-        q.push([x, y]);
-      }
-    }
-  return seen;
+import { LEVELS } from '../src/games/dungeon-dash-levels.js';
+import { WARNING_HALF_ARC } from '../src/games/dungeon-dash-foes.js';
+import { harness, input, mockContext } from './harness.js';
+
+function foe(x, y, extra = {}) {
+  return {
+    id: `t${x},${y}`,
+    x,
+    y,
+    vx: 0,
+    vy: 0,
+    hp: 3,
+    type: 'guard',
+    wake: 'near',
+    speed: 0,
+    hit: 0,
+    state: 'recover',
+    timer: 10,
+    aim: { x: 1, y: 0 },
+    struck: false,
+    ...extra,
+  };
 }
-const cellKey = (p) => [Math.floor((p.x - 20) / 20), Math.floor((p.y - 30) / 20)].join(',');
-test('Dungeon required switches are reachable before gates and all objectives after opening', () => {
-  for (let number = 1; number <= 5; number++) {
-    const room = buildRoom(number),
-      before = flood(room.tiles);
-    if (room.lever) assert.ok(before.has(cellKey(room.lever)));
-    if (room.gates.length)
-      assert.equal(before.has(cellKey(room.key)), false, 'archive key is actually sealed');
-    for (const gate of room.gates) room.tiles[gate.cy][gate.cx] = 0;
-    const after = flood(room.tiles);
-    assert.ok(after.has(cellKey(room.key)));
-    assert.ok(after.has(cellKey(room.exit)));
-    for (const enemy of room.enemies) assert.ok(after.has(cellKey(enemy)));
-  }
-});
-test('Dungeon walls stop movement and melee defeats nearby enemies', () => {
-  const { env } = harness();
-  const s = createDungeonState(env);
-  s.player.x = 48;
-  s.player.y = 60;
-  stepDungeon(s, 1 / 30, input(['ArrowLeft']), env);
-  assert.ok(s.player.x >= 47);
-  s.player.facing = 1;
-  s.enemies = [{ x: s.player.x + 20, y: s.player.y, hp: 1, speed: 0, hit: 0 }];
-  stepDungeon(s, 1 / 30, input([], ['Space']), env);
-  for (let f = 0; f < 30; f++) stepDungeon(s, 1 / 120, input(), env);
-  assert.equal(s.enemies.length, 0);
-  assert.ok(s.score >= 100);
-});
-test('Dungeon key unlocks next room only after clearing enemies', () => {
-  const { env } = harness();
-  const s = createDungeonState(env);
-  s.enemies = [];
-  s.player.x = s.key.x;
-  s.player.y = s.key.y;
-  stepDungeon(s, 1 / 60, input(), env);
-  assert.equal(s.hasKey, true);
-  s.player.x = s.exit.x;
-  s.player.y = s.exit.y;
-  stepDungeon(s, 1 / 60, input(), env);
-  assert.equal(s.room, 2);
-  assert.equal(s.hasKey, false);
-});
-test('Dungeon loss and final exit are terminal', () => {
-  for (const win of [false, true]) {
-    const { env, ends } = harness();
-    const s = createDungeonState(env);
-    if (win) {
-      s.room = 5;
-      s.hasKey = true;
-      s.enemies = [];
-      s.player.x = s.exit.x;
-      s.player.y = s.exit.y;
-    } else s.health = 0;
-    stepDungeon(s, 1 / 60, input(), env);
-    assert.equal(s.phase, win ? 'won' : 'lost');
-    assert.equal(ends.length, 1);
-  }
-  const { env } = harness();
-  const g = createGame(env);
-  g.draw(mockContext());
-  assert.equal(g.getState().room, 1);
-});
-function dungeonPath(s, goal) {
-  const start = [Math.floor((s.player.x - 20) / 20), Math.floor((s.player.y - 30) / 20)];
-  const target = [Math.floor((goal.x - 20) / 20), Math.floor((goal.y - 30) / 20)];
-  const q = [start],
-    parents = new Map([[start.join(','), null]]);
-  for (let k = 0; k < q.length; k++) {
-    const p = q[k];
-    if (p[0] === target[0] && p[1] === target[1]) break;
-    for (const [dx, dy] of [
-      [1, 0],
-      [-1, 0],
-      [0, 1],
-      [0, -1],
-    ]) {
-      const n = [p[0] + dx, p[1] + dy],
-        key = n.join(',');
-      if (s.tiles[n[1]]?.[n[0]] === 0 && !parents.has(key)) {
-        parents.set(key, p);
-        q.push(n);
-      }
-    }
-  }
-  let next = target;
-  while (parents.get(next.join(',')) && parents.get(next.join(',')).join(',') !== start.join(','))
-    next = parents.get(next.join(','));
-  return next;
-}
-function campaign(hz = 60, mistake = false) {
-  const { env, ends } = harness();
-  const g = createGame(env);
-  let maxRoom = 1,
-    opened = false,
-    healed = false;
-  for (let frame = 0; frame < hz * 600 && g.getState().phase === 'playing'; frame++) {
-    const s = g.getState();
-    if (mistake && !healed && s.health > 3) {
-      g.update(1 / hz, input());
-      continue;
-    }
-    if (mistake && s.health <= 3) healed = true;
-    if (s.room === 3 && s.lever.on) opened = true;
-    if (frame % 600 === 0) g.draw(mockContext());
-    maxRoom = Math.max(maxRoom, s.room);
-    if (s.enemies.length === 1) assert.ok(!s.status.en.includes('1 guardians'));
-    const enemies = [...s.enemies].sort(
-      (a, b) =>
-        Math.hypot(a.x - s.player.x, a.y - s.player.y) -
-        Math.hypot(b.x - s.player.x, b.y - s.player.y),
-    );
-    const nearest = enemies[0];
-    const recovery =
-      s.health < 4 && s.flasks === 0 ? (!s.shrine.used ? s.shrine : s.potions[0]) : null;
-    const switchGoal = s.lever && !s.lever.on ? s.lever : null;
-    let goal = recovery || switchGoal || nearest || (!s.hasKey ? s.key : s.exit);
-    const keys = ['Space'];
-    if ((recovery || switchGoal) && Math.hypot(goal.x - s.player.x, goal.y - s.player.y) < 26)
-      keys.push('KeyE');
-    if (s.health <= 3 && s.flasks > 0) keys.push('KeyH');
-    const d =
-      recovery || switchGoal
-        ? 1000
-        : nearest
-          ? Math.hypot(nearest.x - s.player.x, nearest.y - s.player.y)
-          : 1000;
-    if (nearest && d < 75 && nearest.state === 'windup' && nearest.type === 'warden') {
-      keys.push('KeyK');
-      keys.push(s.player.x < nearest.x ? 'ArrowLeft' : 'ArrowRight');
-      keys.push(s.player.y < nearest.y ? 'ArrowUp' : 'ArrowDown');
-    } else if (d > 26) {
-      const cell = dungeonPath(s, goal);
-      let tx = 30 + cell[0] * 20,
-        ty = 40 + cell[1] * 20;
-      const sx = Math.floor((s.player.x - 20) / 20),
-        sy = Math.floor((s.player.y - 30) / 20);
-      if (sx === cell[0] && sy === cell[1]) {
-        tx = goal.x;
-        ty = goal.y;
-      }
-      if (Math.abs(tx - s.player.x) > 2) keys.push(tx > s.player.x ? 'ArrowRight' : 'ArrowLeft');
-      if (Math.abs(ty - s.player.y) > 2) keys.push(ty > s.player.y ? 'ArrowDown' : 'ArrowUp');
-    } else if (nearest) {
-      const tx = nearest.x - s.player.x,
-        ty = nearest.y - s.player.y;
-      const dot = tx * s.player.facing + ty * s.facingY;
-      if (dot < d * 0.5)
-        keys.push(
-          Math.abs(tx) > Math.abs(ty)
-            ? tx > 0
-              ? 'ArrowRight'
-              : 'ArrowLeft'
-            : ty > 0
-              ? 'ArrowDown'
-              : 'ArrowUp',
-        );
-    }
-    g.update(
-      1 / hz,
-      input(keys, [
-        ...(keys.includes('KeyK') ? ['KeyK'] : []),
-        ...(keys.includes('KeyE') ? ['KeyE'] : []),
-        ...(keys.includes('KeyH') ? ['KeyH'] : []),
-      ]),
-    );
-  }
-  return { g, ends, maxRoom, opened, healed };
-}
-test('Dungeon complete campaign and ordinary missed-defense recovery work through public controls at 30/60/120Hz', () => {
-  for (const hz of [30, 60, 120])
-    for (const mistake of [false, true]) {
-      const { g, ends, maxRoom, opened, healed } = campaign(hz, mistake);
-      assert.equal(g.getState().phase, 'won', `rate ${hz}, mistake ${mistake}, room ${maxRoom}`);
-      assert.equal(g.getState().kills, 20);
-      assert.equal(ends.length, 1);
-      assert.ok(opened);
-      if (mistake) {
-        assert.ok(healed);
-        assert.ok(g.getState().drank > 0);
-      }
-      const final = g.getState();
-      g.update(1 / hz, input(['ArrowLeft', 'Space'], ['KeyH']));
-      assert.deepEqual(g.getState(), final);
-    }
-});
-
-test('Dungeon rooms have distinct layouts, boss and telegraphed attacks', () => {
-  const layouts = Array.from({ length: 5 }, (_, n) => JSON.stringify(buildRoom(n + 1).tiles));
-  assert.equal(new Set(layouts).size, 5);
-  const s = createDungeonState();
-  assert.ok(s.enemies.every((e) => typeof e.state === 'string'));
-  assert.ok(buildRoom(5).boss);
-});
-test('Dungeon swings face the enemy and holding attack cannot bypass recovery', () => {
-  const { env } = harness();
-  const s = createDungeonState();
-  s.enemies = [
-    {
-      x: s.player.x - 22,
-      y: s.player.y,
-      hp: 3,
-      speed: 0,
-      hit: 0,
-      state: 'recover',
-      timer: 10,
-      type: 'guard',
-    },
-  ];
-  stepDungeon(s, 1 / 60, input([], ['Space']), env);
-  assert.equal(s.enemies[0].hp, 3, 'enemy behind sword arc is protected');
-  assert.ok(s.stamina < 100);
-});
-
-test('Dungeon telegraphs give player time to dodge, shrine heals once and chest opens once', () => {
-  const { env } = harness();
-  const s = createDungeonState();
-  s.invulnerable = 0;
-  s.enemies = [
-    {
-      x: s.player.x + 28,
-      y: s.player.y,
-      hp: 3,
-      speed: 0,
-      hit: 0,
-      type: 'guard',
-      state: 'approach',
-      timer: 0,
-    },
-  ];
-  stepDungeon(s, 1 / 60, input(), env);
-  assert.equal(s.enemies[0].state, 'windup');
-  assert.equal(s.health, 5);
-  s.health = 2;
-  s.player.x = s.shrine.x;
-  s.player.y = s.shrine.y;
-  stepDungeon(s, 1 / 60, input([], ['KeyE']), env);
-  assert.equal(s.health, 4);
-  stepDungeon(s, 1 / 60, input([], ['KeyE']), env);
-  assert.equal(s.health, 4);
-  s.player.x = s.chest.x;
-  s.player.y = s.chest.y;
-  stepDungeon(s, 1 / 60, input([], ['KeyE']), env);
-  const score = s.score;
-  stepDungeon(s, 1 / 60, input([], ['KeyE']), env);
-  assert.equal(s.score, score);
-  assert.ok(s.chest.opened);
-});
-test('Dungeon dodging consumes stamina and respects cooldown', () => {
-  const { env } = harness();
-  const s = createDungeonState();
-  stepDungeon(s, 1 / 120, input(['ArrowRight'], ['KeyK']), env);
-  assert.ok(s.dash > 0);
-  assert.ok(s.stamina < 80);
-  const stamina = s.stamina;
-  stepDungeon(s, 1 / 120, input([], ['KeyK']), env);
-  assert.ok(s.stamina > stamina);
-});
-
-test('Dungeon movement uses bounded acceleration and a dodge has no magical invulnerability', () => {
-  const { env } = harness();
-  const s = createDungeonState();
-  s.invulnerable = 0;
-  const x = s.player.x;
-  stepDungeon(s, 1 / 120, input(['ArrowRight'], ['KeyK']), env);
-  assert.ok(s.player.vx > 0 && s.player.vx < 30);
-  assert.ok(s.player.x - x < 0.2);
-  assert.equal(s.invulnerable, 0);
-});
-test('Dungeon sword has a real windup and cannot hit outside its visible forward sector', () => {
-  const { env } = harness();
-  const s = createDungeonState();
-  s.enemies = [
-    {
-      id: 'side',
-      x: s.player.x,
-      y: s.player.y - 30,
-      hp: 3,
-      speed: 0,
-      hit: 0,
-      type: 'guard',
-      state: 'recover',
-      timer: 10,
-    },
-  ];
-  stepDungeon(s, 1 / 120, input([], ['Space']), env);
-  assert.equal(s.enemies[0].hp, 3);
-  for (let f = 0; f < 30; f++) stepDungeon(s, 1 / 120, input(), env);
-  assert.equal(s.enemies[0].hp, 3);
-});
-test('Dungeon inactive body contact does no damage, and a locked guard swing cannot hit behind', () => {
-  const { env } = harness();
-  const s = createDungeonState();
-  s.invulnerable = 0;
-  s.player.x = 170;
-  s.player.y = 180;
-  s.enemies = [
-    {
-      id: 'guard',
-      x: 195,
-      y: 180,
-      hp: 3,
-      speed: 0,
-      hit: 0,
-      type: 'guard',
-      state: 'windup',
-      timer: 0.001,
-      aim: { x: 1, y: 0 },
-      vx: 0,
-      vy: 0,
-    },
-  ];
-  for (let f = 0; f < 35; f++) stepDungeon(s, 1 / 120, input(), env);
-  assert.equal(s.health, 5);
-});
-test('Dungeon expired and wall-blocked arrows cannot hurt the player', () => {
-  const { env } = harness();
-  const s = createDungeonState();
-  s.invulnerable = 0;
-  s.enemies = [];
-  s.projectiles = [
-    { x: s.player.x - 25, y: s.player.y, vx: 100, vy: 0, life: 0.001, active: true },
-  ];
-  stepDungeon(s, 1 / 30, input(), env);
-  assert.equal(s.health, 5);
-  assert.equal(s.projectiles.length, 0);
-});
-test('Dungeon carries healing supplies and full-health recovery is not wasted', () => {
-  const { env } = harness();
-  const s = createDungeonState();
-  assert.equal(s.flasks, 1);
-  stepDungeon(s, 1 / 120, input([], ['KeyH']), env);
-  assert.equal(s.flasks, 1);
-  s.health = 2;
-  stepDungeon(s, 1 / 120, input([], ['KeyH']), env);
-  assert.equal(s.health, 4);
-  assert.equal(s.flasks, 0);
-});
-test('Dungeon chamber three has an actual sealed gate and reachable lever', () => {
-  const room = buildRoom(3);
-  assert.ok(room.lever);
-  assert.ok(room.gates.length > 0);
-  assert.ok(room.gates.every((g) => room.tiles[g.cy][g.cx] !== 0));
-});
-
-function arena() {
-  const s = createDungeonState();
+/** An empty walled room with the player in the middle, ready for one rule at a time. */
+function arena(level = 1) {
+  const s = createDungeonState(level);
   s.tiles = Array.from({ length: 14 }, (_, y) =>
     Array.from({ length: 22 }, (_, x) => +(x === 0 || x === 21 || y === 0 || y === 13)),
   );
-  s.enemies = [];
-  s.hazards = [];
-  s.projectiles = [];
-  s.treasures = [];
-  s.potions = [];
+  Object.assign(s, {
+    enemies: [],
+    hazards: [],
+    projectiles: [],
+    treasures: [],
+    potions: [],
+    levers: [],
+    chests: [],
+    shrines: [],
+    gates: [],
+    invulnerable: 0,
+  });
   s.player = { x: 100, y: 150, vx: 0, vy: 0, facing: 1 };
-  s.invulnerable = 0;
+  s.key = { x: 400, y: 280 };
+  s.exit = { x: 420, y: 60 };
   return s;
 }
-test('Dungeon status uses singular English resource labels', () => {
-  const game = createGame(harness().env);
-  assert.match(game.getState().status.en, /1 flask(?!s)/);
-});
-test('Dungeon fast movement cannot tunnel and ordinary motion slides along walls', () => {
+const run = (s, frames, held = [], pressed = []) => {
   const { env } = harness();
+  for (let n = 0; n < frames; n++)
+    stepDungeon(s, 1 / 120, input(held, n === 0 ? pressed : []), env);
+  return env;
+};
+
+test('walls stop movement, slide, and a fast body cannot tunnel', () => {
   const s = arena();
   s.tiles[6][5] = 1;
   s.player.y = 160;
   s.player.vx = 10000;
-  stepDungeon(s, 1 / 30, input(['ArrowRight']), env);
-  assert.ok(s.player.x <= 112 + 1e-8);
-  assert.ok(s.player.vx <= 1e-8);
+  run(s, 1, ['ArrowRight']);
+  assert.ok(s.player.x <= 112 + 1e-8 && s.player.vx <= 1e-8);
   const y = s.player.y;
-  for (let n = 0; n < 20; n++) stepDungeon(s, 1 / 120, input(['ArrowRight', 'ArrowDown']), env);
+  run(s, 20, ['ArrowRight', 'ArrowDown']);
   assert.ok(s.player.y > y);
 });
-test('Dungeon solid actor contact cannot become a passive attack or pass through a guardian', () => {
-  const { env } = harness();
+test('the sword has a windup, a forward sector and strikes once per swing', () => {
   const s = arena();
-  s.enemies = [
-    {
-      id: 'idle',
-      x: 124,
-      y: 150,
-      vx: 0,
-      vy: 0,
-      hp: 5,
-      speed: 0,
-      hit: 0,
-      type: 'guard',
-      state: 'recover',
-      timer: 10,
-    },
-  ];
-  for (let n = 0; n < 60; n++) {
-    stepDungeon(s, 1 / 120, input(['ArrowRight']), env);
-    assert.ok(s.enemies[0].x - s.player.x >= 15.9);
-  }
-  assert.equal(s.health, 5);
-  assert.equal(s.enemies[0].hp, 5);
-});
-test('Dungeon sword strike gives bounded impulse knockback and damages once per swing', () => {
-  const { env } = harness();
-  const s = arena();
-  s.enemies = [
-    {
-      id: 'target',
-      x: 124,
-      y: 150,
-      vx: 0,
-      vy: 0,
-      hp: 5,
-      speed: 0,
-      hit: 0,
-      type: 'guard',
-      state: 'recover',
-      timer: 10,
-    },
-  ];
-  stepDungeon(s, 1 / 120, input([], ['Space']), env);
-  let struck = false;
-  for (let n = 0; n < 44; n++) {
-    const before = s.enemies[0].x;
-    stepDungeon(s, 1 / 120, input(), env);
-    assert.ok(Math.abs(s.enemies[0].x - before) < 2);
-    if (s.enemies[0].hp < 5) {
-      struck = true;
-    }
-  }
-  assert.ok(struck);
+  s.enemies = [foe(124, 150, { hp: 5 }), foe(100, 120, { hp: 5, id: 'side' })];
+  run(s, 1, [], ['Space']);
+  assert.equal(s.enemies[0].hp, 5, 'no damage before the windup ends');
+  run(s, 60);
   assert.equal(s.enemies[0].hp, 4);
-  assert.equal(s.score, 0);
+  assert.equal(s.enemies[1].hp, 5, 'enemies beside the swing are untouched');
+  assert.equal(s.stamina < 100, true);
 });
-test('Dungeon blade and arrow are stopped by the visible wall before actors behind it', () => {
-  const { env } = harness();
+test('dodging costs stamina, has a cooldown and no invulnerability, with both Shift keys', () => {
+  for (const key of ['KeyK', 'ShiftLeft', 'ShiftRight']) {
+    const s = arena();
+    run(s, 1, ['ArrowRight'], [key]);
+    assert.ok(s.dash > 0 && s.stamina < 80 && s.invulnerable === 0);
+    assert.ok(s.player.vx > 0 && s.player.vx < 30, 'acceleration is bounded');
+  }
+});
+test('a tap during a cooldown is kept and answered, not silently dropped', () => {
+  const s = arena();
+  run(s, 1, [], ['Space']);
+  assert.ok(s.cooldown > 0);
+  run(s, 20, [], []);
+  const stamina = s.stamina;
+  const env = harness().env;
+  stepDungeon(s, 1 / 120, input([], ['Space']), env);
+  for (let n = 0; n < 90 && !s.swing; n++) stepDungeon(s, 1 / 120, input(), env);
+  assert.ok(s.swing || s.stamina < stamina + 24, 'the buffered tap became a second swing');
+  const t = arena();
+  t.stamina = 0;
+  run(t, 1, [], ['KeyK']);
+  run(t, 15);
+  assert.equal(t.dash, 0);
+  run(t, 40);
+  assert.match(t.toast.en, /Dodge needs more stamina/);
+  assert.match(t.toast.zh, /闪步/);
+  const u = arena();
+  u.health = 2;
+  u.flasks = 2;
+  run(u, 1, [], ['KeyH']);
+  run(u, 1, [], ['KeyH']);
+  assert.equal(u.health, 4);
+  run(u, 70);
+  assert.equal(u.health, 5, 'the second tap drank once the first flask cooldown ended');
+});
+test('a guard telegraphs, a locked swing cannot reach behind, body contact is harmless', () => {
+  const s = arena();
+  s.enemies = [foe(128, 150, { state: 'approach', timer: 0 })];
+  run(s, 2);
+  assert.equal(s.enemies[0].state, 'windup');
+  assert.equal(s.health, 5);
+  const t = arena();
+  t.player.x = 170;
+  t.player.y = 180;
+  t.enemies = [foe(195, 180, { state: 'windup', timer: 0.001 })];
+  run(t, 35);
+  assert.equal(t.health, 5, 'the enemy aimed away from the player');
+  const u = arena();
+  u.enemies = [foe(124, 150, { hp: 5 })];
+  run(u, 60, ['ArrowRight']);
+  assert.ok(u.enemies[0].x - u.player.x >= 15.9);
+  assert.equal(u.health, 5);
+});
+test('blades and arrows stop at walls, and idle or expired arrows are harmless', () => {
   const s = arena();
   s.player.x = 110;
   s.tiles[6][5] = 1;
-  const blade = weaponSegment(s, s.player, 0, 32);
-  assert.ok(blade.bx <= 118 + 1e-8);
+  assert.ok(weaponSegment(s, s.player, 0, 32).bx <= 118 + 1e-8);
   s.player.x = 150;
   s.projectiles = [{ x: 100, y: 150, vx: 6000, vy: 0, life: 1, active: true }];
-  stepDungeon(s, 1 / 30, input(), env);
+  run(s, 1);
   assert.equal(s.health, 5);
   assert.equal(s.projectiles.length, 0);
-});
-test('Dungeon inactive or stationary arrows cannot damage even on top of the player', () => {
-  const { env } = harness();
-  const s = arena();
-  s.projectiles = [
+  const t = arena();
+  t.projectiles = [
     { x: 100, y: 150, vx: 0, vy: 0, life: 1, active: true },
     { x: 100, y: 150, vx: 150, vy: 0, life: 1, active: false },
+    { x: 75, y: 150, vx: 100, vy: 0, life: 0.001, active: true },
   ];
-  stepDungeon(s, 1 / 30, input(), env);
-  assert.equal(s.health, 5);
+  run(t, 130);
+  assert.equal(t.health, 5);
+  assert.equal(t.projectiles.length, 0);
+  const u = arena();
+  u.player.x = 300;
+  u.projectiles = [{ x: 200, y: 150, vx: 150, vy: 0, life: 3, active: true }];
+  run(u, 360);
+  assert.equal(u.health, 4, 'a live arrow does hit');
 });
-test('Dungeon spikes warn before their active damage and switches disarm them', () => {
-  const { env } = harness();
+test('spikes warn before they strike and the spike lever disarms them', () => {
   const s = arena();
   s.hazards = [{ x: 100, y: 150, offset: 0, disabled: false, state: 'safe' }];
-  s.time = 1.79;
-  stepDungeon(s, 1 / 30, input(), env);
+  s.time = 2.39;
+  run(s, 1);
   assert.equal(s.hazards[0].state, 'warning');
   assert.equal(s.health, 5);
-  s.time = 2.39;
-  stepDungeon(s, 1 / 30, input(), env);
+  s.time = 2.395;
+  run(s, 40);
   assert.equal(s.hazards[0].state, 'active');
   assert.equal(s.health, 4);
-  const fourth = arena();
-  Object.assign(fourth, buildRoom(4));
-  fourth.enemies = [];
-  fourth.player.x = fourth.lever.x;
-  fourth.player.y = fourth.lever.y;
-  stepDungeon(fourth, 1 / 120, input([], ['KeyE']), env);
-  assert.ok(fourth.hazards.every((h) => h.disabled));
-  assert.ok(fourth.lever.on);
+  const l = createDungeonState(11);
+  l.enemies = [];
+  const lever = l.levers[0];
+  l.player.x = lever.x;
+  l.player.y = lever.y;
+  run(l, 1, [], ['KeyE']);
+  assert.ok(l.hazards.every((h) => h.disabled) && lever.on);
 });
-test('Dungeon actual switch interaction opens the archive for traversal and cannot repeat score', () => {
-  const { env } = harness();
-  const s = arena();
-  Object.assign(s, buildRoom(3));
+test('a lever opens only its own gate and cannot repeat its score', () => {
+  const s = createDungeonState(13);
   s.enemies = [];
-  s.player.x = s.lever.x;
-  s.player.y = s.lever.y;
-  const before = flood(s.tiles);
-  assert.equal(before.has(cellKey(s.key)), false);
-  stepDungeon(s, 1 / 120, input([], ['KeyE']), env);
-  assert.ok(flood(s.tiles).has(cellKey(s.key)));
+  const [first] = s.levers;
+  s.player.x = first.x;
+  s.player.y = first.y;
+  const closed = s.gates.filter((g) => s.tiles[g.cy][g.cx] === 2).length;
+  run(s, 1, [], ['KeyE']);
+  const open = s.gates.filter((g) => s.tiles[g.cy][g.cx] === 2).length;
+  assert.equal(closed - open, 1);
   const score = s.score;
-  stepDungeon(s, 1 / 120, input([], ['KeyE']), env);
+  run(s, 1, [], ['KeyE']);
   assert.equal(s.score, score);
 });
-test('Dungeon full packs retain supplies and full-health shrines stay available', () => {
-  const { env } = harness();
+test('supply, flasks and shrine: full packs and full health keep them available', () => {
   const s = arena();
+  s.chests = [{ x: 100, y: 150, opened: false }];
+  s.shrines = [{ x: 100, y: 150, used: false }];
   s.flasks = 3;
-  s.player.x = s.chest.x;
-  s.player.y = s.chest.y;
-  stepDungeon(s, 1 / 120, input([], ['KeyE']), env);
-  assert.equal(s.chest.opened, false);
-  s.potions = [{ x: s.player.x, y: s.player.y }];
-  stepDungeon(s, 1 / 120, input(), env);
+  run(s, 1, [], ['KeyE']);
+  assert.equal(s.chests[0].opened, false);
+  s.potions = [{ x: 100, y: 150 }];
+  run(s, 1);
   assert.equal(s.potions.length, 1);
-  s.player.x = s.shrine.x;
-  s.player.y = s.shrine.y;
-  stepDungeon(s, 1 / 120, input([], ['KeyE']), env);
-  assert.equal(s.shrine.used, false);
+  s.chests[0].opened = true;
+  run(s, 1, [], ['KeyE']);
+  assert.equal(s.shrines[0].used, false);
   s.health = 2;
-  stepDungeon(s, 1 / 120, input([], ['KeyE']), env);
-  assert.equal(s.shrine.used, true);
+  run(s, 1, [], ['KeyE']);
+  assert.equal(s.shrines[0].used, true);
   assert.equal(s.health, 4);
+  s.potions = [];
+  s.flasks = 1;
+  s.health = 5;
+  run(s, 1, [], ['KeyH']);
+  assert.equal(s.flasks, 1, 'full health keeps the flask');
+  s.flasks = 0;
+  run(s, 1, [], ['KeyE']);
+  assert.match(s.toast.en, /Stand near/);
+  s.chests[0].opened = false;
+  s.health = 3;
+  run(s, 1, [], ['KeyH']);
+  assert.match(s.toast.en, /No healing flasks/);
 });
-test('Dungeon movement and dodge distance agree at 30/60/120Hz', () => {
+test('the key wakes statues, proximity wakes sleepers, and the exit needs the key', () => {
+  const s = createDungeonState(9);
+  assert.ok(s.enemies.every((e) => e.state === 'sleep' && e.wake === 'key'));
+  s.player.x = s.key.x;
+  s.player.y = s.key.y;
+  run(s, 1);
+  assert.ok(s.hasKey && s.enemies.every((e) => e.state === 'approach'));
+  const t = createDungeonState(2);
+  const guard = t.enemies[0];
+  assert.equal(guard.state, 'sleep');
+  t.player.x = guard.x - 60;
+  t.player.y = guard.y;
+  run(t, 40);
+  assert.notEqual(t.enemies[0].state, 'sleep');
+  const u = createDungeonState(1);
+  u.player.x = u.exit.x;
+  u.player.y = u.exit.y;
+  run(u, 2);
+  assert.equal(u.level, 1);
+  u.hasKey = true;
+  run(u, 2);
+  assert.equal(u.level, 2);
+  assert.equal(u.health, 5);
+  assert.equal(u.hasKey, false);
+});
+test('a level that does not need a clear lets the key holder leave past live guards', () => {
+  const s = createDungeonState(14);
+  assert.ok(s.enemies.length > 0);
+  s.hasKey = true;
+  s.invulnerable = 5;
+  s.player.x = s.exit.x;
+  s.player.y = s.exit.y;
+  run(s, 2);
+  assert.equal(s.level, 15);
+});
+test('every chamber is walled in and its objects stand on open floor', () => {
+  for (let n = 1; n <= 20; n++) {
+    const room = buildLevel(n);
+    assert.equal(room.tiles.length, 14);
+    for (const p of [room.key, room.exit, room.start, ...room.enemies, ...room.levers]) {
+      const cx = Math.floor((p.x - 20) / 20),
+        cy = Math.floor((p.y - 30) / 20);
+      assert.equal(room.tiles[cy][cx], 0, `level ${n}`);
+    }
+    for (const g of room.gates) assert.equal(room.tiles[g.cy][g.cx], 2);
+  }
+});
+test('a legal idle loss freezes once and a new game starts fresh', () => {
+  const s = createDungeonState(2);
+  s.health = 0;
+  const { env, ends } = harness();
+  stepDungeon(s, 1 / 60, input(), env);
+  stepDungeon(s, 1 / 60, input(['Space'], ['KeyH']), env);
+  assert.equal(s.phase, 'lost');
+  assert.equal(ends.length, 1);
+  const fresh = createGame(harness().env).getState();
+  assert.deepEqual([fresh.health, fresh.flasks, fresh.level, fresh.kills], [5, 1, 1, 0]);
+  assert.match(fresh.status.en, /1 flask(?!s)/);
+});
+test('the last exit wins', () => {
+  const s = createDungeonState(20);
+  s.enemies = [];
+  s.hasKey = true;
+  s.player.x = s.exit.x;
+  s.player.y = s.exit.y;
+  const { env, ends } = harness();
+  stepDungeon(s, 1 / 60, input(), env);
+  assert.equal(s.phase, 'won');
+  assert.equal(ends.length, 1);
+  assert.equal(ends[0].won, true);
+});
+test('movement and dodge distance agree at 30, 60 and 120 Hz', () => {
   const states = [30, 60, 120].map((hz) => {
-    const { env } = harness();
-    const s = arena();
+    const { env } = harness(),
+      s = arena();
     for (let n = 0; n < hz; n++)
       stepDungeon(s, 1 / hz, input(['ArrowRight'], n === 0 ? ['KeyK'] : []), env);
     return s;
@@ -553,57 +307,14 @@ test('Dungeon movement and dodge distance agree at 30/60/120Hz', () => {
     assert.ok(Math.abs(s.stamina - states[0].stamina) < 1e-8);
   }
 });
-test('Dungeon both Shift keys trigger the documented dodge', () => {
-  for (const key of ['ShiftLeft', 'ShiftRight']) {
-    const { env } = harness();
-    const s = arena();
-    stepDungeon(s, 1 / 120, input(['ArrowRight'], [key]), env);
-    assert.ok(s.dash > 0);
-    assert.ok(s.stamina < 80);
-  }
+test('fast knockback cannot tunnel through a solid guardian', () => {
+  const s = arena();
+  s.player.vx = 20000;
+  s.enemies = [foe(180, 150, { hp: 5 })];
+  run(s, 4);
+  assert.ok(s.player.x + 15.9 <= s.enemies[0].x);
 });
-test('Dungeon legal idle loss freezes once and a new campaign resets resources', () => {
-  const { env, ends } = harness();
-  const game = createGame(env);
-  for (let n = 0; n < 3600 && game.getState().phase === 'playing'; n++)
-    game.update(1 / 60, input());
-  assert.equal(game.getState().phase, 'lost');
-  assert.equal(ends.length, 1);
-  const frozen = game.getState();
-  game.update(1 / 30, input(['Space'], ['KeyH']));
-  assert.deepEqual(game.getState(), frozen);
-  const fresh = createGame(env).getState();
-  assert.equal(fresh.health, 5);
-  assert.equal(fresh.flasks, 1);
-  assert.equal(fresh.room, 1);
-  assert.equal(fresh.kills, 0);
-});
-test('Dungeon seeded public inputs remain finite, deterministic, and bounded', () => {
-  const games = [createGame(harness().env), createGame(harness().env)],
-    random = seeded(19);
-  let held = [];
-  const finite = (v) => {
-    if (typeof v === 'number') assert.ok(Number.isFinite(v));
-    else if (v && typeof v === 'object') Object.values(v).forEach(finite);
-  };
-  for (let n = 0; n < 2400; n++) {
-    if (n % 24 === 0)
-      held = [['ArrowLeft'], ['ArrowRight'], ['ArrowUp'], ['ArrowDown']][
-        Math.floor(random() * 4)
-      ].concat(random() < 0.6 ? ['Space'] : []);
-    for (const g of games) g.update(1 / 60, input(held, n % 90 === 0 ? ['KeyK'] : []));
-    if (n % 120 === 0) {
-      const s = games[0].getState();
-      finite(s);
-      assert.ok(s.projectiles.length <= 20);
-      assert.ok(s.particles.length <= 24);
-      games[0].draw(mockContext());
-      assert.deepEqual(s, games[1].getState());
-    }
-  }
-});
-test('Dungeon every essential touch action has an explicit side', async () => {
-  const { meta } = await import('../src/games/dungeon-dash.js');
+test('every essential touch action has an explicit side', () => {
   for (const code of [
     'ArrowLeft',
     'ArrowRight',
@@ -615,27 +326,75 @@ test('Dungeon every essential touch action has an explicit side', async () => {
     'KeyH',
   ])
     assert.ok(meta.touchControls.some((c) => c.code === code && c.side));
+  assert.ok(createGame(harness().env).draw(mockContext()) === undefined);
 });
-
-test('Dungeon even fast knockback cannot tunnel through a solid guardian', () => {
-  const { env } = harness();
+test('a hit staggers a guard for less than the swing cooldown, so swings cannot be chained for free', () => {
   const s = arena();
-  s.player.vx = 20000;
-  s.enemies = [
-    {
-      id: 'solid',
-      x: 180,
-      y: 150,
-      vx: 0,
-      vy: 0,
-      hp: 5,
-      speed: 0,
-      hit: 0,
-      type: 'guard',
-      state: 'recover',
-      timer: 10,
-    },
-  ];
-  stepDungeon(s, 1 / 30, input(), env);
-  assert.ok(s.player.x + 15.9 <= s.enemies[0].x);
+  s.enemies = [foe(124, 150, { hp: 5, state: 'approach', timer: 0, speed: 0 })];
+  s.enemies[0].state = 'windup';
+  s.enemies[0].timer = 5;
+  run(s, 1, [], ['Space']);
+  run(s, 28);
+  assert.equal(s.enemies[0].state, 'recover');
+  assert.ok(s.enemies[0].timer <= 0.3);
+  run(s, 40);
+  assert.notEqual(s.enemies[0].state, 'recover');
+});
+test('an armoured guard finishes a started windup when hit, a plain guard is interrupted', () => {
+  for (const armor of [false, true]) {
+    const s = arena();
+    s.enemies = [foe(124, 150, { hp: 5, state: 'windup', timer: 5, armor })];
+    run(s, 1, [], ['Space']);
+    run(s, 40);
+    assert.equal(s.enemies[0].hp, 4);
+    assert.equal(s.enemies[0].state, armor ? 'windup' : 'recover');
+  }
+});
+test('armoured sleepers wake as a pack, plain sleepers wake alone', () => {
+  for (const armor of [false, true]) {
+    const s = arena();
+    s.pathTimer = 0;
+    s.enemies = [
+      foe(130, 150, { state: 'sleep', wake: 'near', armor }),
+      foe(240, 150, { state: 'sleep', wake: 'near', armor, id: 'second' }),
+    ];
+    s.player.x = 100;
+    run(s, 2);
+    assert.equal(s.enemies[1].state === 'sleep', !armor);
+  }
+});
+test('each level starts with its own flask count and the tip on screen', () => {
+  assert.equal(createDungeonState(2).flasks, 1);
+  assert.equal(createDungeonState(17).flasks, 0);
+  assert.equal(createDungeonState(2).toast.en, LEVELS[1].tip.en);
+});
+test('a straight push at the edge of a one-cell doorway slides into it', () => {
+  const s = arena();
+  for (let y = 1; y < 13; y++) if (y !== 6) s.tiles[y][5] = 1;
+  s.player.x = 100;
+  s.player.y = 164;
+  run(s, 240, ['ArrowRight']);
+  assert.ok(s.player.x > 150, `stuck at ${s.player.x}`);
+  const wall = arena();
+  for (let y = 1; y < 13; y++) wall.tiles[y][5] = 1;
+  wall.player.x = 100;
+  wall.player.y = 164;
+  run(wall, 240, ['ArrowRight']);
+  assert.ok(
+    wall.player.x <= 112 + 1e-6 && Math.abs(wall.player.y - 164) < 0.01,
+    'a plain wall does not drag',
+  );
+});
+test('the drawn guard warning arc covers every angle a static player can be hit from at 30 px', () => {
+  let widest = 0;
+  for (let degrees = 0; degrees <= 110; degrees += 2) {
+    const s = arena();
+    const angle = (degrees * Math.PI) / 180;
+    s.player.x = 200 + Math.cos(angle) * 30;
+    s.player.y = 150 + Math.sin(angle) * 30;
+    s.enemies = [foe(200, 150, { state: 'windup', timer: 0.001, aim: { x: 1, y: 0 } })];
+    run(s, 40);
+    if (s.health < 5) widest = degrees;
+  }
+  assert.ok(widest > 0 && (widest * Math.PI) / 180 <= WARNING_HALF_ARC, `hit at ${widest} degrees`);
 });

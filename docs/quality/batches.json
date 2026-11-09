@@ -247,7 +247,8 @@
       "paddle-duel",
       "pixel-rally",
       "memory-grove",
-      "pinball-pocket"
+      "pinball-pocket",
+      "dungeon-dash"
     ],
     "records": [
       "final-review/snowball-siege.json",
@@ -267,7 +268,8 @@
       "final-review/paddle-duel.json",
       "final-review/pixel-rally.json",
       "final-review/memory-grove.json",
-      "final-review/pinball-pocket.json"
+      "final-review/pinball-pocket.json",
+      "final-review/dungeon-dash.json"
     ]
   }
 }

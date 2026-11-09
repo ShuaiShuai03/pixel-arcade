@@ -36,7 +36,7 @@ Effort: S = level data only, M = data plus some mechanics or tests, L = structur
 | memory-grove     |             20 | `LEVELS`            |   M    | done (final review) |
 | gravity-courier  |              3 | `COURIER_ROOMS`     |   M    | queued              |
 | grapnel-gorge    |              3 | inline `plans`      |   M    | queued              |
-| dungeon-dash     |              5 | per-room branches   |   L    | queued              |
+| dungeon-dash     |             20 | `LEVELS`            |   L    | done (final review) |
 | neon-snake       |             20 | `LEVELS`            |   L    | done (final review) |
 
 Not level-based (no retrofit needed): pinball-pocket (one table), paddle-duel (single match), pixel-rally (one continuous course), lantern-climber (one continuous tower). Pixel Parkour is a separate project.
