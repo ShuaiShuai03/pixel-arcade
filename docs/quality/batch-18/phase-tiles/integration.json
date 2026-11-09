@@ -1,0 +1,62 @@
+{
+  "date": "2026-11-09",
+  "status": "complete",
+  "workspace": "Checks ran in a clean detached worktree of HEAD 04b9515 plus exactly the six Phase Tiles files and its catalog entry.",
+  "checks": {
+    "focused game tests with coverage": {
+      "command": "node --experimental-test-coverage --test-coverage-include='src/games/phase-tiles*.js' --test tests/phase-tiles.test.js tests/phase-tiles-quality.test.js",
+      "exitCode": 0,
+      "passed": 70,
+      "failed": 0,
+      "coverageLines": {
+        "phase-tiles": 100,
+        "phase-tiles-rules": 100,
+        "phase-tiles-boards": 100,
+        "phase-tiles-draw": 100
+      },
+      "coverageBranches": {
+        "phase-tiles": 99.45,
+        "phase-tiles-rules": 98.77,
+        "phase-tiles-boards": 100,
+        "phase-tiles-draw": 100
+      },
+      "log": "coverage.txt"
+    },
+    "shared input, simulation and platform lifecycle": {
+      "command": "node --test tests/input.test.js tests/simulation.test.js tests/platform-lifecycle.test.js",
+      "exitCode": 0,
+      "passed": 28,
+      "failed": 0,
+      "log": "shared-tests.txt"
+    },
+    "scoped catalog tests": {
+      "command": "node --test --test-name-pattern='release contains|Pixel Parkour|^phase' tests/catalog.test.js",
+      "exitCode": 0,
+      "passed": 3,
+      "failed": 0,
+      "log": "catalog-tests.txt"
+    },
+    "static check": {
+      "command": "npm run check",
+      "exitCode": 0,
+      "log": "static-check.txt"
+    },
+    "format check": {
+      "command": "npm run format:check",
+      "exitCode": 0,
+      "log": "format-check.txt"
+    },
+    "build": {
+      "command": "npm run build",
+      "exitCode": 0,
+      "log": "build.txt"
+    },
+    "diff check": {
+      "command": "git diff --cached --check",
+      "exitCode": 0
+    }
+  },
+  "catalog": "One entry added (Phase Tiles, 1 player, puzzle); the release assertion rises from 48 to 49 JavaScript games, which with Pixel Parkour completes the 50-game collection.",
+  "hostChanges": "None.",
+  "uncommittedExcluded": "A stray untracked greedy.mjs is not part of this release."
+}

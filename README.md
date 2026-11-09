@@ -1,6 +1,6 @@
 # Pixel Arcade
 
-A pixel-art island with **48 original browser games**, plus **Pixel Parkour**. Play free on a keyboard or touch screen, in English or Simplified Chinese.
+A pixel-art island with **49 original browser games**, plus **Pixel Parkour**. Play free on a keyboard or touch screen, in English or Simplified Chinese.
 
 **[Play Pixel Arcade](https://shuaishuai03.github.io/pixel-arcade/)**
 
@@ -34,7 +34,7 @@ No account, downloads, ads, analytics, or CDN dependencies. Personal bests and l
 
 The collection uses original code and artwork inspired by classic game mechanics. It does not include the assets or characters of commercial arcade games.
 
-The collection is being expanded and refined in batches of at most three games. Forty-nine games have passed initial acceptance; batch 18 adds [Weightworks](docs/quality/batch-18/weightworks/ACCEPTANCE.md), after batch 17 added [Mirror Lab](docs/quality/batch-17/mirror-lab/ACCEPTANCE.md), [Circuit Weaver](docs/quality/batch-17/circuit-weaver/ACCEPTANCE.md) and [Tide Lock](docs/quality/batch-17/tide-lock/ACCEPTANCE.md). Level-based games have at least 20 levels. The [quality schedule](docs/quality/BATCHES.md) tracks the 50-game target and the required second independent review after development is complete.
+The collection is being expanded and refined in batches of at most three games. All fifty games have passed initial acceptance; batch 18 added [Weightworks](docs/quality/batch-18/weightworks/ACCEPTANCE.md) and [Phase Tiles](docs/quality/batch-18/phase-tiles/ACCEPTANCE.md), after batch 17 added [Mirror Lab](docs/quality/batch-17/mirror-lab/ACCEPTANCE.md), [Circuit Weaver](docs/quality/batch-17/circuit-weaver/ACCEPTANCE.md) and [Tide Lock](docs/quality/batch-17/tide-lock/ACCEPTANCE.md). Level-based games have at least 20 levels. The [quality schedule](docs/quality/BATCHES.md) tracks the 50-game target and the required second independent review after development is complete.
 
 ## Controls
 
@@ -75,7 +75,7 @@ npm run build
 pixel-arcade/
   index.html              Arcade hub and shared game screen
   src/app.js              Navigation, input, audio, scores, language
-  src/games/              Forty-eight independent game modules
+  src/games/              Forty-nine independent game modules
   src/shared/             Small shared utilities
   src/world.js            Original pixel island illustration
   public/parkour/         Runnable Pixel Parkour WebAssembly port

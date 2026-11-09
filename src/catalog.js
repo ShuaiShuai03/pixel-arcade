@@ -47,6 +47,7 @@ export const catalog = [
   ['circuit-weaver', 'Circuit Weaver', '电路织匠', 'puzzle', '1', '#c8873a'],
   ['tide-lock', 'Tide Lock', '潮汐船闸', 'puzzle', '1', '#3a7ca5'],
   ['weightworks', 'Weightworks', '天平工坊', 'puzzle', '1', '#a8763e'],
+  ['phase-tiles', 'Phase Tiles', '相位方格', 'puzzle', '1', '#6fb8c9'],
 ].map(([id, en, zh, genre, players, color]) => ({ id, name: { en, zh }, genre, players, color }));
 export const loadGame = (id) => import(`./games/${id}.js`);
 

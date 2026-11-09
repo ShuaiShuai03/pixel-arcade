@@ -2,16 +2,17 @@
 
 At the user's direction, at most **three games** may be under development and acceptance testing at one time. Do not begin the next batch until all games in the active batch satisfy the gates below. The collection target is 50 games, including Pixel Parkour (reduced from 100 at the user's direction on 2026-11-05). Roster themes are not work assignments.
 
-## Active batch 18
+## All 50 games initially accepted
 
-| Game        | Implementation owner | Independent reviewer | Current state                           |
-| ----------- | -------------------- | -------------------- | --------------------------------------- |
-| Phase Tiles | `owner-phase`        | `review-phase`       | Fixing review findings                  |
-| Weightworks | `owner-weight`       | `review-weight`      | Accepted and released (batch 18 record) |
+Phase Tiles completed batch 18 and the 50-game target, Pixel Parkour included. The [required final review](#required-final-review) of every game comes next.
 
-Tide Lock brought the accepted total to 48, so these two games reach the 50-game target. Fold Map, first scheduled for this batch, is not needed for the target.
+## Completed batch 18
+
+Tide Lock brought the accepted total to 48, so two games reached the 50-game target. Fold Map, first scheduled for this batch, was not needed.
 
 Weightworks, a balance-machine puzzle with 24 machines, hanging beams, sliders, tippers and move budgets, passed two rounds of independent review and browser acceptance, bringing the accepted total to 49. A prompt-following driver balanced all 24 machines in Chinese at the maximum score, a budget machine was played to a loss in English, and touch play was checked on a phone layout. See the [Weightworks evidence](batch-18/weightworks/ACCEPTANCE.md). Commit `08a4d01` is live; all seven checked assets match, and the published game accepted real input. See the [deployment receipt](batch-18/weightworks/deployment.json).
+
+Phase Tiles, a tile-phase puzzle with 26 boards, influence shapes, holes, locked tiles, three phases and tight press budgets, passed two rounds of independent review and browser acceptance, bringing the accepted total to 50. A prompt-following driver cleared all 26 boards in English at the maximum score, a budget board was played to a loss in Chinese, and touch play was checked on a phone layout. See the [Phase Tiles evidence](batch-18/phase-tiles/ACCEPTANCE.md).
 
 ## Completed batch 17
 

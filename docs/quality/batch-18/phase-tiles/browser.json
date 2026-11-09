@@ -1,0 +1,35 @@
+{
+  "date": "2026-11-09",
+  "browser": "The user's stable Google Chrome, driven through the official Claude in Chrome extension in its own tab-group window. Keys were synthetic in-page keydown/keyup events; touch buttons, Start, the language switch, menu cells on the canvas and Play again were real mouse clicks. Only visible DOM text and the drawn canvas were read; no game state was read or injected.",
+  "status": "complete",
+  "stateInjection": false,
+  "phoneLayouts": "Checked in a same-origin 390-wide portrait frame on the page (371 px inner width, no horizontal overflow).",
+  "servedSourceCheck": "The SHA-256 of all four served phase-tiles modules was computed in the page and matched 2c81d920, 5f77d459, 60bd8bc6 and aba765af.",
+  "games": [
+    {
+      "id": "phase-tiles",
+      "sourceSha256": {
+        "src/games/phase-tiles.js": "2c81d92053c41a54062c99279af6169ff2f49796114b6b115dffce40f80c2de1",
+        "src/games/phase-tiles-rules.js": "5f77d459e37f666172fdd9089c2c2c1495c91bd2382f833fc7868a8a9645d9f3",
+        "src/games/phase-tiles-boards.js": "60bd8bc6965260d7aa114488d004db2ac90cb0af7c91a08a85649278a3358f21",
+        "src/games/phase-tiles-draw.js": "aba765aff320189abdde491bb36afa7f059fc4b8dc91e575d5cb833ebcdcd41b"
+      },
+      "levels": 26,
+      "observed": [
+        "A driver that reads only the English status line, with a 0.35 s reaction delay and pressing an arrow exactly as many times as the line says, played boards 1 to 26 back to back in 6 minutes 26 seconds and reached 'Nicely played! Every board is clear. The loom is yours!' with the maximum score of 2600. It never needed an undo or a repeated action.",
+        "Chinese board select listed all 26 boards; two taps on the canvas entered board 8.",
+        "Chinese: spending board 8's seven presses on one tile showed 'Z：撤销多余的一步' from the first wasted press and the canvas countdown '次数用完：按 Z 撤销（4 秒）'. Without an undo the run ended exactly 8.0 s after the last press with '第 8 块棋盘的按压次数用完了，再试一次。'. Z, arrows, Space and Q on the loss screen changed nothing, and Play again returned to board select.",
+        "Chinese phone frame: real taps on the touch buttons alone, following the prompt, cleared boards 1 and 2. A wrong press was taken back with the Undo button, and Reset restored board 3 after a press.",
+        "The game paused itself twice when the window lost focus; the driver pressed the visible Resume button."
+      ],
+      "screenshots": [
+        "../screenshots/phase-26-win-en.jpg",
+        "../screenshots/phase-select-zh.jpg",
+        "../screenshots/phase-countdown-zh.jpg",
+        "../screenshots/phase-loss-zh.jpg",
+        "../screenshots/phase-phone-zh-touch.png"
+      ]
+    }
+  ],
+  "limitations": "Physical phones, other browsers, the English phone header and audio were not tested; console output was not captured."
+}

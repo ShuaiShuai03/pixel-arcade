@@ -1,0 +1,64 @@
+{
+  "date": "2026-11-09",
+  "phase": "complete",
+  "finalCollectionReview": false,
+  "levelRule": "Level-based games need at least 20 authored levels with level select through env.progress.",
+  "records": [
+    {
+      "game": "phase-tiles",
+      "owner": "owner-phase",
+      "reviewer": "review-phase",
+      "rounds": 2,
+      "verdict": "approved",
+      "approvedSha256": {
+        "src/games/phase-tiles.js": "2c81d92053c41a54062c99279af6169ff2f49796114b6b115dffce40f80c2de1",
+        "src/games/phase-tiles-rules.js": "5f77d459e37f666172fdd9089c2c2c1495c91bd2382f833fc7868a8a9645d9f3",
+        "src/games/phase-tiles-boards.js": "60bd8bc6965260d7aa114488d004db2ac90cb0af7c91a08a85649278a3358f21",
+        "src/games/phase-tiles-draw.js": "aba765aff320189abdde491bb36afa7f059fc4b8dc91e575d5cb833ebcdcd41b",
+        "tests/phase-tiles.test.js": "17dd944e91f5c0f970a26df1433419cb3570c44d1e9ba39954f9cbc773fe423a",
+        "tests/phase-tiles-quality.test.js": "5eda8a07013c69a6bec3759d0c9202973bf11f1da5811fe48c850fd2bad82a13"
+      },
+      "hashCheck": "The reviewer recorded all six hashes at the start and the end of each round; both rounds' records were identical, and the served modules matched in Chrome.",
+      "verdictNote": "Round 2 was first reported as REJECT on a depth-4 look-ahead bot, which lies outside the agreed bar (depth 2 and 3); the reviewer then approved on the agreed bars and recorded depth 4 as a note.",
+      "findings": [
+        {
+          "id": "phase-lookahead-depth",
+          "severity": "high",
+          "status": "closed",
+          "observation": "A no-prompt look-ahead bot with free restarts (depth 3) won boards 16-18, 21, 24 and 26, about 15 boards in all. Boards were regenerated as denser, low-nullity scrambles with a look-ahead filter and tighter budgets (slack 1 on boards 7-26); depth 2 (40 seeds) and depth 3 (30 seeds) now win nothing from board 3, and a quality test ports the bot."
+        },
+        {
+          "id": "phase-loss-window",
+          "severity": "medium",
+          "status": "closed",
+          "observation": "An unsolved board with no presses left ended the run after 1.2 s, too short to reach Undo by touch. An 8 s countdown is now shown on the canvas; an undo cancels it and idle still loses."
+        },
+        {
+          "id": "phase-mutable-data",
+          "severity": "low",
+          "status": "closed",
+          "observation": "Board definitions, meta and shape-name arrays were mutable and the advice line returned shared arrays. They are now frozen or copied."
+        },
+        {
+          "id": "phase-hole-card",
+          "severity": "low",
+          "status": "closed",
+          "observation": "With the cursor on a hole, the shape card showed a neighbouring tile's shape. It now reads 'no tile'."
+        },
+        {
+          "id": "phase-tip-wording",
+          "severity": "low",
+          "status": "closed",
+          "observation": "Board 17's tip could be read as wrap-around, and the first row and column tiles on board 19 had no tip. Both tips were rewritten; an unused constant was removed."
+        }
+      ],
+      "openNotes": [
+        "An exhaustive depth-4 look-ahead with free restarts (on the order of 10^5 to 10^6 sequences per decision) beats boards 3, 4, 7, 16, 20, 22, 23, 24 and 25 in small samples (for example 11 of 16 on board 22 and 6 of 16 on board 25). Human-plausible bots, the hill-climber with restarts and informed random presses, win nothing from board 12.",
+        "Optimal press counts rise from 1 to 14; bot success does not rise monotonically across the late boards.",
+        "Boards 7-26 allow one spare press. Undo refunds a press and the prompt asks for it at once, so a player who follows the prompt is never trapped.",
+        "tests/phase-tiles.test.js is over 1,500 lines; tests are exempt from the 800-line guideline.",
+        "Text fit was checked with a width model, not measured fonts."
+      ]
+    }
+  ]
+}
