@@ -1,0 +1,82 @@
+{
+  "game": "bomb-garden",
+  "date": "2026-11-09",
+  "reviewedRevision": "2739506 plus the rework in this commit",
+  "owner": "owner-bomb, then owner-bomb2 after a session restart",
+  "reviewer": "final-bomb (rounds 1-2), final-bomb3 (rounds 3-4)",
+  "rounds": 4,
+  "verdict": "pass",
+  "approvedSha256": {
+    "src/games/bomb-garden.js": "c21cc4389a7cf4e280294014800d903da30716dc192f52a19da87b426779e685",
+    "src/games/bomb-garden-draw.js": "c2b32421a7c80aa4064fb9172a0ae42c69992d4b73375ab42bb07e093b9eccc3",
+    "src/games/bomb-garden-gardens.js": "e40eb7d0014038fcc56abdab88f22a137ef8e882b9ef52ea8e360dc2e367d1c1",
+    "src/games/bomb-garden-rules.js": "8edcf5791de4b929825b8029c28534770eb86fc2ea899e7ad93f1857f5ca56f5",
+    "tests/bomb-garden.test.js": "b9b3e4c5c89db7925fcb02204d9d3fd11a02a040733201544f9d2da3e564f034",
+    "tests/bomb-garden-quality.test.js": "0ce7524087e2e22dcd6fa9b53e18c1f0d60521d96649d3e898834c886849534c"
+  },
+  "tests": {
+    "command": "node --experimental-test-coverage --test-coverage-include='src/games/bomb-garden*.js' --test tests/bomb-garden.test.js tests/bomb-garden-quality.test.js",
+    "passed": 109,
+    "failed": 0,
+    "lineCoverage": 100,
+    "log": "bomb-garden-coverage.txt"
+  },
+  "independentProbes": "The reviewer's own reaction-limited bot, reading only public state, cleared 334 of 352 garden runs at 0.25 s lag and 304 of 352 at 0.35 s with 7.5 decisions per second (round 3); after the round-4 change it cleared gardens 8-12 at 15-16 of 16 and 13-16 of 16. Idle, mash and random keys won 0 of 440. With the reviewer's own seeds, the owner's greedy bot beats 8 of 22 gardens and none of 15-22 above half; informed-random wins garden 9 12% and garden 11 40% of 100 runs. Fuzz of 162 solo and duel runs with hostile dt and pointer values broke no invariant; 88 runs matched across 30, 60 and 120 Hz; 112 barrel-preview trials matched the real blast.",
+  "findings": [
+    {
+      "id": "B1-B2",
+      "severity": "blocking",
+      "status": "fixed",
+      "observation": "Only 6 gardens and no select or continue. There are now 22 data-driven gardens that introduce bombers, upgrades, scouts, walls, wardens, wet soil and compost barrels one at a time, with per-garden bilingual tips, a garden select and env.progress continue; missing, junk and throwing stores are safe."
+    },
+    {
+      "id": "M1-M2",
+      "severity": "medium",
+      "status": "fixed",
+      "observation": "Dead resolveBlastChain was deleted and its test rewritten against the real engine; a quality suite now covers time-outs, duel results, Chinese and touch-only play, blind and greedy bars over 20 seeds, reaction-limited clears at 30, 60 and 120 Hz and a rising curve."
+    },
+    {
+      "id": "R2-M1",
+      "severity": "medium",
+      "status": "fixed",
+      "observation": "Round 2: the greedy bar held only for a lucky seed set (garden 17 at 80%, gardens 12-14 at 100%). Gardens were retuned and the bars run on 20 seeds; garden 17 is now about 30% pooled and gardens 12-14 range from 0% to 55%."
+    },
+    {
+      "id": "R2-M2",
+      "severity": "medium",
+      "status": "fixed",
+      "observation": "Round 2: garden 14 cleared only 6 of 16 for a slow human-like bot and garden 11 opened with a repeatable ambush. Both were softened and given tips; they now clear 12-16 of 16."
+    },
+    {
+      "id": "R3-M1",
+      "severity": "medium",
+      "status": "fixed",
+      "observation": "Round 3: informed-random won garden 9 about 53% of 220 runs. Gardens 9 and 11 gained a bomber rival; a 100-run test caps both at 45%."
+    },
+    {
+      "id": "L",
+      "severity": "low",
+      "status": "fixed",
+      "observation": "Barrel range-2 chains are previewed in orange with brighter dots; fuse, HUD and objective text are accurate; tips for gardens 3, 15 and 19 were corrected; rivals no longer pick up authored upgrades and upgrades survive later blasts; ROLES, FEATURES, DIRS and MENU are frozen; the 1,219-line file is split into four modules."
+    }
+  ],
+  "openNotes": [
+    "Garden 3's lone scout can seal itself behind crates; bots that do not blast in time out on 4 of 16 runs, and the tip tells players to blast crates to reach it.",
+    "The greedy bot beats garden 11 about half the time and garden 12 slightly more; informed-random sits at 40% on garden 11 against a 45% test ceiling.",
+    "Greedy fails every garden built around a scout or warden, so the reaction-limited bot is the better gauge of the curve, which rises with dips at gardens 5 and 17.",
+    "The quality suite takes about 5-6 minutes.",
+    "A duel P2 win is reported as won: false, following the other two-player games."
+  ],
+  "browser": {
+    "method": "Official Claude in Chrome extension, local server; real clicks on Start, Play again, the language switch and the touch buttons, synthetic in-page keys; only DOM text and the canvas were read.",
+    "servedSha256Prefixes": "c21cc438 c2b32421 e40eb7d0 8edcf579",
+    "observed": [
+      "Chinese: Start opened garden 1 of 22 with the localized HUD, lesson and rival count.",
+      "Chinese loss: three bombs planted underfoot cost one heart each (3, 2, 1), then the loss screen explained it (生命耗尽。放置炸弹前请留下逃生路线。); arrow keys on the loss screen changed nothing, and Play again restarted garden 1 with three hearts.",
+      "English 390 px phone frame (388 px inner, no horizontal overflow): real presses on the Right touch button moved the gardener and the Bomb button planted a bomb with its blast preview.",
+      "Two console errors appeared only when the test harness replaced the page body with the phone frame while the outer game loop was running; a fresh load logged nothing.",
+      "Not covered in the browser: a garden win and the garden select, which appears only after a first clear; both are covered by the reviewer's bots and the quality tests."
+    ],
+    "screenshots": ["screenshots/bomb-garden-loss-zh.jpg", "screenshots/bomb-garden-phone-en.png"]
+  }
+}

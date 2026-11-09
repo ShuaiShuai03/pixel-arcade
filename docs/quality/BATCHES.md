@@ -10,8 +10,8 @@ Phase Tiles completed batch 18 and the 50-game target, Pixel Parkour included. T
 | -------------- | ---------------------------------------------------------------------------------------------------- |
 | Snowball Siege | Passed after three rounds ([record](final-review/snowball-siege.json))                               |
 | Ember Knights  | Passed after three rounds: 20 stages, reactive champions ([record](final-review/ember-knights.json)) |
-| Bomb Garden    | Passed round 3; fixing one medium difficulty finding (garden 9)                                      |
-| Iron Bastion   | Round 2 review of the 24-field rebuild                                                               |
+| Bomb Garden    | Passed after four rounds: 22 gardens, barrel previews ([record](final-review/bomb-garden.json))      |
+| Iron Bastion   | Passed round 2; re-checking three low fixes (curve, tests, cover rebuild)                            |
 | Sky Raiders    | Passed after two rounds: 24 sectors, aimed strike zones ([record](final-review/sky-raiders.json))    |
 
 ## Completed batch 18

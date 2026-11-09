@@ -25,7 +25,7 @@ Effort: S = level data only, M = data plus some mechanics or tests, L = structur
 | starbreaker      |              3 | hard-coded brick patterns |   M    | queued              |
 | meteor-drift     |              5 | wave if-chain             |   M    | queued              |
 | ember-knights    |             20 | `STAGES`                  |   M    | done (final review) |
-| bomb-garden      |              6 | `GARDENS`/`LAYOUTS`       |   M    | queued              |
+| bomb-garden      |             22 | `GARDENS`                 |   M    | done (final review) |
 | sky-raiders      |             24 | `SECTORS`                 |   M    | done (final review) |
 | iron-bastion     |              3 | inline plans              |   M    | queued              |
 | orbit-invaders   |              4 | fleet if-chain            |   M    | queued              |
