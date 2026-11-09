@@ -1,0 +1,83 @@
+{
+  "game": "ember-knights",
+  "date": "2026-11-09",
+  "reviewedRevision": "6dd0f66 plus the rework in this commit",
+  "owner": "owner-ember",
+  "reviewer": "final-ember",
+  "rounds": 3,
+  "verdict": "pass",
+  "approvedSha256": {
+    "src/games/ember-knights-ai.js": "520532cdf0ed515ff6bb5fdaff609d1ca0dd59b2d479be4093b44079d3209723",
+    "src/games/ember-knights-arenas.js": "c64908dced4b084e9a797d47cd4b93f0c3f712e743cf2831f5991af1f2c481c6",
+    "src/games/ember-knights-draw.js": "1c8afddee8dffb4ebfd3ab7f5cc5c075ae7042e649f68a60c7363a85e3c2f1e6",
+    "src/games/ember-knights-menu.js": "2105c93b3b36711073432ed617a8d237f5e29f25636267d027997431a3f716ea",
+    "src/games/ember-knights-physics.js": "b9eff222305268f674bd00c292dad7e74011d680565dd9f50ff6074c887de4e2",
+    "src/games/ember-knights-stages.js": "7da4a5595a79c76957ba6e5b77388b220af56653d809b26f348ee1d8b639fa9c",
+    "src/games/ember-knights-text.js": "110b53de1c8ee1961d8ead99bc2a0d85951d0201604f09e9fcf5b0d628102724",
+    "src/games/ember-knights.js": "1cddbebeae650d12f63ee809236d0326c30237cb54bcf1d1f9cde3961c355d75",
+    "tests/ember-knights-quality.test.js": "d134be10c37e8eef7fa6e1ddba26adc48df6812bce072a3c994c81114f23f151",
+    "tests/ember-knights.test.js": "146914cd90ff8c33a45bbe3c4fbc2dfbf38698036be5928747f80630bdbdcf39"
+  },
+  "tests": {
+    "command": "node --experimental-test-coverage --test-coverage-include='src/games/ember-knights*.js' --test tests/ember-knights*.test.js",
+    "passed": 143,
+    "failed": 0,
+    "lineCoverage": 99.35,
+    "log": "ember-knights-coverage.txt"
+  },
+  "independentProbes": "Fuzz of 96 runs (337k frames, solo at five unlock levels and two-player, hostile dt and pointer values) broke no invariant; passive contact dealt no damage; play was identical at 30, 60 and 120 Hz. The reviewer's own lesson-following bot cleared every stage at 0.25 s and 0.35 s reaction and won 18 full 20-champion campaigns in EN and ZH at all three rates; at 0.45 s it clears stages 1-4. Holding Quick and advancing wins 2.3% overall.",
+  "findings": [
+    {
+      "id": "B1",
+      "severity": "blocking",
+      "status": "fixed",
+      "observation": "Holding Quick and walking forward beat all six champions in 40 of 40 seeds, because the AI never reacted to the player's wind-up. Champions now see the player through a per-champion reaction delay and guard, parry, retreat or counter; chained swings cost stamina, tired swings hit softer, later champions have poise, and blocks and parries punish."
+    },
+    {
+      "id": "B2",
+      "severity": "blocking",
+      "status": "fixed",
+      "observation": "Only 6 stages and no level select. There are now 20 stages (teaching 1-6, combination 7-14, mastery 15-20) with bilingual lessons, a stage select and env.progress continue; broken stores fall back to stage 1."
+    },
+    {
+      "id": "M1",
+      "severity": "medium",
+      "status": "fixed",
+      "observation": "The 1,325-line file was split into eight modules, the largest 669 lines."
+    },
+    {
+      "id": "L1",
+      "severity": "low",
+      "status": "fixed",
+      "observation": "Two-player matches no longer write the shared best score or progress."
+    },
+    {
+      "id": "L2",
+      "severity": "low",
+      "status": "fixed",
+      "observation": "Quick, Heavy and Guard taps shorter than a frame are latched."
+    },
+    {
+      "id": "L3",
+      "severity": "low",
+      "status": "fixed",
+      "observation": "Stages 1-4 give at least 0.5 s of champion wind-up so slower players can learn; tired swings are explained and flagged on screen; draw messages follow how the duel ended; stage tags show only real differences; stage 20 reads FINAL."
+    }
+  ],
+  "openNotes": [
+    "Mashing Heavy wins 73% and 60% of the tutorial stages 1 and 2 (Heavy starts faster than their 0.5 s champion wind-up); from stage 3 no blind policy exceeds 17%.",
+    "A player who reacts in 0.55 s or slower still struggles from stage 2.",
+    "A poke-then-kite strategy wins 5 of 12 on stage 15 only.",
+    "The mutual-KO message was exercised only at message level."
+  ],
+  "browser": {
+    "method": "Official Claude in Chrome extension, local server; real clicks on Start, the language switch and the touch buttons, synthetic in-page keys; only DOM text and the canvas were read.",
+    "servedSha256Prefixes": "1cddbebe b9eff222 7da4a559 520532cd 1c8afdde c64908dc 2105c93b 110b53de",
+    "observed": [
+      "English: Start opened stage 1 of 20 (Gate Recruit); walking, Quick and Guard keys moved and swung the knight, stamina and health bars reacted, and the lesson line was shown.",
+      "Chinese 390 px phone frame (371 px inner, no horizontal overflow): the six touch buttons (左 右 跳跃 举盾 轻击 重击) moved the knight and swung.",
+      "The console showed no errors or warnings."
+    ],
+    "screenshots": ["screenshots/ember-knights-en.jpg", "screenshots/ember-knights-phone-zh.png"]
+  }
+}
