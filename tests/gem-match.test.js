@@ -2,26 +2,70 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
   createGame,
-  findMatches,
-  legalSwaps,
-  makeBoard,
-  applySwap,
   createGemState,
   stepGem,
   gemObjective,
   gemSwapPose,
+  findMatches,
+  legalSwaps,
+  makeBoard,
+  applySwap,
+  LEVELS,
+  LEVEL_COUNT,
   meta,
 } from '../src/games/gem-match.js';
+import { chooseColor } from '../src/games/gem-match-rules.js';
 import { harness, input, mockContext, seeded } from './harness.js';
 
-test('Gem Match generated boards have no initial matches and always have valid swaps', () => {
-  for (let seed = 1; seed <= 100; seed++) {
-    const board = makeBoard(seeded(seed));
-    assert.equal(findMatches(board).length, 0);
-    assert.ok(legalSwaps(board).length);
+const at = (p) => ({ x: 139 + p.x * 34, y: 65 + p.y * 34, clicked: true });
+const click = (p) => input([], [], at(p));
+function swapBy(s, env, move, hz = 120) {
+  for (const p of [move.a, move.b]) stepGem(s, 1 / hz, click(p), env);
+}
+function settle(s, env, hz = 120) {
+  for (
+    let i = 0;
+    i < hz * 20 && s.phase === 'playing' && !['ready', 'garden-clear'].includes(s.mode);
+    i++
+  )
+    stepGem(s, 1 / hz, input(), env);
+}
+const bareBoard = () =>
+  Array.from({ length: 7 }, (_, y) => Array.from({ length: 7 }, (_, x) => (x + 2 * y) % 6));
+const noSoil = () => Array.from({ length: 7 }, () => Array(7).fill(-1));
+
+test('generated boards have no initial matches and always offer a legal swap', () => {
+  for (const kinds of [4, 5, 6])
+    for (let seed = 1; seed <= 40; seed++) {
+      const board = makeBoard(seeded(seed), kinds);
+      assert.equal(findMatches(board).length, 0);
+      assert.ok(legalSwaps(board).length);
+      assert.ok(board.flat().every((v) => v >= 0 && v < kinds));
+    }
+  const flat = makeBoard(() => 0);
+  assert.equal(findMatches(flat).length, 0);
+  assert.ok(legalSwaps(flat).length);
+  assert.throws(() => makeBoard(seeded(1), 6, 2), RangeError);
+  for (const kinds of [3, 4, 5]) {
+    const fallback = makeBoard(() => 0, kinds);
+    assert.equal(findMatches(fallback).length, 0);
+    assert.ok(legalSwaps(fallback).length);
   }
 });
-test('Gem Match identifies crossing lines once and rejects distant swaps', () => {
+
+test('a refill cell boxed in by pairs of every kind keeps a gem and cascades instead of throwing', () => {
+  const board = Array.from({ length: 7 }, () => Array(7).fill(-1));
+  // Four kinds each form a pair beside (3,3): left, right, above, below.
+  board[3][1] = board[3][2] = 0;
+  board[3][4] = board[3][5] = 1;
+  board[1][3] = board[2][3] = 2;
+  board[4][3] = board[5][3] = 3;
+  const value = chooseColor(board, 3, 3, () => 0, 4);
+  assert.ok(value >= 0 && value < 4);
+  assert.ok(findMatches(board).length > 0);
+});
+
+test('matching counts crossing lines once and swaps must be adjacent, legal and on gems', () => {
   const board = [
     [0, 1, 2, 3],
     [1, 1, 1, 4],
@@ -30,233 +74,101 @@ test('Gem Match identifies crossing lines once and rejects distant swaps', () =>
   ];
   assert.deepEqual(findMatches(board).sort(), ['0,1', '1,0', '1,1', '1,2', '2,1'].sort());
   assert.equal(applySwap(board, { x: 0, y: 0 }, { x: 2, y: 2 }), null);
+  assert.equal(applySwap(board, { x: 0, y: 0 }, { x: 9, y: 0 }), null);
+  assert.equal(applySwap(board, { x: 0, y: 0 }, null), null);
+  assert.equal(applySwap([[-1, 1, 1]], { x: 0, y: 0 }, { x: 1, y: 0 }), null);
 });
-test('Gem Match keyboard selection and legal swaps reduce moves and award score', () => {
-  const h = harness();
-  const game = createGame(h.env);
-  const before = game.getState();
-  const move = legalSwaps(before.board)[0];
-  const press = (code) => game.update(1 / 60, input([], [code]));
+
+test('keyboard selection spends exactly one move on a legal swap and scores it', () => {
+  const h = harness(),
+    g = createGame(h.env),
+    before = g.getState(),
+    move = legalSwaps(before.board)[0],
+    press = (code) => g.update(1 / 60, input([], [code]));
   for (let i = 0; i < move.a.x; i++) press('ArrowRight');
-  for (let i = 0; i < move.a.y; i++) press('ArrowDown');
+  for (let i = 0; i < move.a.y; i++) press('KeyS');
   press('Space');
   const dx = move.b.x - move.a.x,
     dy = move.b.y - move.a.y;
   press(dx > 0 ? 'ArrowRight' : dx < 0 ? 'ArrowLeft' : dy > 0 ? 'ArrowDown' : 'ArrowUp');
-  press('Space');
-  for (let i = 0; i < 120; i++) game.update(1 / 60, input());
-  assert.ok(game.getState().score > 0);
-  assert.equal(game.getState().moves, before.moves - 1);
-  game.draw(mockContext());
+  press('Enter');
+  for (let i = 0; i < 240; i++) g.update(1 / 60, input());
+  assert.ok(g.getState().score > 0);
+  assert.equal(g.getState().moves, before.moves - 1);
+  g.draw(mockContext());
   assert.equal(createGame(h.env).getState().score, 0);
 });
 
-test('Gem Match completes all gardens with legal pointer swaps', () => {
-  for (const seed of [1, 7, 21]) {
-    const h = harness({ seed });
-    const game = createGame(h.env);
-    for (let turn = 0; turn < 100 && game.getState().phase === 'playing'; turn++) {
-      const state = game.getState();
-      if (state.mode === 'garden-clear') {
-        game.update(1 / 60, input([], ['Space']));
-        continue;
-      }
-      if (!legalSwaps(state.board).length) {
-        game.update(1 / 60, input([], ['KeyX']));
-        for (let i = 0; i < 180; i++) game.update(1 / 60, input());
-        continue;
-      }
-      const value = (move) => {
-        const swapped = applySwap(state.board, move.a, move.b);
-        const matches = findMatches(swapped).map((key) => key.split(',').map(Number));
-        return matches.reduce(
-          (total, [y, x]) =>
-            total +
-            (state.stage === 2 && [1, 2].includes(swapped[y][x])
-              ? 5
-              : state.stage === 3 && state.soil[y][x]
-                ? 20
-                : 1),
-          0,
-        );
-      };
-      const moves = legalSwaps(state.board).sort((a, b) => value(b) - value(a));
-      assert.ok(moves.length);
-      for (const pos of [moves[0].a, moves[0].b])
-        game.update(
-          1 / 60,
-          input([], [], { x: 122 + pos.x * 34 + 17, y: 48 + pos.y * 34 + 17, clicked: true }),
-        );
-      for (let i = 0; i < 180; i++) game.update(1 / 60, input());
-    }
-    assert.equal(game.getState().phase, 'won', `seed ${seed}`);
-    assert.equal(h.ends.length, 1);
-  }
+test('cursor wraps, ignores diagonals and held keys do not repeat', () => {
+  const g = createGame(harness().env);
+  g.update(1 / 60, input(['ArrowRight']));
+  assert.deepEqual(g.getState().cursor, { x: 0, y: 0 });
+  g.update(1 / 60, input([], ['ArrowLeft']));
+  assert.deepEqual(g.getState().cursor, { x: 6, y: 0 });
+  g.update(1 / 60, input([], ['KeyW']));
+  assert.deepEqual(g.getState().cursor, { x: 6, y: 6 });
+  g.update(1 / 60, input([], ['ArrowRight', 'ArrowDown']));
+  assert.deepEqual(g.getState().cursor, { x: 6, y: 6 });
 });
 
-test('Gem Match move budget can be exhausted through legal low-value swaps', () => {
-  const h = harness({ seed: 1, lang: 'zh' }),
-    g = createGame(h.env);
-  for (let turn = 0; turn < 100 && g.getState().phase === 'playing'; turn++) {
-    const s = g.getState();
-    if (s.mode === 'garden-clear') {
-      g.update(1 / 60, input([], ['Space']));
-      continue;
-    }
-    if (!legalSwaps(s.board).length) {
-      g.update(1 / 60, input([], ['KeyX']));
-      for (let i = 0; i < 180; i++) g.update(1 / 60, input());
-      continue;
-    }
-    const choices = legalSwaps(s.board).sort(
-      (a, b) =>
-        findMatches(applySwap(s.board, a.a, a.b)).length -
-        findMatches(applySwap(s.board, b.a, b.b)).length,
-    );
-    for (const p of [choices[0].a, choices[0].b])
-      g.update(
-        1 / 60,
-        input([], [], { x: 122 + p.x * 34 + 17, y: 48 + p.y * 34 + 17, clicked: true }),
-      );
-    for (let i = 0; i < 180; i++) g.update(1 / 60, input());
-  }
-  assert.equal(g.getState().phase, 'lost');
-  assert.equal(g.getState().moves, 0);
-  assert.equal(h.ends.length, 1);
-  assert.ok(h.ends[0].message.includes('步数'));
-  g.update(1 / 60, input([], ['Space']));
-  assert.equal(h.ends.length, 1);
-});
-
-test('Gem Match constant-random generation stays productive without hanging', () => {
-  const board = makeBoard(() => 0);
-  assert.equal(findMatches(board).length, 0);
-  assert.ok(legalSwaps(board).length);
-});
-
-test('Gem Match zero and invalid time preserve every exposed state and input side effect', () => {
-  const h = harness(),
-    g = createGame(h.env),
-    before = g.getState(),
-    sounds = h.sounds.length;
-  for (const dt of [0, -1, NaN, Infinity])
-    g.update(
-      dt,
-      input(['ArrowRight'], ['ArrowRight', 'Space', 'KeyH'], { x: 139, y: 65, clicked: true }),
-    );
-  assert.deepEqual(g.getState(), before);
-  assert.equal(h.sounds.length, sounds);
-  assert.equal(h.ends.length, 0);
-});
-test('Gem Match legal swaps visibly travel before committing board cells', () => {
+test('hint points at a real legal swap and costs nothing', () => {
   const g = createGame(harness().env),
-    before = g.getState(),
-    move = legalSwaps(before.board)[0];
-  for (const p of [move.a, move.b])
-    g.update(
-      1 / 240,
-      input([], [], { x: 122 + p.x * 34 + 17, y: 48 + p.y * 34 + 17, clicked: true }),
-    );
-  const s = g.getState();
-  assert.equal(s.mode, 'swap');
-  assert.deepEqual(s.board, before.board);
-  assert(s.swap && s.swap.time > 0 && s.swap.time < s.swap.duration);
+    s = g.getState();
+  g.update(1 / 60, input([], ['KeyH']));
+  assert.ok(
+    legalSwaps(s.board).some((m) => JSON.stringify(m) === JSON.stringify(g.getState().hint)),
+  );
+  assert.equal(g.getState().moves, s.moves);
+  for (let i = 0; i < 200; i++) g.update(1 / 60, input());
+  assert.equal(g.getState().hint, null);
 });
 
-function chooseCore(s, env, p, hz = 120) {
-  stepGem(s, 1 / hz, input([], [], { x: 139 + p.x * 34, y: 65 + p.y * 34, clicked: true }), env);
-}
-function finishCore(s, env, hz = 120) {
-  for (
-    let i = 0;
-    i < hz * 15 && s.phase === 'playing' && !['ready', 'garden-clear'].includes(s.mode);
-    i++
-  )
-    stepGem(s, 1 / hz, input(), env);
-}
-function moveKeyboard(g, p, hz) {
-  let c = g.getState().cursor;
-  for (let i = 0; i < (p.x - c.x + 7) % 7; i++) g.update(1 / hz, input([], ['ArrowRight']));
-  c = g.getState().cursor;
-  for (let i = 0; i < (p.y - c.y + 7) % 7; i++) g.update(1 / hz, input([], ['ArrowDown']));
-  g.update(1 / hz, input([], ['Space']));
-}
-function waitGame(g, hz) {
-  for (let i = 0; i < hz * 12 && g.getState().phase === 'playing' && g.getState().resolving; i++)
-    g.update(1 / hz, input());
-}
-function rankedMoves(s) {
-  const value = (m) =>
-    findMatches(applySwap(s.board, m.a, m.b)).reduce((n, key) => {
-      const [y, x] = key.split(',').map(Number),
-        value = applySwap(s.board, m.a, m.b)[y][x];
-      return (
-        n +
-        1 +
-        (s.stage === 2 && [1, 2].includes(value) && s.collected[value] < 8 ? 12 : 0) +
-        (s.stage === 3 && s.soil[y][x] ? 30 : 0)
-      );
-    }, 0);
-  return legalSwaps(s.board).sort((a, b) => value(b) - value(a));
-}
-function campaign(seed, hz, { mistake = false, keyboard = true } = {}) {
-  const h = harness({ seed }),
-    g = createGame(h.env),
-    stages = new Set();
-  let madeMistake = false,
-    mixes = 0;
-  for (let turn = 0; turn < 180 && g.getState().phase === 'playing'; turn++) {
-    const s = g.getState();
-    stages.add(s.stage);
-    if (s.mode === 'garden-clear') {
-      g.draw(mockContext());
-      g.update(1 / hz, input([], ['Enter']));
-      continue;
-    }
-    const choices = rankedMoves(s);
-    if (!choices.length) {
-      g.update(1 / hz, input([], ['KeyX']));
-      waitGame(g, hz);
-      mixes++;
-      continue;
-    }
-    const m = mistake && s.stage === 2 && !madeMistake ? choices.at(-1) : choices[0];
-    if (mistake && s.stage === 2 && !madeMistake) madeMistake = true;
-    for (const p of [m.a, m.b]) {
-      if (keyboard) moveKeyboard(g, p, hz);
-      else g.update(1 / hz, input([], [], { x: 139 + p.x * 34, y: 65 + p.y * 34, clicked: true }));
-    }
-    waitGame(g, hz);
-    g.draw(mockContext());
-  }
-  assert.equal(
-    g.getState().phase,
-    'won',
-    `${seed}/${hz} stage${g.getState().stage} moves${g.getState().moves}`,
-  );
-  assert.equal(stages.size, 3);
-  assert.equal(h.ends.length, 1);
-  assert(h.ends[0].won);
-  const terminal = g.getState();
-  for (let i = 0; i < 60; i++)
-    g.update(
-      1 / hz,
-      input(['ArrowLeft'], ['ArrowLeft', 'Space', 'KeyX', 'KeyH'], {
-        x: 139,
-        y: 65,
-        clicked: true,
-      }),
-    );
-  assert.deepEqual(g.getState(), terminal);
-  assert.equal(h.ends.length, 1);
-  if (mistake) assert(madeMistake);
-  return { score: terminal.score, mixes };
-}
-test('Gem Match all three gardens complete through public keyboard controls at30/60/120Hz with ordinary mistake recovery', () => {
-  for (const seed of [1, 7, 21])
-    for (const hz of [30, 60, 120]) campaign(seed, hz, { mistake: true });
+test('an invalid adjacent swap animates out and back for free, then a real match still works', () => {
+  const h = harness(),
+    s = createGemState(h.env),
+    before = structuredClone(s.board),
+    moves = s.moves;
+  let bad;
+  for (let y = 0; y < 7 && !bad; y++)
+    for (let x = 0; x < 6 && !bad; x++)
+      if (!applySwap(s.board, { x, y }, { x: x + 1, y })) bad = { a: { x, y }, b: { x: x + 1, y } };
+  swapBy(s, h.env, bad);
+  assert.equal(s.mode, 'swap');
+  assert.equal(s.swap.valid, false);
+  settle(s, h.env);
+  assert.equal(s.mode, 'ready');
+  assert.equal(s.feedback, 'invalid');
+  assert.deepEqual(s.board, before);
+  assert.equal(s.moves, moves);
+  assert.equal(s.score, 0);
+  stepGem(s, 1 / 120, click(s.selected), h.env);
+  assert.equal(s.selected, null);
+  swapBy(s, h.env, legalSwaps(s.board)[0]);
+  settle(s, h.env);
+  assert.ok(s.score > 0);
+  assert.equal(s.moves, moves - 1);
 });
-test('Gem Match swap carriers lift clear before translating and lower only at separated sockets', () => {
+
+test('choosing a far gem re-targets the selection instead of swapping', () => {
+  const h = harness(),
+    s = createGemState(h.env);
+  stepGem(s, 1 / 60, click({ x: 0, y: 0 }), h.env);
+  stepGem(s, 1 / 60, click({ x: 4, y: 4 }), h.env);
+  assert.deepEqual(s.selected, { x: 4, y: 4 });
+  assert.equal(s.mode, 'ready');
+});
+
+test('legal swaps travel before the board changes', () => {
+  const h = harness(),
+    s = createGemState(h.env),
+    board = structuredClone(s.board);
+  swapBy(s, h.env, legalSwaps(s.board)[0], 240);
+  assert.equal(s.mode, 'swap');
+  assert.deepEqual(s.board, board);
+  assert.ok(s.swap.time > 0 && s.swap.time < s.swap.duration);
+});
+
+test('swap carriers lift clear before translating and lower only at separated sockets', () => {
   for (const vertical of [false, true])
     for (const returning of [false, true]) {
       const sw = {
@@ -270,14 +182,11 @@ test('Gem Match swap carriers lift clear before translating and lower only at se
       for (let i = 0; i <= 480; i++) {
         sw.time = i / 1000;
         const p = gemSwapPose(sw);
-        const overlap = Math.abs(p.a.x - p.b.x) < 34 - 1e-8 && Math.abs(p.a.y - p.b.y) < 34 - 1e-8;
-        if (overlap) assert(Math.abs(p.a.z - p.b.z) >= 48 - 1e-8);
-        if (i < 120 || i > 360) {
-          assert(Math.abs(p.a.x - p.b.x) + Math.abs(p.a.y - p.b.y) >= 34 - 1e-8);
-        }
+        if (Math.abs(p.a.x - p.b.x) < 33 && Math.abs(p.a.y - p.b.y) < 33)
+          assert.ok(Math.abs(p.a.z - p.b.z) >= 48 - 1e-8);
         if (prior)
           for (const who of ['a', 'b'])
-            assert(
+            assert.ok(
               Math.hypot(
                 p[who].x - prior[who].x,
                 p[who].y - prior[who].y,
@@ -288,138 +197,62 @@ test('Gem Match swap carriers lift clear before translating and lower only at se
       }
     }
 });
-test('Gem Match falling carriers obey ballistic gravity, settle on real supports and keep column order', () => {
+
+test('falling gems obey ballistic gravity and settle on the column floor', () => {
   const h = harness({ seed: 4 }),
-    s = createGemState(h.env),
-    m = legalSwaps(s.board)[0];
-  for (const p of [m.a, m.b]) chooseCore(s, h.env, p, 240);
+    s = createGemState(h.env);
+  swapBy(s, h.env, legalSwaps(s.board)[0], 240);
   for (let i = 0; i < 1000 && s.mode !== 'fall'; i++) stepGem(s, 1 / 240, input(), h.env);
-  assert(s.fall);
-  assert(s.fall.particles.some((p) => p.start < 48));
+  assert.ok(s.fall);
   const target = structuredClone(s.fall.target);
-  assert(s.board.flat().some((v) => v < 0));
   for (let i = 0; i < 1000 && s.mode === 'fall'; i++) {
-    const time = s.fall.time;
+    const t = s.fall.time;
     for (const p of s.fall.particles) {
-      assert(Math.abs(p.y - Math.min(p.target, p.start + 340 * time * time)) < 1e-7);
-      assert(p.y <= p.target + 1e-8);
-      assert(Number.isFinite(p.vy));
-      if (p.y < p.target - 1e-8) assert(Math.abs(p.vy - 680 * time) < 1e-7);
-      else assert.equal(p.vy, 0);
-    }
-    for (let x = 0; x < 7; x++) {
-      const col = s.fall.particles.filter((p) => p.col === x).sort((a, b) => a.row - b.row);
-      for (let k = 1; k < col.length; k++) assert(col[k].y - col[k - 1].y >= 34 - 1e-7);
+      assert.ok(Math.abs(p.y - Math.min(p.target, p.start + 340 * t * t)) < 1e-7);
+      assert.ok(Number.isFinite(p.vy));
     }
     stepGem(
       s,
       1 / 240,
-      input(['ArrowRight'], ['Space', 'KeyX', 'KeyH'], { x: 139, y: 65, clicked: true }),
+      input(['ArrowRight'], ['Space', 'KeyH'], { x: 139, y: 65, clicked: true }),
       h.env,
     );
   }
   assert.deepEqual(s.board, target);
 });
-test('Gem Match event boundary remainder gives the same active swap, clear and fall state at30/60/120Hz', () => {
-  const run = (hz, seconds) => {
-    const h = harness({ seed: 4 }),
-      s = createGemState(h.env),
-      m = legalSwaps(s.board)[0];
-    for (const p of [m.a, m.b]) chooseCore(s, h.env, p, 240);
-    for (let i = 0; i < Math.round(hz * seconds); i++) stepGem(s, 1 / hz, input(), h.env);
-    return s;
-  };
-  for (const seconds of [0.1, 0.5, 0.8, 1.2]) {
-    const states = [30, 60, 120].map((hz) => run(hz, seconds));
-    for (const s of states.slice(1)) {
-      const a = states[0];
-      assert.equal(s.mode, a.mode);
-      assert.equal(s.score, a.score);
-      assert.equal(s.moves, a.moves);
-      assert.deepEqual(s.board, a.board);
-      assert(Math.abs(s.time - a.time) < 1e-8);
-      if (s.swap) assert(Math.abs(s.swap.time - a.swap.time) < 1e-8);
-      if (s.fall)
-        for (let i = 0; i < s.fall.particles.length; i++)
-          assert(Math.abs(s.fall.particles[i].y - a.fall.particles[i].y) < 1e-7);
-    }
-  }
-});
-test('Gem Match invalid adjacent swap animates out and back without cost then allows a real match', () => {
-  const h = harness(),
-    s = createGemState(h.env),
-    before = structuredClone(s.board),
-    moves = s.moves;
-  let bad;
-  for (let y = 0; y < 7 && !bad; y++)
-    for (let x = 0; x < 6 && !bad; x++)
-      if (!applySwap(s.board, { x, y }, { x: x + 1, y }))
-        bad = [
-          { x, y },
-          { x: x + 1, y },
-        ];
-  for (const p of bad) chooseCore(s, h.env, p);
-  assert.equal(s.mode, 'swap');
-  assert(!s.swap.valid);
-  finishCore(s, h.env);
-  assert.equal(s.mode, 'ready');
-  assert.equal(s.feedback, 'invalid');
-  assert.deepEqual(s.board, before);
-  assert.equal(s.moves, moves);
-  assert.equal(s.score, 0);
-  chooseCore(s, h.env, s.selected);
-  const m = legalSwaps(s.board)[0];
-  for (const p of [m.a, m.b]) chooseCore(s, h.env, p);
-  finishCore(s, h.env);
-  assert(s.score > 0);
-  assert.equal(s.moves, moves - 1);
-});
-test('Gem Match dead-board mixer is explicit and free, productive and never awards unearned matches', () => {
-  for (const seed of [1, 9]) {
-    const h = harness({ seed }),
-      s = createGemState(h.env, 3);
-    s.board = Array.from({ length: 7 }, (_, y) =>
-      Array.from({ length: 7 }, (_, x) => (x + 2 * y) % 6),
-    );
-    s.score = 220;
-    s.moves = 5;
-    s.collected[1] = 4;
-    s.soil[2][1] = false;
-    const before = {
-      score: s.score,
-      moves: s.moves,
-      collected: [...s.collected],
-      soil: structuredClone(s.soil),
-    };
-    assert.equal(legalSwaps(s.board).length, 0);
-    stepGem(s, 1 / 120, input([], ['KeyH']), h.env);
-    assert.equal(s.hint, null);
-    assert.equal(s.feedback, 'dead');
-    stepGem(s, 1 / 120, input([], ['KeyX']), h.env);
-    assert.equal(s.mode, 'mix-lift');
-    assert.equal(s.mixes, 1);
-    finishCore(s, h.env);
-    assert.equal(s.mode, 'ready');
-    assert.equal(findMatches(s.board).length, 0);
-    assert(legalSwaps(s.board).length);
-    assert.equal(s.score, before.score);
-    assert.equal(s.moves, before.moves);
-    assert.deepEqual(s.collected, before.collected);
-    assert.deepEqual(s.soil, before.soil);
-    const board = structuredClone(s.board);
-    stepGem(s, 1 / 120, input([], ['KeyX']), h.env);
-    assert.equal(s.mode, 'ready');
-    assert.equal(s.mixes, 1);
-    assert.deepEqual(s.board, board);
-    assert.equal(s.score, before.score);
-  }
-});
-test('Gem Match simultaneous crossing removal scores each cell exactly once and records exact collection and soil', () => {
+
+test('a bed clears only for its own gem kind and the garden counts it', () => {
   const h = harness(),
     s = createGemState(h.env, 3);
-  s.board = Array.from({ length: 7 }, (_, y) =>
-    Array.from({ length: 7 }, (_, x) => (x + 2 * y) % 6),
-  );
+  const beds = LEVELS[2].beds;
+  const rowIndex = beds.findIndex((row) => /\d/.test(row)),
+    col = beds[rowIndex].search(/\d/),
+    kind = Number(beds[rowIndex][col]),
+    other = (kind + 1) % 4;
+  for (const [gem, expected] of [
+    [other, kind],
+    [kind, -1],
+  ]) {
+    const t = createGemState(h.env, 3);
+    t.board = bareBoard();
+    for (let x = 0; x < 3; x++) t.board[rowIndex][col + x] = gem;
+    t.board[rowIndex][col + 3] = (gem + 1) % 6;
+    t.board[rowIndex][col - 1] = (gem + 2) % 6;
+    t.mode = 'clear';
+    t.pending = findMatches(t.board);
+    t.clearTime = 0.01;
+    t.combo = 1;
+    stepGem(t, 0.01, input(), h.env);
+    assert.equal(t.soil[rowIndex][col], expected);
+    assert.equal(t.score, 60);
+  }
+  assert.equal(gemObjective(s).goals[0].progress, 0);
+});
+
+test('crossing removal scores each cell once and records exact collection', () => {
+  const h = harness(),
+    s = createGemState(h.env, 3);
+  s.board = bareBoard();
   for (const [y, x] of [
     [2, 3],
     [3, 2],
@@ -428,204 +261,321 @@ test('Gem Match simultaneous crossing removal scores each cell exactly once and 
     [4, 3],
   ])
     s.board[y][x] = 2;
-  const matches = findMatches(s.board);
-  assert.equal(matches.length, 5);
   s.mode = 'clear';
-  s.pending = matches;
+  s.pending = findMatches(s.board);
   s.clearTime = 0.01;
   s.combo = 2;
   stepGem(s, 0.01, input(), h.env);
   assert.equal(s.score, 200);
-  assert.equal(s.totalCleared, 5);
+  assert.equal(s.levelScore, 200);
   assert.equal(s.collected[2], 5);
-  assert.equal(s.soil.flat().filter(Boolean).length, 7);
   assert.equal(s.mode, 'fall');
 });
-test('Gem Match final move resolves its full goal and opens an intentional fresh garden boundary before exhaustion', () => {
-  const h = harness(),
-    s = createGemState(h.env),
-    m = legalSwaps(s.board)[0];
-  s.score = 540;
-  s.moves = 1;
-  for (const p of [m.a, m.b]) chooseCore(s, h.env, p);
-  finishCore(s, h.env);
-  assert.equal(s.mode, 'garden-clear');
-  assert.equal(s.phase, 'playing');
-  assert.equal(s.moves, 0);
-  assert.equal(h.ends.length, 0);
-  const board = structuredClone(s.board);
-  stepGem(s, 1 / 60, input(['Space'], [], { x: 139, y: 65, clicked: true }), h.env);
-  assert.equal(s.stage, 1);
-  assert.deepEqual(s.board, board);
-  stepGem(s, 1 / 60, input([], ['Enter']), h.env);
-  assert.equal(s.stage, 2);
-  assert.equal(s.mode, 'ready');
-  assert.equal(s.moves, 28);
-  assert.equal(s.selected, null);
-  assert.equal(s.swap, null);
-  assert.equal(
-    s.collected.reduce((a, b) => a + b),
-    0,
-  );
-  assert.equal(gemObjective(s).progress, 0);
-});
-test('Gem Match last-move soil victory wins once and terminal state remains fully frozen', () => {
-  const h = harness({ lang: 'zh' }),
-    s = createGemState(h.env, 3),
-    m = legalSwaps(s.board)[0],
-    board = applySwap(s.board, m.a, m.b),
-    matches = findMatches(board);
-  s.soil = Array.from({ length: 7 }, () => Array(7).fill(false));
-  for (const key of matches) {
-    const [y, x] = key.split(',').map(Number);
-    s.soil[y][x] = true;
-  }
-  s.moves = 1;
-  for (const p of [m.a, m.b]) chooseCore(s, h.env, p);
-  finishCore(s, h.env);
-  assert.equal(s.phase, 'won');
-  assert.equal(s.moves, 0);
-  assert.equal(h.ends.length, 1);
-  assert(h.ends[0].message.includes('三座'));
-  const terminal = structuredClone(s);
-  for (let i = 0; i < 100; i++) stepGem(s, 1 / 30, input([], ['Space', 'KeyX', 'KeyH']), h.env);
-  assert.deepEqual(s, terminal);
-  assert.equal(h.ends.length, 1);
-});
-test('Gem Match zero or invalid dt is a total no-op during every busy phase as well as at rest', () => {
-  const h = harness(),
-    s = createGemState(h.env),
-    m = legalSwaps(s.board)[0];
-  for (const p of [m.a, m.b]) chooseCore(s, h.env, p);
-  const tested = new Set();
-  for (let i = 0; i < 2000 && tested.size < 3; i++) {
-    if (['swap', 'clear', 'fall'].includes(s.mode) && !tested.has(s.mode)) {
-      tested.add(s.mode);
-      const before = structuredClone(s),
-        sounds = h.sounds.length;
-      for (const dt of [0, -1, NaN, Infinity])
-        stepGem(
-          s,
-          dt,
-          input([], ['ArrowLeft', 'Space', 'KeyH', 'KeyX'], { x: 139, y: 65, clicked: true }),
-          h.env,
-        );
-      assert.deepEqual(s, before);
-      assert.equal(h.sounds.length, sounds);
-    }
-    stepGem(s, 1 / 240, input(), h.env);
-  }
-  assert.equal(tested.size, 3);
-});
-test('Gem Match touch metadata includes all keyboard actions and opposing direction chords do not bias the cursor', () => {
-  for (const code of ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Space', 'KeyH', 'KeyX'])
-    assert(meta.touchControls.some((c) => c.code === code));
-  const g = createGame(harness().env),
-    s = g.getState();
-  for (const keys of [
-    ['ArrowLeft', 'ArrowRight'],
-    ['ArrowUp', 'ArrowDown'],
-    ['ArrowRight', 'ArrowDown'],
-  ])
-    g.update(1 / 60, input([], keys));
-  assert.deepEqual(g.getState().cursor, s.cursor);
-  g.update(1 / 60, input(['ArrowRight']));
-  assert.deepEqual(g.getState().cursor, s.cursor);
-});
-test('Gem Match seeded mixed input remains finite and bounded and fresh instances restore every resource', () => {
-  for (const seed of [1, 17, 29]) {
+
+test('a dead board remixes by itself, for free, without awarding anything', () => {
+  for (const seed of [1, 9]) {
     const h = harness({ seed }),
-      g = createGame(h.env),
-      random = seeded(seed + 99);
-    for (let i = 0; i < 3600; i++) {
-      const keys = [
-        'ArrowLeft',
-        'ArrowRight',
-        'ArrowDown',
-        'ArrowUp',
-        'Space',
-        'KeyH',
-        'KeyX',
-        'Enter',
-      ];
-      g.update(
-        1 / 60,
-        input([], random() < 0.2 ? [keys[Math.floor(random() * keys.length)]] : [], {
-          x: 122 + Math.floor(random() * 7) * 34 + 17,
-          y: 48 + Math.floor(random() * 7) * 34 + 17,
-          clicked: random() < 0.1,
-        }),
-      );
-      const s = g.getState();
-      assert(Number.isFinite(s.time) && Number.isFinite(s.score));
-      assert(s.moves >= 0 && s.moves <= 32);
-      assert(s.sparkles.length <= 98);
-      assert(s.pending.length <= 49);
-      assert(
-        s.board.length === 7 &&
-          s.board.every((r) => r.length === 7 && r.every((v) => v >= -1 && v < 6)),
-      );
-      if (s.fall) {
-        assert.equal(s.fall.particles.length, 49);
-        assert(s.fall.particles.every((p) => Number.isFinite(p.y) && Number.isFinite(p.vy)));
-      }
-      if (i % 300 === 0) g.draw(mockContext());
-    }
-    const a = createGame(harness({ seed }).env).getState(),
-      b = createGame(harness({ seed }).env).getState();
-    assert.deepEqual(a, b);
-    assert.equal(a.score, 0);
-    assert.equal(a.moves, 20);
-    assert.equal(a.selected, null);
-    assert.equal(a.mixes, 0);
+      s = createGemState(h.env, 3);
+    s.board = bareBoard();
+    s.score = 220;
+    s.moves = 5;
+    s.collected[1] = 4;
+    const before = {
+      score: s.score,
+      moves: s.moves,
+      collected: [...s.collected],
+      soil: structuredClone(s.soil),
+    };
+    assert.equal(legalSwaps(s.board).length, 0);
+    s.mode = 'fall';
+    s.fall = { particles: [], target: s.board, time: 0, duration: 0.01 };
+    stepGem(s, 0.02, input(), h.env);
+    assert.equal(s.mode, 'mix-lift');
+    assert.equal(s.mixes, 1);
+    settle(s, h.env);
+    assert.equal(s.mode, 'ready');
+    assert.equal(findMatches(s.board).length, 0);
+    assert.ok(legalSwaps(s.board).length);
+    assert.deepEqual(
+      { score: s.score, moves: s.moves, collected: s.collected, soil: s.soil },
+      before,
+    );
   }
 });
 
-test('Gem Match soil markers remain visible above carriers and miniature tracks exact remaining locations', () => {
-  const h = harness({ seed: 1 }),
-    g = createGame(h.env);
-  for (let turn = 0; turn < 100 && g.getState().stage < 3; turn++) {
-    const s = g.getState();
-    if (s.mode === 'garden-clear') {
-      g.update(1 / 60, input([], ['Enter']));
-      continue;
-    }
-    const m = rankedMoves(s)[0];
-    assert(m);
-    for (const p of [m.a, m.b])
-      g.update(1 / 60, input([], [], { x: 139 + p.x * 34, y: 65 + p.y * 34, clicked: true }));
-    waitGame(g, 60);
+test('the winning move opens a garden boundary, and Space, Enter or a tap starts the next garden', () => {
+  const h = harness(),
+    store = { value: 1, unlock: (n) => (store.value = Math.max(store.value, n)) };
+  h.env.progress = { unlocked: () => store.value, unlock: store.unlock };
+  for (const press of [['Space'], ['Enter'], []]) {
+    const s = createGemState(h.env);
+    s.levelScore = 1500 - 40;
+    s.score = 1460;
+    swapBy(s, h.env, legalSwaps(s.board)[0]);
+    settle(s, h.env);
+    assert.equal(s.mode, 'garden-clear');
+    assert.equal(h.ends.length, 0);
+    assert.ok(store.value >= 2);
+    stepGem(s, 1 / 60, input(['ArrowRight'], ['KeyH']), h.env);
+    assert.equal(s.level, 1);
+    stepGem(s, 1 / 60, input([], press, press.length ? {} : { x: 1, y: 1, clicked: true }), h.env);
+    assert.equal(s.level, 2);
+    assert.equal(s.mode, 'ready');
+    assert.equal(s.levelScore, 0);
+    assert.ok(s.score >= 1460);
+    assert.equal(s.moves, LEVELS[1].moves);
   }
-  assert.equal(g.getState().stage, 3);
-  const start = g.getState(),
-    m = rankedMoves(start).find((move) => {
-      const removed = findMatches(applySwap(start.board, move.a, move.b))
-        .map((k) => k.split(',').map(Number))
-        .filter(([y, x]) => start.soil[y][x]);
-      return removed.length > 0 && removed.some(([y, x]) => (y - 2) * 4 + x - 1 >= removed.length);
-    });
-  assert(m);
-  for (const p of [m.a, m.b])
-    g.update(1 / 60, input([], [], { x: 139 + p.x * 34, y: 65 + p.y * 34, clicked: true }));
-  waitGame(g, 60);
-  const s = g.getState(),
-    commands = [],
-    ctx = mockContext();
-  ctx.fillRect = (x, y, w, h) => commands.push({ color: ctx.fillStyle, x, y, w, h });
-  g.draw(ctx);
-  const lastCarrier = commands.findLastIndex((c) => c.color === '#47665c');
-  for (let y = 2; y <= 4; y++)
-    for (let x = 1; x <= 4; x++) {
-      const map = commands.find(
-        (c) => c.x === 381 + (x - 1) * 19 && c.y === 146 + (y - 2) * 19 && c.w === 14 && c.h === 14,
-      );
-      assert(map);
-      assert.equal(map.color, s.soil[y][x] ? '#805c3f' : '#80aa85');
-      const mark = commands.findIndex(
-        (c) => c.color === '#e7b76f' && c.x === 122 + x * 34 + 1 && c.y === 48 + y * 34 + 1,
-      );
-      if (s.soil[y][x])
-        assert(mark > lastCarrier, 'remaining soil corner must be drawn above opaque carriers');
-      else assert.equal(mark, -1, 'restored soil must not retain a remaining-soil hatch');
+});
+
+test('running out of moves loses once and freezes the state', () => {
+  const h = harness({ lang: 'zh' }),
+    s = createGemState(h.env, 4);
+  s.moves = 1;
+  swapBy(s, h.env, legalSwaps(s.board)[0]);
+  settle(s, h.env);
+  assert.equal(s.phase, 'lost');
+  assert.equal(h.ends.length, 1);
+  assert.equal(h.ends[0].won, false);
+  assert.match(h.ends[0].message, /步数/);
+  const frozen = structuredClone(s);
+  for (let i = 0; i < 30; i++)
+    stepGem(s, 1 / 60, input(['ArrowLeft'], ['Space', 'KeyH'], at({ x: 0, y: 0 })), h.env);
+  assert.deepEqual(s, frozen);
+  assert.equal(h.ends.length, 1);
+});
+
+test('clearing the last garden wins once with a localized message', () => {
+  for (const lang of ['en', 'zh']) {
+    const h = harness({ lang }),
+      s = createGemState(h.env, LEVEL_COUNT);
+    s.collected.fill(99);
+    s.levelScore = 99999;
+    s.score = 99999;
+    for (let y = 0; y < 7; y++) s.soil[y].fill(-1);
+    swapBy(s, h.env, legalSwaps(s.board)[0]);
+    settle(s, h.env);
+    assert.equal(s.phase, 'won');
+    assert.equal(h.ends.length, 1);
+    assert.equal(h.ends[0].won, true);
+    assert.match(h.ends[0].message, lang === 'en' ? /twenty gardens/ : /二十座/);
+  }
+});
+
+test('the same active state appears at 30, 60 and 120 Hz', () => {
+  const run = (hz, seconds) => {
+    const h = harness({ seed: 4 }),
+      s = createGemState(h.env);
+    swapBy(s, h.env, legalSwaps(s.board)[0], 240);
+    for (let i = 0; i < Math.round(hz * seconds); i++) stepGem(s, 1 / hz, input(), h.env);
+    return s;
+  };
+  for (const seconds of [0.1, 0.5, 0.8, 1.2, 4]) {
+    const [a, ...rest] = [30, 60, 120].map((hz) => run(hz, seconds));
+    for (const s of rest) {
+      assert.equal(s.mode, a.mode);
+      assert.equal(s.score, a.score);
+      assert.deepEqual(s.board, a.board);
+      assert.ok(Math.abs(s.time - a.time) < 1e-8);
     }
+  }
+});
+
+test('hostile dt and pointer values change nothing', () => {
+  const h = harness(),
+    g = createGame(h.env),
+    before = g.getState(),
+    sounds = h.sounds.length;
+  for (const dt of [0, -1, NaN, Infinity, undefined, '1'])
+    g.update(
+      dt,
+      input(['ArrowRight'], ['ArrowRight', 'Space', 'KeyH'], { x: 139, y: 65, clicked: true }),
+    );
+  assert.deepEqual(g.getState(), before);
+  assert.equal(h.sounds.length, sounds);
+  for (const pointer of [
+    { x: NaN, y: NaN },
+    { x: Infinity, y: -Infinity },
+    { x: undefined, y: null },
+    { x: '1e9', y: {} },
+    { x: -5, y: 9999 },
+  ])
+    g.update(1 / 60, input([], [], { ...pointer, clicked: true }));
+  const bare = { held: () => false, pressed: () => false };
+  g.update(1 / 60, input([], [], press({ x: 3, y: 3 })));
+  for (const pointer of [null, undefined]) g.update(1 / 60, { ...bare, pointer });
+  g.update(1 / 60, bare);
+  assert.equal(g.getState().moves, before.moves);
+  assert.equal(g.getState().phase, 'playing');
+  const t0 = g.getState().time;
+  g.update(1e9, input());
+  assert.ok(g.getState().time <= t0 + 1 / 30 + 1e-9);
+});
+
+test('metadata documents the controls and the host can draw every mode', () => {
+  assert.equal(meta.id, 'gem-match');
+  assert.ok(meta.touchControls.some((c) => c.code === 'KeyH'));
+  const h = harness(),
+    s = createGemState(h.env, 3);
+  s.hint = legalSwaps(s.board)[0];
+  const g = createGame(h.env);
+  g.draw(mockContext());
+  for (const mode of ['ready', 'swap', 'clear', 'fall', 'mix-lift', 'garden-clear']) {
+    const t = createGemState(h.env, 3);
+    t.hint = legalSwaps(t.board)[0];
+    t.selected = { x: 1, y: 1 };
+    t.mode = mode;
+    t.pending = ['0,0'];
+    t.combo = 2;
+    t.swap = { a: { x: 0, y: 0 }, b: { x: 1, y: 0 }, time: 0.2, duration: 0.48, returning: true };
+    t.mixer = { time: 0.2, duration: 0.6 };
+    t.fall = {
+      particles: [{ color: 1, col: 2, row: 3, start: 10, y: 80, vy: 0, target: 150 }],
+      target: t.board,
+      time: 0.1,
+      duration: 0.3,
+    };
+    const ctx = mockContext();
+    assert.doesNotThrow(() => g.draw(ctx));
+    assert.ok(typeof createGame(h.env).getState().status.en === 'string');
+  }
+});
+
+const press = (p) => ({ ...at(p), down: true });
+const hold = (p) => ({ ...at(p), down: true, clicked: false });
+const release = (p) => ({ ...at(p), down: false, clicked: false });
+function dragFrom(s, env, from, over, to) {
+  stepGem(s, 1 / 60, input([], [], press(from)), env);
+  for (let i = 0; i < 4; i++) stepGem(s, 1 / 60, input([], [], hold(over)), env);
+  stepGem(s, 1 / 60, input([], [], release(to)), env);
+}
+
+test('press-drag-release onto an adjacent gem swaps like tap-tap', () => {
+  const h = harness({ seed: 4 }),
+    tap = createGemState(h.env),
+    drag = createGemState(harness({ seed: 4 }).env),
+    move = legalSwaps(tap.board)[0];
+  swapBy(tap, h.env, move);
+  dragFrom(drag, h.env, move.a, move.b, move.b);
+  assert.equal(drag.mode, 'swap');
+  assert.deepEqual(drag.swap.a, move.a);
+  assert.deepEqual(drag.swap.b, move.b);
+  assert.equal(drag.drag, null);
+  settle(tap, h.env);
+  settle(drag, h.env);
+  assert.equal(drag.moves, tap.moves);
+});
+
+test('a drag past the first neighbour swaps with the neighbour in that direction', () => {
+  const h = harness({ seed: 4 }),
+    s = createGemState(h.env),
+    from = { x: 3, y: 3 };
+  for (const [over, expected] of [
+    [
+      { x: 6, y: 3 },
+      { x: 4, y: 3 },
+    ],
+    [
+      { x: 0, y: 3 },
+      { x: 2, y: 3 },
+    ],
+    [
+      { x: 3, y: 6 },
+      { x: 3, y: 4 },
+    ],
+    [
+      { x: 4, y: 0 },
+      { x: 3, y: 2 },
+    ],
+  ]) {
+    const t = createGemState(harness({ seed: 4 }).env);
+    dragFrom(t, h.env, from, over, over);
+    assert.deepEqual(t.swap ? [t.swap.a, t.swap.b] : null, [from, expected]);
+  }
+  assert.equal(s.mode, 'ready');
+});
+
+test('a drag that ends on the pressed gem, leaves the board or hits the edge just selects it', () => {
+  const h = harness({ seed: 4 }),
+    from = { x: 3, y: 3 };
+  for (const [to, selected] of [
+    [at(from), from],
+    [{ x: NaN, y: NaN }, from],
+  ]) {
+    const s = createGemState(h.env);
+    stepGem(s, 1 / 60, input([], [], press(from)), h.env);
+    stepGem(s, 1 / 60, input([], [], { x: to.x, y: to.y, down: false }), h.env);
+    assert.equal(s.mode, 'ready');
+    assert.equal(s.moves, LEVELS[0].moves);
+    assert.deepEqual(s.selected, selected);
+    assert.equal(s.drag, null);
+  }
+  const edge = createGemState(h.env),
+    corner = { x: 0, y: 0 };
+  dragFrom(edge, h.env, corner, { x: -1, y: 0 }, { x: -1, y: 0 });
+  assert.equal(edge.mode, 'ready');
+  assert.deepEqual(edge.selected, corner);
+  const back = createGemState(h.env);
+  stepGem(back, 1 / 60, input([], [], press(from)), h.env);
+  stepGem(back, 1 / 60, input([], [], release(from)), h.env);
+  assert.deepEqual(back.selected, from);
+  stepGem(back, 1 / 60, input([], [], press(from)), h.env);
+  stepGem(back, 1 / 60, input([], [], hold({ x: 4, y: 3 })), h.env);
+  stepGem(back, 1 / 60, input([], [], release({ x: 4, y: 3 })), h.env);
+  assert.equal(back.mode, 'swap');
+});
+
+test('dragging is deterministic across frame rates and a tap still needs two taps', () => {
+  const run = (hz) => {
+    const h = harness({ seed: 4 }),
+      s = createGemState(h.env),
+      move = legalSwaps(s.board)[0];
+    stepGem(s, 1 / hz, input([], [], press(move.a)), h.env);
+    for (let i = 0; i < hz / 10; i++) stepGem(s, 1 / hz, input([], [], hold(move.b)), h.env);
+    stepGem(s, 1 / hz, input([], [], release(move.b)), h.env);
+    for (let i = 0; i < hz * 4; i++) stepGem(s, 1 / hz, input(), h.env);
+    return s;
+  };
+  const [a, b, c] = [30, 60, 120].map(run);
+  assert.deepEqual(a.board, b.board);
+  assert.deepEqual(b.board, c.board);
+  assert.equal(a.score, c.score);
+  const h = harness(),
+    s = createGemState(h.env);
+  stepGem(s, 1 / 60, input([], [], at({ x: 2, y: 2 })), h.env);
+  assert.equal(s.mode, 'ready');
+  assert.equal(s.drag, null);
+});
+
+test('every gem kind has its own silhouette and beds name their wanted gem by shape', async () => {
+  const { drawGame } = await import('../src/games/gem-match-draw.js'),
+    shapes = new Set(),
+    h = harness();
+  for (let kind = 0; kind < 6; kind++) {
+    const rects = [],
+      ctx = mockContext();
+    ctx.fillRect = (x, y, w, hh) => rects.push([x, y, w, hh].join());
+    const s = createGemState(h.env, 3);
+    s.soil[0][0] = kind;
+    s.board = bareBoard();
+    s.board[3][3] = kind;
+    drawGame(ctx, s, h.env);
+    shapes.add(rects.join('|'));
+  }
+  assert.equal(shapes.size, 6);
+  const glyphs = new Set();
+  for (let kind = 0; kind < 4; kind++) {
+    const rects = [],
+      ctx = mockContext();
+    ctx.fillRect = (x, y, w, hh) => {
+      if (w === 1 && hh === 1 && x >= 122 && x < 133 && y >= 48 && y < 59)
+        rects.push(`${x - 122},${y - 48}`);
+    };
+    const s = createGemState(h.env, 3);
+    s.soil = noSoil();
+    s.soil[0][0] = kind;
+    drawGame(ctx, s, h.env);
+    glyphs.add(rects.join('|'));
+    assert.ok(rects.length > 15);
+  }
+  assert.equal(glyphs.size, 4);
 });

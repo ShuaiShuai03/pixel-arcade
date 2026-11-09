@@ -19,7 +19,7 @@ Phase Tiles completed batch 18 and the 50-game target, Pixel Parkour included. T
 | River Hop      | Passed in one round: 20 crossings, turtles and ferry ([record](final-review/river-hop.json))              |
 | Meteor Drift   | Passed in one round: 22 sectors, fixed ammo ([record](final-review/meteor-drift.json))                    |
 | Blockfall      | Passed in one round: 20 districts, four goal kinds ([record](final-review/blockfall.json))                |
-| Gem Match      | Retrofitting to 20+ levels (3 stages)                                                                     |
+| Gem Match      | Passed in one round: 20 gardens, shape-coded beds ([record](final-review/gem-match.json))                 |
 | Crate Keeper   | Passed in one round: 20 solver-proven rooms ([record](final-review/crate-keeper.json))                    |
 | Minefield      | Passed in one round: 20 fields, no guessing ([record](final-review/minefield.json))                       |
 

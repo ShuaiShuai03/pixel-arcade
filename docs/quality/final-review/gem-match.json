@@ -1,0 +1,72 @@
+{
+  "game": "gem-match",
+  "date": "2026-11-09",
+  "reviewedRevision": "59e0039 plus the rework in this commit",
+  "owner": "owner-gem",
+  "reviewer": "final-gem",
+  "rounds": 1,
+  "process": "Lean final review at the user's request: the known 3-stage shortfall went straight to a retrofit, followed by one independent review round. Its two MEDIUM findings were fixed and verified by re-running the reviewer's own rules and touch probe, one clean-worktree run and the browser check, without a second review round.",
+  "verdict": "pass",
+  "approvedSha256": {
+    "src/games/gem-match.js": "8855862e80473704f7d5a8f0aa59ad94fd9a2a9a25887548c2939c9db2988de4",
+    "src/games/gem-match-draw.js": "e67a1b6459565c142eec1de2e9193de3aefa0db3bbcb468d26b713469cd5d472",
+    "src/games/gem-match-levels.js": "c8eebb49ca009ce683bcce6ddea644778ea06a9056446915e5ebb69f91f4badd",
+    "src/games/gem-match-menu.js": "479924543bdedddd12a82cddfedd5fe49044bdb2c71ef700ead387b72a1050df",
+    "src/games/gem-match-rules.js": "222240ceb1a0ed2320f4d09136f6755a1e018529cb18e48fde4b2152b29095b0",
+    "src/games/gem-match-step.js": "13ff7df3a49142ba22563de0ac78f7d0c4bdd43c61d268c3b38586956effb2f2",
+    "tests/gem-match.test.js": "b8cf7b017c45e95dc2e0c224311fc05dbdd62dc6bee7b8b39ca76d5ec4864ac0",
+    "tests/gem-match-quality.test.js": "811f21c13bc4bd520437361e1e12553ab8a089709c24e0a9b77da33a1307d20c"
+  },
+  "tests": {
+    "command": "node --experimental-test-coverage --test-coverage-include='src/games/gem-match*.js' --test tests/gem-match.test.js tests/gem-match-quality.test.js",
+    "passed": 39,
+    "failed": 0,
+    "lineCoverage": 96.15,
+    "log": "gem-match-coverage.txt"
+  },
+  "independentProbes": "The reviewer's own goal-aware player, reading only public state, cleared 99.9% of runs (40 seeds on each of 20 gardens, every garden at least 98%, median 11-22 moves to spare); a goal-blind high-score player cleared 96.5%. From garden 3, random legal swaps cleared 8.1% overall (at most 18% on a garden), repeating the first legal swap 0%, and pointer mashing at most 19% at 150 seeds, all under the 25% cap. No accepted swap failed to match, no rejected swap cost a move, cascade scores were always exact, a dead board remixed for free, and fuzz, determinism at 30, 60 and 120 Hz and broken progress stores all passed. On the final files the same rules probe reported 0 violations and 0 fuzz throws, and its drag from one gem to the next ended in a swap.",
+  "findings": [
+    {
+      "id": "R1",
+      "severity": "blocking",
+      "status": "fixed",
+      "observation": "Only 3 stages with per-stage goal logic and no select or continue. There are now 20 data-driven gardens with score, collect, coloured soil-bed and combined goals under move budgets, accurate EN/ZH tips, a garden select and env.progress continue; dead boards remix for free, and the 805-line file is split into six modules."
+    },
+    {
+      "id": "M1",
+      "severity": "medium",
+      "status": "fixed",
+      "observation": "Review finding: touch only supported tap-then-tap. Pressing a gem and releasing past it now swaps with the neighbour in the dominant drag direction; tap-tap still works and the help text mentions dragging."
+    },
+    {
+      "id": "M2",
+      "severity": "medium",
+      "status": "fixed",
+      "observation": "Review finding: soil beds showed their required gem only by colour, Rose and Leaf were close under red-green colour blindness, and Rose and Dew shared a silhouette. Every gem kind now has its own shape, and each bed carries a badge with the wanted gem's shape as well as its colour."
+    },
+    {
+      "id": "L1",
+      "severity": "low",
+      "status": "fixed",
+      "observation": "Garden 20 now shows as cleared after the final win, and the fallback board respects the garden's gem kinds."
+    }
+  ],
+  "openNotes": [
+    "The bed shape badge is about 11 px on the 480 px canvas, small on a phone.",
+    "The game is generous: a sensible player finishes most gardens with many moves to spare.",
+    "A press and move that both land within a single frame read as a tap at the release point; a real finger drag spans several frames."
+  ],
+  "browser": {
+    "method": "Official Claude in Chrome extension, local server; real clicks on Start, Resume and the board, synthetic in-page keys; only DOM text and the canvas were read, except that garden 3 was rendered from the game's own modules into a separate canvas to inspect the bed badges.",
+    "servedSha256Prefixes": "8855862e e67a1b64 c8eebb49 47992454 222240ce 13ff7df3",
+    "observed": [
+      "Chinese: Start opened garden 1 of 20 (育苗床, score 1500 in 20 moves) with the tip below the board; all four gem kinds have distinct silhouettes.",
+      "Tap then tap on adjacent gems swapped them, matched four and cascaded (score 280, 19 moves left).",
+      "The automation tool's drag pressed, moved and released within one frame, which the game read as a tap at the release cell; the frame-stepped probe confirms that a real drag swaps.",
+      "Garden 3 rendered with a shape badge in the top-left corner of every soil bed (leaf, drop, sun, rose) beside the coloured corner marks.",
+      "Chinese 390 px phone frame (388 px inner, no horizontal overflow): six touch buttons (向左 向右 向上 向下 选择/下一关 提示); the select button picked the gem under the cursor.",
+      "Not covered in the browser: a garden win or loss and the garden select; the reviewer's players and the quality tests cover them, and idle play never loses."
+    ],
+    "screenshots": ["screenshots/gem-match-play-zh.png", "screenshots/gem-match-soil-badges.png"]
+  }
+}
