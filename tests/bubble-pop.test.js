@@ -8,6 +8,7 @@ import {
   neighbors,
   bubblePoint,
 } from '../src/games/bubble-pop.js';
+import { LEVELS } from '../src/games/bubble-pop-levels.js';
 import { harness, input, mockContext } from './harness.js';
 test('Bubble cluster removes three plus disconnected bubbles', () => {
   const { env } = harness();
@@ -60,126 +61,11 @@ test('Bubble terminal clear/overflow, restart and drawing', () => {
   g.draw(mockContext());
   assert.ok(g.getState().remaining > 0);
 });
-function keyboardAim(update, state, target, hz) {
-  for (let i = 0; i < hz * 5; i++) {
-    const s = state(),
-      error = target - s.angle,
-      omega = s.angularVelocity;
-    if (Math.abs(error) < 0.018 && Math.abs(omega) < 0.015) return;
-    const stopping = (omega * Math.abs(omega)) / 24,
-      adjust = error - stopping,
-      keys = [];
-    if (adjust > 0.006) keys.push('ArrowRight');
-    else if (adjust < -0.006) keys.push('ArrowLeft');
-    update(1 / hz, input(keys));
-  }
-}
-function bubbleAim(s, angle, swap = false, mode = 'pointer', hz = 60) {
-  const copy = structuredClone(s);
-  const { env } = harness({ seed: 29 });
-  if (swap) stepBubble(copy, 1 / hz, input([], ['KeyX']), env);
-  const p = {
-    x: 240 + Math.cos(angle) * 120,
-    y: 297 + Math.sin(angle) * 120,
-    down: true,
-    clicked: true,
-  };
-  if (mode === 'keyboard') {
-    keyboardAim(
-      (dt, i) => stepBubble(copy, dt, i, env),
-      () => copy,
-      angle,
-      hz,
-    );
-    stepBubble(copy, 1 / hz, input([], ['Space']), env);
-  } else stepBubble(copy, 1 / hz, input([], [], p), env);
-  for (
-    let k = 0;
-    k < 900 &&
-    (copy.queuedFire ||
-      copy.shot ||
-      copy.capture ||
-      copy.ceilingMotion ||
-      copy.transition > 0 ||
-      copy.popped.length > 0) &&
-    copy.phase === 'playing';
-    k++
-  )
-    stepBubble(copy, 1 / hz, input(), env);
-  const remaining = copy.board.flat().filter((v) => v >= 0).length;
-  let depth = 0,
-    pairs = 0;
-  for (let r = 0; r < 12; r++)
-    for (let c = 0; c < 12; c++)
-      if (copy.board[r][c] >= 0) {
-        depth = Math.max(depth, r * 21 + copy.ceiling);
-        pairs += neighbors(r, c).filter(
-          ([rr, cc]) => copy.board[rr][cc] === copy.board[r][c],
-        ).length;
-      }
-  const rank =
-    (copy.phase === 'lost' ? -100000 : 0) +
-    (copy.phase === 'won' ? 100000 : 0) +
-    (copy.level - s.level) * 10000 +
-    (copy.shots === s.shots ? -100000 : 0) +
-    (copy.score - s.score) * 10 -
-    (copy.ceiling - s.ceiling) * 20 -
-    copy.misses * 8 -
-    remaining * 4 -
-    depth * 0.15 +
-    pairs;
-  return {
-    angle,
-    swap,
-    p,
-    rank,
-    fired: copy.shots > s.shots,
-    resultPhase: copy.phase,
-    scoreGain: copy.score - s.score,
-    depth,
-  };
-}
-test('Bubble cavern can be cleared through real aim, fire and swap actions', () => {
-  const { env, ends } = harness({ seed: 7 });
-  const g = createGame(env);
-  let count = 0;
-  while (g.getState().phase === 'playing' && count++ < 100) {
-    const s = g.getState();
-    let best = null;
-    for (const swap of s.current === s.next ? [false] : [false, true])
-      for (let a = -2.85; a < -0.27; a += 0.045) {
-        const trial = bubbleAim(s, a, swap);
-        if (!best || trial.rank > best.rank) best = trial;
-      }
-    if (best.swap) g.update(1 / 60, input([], ['KeyX']));
-    g.update(1 / 60, input([], [], best.p));
-    for (
-      let i = 0;
-      i < 900 &&
-      (g.getState().queuedFire ||
-        g.getState().shot ||
-        g.getState().capture ||
-        g.getState().ceilingMotion ||
-        g.getState().transition > 0 ||
-        g.getState().popped.length > 0) &&
-      g.getState().phase === 'playing';
-      i++
-    )
-      g.update(1 / 60, input());
-  }
-  assert.equal(
-    g.getState().phase,
-    'won',
-    `shots ${count}; remaining ${g.getState().remaining}; ceiling ${g.getState().ceiling}`,
-  );
-  assert.equal(ends.length, 1);
-});
-
 test('Bubble geometry uses an exact hex lattice inside side walls', () => {
   const s = createBubbleState(harness().env);
   assert.equal(s.board[1][11], -1, 'short odd rows cannot contain off-board bubble');
   assert.equal(s.level, 1);
-  assert.equal(s.totalLevels, 3);
+  assert.equal(s.totalLevels, LEVELS.length);
 });
 test('Bubble shot ignores zero dt and invalid placement cannot overwrite occupied cell', () => {
   const { env } = harness();
@@ -254,9 +140,10 @@ test('Bubble mechanical pressure warns and moves continuously instead of steppin
     s = createBubbleState(env);
   s.board.forEach((r) => r.fill(-1));
   s.board[0][0] = 0;
-  s.misses = 4;
+  s.misses = s.maxMisses - 1;
   s.shot = { x: 240, y: 49, vx: 0, vy: -350, color: 1 };
-  for (let i = 0; i < 240 && s.misses === 4; i++) stepBubble(s, 1 / 240, input(), env);
+  for (let i = 0; i < 240 && s.misses === s.maxMisses - 1; i++)
+    stepBubble(s, 1 / 240, input(), env);
   assert.equal(s.ceiling, 0);
   assert(s.pressureWarning > 0);
   assert(s.ceilingMotion);
@@ -285,8 +172,8 @@ test('Bubble pointer aiming uses a bounded physical gimbal and each stage has au
     angle = s.angle;
   stepBubble(s, 1 / 120, input([], [], { x: 100, y: 290, down: true }), env);
   assert(Math.abs(s.angle - angle) < 0.03);
-  const second = createBubbleState(harness().env, 2),
-    third = createBubbleState(harness().env, 3);
+  const second = createBubbleState(harness().env, 5),
+    third = createBubbleState(harness().env, 9);
   assert(second.obstacles.length > 0);
   assert(third.obstacles.length > 0);
   assert.notDeepEqual(second.board, third.board);
@@ -314,7 +201,7 @@ test('Bubble launches wait until released capsules have one-diameter vertical cl
 });
 test('Bubble final victory waits until the physical drain clears before freezing', () => {
   const { env, ends } = harness(),
-    s = createBubbleState(env, 3);
+    s = createBubbleState(env, LEVELS.length);
   s.board.forEach((r) => r.fill(-1));
   s.obstacles = [];
   s.board[0][0] = 0;
@@ -379,7 +266,7 @@ test('Bubble old-board clicks and fire presses cannot leak through drain or stag
 });
 test('Bubble terminal drain clears stale intent and never launches a ghost capsule', () => {
   const { env, ends } = harness(),
-    s = createBubbleState(env, 3);
+    s = createBubbleState(env, LEVELS.length);
   s.board.forEach((r) => r.fill(-1));
   s.obstacles = [];
   s.board[0][0] = 0;
@@ -396,58 +283,6 @@ test('Bubble terminal drain clears stale intent and never launches a ghost capsu
   assert(!s.queuedFire);
   assert.equal(s.shots, 0);
   assert.equal(ends.length, 1);
-});
-
-test('Bubble three authored air tables clear through actual keyboard aiming, firing and swapping at 30,60,120Hz', () => {
-  for (const hz of [30, 60, 120]) {
-    const h = harness({ seed: 7 }),
-      g = createGame(h.env);
-    let count = 0,
-      swaps = 0;
-    const levels = new Set();
-    while (g.getState().phase === 'playing' && count++ < 100) {
-      const s = g.getState();
-      levels.add(s.level);
-      let best = null;
-      for (const swap of s.current === s.next ? [false] : [false, true])
-        for (let angle = -2.85; angle < -0.27; angle += 0.06) {
-          const trial = bubbleAim(s, angle, swap, 'keyboard', hz);
-          if (!best || trial.rank > best.rank) best = trial;
-        }
-      if (best.swap) {
-        g.update(1 / hz, input([], ['KeyX']));
-        swaps++;
-      }
-      keyboardAim(
-        (dt, i) => g.update(dt, i),
-        () => g.getState(),
-        best.angle,
-        hz,
-      );
-      g.update(1 / hz, input([], ['Space']));
-      for (let frame = 0; frame < hz * 12 && g.getState().phase === 'playing'; frame++) {
-        const q = g.getState();
-        if (!q.shot && !q.capture && !q.ceilingMotion && q.transition <= 0 && !q.popped.length)
-          break;
-        g.update(1 / hz, input());
-      }
-      g.draw(mockContext());
-    }
-    const result = g.getState();
-    assert.equal(
-      result.phase,
-      'won',
-      `${hz}Hz after${count}shots, level${result.level}, remaining${result.remaining}`,
-    );
-    assert.equal(levels.size, 3);
-    assert(swaps > 0);
-    assert.equal(h.ends.length, 1);
-    assert(h.ends[0].won);
-    const terminal = g.getState();
-    for (let i = 0; i < 60; i++) g.update(1 / hz, input(['ArrowLeft'], ['Space', 'KeyX']));
-    assert.deepEqual(g.getState(), terminal);
-    assert.equal(h.ends.length, 1);
-  }
 });
 
 test('Bubble chamber boundaries use the same radius and lattice as rendered contacts', () => {

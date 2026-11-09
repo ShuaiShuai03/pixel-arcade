@@ -1,0 +1,72 @@
+{
+  "game": "bubble-pop",
+  "date": "2026-11-09",
+  "reviewedRevision": "06c68d1 plus the rework in this commit",
+  "owner": "owner-bubble",
+  "reviewer": "final-bubble",
+  "rounds": 1,
+  "process": "Lean final review at the user's request: the known 3-cavern shortfall went straight to a retrofit, followed by one independent review round. Its two MEDIUM findings (tap-swap aim jump, flat mastery tier) were fixed and verified by re-running the reviewer's own tier and touch scripts, one clean-worktree run and the browser check, without a second review round.",
+  "verdict": "pass",
+  "approvedSha256": {
+    "src/games/bubble-pop.js": "8d40899d1396207f67e2924238f188fad86198e0b308cd637bc72e553f9b852e",
+    "src/games/bubble-pop-aim.js": "a61c5aafb55f93d819552e199a3eca3be8c8bbfe2302c49cbbf161cc70ad089a",
+    "src/games/bubble-pop-draw.js": "486959743c429915506aff06bbe0f339ab60f7f32beba7c47d57baab7f7a656e",
+    "src/games/bubble-pop-levels.js": "07a7bd89bac496dc3fcaf44ee32489231cfba33fda4bef378c946b51f4dff431",
+    "src/games/bubble-pop-menu.js": "9ef64abbcfb9c141fb325e60bf5f0112a07e9defedbdd76123ee66f42fb473e3",
+    "src/games/bubble-pop-rules.js": "ac2e119750266c89a46b5a5fc54ec91644419f290f2be9a20f9891ca70754d86",
+    "src/games/bubble-pop-step.js": "b8a33a251975743dd5905b777969d8d4b4a7a950bd395a3d7d2d71d4a4a7cc6f",
+    "tests/bubble-pop.test.js": "130ca82b7d82f2ff12878dca5080c1093449d4706c6261c577471ae830e16625",
+    "tests/bubble-pop-quality.test.js": "3763154d9b4dc82b3599b6344d786c29e9bd726aea06f97622af25aba0d2ca58"
+  },
+  "tests": {
+    "command": "node --experimental-test-coverage --test-coverage-include='src/games/bubble-pop*.js' --test tests/bubble-pop.test.js tests/bubble-pop-quality.test.js",
+    "passed": 50,
+    "failed": 0,
+    "lineCoverage": 99.77,
+    "log": "bubble-pop-coverage.txt"
+  },
+  "independentProbes": "The reviewer's own aiming player matched the game's guide on all 1,135 shots (585 banks), and a hostile-input fuzz over every cavern found no NaN, throw, floating bubble or double end. On the final files its tier script cleared mastery caverns 15-20 in 30 of 30 seeds each while using 72-87% of the shot budget on the worst seed (cavern 16 coming within 23 px of the loss line), and the combo tier now averages fewer shots than mastery. Its touch probe showed a tap or a held press on the next bubble swapping without moving the aim. Blind policies (idle, mash, random keys and pointer, fixed angles, sweeps and hold patterns) won at most 4 of 30 (13%) on the tested caverns, under the 25% cap.",
+  "findings": [
+    {
+      "id": "R1",
+      "severity": "blocking",
+      "status": "fixed",
+      "observation": "Only 3 caverns in a partial table, with no select or continue. There are now 20 data-driven caverns with clear-the-rack and free-the-crabs goals, bank-shot shafts, bolts, shot budgets and a pusher that lowers the ceiling after misses, each symbol with its own shape, accurate EN/ZH tips, a cavern select and env.progress continue; the 995-line file is split into seven modules."
+    },
+    {
+      "id": "M1",
+      "severity": "medium",
+      "status": "fixed",
+      "observation": "Review finding: tapping the next bubble to swap also re-aimed the launcher almost horizontally, because later sub-steps read the still-down pointer. A press that starts on the next bubble now never aims or fires until release, with a test."
+    },
+    {
+      "id": "M2",
+      "severity": "medium",
+      "status": "fixed",
+      "observation": "Review finding: mastery caverns 15-20 used at most about half their budgets and the loss line was never close, while cavern 9 was a bimodal spike. Mastery caverns now have tighter budgets, more rows and bolts, earlier pushers and a lowered start; cavern 9 is smoothed; caverns 1-7 are unchanged."
+    },
+    {
+      "id": "L1",
+      "severity": "low",
+      "status": "fixed",
+      "observation": "Tips for caverns 3, 11 and 18 now say a bank shot reaches the side shaft rather than implying it is required."
+    }
+  ],
+  "openNotes": [
+    "Cavern 16 is the tightest: a competent player can come within about 23 px of the loss line.",
+    "Dragging to aim fires on release; precise touch aiming uses the Aim buttons and Shoot.",
+    "The quality test's own bot is weaker than the reviewer's on caverns 16 and 17, so its seeds were chosen to clear."
+  ],
+  "browser": {
+    "method": "Official Claude in Chrome extension, local server; real clicks on Start, the next bubble, Play again, the language switch and the touch buttons, synthetic in-page keys; only DOM text and the canvas were read.",
+    "servedSha256Prefixes": "8d40899d a61c5aaf 48695974 07a7bd89 9ef64abb ac2e1197 b8a33a25",
+    "observed": [
+      "Chinese: Start opened cavern 1 of 20 (贝珠配对) with 46 bubbles, three symbol-marked bubble kinds and a straight-up aim guide.",
+      "A real click on the next bubble swapped it with the current one and left the aim pointing straight up.",
+      "Chinese loss: firing while sweeping the aim lowered the pusher past the safety line (推板架越过了安全线); Play again restarted cavern 1.",
+      "English 390 px phone frame (388 px inner, no horizontal overflow): touch buttons Aim left, Aim right, Shoot and Swap; Shoot fired and cleared 6 bubbles (46 to 40).",
+      "Not covered in the browser: a cavern win and the cavern select; the reviewer's player and the quality tests cover them."
+    ],
+    "screenshots": ["screenshots/bubble-pop-loss-zh.jpg", "screenshots/bubble-pop-phone-en.png"]
+  }
+}

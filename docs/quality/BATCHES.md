@@ -27,7 +27,7 @@ Phase Tiles completed batch 18 and the 50-game target, Pixel Parkour included. T
 | Paddle Duel    | Passed in one round: single match, hardened input ([record](final-review/paddle-duel.json))               |
 | Pinball Pocket | Passed in one round with no changes ([record](final-review/pinball-pocket.json))                          |
 | Dungeon Dash   | Passed in one round: 20 chambers, armoured mastery ([record](final-review/dungeon-dash.json))             |
-| Bubble Pop     | Retrofitting to 20+ levels (3 caverns)                                                                    |
+| Bubble Pop     | Passed in one round: 20 caverns, symbol bubbles ([record](final-review/bubble-pop.json))                  |
 
 ## Completed batch 18
 
