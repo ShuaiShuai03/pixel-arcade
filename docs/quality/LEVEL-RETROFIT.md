@@ -23,7 +23,7 @@ Effort: S = level data only, M = data plus some mechanics or tests, L = structur
 | river-hop        |              3 | `STAGES`                |   S    | queued              |
 | snowball-siege   |             30 | `FLOORS`                |   M    | done (batch 16)     |
 | starbreaker      |             20 | `LEVELS`                |   M    | done (final review) |
-| meteor-drift     |              5 | wave if-chain           |   M    | queued              |
+| meteor-drift     |             22 | `LEVELS`                |   M    | done (final review) |
 | ember-knights    |             20 | `STAGES`                |   M    | done (final review) |
 | bomb-garden      |             22 | `GARDENS`               |   M    | done (final review) |
 | sky-raiders      |             24 | `SECTORS`               |   M    | done (final review) |

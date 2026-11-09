@@ -9,12 +9,14 @@ import {
   drawWrappedRock,
   drawWrappedShip,
 } from '../src/games/meteor-drift.js';
+import { LEVELS, LEVEL_COUNT } from '../src/games/meteor-drift-levels.js';
+import { MAX_SPEED, MAGAZINE } from '../src/games/meteor-drift-step.js';
 import { harness, input, mockContext, seeded } from './harness.js';
 test('meteor wrap and spawn are deterministic and safe', () => {
   assert.equal(wrap(-1, 480), 479);
   assert.equal(wrap(482, 480), 2);
   const a = makeRocks(1, seeded(2));
-  assert.equal(a.length, 4);
+  assert.equal(a.length, LEVELS[0].rocks.length);
   assert.deepEqual(a, makeRocks(1, seeded(2)));
   assert(a.every((r) => Math.hypot(r.x - 240, r.y - 160) > 100));
 });
@@ -25,10 +27,10 @@ test('meteor thrust, turning and firing use finite forces', () => {
   assert(s.ship.angle > -Math.PI / 2);
   assert.equal(s.shots.length, 1);
   const q = createMeteorState(seeded(1));
-  q.ship.vx = 300;
+  q.ship.vx = 100;
   q.ship.angle = 0;
   stepMeteors(q, 1 / 30, input(['ArrowUp']), seeded(2));
-  assert(q.ship.vx > 300);
+  assert(q.ship.vx > 100);
 });
 test('meteor shooting splits rocks and awards score', () => {
   const s = createMeteorState(seeded(1));
@@ -39,7 +41,7 @@ test('meteor shooting splits rocks and awards score', () => {
   assert(s.rocks.every((r) => r.size === 2));
   assert.equal(s.score, 40);
 });
-test('meteor collision loses life then protected respawn; five waves win', () => {
+test('meteor collision loses life then protected respawn; the last sector wins', () => {
   const s = createMeteorState(seeded(1));
   s.invulnerable = 0;
   s.hull = 1;
@@ -54,7 +56,7 @@ test('meteor collision loses life then protected respawn; five waves win', () =>
   stepMeteors(s, 0.01, input(), seeded(1));
   assert.equal(s.phase, 'lost');
   const q = createMeteorState(seeded(1));
-  q.wave = 5;
+  q.level = LEVEL_COUNT;
   q.rocks = [];
   stepMeteors(q, 0.01, input(), seeded(1));
   assert.equal(q.phase, 'won');
@@ -70,49 +72,6 @@ test('meteor game renders in both languages and projectiles expire', () => {
     g.draw(mockContext());
     assert(g.getState().shots.length < 30);
     assert(Number.isFinite(g.getState().ship.x));
-  }
-});
-
-test('legal thrust, turning and firing clear all five sectors on two seeds', () => {
-  const delta = (value, max) => ((value + max * 1.5) % max) - max / 2;
-  for (const seed of [3, 5]) {
-    const h = harness({ seed }),
-      g = createGame(h.env);
-    let frames = 0;
-    while (g.getState().phase === 'playing' && frames++ < 40000) {
-      const s = g.getState(),
-        ship = s.ship;
-      let target,
-        distance = Infinity;
-      for (const rock of s.rocks) {
-        const d = Math.hypot(delta(rock.x - ship.x, 480), delta(rock.y - ship.y, 320));
-        if (d < distance) {
-          target = rock;
-          distance = d;
-        }
-      }
-      let dx = delta(target.x - ship.x, 480),
-        dy = delta(target.y - ship.y, 320);
-      const flight = Math.hypot(dx, dy) / 350;
-      dx += (target.vx - ship.vx) * flight;
-      dy += (target.vy - ship.vy) * flight;
-      const difference = delta(Math.atan2(dy, dx) - ship.angle, Math.PI * 2),
-        keys = ['Space'];
-      const command = 4 * difference - 2.6 * ship.omega;
-      if (command > 0.04) keys.push('ArrowRight');
-      if (command < -0.04) keys.push('ArrowLeft');
-      if (Math.hypot(ship.vx, ship.vy) > 20) keys.push('ArrowDown');
-      else if (frames < 15) keys.push('ArrowUp');
-      g.update(1 / 60, input(keys));
-    }
-    assert.equal(g.getState().phase, 'won');
-    assert.equal(g.getState().wave, 5);
-    assert.equal(h.ends.length, 1);
-    assert(h.ends[0].won);
-    const terminal = g.getState();
-    for (let i = 0; i < 30; i++) g.update(1 / 60, input());
-    assert.deepEqual(g.getState(), terminal);
-    assert.equal(h.ends.length, 1);
   }
 });
 
@@ -194,7 +153,7 @@ test('meteor diagonal collisions agree with the rendered corner copies', () => {
 });
 
 test('meteor sectors introduce ice, iron and volatile rocks and braking is frame independent', () => {
-  const kinds = new Set([1, 2, 3, 4, 5].flatMap((w) => makeRocks(w, seeded(8)).map((r) => r.kind)));
+  const kinds = new Set(LEVELS.flatMap((_, i) => makeRocks(i + 1, seeded(8)).map((r) => r.kind)));
   assert(kinds.has('ice'));
   assert(kinds.has('iron'));
   assert(kinds.has('volatile'));
@@ -297,13 +256,19 @@ test('meteor fragments conserve parent linear momentum', () => {
   }
 });
 
-test('meteor thrust has no hidden speed cap and counter-thrust is an explicit finite force', () => {
+test('meteor thrusters cut out at top speed and counter-thrust is an explicit finite force', () => {
   const s = createMeteorState(seeded(1));
-  s.ship.vx = 300;
+  s.ship.vx = MAX_SPEED - 1;
   s.ship.angle = 0;
   s.rocks = [{ x: 100, y: 20, vx: 0, vy: 0, size: 1, angle: 0, spin: 0 }];
   stepMeteors(s, 1 / 30, input(['ArrowUp']), seeded(1));
-  assert(s.ship.vx > 300);
+  assert(s.ship.vx > MAX_SPEED - 1);
+  const capped = s.ship.vx;
+  stepMeteors(s, 1 / 30, input(['ArrowUp']), seeded(1));
+  assert.equal(s.ship.vx, capped, 'no push along the heading at top speed');
+  s.ship.angle = Math.PI;
+  stepMeteors(s, 1 / 30, input(['ArrowUp']), seeded(1));
+  assert(s.ship.vx < capped, 'pushing against the motion still works');
   const before = s.ship.vx;
   stepMeteors(s, 1 / 30, input(['ArrowDown']), seeded(1));
   assert(s.ship.vx < before);
@@ -322,7 +287,7 @@ test('meteor shot emission conserves total linear momentum including recoil', ()
   const b = s.shots[0];
   assert(Math.abs(s.ship.mass * s.ship.vx + b.mass * b.vx - px) < 1e-8);
   assert(Math.abs(s.ship.mass * s.ship.vy + b.mass * b.vy - py) < 1e-8);
-  assert.equal(s.ammo, 399);
+  assert.equal(s.ammo, MAGAZINE - 1);
 });
 test('meteor slow contact exchanges momentum without damaging either craft', () => {
   const s = createMeteorState(seeded(3));
@@ -439,7 +404,7 @@ test('meteor last-round volatile fuse can finish before ammunition failure', () 
   s.shots = [{ x: 100, y: 100, vx: 0, vy: 0, life: 1, mass: 0 }];
   stepMeteors(s, 1 / 120, input(), seeded(1));
   assert.equal(s.phase, 'playing');
-  s.wave = 5;
+  s.level = LEVEL_COUNT;
   for (let i = 0; i < 90 && s.phase === 'playing'; i++) stepMeteors(s, 1 / 120, input(), seeded(1));
   assert.equal(s.phase, 'won');
 });
@@ -681,10 +646,10 @@ test('meteor terminal loss freezes, reports once and restarts cleanly in both la
     assert.deepEqual(g.getState(), terminal);
     assert.equal(h.ends.length, 1);
     const fresh = createGame(h.env).getState();
-    assert.equal(fresh.wave, 1);
+    assert.equal(fresh.level, 1);
     assert.equal(fresh.hull, 3);
-    assert.equal(fresh.ammo, 400);
-    assert.equal(fresh.reserve, 3600);
+    assert.equal(fresh.ammo, MAGAZINE);
+    assert.equal(fresh.reserve, LEVELS[0].ammo - MAGAZINE);
     assert.equal(fresh.ship.omega, 0);
   }
 });

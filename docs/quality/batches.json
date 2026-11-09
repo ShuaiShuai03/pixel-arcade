@@ -238,7 +238,8 @@
       "starbreaker",
       "neon-snake",
       "orbit-invaders",
-      "blockfall"
+      "blockfall",
+      "meteor-drift"
     ],
     "records": [
       "final-review/snowball-siege.json",
@@ -249,7 +250,8 @@
       "final-review/starbreaker.json",
       "final-review/neon-snake.json",
       "final-review/orbit-invaders.json",
-      "final-review/blockfall.json"
+      "final-review/blockfall.json",
+      "final-review/meteor-drift.json"
     ]
   }
 }

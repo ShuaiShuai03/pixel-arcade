@@ -1,0 +1,25 @@
+ℹ tests 64
+ℹ suites 0
+ℹ pass 64
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 53721.825875
+ℹ start of coverage report
+ℹ --------------------------------------------------------------------------
+ℹ file                      | line % | branch % | funcs % | uncovered lines
+ℹ --------------------------------------------------------------------------
+ℹ src                       |        |          |         |
+ℹ  games                    |        |          |         |
+ℹ   meteor-drift-draw.js    | 100.00 |    96.15 |  100.00 |
+ℹ   meteor-drift-levels.js  | 100.00 |   100.00 |  100.00 |
+ℹ   meteor-drift-math.js    | 100.00 |   100.00 |  100.00 |
+ℹ   meteor-drift-menu.js    | 100.00 |   100.00 |  100.00 |
+ℹ   meteor-drift-physics.js | 100.00 |    92.78 |  100.00 |
+ℹ   meteor-drift-step.js    | 100.00 |    98.37 |  100.00 |
+ℹ   meteor-drift.js         | 100.00 |   100.00 |  100.00 |
+ℹ --------------------------------------------------------------------------
+ℹ all files                 | 100.00 |    97.21 |  100.00 |
+ℹ --------------------------------------------------------------------------
+ℹ end of coverage report
