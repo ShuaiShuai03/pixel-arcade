@@ -1,0 +1,65 @@
+{
+  "game": "minefield",
+  "date": "2026-11-09",
+  "reviewedRevision": "9949c1a plus the rework in this commit",
+  "owner": "owner-mine",
+  "reviewer": "final-mine",
+  "rounds": 1,
+  "process": "Lean final review at the user's request: the known 3-field shortfall went straight to a retrofit, followed by one independent review round. Three small LOW fixes (hint deduction loop, field 5 tip, sector labels) were verified by re-running the reviewer's own solver and generator probes, one clean-worktree run and the browser check, without a second review round.",
+  "verdict": "pass",
+  "approvedSha256": {
+    "src/games/minefield.js": "d010a15adb286fc5408e5d85b51325a455cf503760708cf8647e0bd78dda56e9",
+    "src/games/minefield-actions.js": "e0817ab1d0e63caff3c80a27b8cc9b553a5f5a103595aa31ffcbce326f6dab06",
+    "src/games/minefield-draw.js": "d6474d9791b03eab9f06df82193de202a16bbe857d452b61b5bfa857b407b9ce",
+    "src/games/minefield-field.js": "563fa2dffd9ae786a44ee828c182d9493d3f6a8430400bc96ff3cca7e92b2f86",
+    "src/games/minefield-levels.js": "765f46987ce3d09ed1f8d40ec42cb2b4f600d2978f4535f5a8f169ff4a4aaa7c",
+    "src/games/minefield-menu.js": "3a5334ff264c011f08c448d3102a900cc73be3b1d3c690abd05a6ff7958c4c07",
+    "src/games/minefield-solver.js": "a1ff2a5e244bf55c4387b41d1dc78f1bcaae0d77617832b211ef0c098cb2e322",
+    "tests/minefield.test.js": "f60d02c737571e239abc6444fa9e8f72f2a10a32d02b00cd736211a54d6717d1",
+    "tests/minefield-quality.test.js": "cbea32599ec29f3462d6c44582e59f8ae1b07afeda61f036633e28c6981b8e0b"
+  },
+  "tests": {
+    "command": "node --experimental-test-coverage --test-coverage-include='src/games/minefield*.js' --test tests/minefield.test.js tests/minefield-quality.test.js",
+    "passed": 28,
+    "failed": 0,
+    "lineCoverage": 99.37,
+    "log": "minefield-coverage.txt"
+  },
+  "independentProbes": "The reviewer's own backtracking solver, playing only from public state, cleared 3,000 of 3,000 fields (150 seeds per field, random first tap) without a guess; no first tap was unsafe. Across 8,000 generations no field needed more than 25 of its 400 attempts, so generation never failed. getState() exposed no mine or hidden number while a field was live. On the final files the same solver cleared 600 of 600 fields with 0 of 2,784 hint calls missing a provable safe tile. Blind play won at most 5% of any field from 3 (random keys on field 4); fuzz, determinism at 30, 60 and 120 Hz, broken progress stores and EN/ZH text fit all passed.",
+  "findings": [
+    {
+      "id": "R1",
+      "severity": "blocking",
+      "status": "fixed",
+      "observation": "Only 3 fields built from builder branches, with no select or continue. There are now 20 data-driven fields with rubble, pillars, gates, moats and diagonal rifts and rules such as probes, pre-opened tiles, sector totals, flag limits and hints, each with an accurate EN/ZH tip, plus a field select and env.progress continue; the 956-line file is split into seven modules."
+    },
+    {
+      "id": "R2",
+      "severity": "medium",
+      "status": "fixed",
+      "observation": "Fields could require guessing. Mines are now placed after the first tap, which is always safe with its neighbours, and each field is regenerated until a pure-logic solver clears it; H points only at proven-safe tiles, and getState() hides mines during play."
+    },
+    {
+      "id": "L1",
+      "severity": "low",
+      "status": "fixed",
+      "observation": "Review finding: H could miss a provable safe tile that needed mines found in the same pass; the deduction now repeats until nothing changes. The field 5 tip was corrected, sector totals read 'S1: 5 mines' / '1区：5雷', and a failed field generation now shows a notice instead of throwing."
+    }
+  ],
+  "openNotes": [
+    "Field generation runs on the first tap and can take up to about half a second on the largest fields (1.4 s once on a heavily loaded machine).",
+    "Flags are never needed to win, so flag limits only constrain marking.",
+    "The smallest board cells are about 17 px on a phone."
+  ],
+  "browser": {
+    "method": "Official Claude in Chrome extension, local server; real clicks on Start, the language switch, the field select, board tiles and the touch buttons, synthetic in-page keys; only DOM text and the canvas were read.",
+    "servedSha256Prefixes": "d010a15a e0817ab1 d6474d97 563fa2df 765f4698 3a5334ff a1ff2a5e",
+    "observed": [
+      "English: Start opened field 1 of 20 (Camp Survey, 6x6, 4 mines) with the tip below the board.",
+      "English loss: a driver error revealed a mine and the loss screen explained it; Play again restarted the field.",
+      "English win: Space opened the safe first area, then repeating H and Space revealed A1, B1, A2, A3, B3 and A4 to 32 of 32 safe tiles; SITE MAPPED appeared and Enter travelled to field 2 (Tent Row).",
+      "Chinese 390 px phone frame (388 px inner, no horizontal overflow): the field select showed fields 1-2 unlocked; a tap opened field 2, a tap on the board opened the safe area, the 推理 button proved G1 safe and the 揭开 button revealed it (31 of 36 safe)."
+    ],
+    "screenshots": ["screenshots/minefield-win-en.jpg", "screenshots/minefield-phone-zh.png"]
+  }
+}

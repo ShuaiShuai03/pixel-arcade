@@ -1,0 +1,25 @@
+ℹ tests 28
+ℹ suites 0
+ℹ pass 28
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 47869.9765
+ℹ start of coverage report
+ℹ -----------------------------------------------------------------------
+ℹ file                   | line % | branch % | funcs % | uncovered lines
+ℹ -----------------------------------------------------------------------
+ℹ src                    |        |          |         |
+ℹ  games                 |        |          |         |
+ℹ   minefield-actions.js |  98.20 |    97.92 |  100.00 | 223-229
+ℹ   minefield-draw.js    | 100.00 |    95.12 |  100.00 |
+ℹ   minefield-field.js   |  99.31 |    96.47 |  100.00 | 129
+ℹ   minefield-levels.js  | 100.00 |    97.67 |  100.00 |
+ℹ   minefield-menu.js    | 100.00 |    94.12 |  100.00 |
+ℹ   minefield-solver.js  | 100.00 |    98.63 |  100.00 |
+ℹ   minefield.js         | 100.00 |   100.00 |  100.00 |
+ℹ -----------------------------------------------------------------------
+ℹ all files              |  99.37 |    97.41 |  100.00 |
+ℹ -----------------------------------------------------------------------
+ℹ end of coverage report

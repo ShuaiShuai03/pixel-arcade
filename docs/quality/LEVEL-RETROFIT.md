@@ -32,7 +32,7 @@ Effort: S = level data only, M = data plus some mechanics or tests, L = structur
 | bubble-pop       |              3 | `CAVERNS` (partial)     |   M    | queued              |
 | blockfall        |             20 | `LEVELS`                |   M    | done (final review) |
 | gem-match        |              3 | per-stage goal logic    |   M    | queued              |
-| minefield        |              3 | field builder branches  |   M    | queued              |
+| minefield        |             20 | `LEVELS`                |   M    | done (final review) |
 | memory-grove     |              3 | 3 rule types            |   M    | queued              |
 | gravity-courier  |              3 | `COURIER_ROOMS`         |   M    | queued              |
 | grapnel-gorge    |              3 | inline `plans`          |   M    | queued              |

@@ -240,7 +240,8 @@
       "orbit-invaders",
       "blockfall",
       "meteor-drift",
-      "river-hop"
+      "river-hop",
+      "minefield"
     ],
     "records": [
       "final-review/snowball-siege.json",
@@ -253,7 +254,8 @@
       "final-review/orbit-invaders.json",
       "final-review/blockfall.json",
       "final-review/meteor-drift.json",
-      "final-review/river-hop.json"
+      "final-review/river-hop.json",
+      "final-review/minefield.json"
     ]
   }
 }
