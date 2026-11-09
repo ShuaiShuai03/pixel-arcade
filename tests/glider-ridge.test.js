@@ -143,10 +143,10 @@ test('glider: flare bleeds speed without hidden thrust and recovers when release
   run(flared, 5);
   run(flared, 1.5, ['Space']);
   run(free, 1.5);
-  const ground = terrainAt(COURSES[1], 2100, 0),
+  const ground = terrainAt(COURSES[6], 2100, 0),
     near = { x: 2100, h: ground + 12, vx: 22, vh: -6, gate: 4 },
-    slowFree = fresh(1, near),
-    slowFlare = fresh(1, near);
+    slowFree = fresh(6, near),
+    slowFlare = fresh(6, near);
   run(slowFree, 0.8);
   run(slowFlare, 0.8, ['Space']);
   assert.ok(slowFlare.vh > slowFree.vh + 0.5, 'a flare near the ground arrests the sink');
@@ -156,12 +156,12 @@ test('glider: flare bleeds speed without hidden thrust and recovers when release
 });
 
 test('glider: thermals and ridge lift add visible energy; lee sink removes it', () => {
-  const c = COURSES[1];
+  const c = COURSES[6];
   assert.ok(windAt(c, 640, 60, 300).h > 7);
   assert.equal(windAt(c, 640, 60, 600).h, 0, 'thermal fades above its top');
   assert.equal(windAt(c, 640, 250, 300).h, 0, 'thermal is a localized column');
-  const inLift = fresh(1, { x: 545, h: 320 }),
-    outside = fresh(1, { x: 250, h: 320 });
+  const inLift = fresh(6, { x: 545, h: 320 }),
+    outside = fresh(6, { x: 250, h: 320 });
   run(inLift, 6);
   run(outside, 6);
   assert.ok(inLift.h - outside.h > 25, `${inLift.h} vs ${outside.h}`);
@@ -171,20 +171,20 @@ test('glider: thermals and ridge lift add visible energy; lee sink removes it', 
     ground = terrainAt(spur, 860, 0);
   assert.ok(windAt(spur, 860, 0, ground + 20).h > 2, 'ridge lift on the windward face');
   assert.ok(windAt(spur, 860, 0, ground + 400).h === 0, 'ridge lift fades with height');
-  const crest = COURSES[2];
+  const crest = COURSES[14];
   assert.ok(windAt(crest, 730, 0, terrainAt(crest, 730, 0) + 30).h < -1, 'lee sink');
 });
 
 test('glider: crosswind shifts the ground track while airspeed stays the same', () => {
-  const windy = fresh(1, { x: 850, h: 3000, vz: 7 }),
-    calm = fresh(1, { x: 200, h: 3000 });
+  const windy = fresh(6, { x: 850, h: 3000, vz: 7 }),
+    calm = fresh(6, { x: 200, h: 3000 });
   run(windy, 3);
   run(calm, 3);
   assert.ok(windy.z > 12, `drift ${windy.z}`);
   assert.ok(windy.vz > 5 && windy.vz < 9);
   assert.equal(Math.abs(calm.z) < 1e-9, true);
   assert.ok(Math.abs(airspeed(windy) - airspeed(calm)) < 1.5);
-  const w = windAt(COURSES[1], 900, 0, 300);
+  const w = windAt(COURSES[6], 900, 0, 300);
   assert.equal(w.z, 7);
   assert.ok(Math.hypot(windy.vx, windy.vz) > 0);
   const state = describe(windy);
@@ -291,11 +291,15 @@ test('glider: flying into terrain is fair: explicit crash, then relaunch from th
   assert.equal(s.score, 100, 'a crash keeps points already earned');
   const frozen = { x: s.x, h: s.h };
   stepGlider(s, 1 / 60, input(['ArrowUp'], ['Space']));
-  assert.equal(s.phase, 'crashed', 'a press before the minimum pause is ignored');
-  run(s, 0.9, [], 60);
+  assert.equal(s.phase, 'crashed', 'an early press waits for the minimum pause');
+  run(s, 0.1, [], 60);
   assert.deepEqual({ x: s.x, h: s.h }, frozen, 'nothing moves while the crash is shown');
-  stepGlider(s, 1 / 60, input([], ['Space']));
-  assert.equal(s.phase, 'playing');
+  assert.equal(s.phase, 'crashed');
+  for (let guard = 0; s.phase === 'crashed' && guard < 60; guard++) {
+    stepGlider(s, 1 / 60, input([]));
+  }
+  assert.equal(s.phase, 'playing', 'the early press was remembered, not dropped');
+  assert.ok(s.timer < 0.1, 'relaunched as soon as the minimum pause ended');
   assert.equal(s.gate, 1);
   assert.ok(Math.abs(s.x - (g1.x + 3)) < 2);
   assert.ok(Math.abs(s.h - g1.h) < 2);
@@ -324,7 +328,7 @@ test('glider: completing a course starts the next one and carries the score', ()
   assert.equal(s.course, 1);
   assert.equal(s.score, points);
   assert.equal(s.attempts, 3);
-  assert.equal(describe(s).courseName.en, 'Saddle Crossing');
+  assert.equal(describe(s).courseName.en, 'Meadow Slalom');
   assert.deepEqual(s.events.splice(0), ['move']);
 });
 
@@ -355,7 +359,7 @@ test('glider: three failed attempts lose, call end once and freeze the run', () 
 });
 
 test('glider: every course is authored fairly and has a launch, gates and a flat pad', () => {
-  assert.equal(COURSES.length, 3);
+  assert.equal(COURSES.length, 20);
   for (const c of COURSES) {
     assert.ok(c.name.en && c.name.zh && c.brief.en && c.brief.zh);
     assert.ok(c.terrain.every((p, i) => i === 0 || p[0] > c.terrain[i - 1][0]));
@@ -374,8 +378,8 @@ test('glider: every course is authored fairly and has a launch, gates and a flat
     assert.ok(c.gates.at(-1).x < c.zone.x0);
     assert.ok(c.socks.length >= 3);
   }
-  assert.ok(COURSES[1].wind.some((w) => Math.abs(w.wz) > 0));
-  assert.ok(COURSES[2].zone.hw < COURSES[0].zone.hw, 'the mastery pad is narrower');
+  assert.ok(COURSES[6].wind.some((w) => Math.abs(w.wz) > 0));
+  assert.ok(COURSES[14].zone.hw < COURSES[0].zone.hw, 'the mastery pad is narrower');
 });
 
 function capture(state, lang) {
@@ -392,7 +396,7 @@ function capture(state, lang) {
 
 test('glider: drawing covers every phase and language with 14-16 px text and no state change', () => {
   const scenes = [];
-  for (let course = 0; course < 3; course++) {
+  for (const course of [0, 6, 14]) {
     const c = COURSES[course],
       base = fresh(course, { x: c.gates[0].x - 40, h: c.gates[0].h });
     scenes.push(base);
@@ -414,7 +418,7 @@ test('glider: drawing covers every phase and language with 14-16 px text and no 
       message: { en: 'Gate 1/3 passed', zh: '第 1/3 门通过', timer: 1 },
     });
   }
-  const base = fresh(2);
+  const base = fresh(14);
   const landing = { kind: 'hard', sink: 6, speed: 20 };
   for (const phase of ['crashed', 'landed', 'won', 'lost']) {
     scenes.push({
@@ -491,8 +495,8 @@ test('glider: WASD mirrors the arrows and opposing steering cancels', () => {
 test('glider: getState().status is a bilingual host status string with progress and objective', () => {
   const state = createGame(harness().env).getState();
   assert.equal(typeof state.status.en, 'string');
-  assert.match(state.status.en, /Course 1\/3 · Gate 1\/3 · Attempts 3 · /);
-  assert.match(state.status.zh, /赛道 1\/3 · 检查门 1\/3 · 机会 3 · .*\p{Script=Han}/u);
+  assert.match(state.status.en, /Course 1\/20 · Gate 1\/3 · Attempts 3 · /);
+  assert.match(state.status.zh, /赛道 1\/20 · 检查门 1\/3 · 机会 3 · .*\p{Script=Han}/u);
   const stalled = describe(fresh(0, { time: 10, stalled: true }));
   assert.match(stalled.status.en, /STALL/);
   assert.equal(typeof stalled.glider.airspeed, 'number');
@@ -538,8 +542,8 @@ test('glider: holding Space exactly while the flare cue shows lands safely from 
 });
 
 test('glider: guidance shows the altitude need, lift marker, gate line and flare cue', () => {
-  const c = COURSES[1],
-    low = fresh(1, { x: 430, h: 300, gate: 1, vx: 28, vh: -2.5, time: 10 }),
+  const c = COURSES[6],
+    low = fresh(6, { x: 430, h: 300, gate: 1, vx: 28, vh: -2.5, time: 10 }),
     cues = describe(low).cues;
   assert.equal(cues.kind, 'gate');
   assert.equal(cues.cue, 'low');
@@ -553,30 +557,30 @@ test('glider: guidance shows the altitude need, lift marker, gate line and flare
     'the need line is labelled on screen',
   );
   assert.match(capture(low, 'zh').texts.join('|'), /高度 \d+/);
-  const inside = fresh(1, { x: 640, z: 0, h: 300, gate: 1, time: 10 });
+  const inside = fresh(6, { x: 640, z: 0, h: 300, gate: 1, time: 10 });
   assert.equal(describe(inside).cues.lift.inside, true);
   assert.match(capture(inside, 'en').texts.join('|'), /Hold Left: climb to ALT/);
-  const high = fresh(1, { x: 1500, h: 420, gate: 3, time: 10 });
+  const high = fresh(6, { x: 1500, h: 420, gate: 3, time: 10 });
   assert.equal(describe(high).cues.cue, 'high');
-  const ok = fresh(1, { x: 1500, h: 300, gate: 3, time: 10 });
+  const ok = fresh(6, { x: 1500, h: 300, gate: 3, time: 10 });
   assert.equal(describe(ok).cues.cue, 'ok');
-  const pad = describe(fresh(1, { gate: 4, x: 2100, h: terrainAt(c, 2100, 0) + 10, time: 10 }));
+  const pad = describe(fresh(6, { gate: 4, x: 2100, h: terrainAt(c, 2100, 0) + 10, time: 10 }));
   assert.equal(pad.cues.kind, 'pad');
   assert.equal(pad.cues.flare, true);
-  const far = describe(fresh(1, { gate: 4, x: 1900, h: 240, time: 10 }));
+  const far = describe(fresh(6, { gate: 4, x: 1900, h: 240, time: 10 }));
   assert.equal(far.cues.flare, false);
-  const behind = describe(fresh(1, { x: 2000, h: 300, time: 10 }));
+  const behind = describe(fresh(6, { x: 2000, h: 300, time: 10 }));
   assert.ok(behind.cues.distance < 0);
 });
 
 test('glider: gate pointers and lift markers are drawn when targets are off screen', () => {
-  const far = fresh(1, { x: 20, h: 380, time: 10 }),
+  const far = fresh(6, { x: 20, h: 380, time: 10 }),
     { texts } = capture(far, 'en');
   assert.ok(
     texts.some((t) => /^1: \d+$/.test(t)),
     'distance to the next gate',
   );
-  const behind = capture(fresh(1, { x: 560, h: 250, gate: 1, time: 10 }), 'en').texts.join('|');
+  const behind = capture(fresh(6, { x: 560, h: 250, gate: 1, time: 10 }), 'en').texts.join('|');
   assert.match(behind, /LIFT/);
 });
 
@@ -596,7 +600,7 @@ test('glider: course edges are visible walls, with a warning prompt before them'
     assert.ok(terrainAt(c, c.xmax - 1, 0) > 1400 && terrainAt(c, c.xmin + 1, 0) > 1400);
     assert.ok(Math.max(...c.thermals.map((t) => t.top)) < 1400, 'lift ends below the wall top');
   }
-  const edge = fresh(2, { x: 1000, z: 220, h: 500, time: 10 });
+  const edge = fresh(14, { x: 1000, z: 220, h: 500, time: 10 });
   assert.match(capture(edge, 'en').texts.join('|'), /Course edge: Hold Left: turn back/);
   assert.match(capture(edge, 'zh').texts.join('|'), /赛道边缘/);
   assert.match(describe(edge).status.en, /Course edge/);

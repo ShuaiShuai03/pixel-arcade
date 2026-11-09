@@ -6,31 +6,34 @@ At the user's direction, at most **three games** may be under development and ac
 
 Phase Tiles completed batch 18 and the 50-game target, Pixel Parkour included. The [required final review](#required-final-review) of every game is under way, three games at a time.
 
-| Game            | Final review                                                                                              |
-| --------------- | --------------------------------------------------------------------------------------------------------- |
-| Snowball Siege  | Passed after three rounds ([record](final-review/snowball-siege.json))                                    |
-| Ember Knights   | Passed after three rounds: 20 stages, reactive champions ([record](final-review/ember-knights.json))      |
-| Bomb Garden     | Passed after four rounds: 22 gardens, barrel previews ([record](final-review/bomb-garden.json))           |
-| Iron Bastion    | Passed after three rounds: 24 fields, blind pointer play fixed ([record](final-review/iron-bastion.json)) |
-| Sky Raiders     | Passed after two rounds: 24 sectors, aimed strike zones ([record](final-review/sky-raiders.json))         |
-| Neon Snake      | Passed in one round: 20 levels, countdown starts ([record](final-review/neon-snake.json))                 |
-| Starbreaker     | Passed in one round: 20 fields, docked launch ([record](final-review/starbreaker.json))                   |
-| Orbit Invaders  | Passed in one round: 20 levels, aimed crossfire ([record](final-review/orbit-invaders.json))              |
-| River Hop       | Passed in one round: 20 crossings, turtles and ferry ([record](final-review/river-hop.json))              |
-| Meteor Drift    | Passed in one round: 22 sectors, fixed ammo ([record](final-review/meteor-drift.json))                    |
-| Blockfall       | Passed in one round: 20 districts, four goal kinds ([record](final-review/blockfall.json))                |
-| Gem Match       | Passed in one round: 20 gardens, shape-coded beds ([record](final-review/gem-match.json))                 |
-| Crate Keeper    | Passed in one round: 20 solver-proven rooms ([record](final-review/crate-keeper.json))                    |
-| Minefield       | Passed in one round: 20 fields, no guessing ([record](final-review/minefield.json))                       |
-| Memory Grove    | Passed in one round: 20 clearings, four memory rules ([record](final-review/memory-grove.json))           |
-| Pixel Rally     | Passed in one round with no changes ([record](final-review/pixel-rally.json))                             |
-| Paddle Duel     | Passed in one round: single match, hardened input ([record](final-review/paddle-duel.json))               |
-| Pinball Pocket  | Passed in one round with no changes ([record](final-review/pinball-pocket.json))                          |
-| Dungeon Dash    | Passed in one round: 20 chambers, armoured mastery ([record](final-review/dungeon-dash.json))             |
-| Bubble Pop      | Passed in one round: 20 caverns, symbol bubbles ([record](final-review/bubble-pop.json))                  |
-| Lantern Climber | Passed in one round: deeper tower, four rail climbs ([record](final-review/lantern-climber.json))         |
-| Gravity Courier | Passed in one round: 20 chambers, field reversal ([record](final-review/gravity-courier.json))            |
-| Grapnel Gorge   | Passed in one round: 20 routes, still-stand hooks ([record](final-review/grapnel-gorge.json))             |
+| Game             | Final review                                                                                              |
+| ---------------- | --------------------------------------------------------------------------------------------------------- |
+| Snowball Siege   | Passed after three rounds ([record](final-review/snowball-siege.json))                                    |
+| Ember Knights    | Passed after three rounds: 20 stages, reactive champions ([record](final-review/ember-knights.json))      |
+| Bomb Garden      | Passed after four rounds: 22 gardens, barrel previews ([record](final-review/bomb-garden.json))           |
+| Iron Bastion     | Passed after three rounds: 24 fields, blind pointer play fixed ([record](final-review/iron-bastion.json)) |
+| Sky Raiders      | Passed after two rounds: 24 sectors, aimed strike zones ([record](final-review/sky-raiders.json))         |
+| Neon Snake       | Passed in one round: 20 levels, countdown starts ([record](final-review/neon-snake.json))                 |
+| Starbreaker      | Passed in one round: 20 fields, docked launch ([record](final-review/starbreaker.json))                   |
+| Orbit Invaders   | Passed in one round: 20 levels, aimed crossfire ([record](final-review/orbit-invaders.json))              |
+| River Hop        | Passed in one round: 20 crossings, turtles and ferry ([record](final-review/river-hop.json))              |
+| Meteor Drift     | Passed in one round: 22 sectors, fixed ammo ([record](final-review/meteor-drift.json))                    |
+| Blockfall        | Passed in one round: 20 districts, four goal kinds ([record](final-review/blockfall.json))                |
+| Gem Match        | Passed in one round: 20 gardens, shape-coded beds ([record](final-review/gem-match.json))                 |
+| Crate Keeper     | Passed in one round: 20 solver-proven rooms ([record](final-review/crate-keeper.json))                    |
+| Minefield        | Passed in one round: 20 fields, no guessing ([record](final-review/minefield.json))                       |
+| Memory Grove     | Passed in one round: 20 clearings, four memory rules ([record](final-review/memory-grove.json))           |
+| Pixel Rally      | Passed in one round with no changes ([record](final-review/pixel-rally.json))                             |
+| Paddle Duel      | Passed in one round: single match, hardened input ([record](final-review/paddle-duel.json))               |
+| Pinball Pocket   | Passed in one round with no changes ([record](final-review/pinball-pocket.json))                          |
+| Dungeon Dash     | Passed in one round: 20 chambers, armoured mastery ([record](final-review/dungeon-dash.json))             |
+| Bubble Pop       | Passed in one round: 20 caverns, symbol bubbles ([record](final-review/bubble-pop.json))                  |
+| Lantern Climber  | Passed in one round: deeper tower, four rail climbs ([record](final-review/lantern-climber.json))         |
+| Gravity Courier  | Passed in one round: 20 chambers, field reversal ([record](final-review/gravity-courier.json))            |
+| Grapnel Gorge    | Passed in one round: 20 routes, still-stand hooks ([record](final-review/grapnel-gorge.json))             |
+| Wallrunner Relay | Retrofitting to 20+ levels (3 courses)                                                                    |
+| Clockwork Bridge | Retrofitting to 20+ levels (3 machines)                                                                   |
+| Glider Ridge     | Passed in one round: 20 courses, thermals and gates ([record](final-review/glider-ridge.json))            |
 
 ## Completed batch 18
 

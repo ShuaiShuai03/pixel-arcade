@@ -252,7 +252,8 @@
       "bubble-pop",
       "lantern-climber",
       "gravity-courier",
-      "grapnel-gorge"
+      "grapnel-gorge",
+      "glider-ridge"
     ],
     "records": [
       "final-review/snowball-siege.json",
@@ -277,7 +278,8 @@
       "final-review/bubble-pop.json",
       "final-review/lantern-climber.json",
       "final-review/gravity-courier.json",
-      "final-review/grapnel-gorge.json"
+      "final-review/grapnel-gorge.json",
+      "final-review/glider-ridge.json"
     ]
   }
 }

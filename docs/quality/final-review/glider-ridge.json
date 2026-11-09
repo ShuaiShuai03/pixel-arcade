@@ -1,0 +1,65 @@
+{
+  "game": "glider-ridge",
+  "date": "2026-11-10",
+  "reviewedRevision": "1fadde4 plus the rework in this commit",
+  "owner": "owner-glider",
+  "reviewer": "final-glider",
+  "rounds": 1,
+  "process": "Lean final review at the user's request: the known 3-course shortfall went straight to a retrofit, followed by one independent review round. It passed; a MEDIUM tuning note on the hardest courses and two LOW items were fixed and verified by re-running the reviewer's own pilot and blind scripts, one clean-worktree run and the browser check, without a second review round.",
+  "verdict": "pass",
+  "approvedSha256": {
+    "src/games/glider-ridge.js": "45e49a0574c2a6a253feb5a219ebd16e34e68cdf275c78347e841e85b63a9893",
+    "src/games/glider-ridge-levels.js": "a6c8a8d90f895e98370cc7f2bd0fa0078e35d36c93bef0df3f18c2f7b5e5cb2e",
+    "src/games/glider-ridge-world.js": "925a1af4aedd96b9c84acb3e436272e6c335e2c20864d3d7784e8a53a3cf7ed8",
+    "src/games/glider-ridge-physics.js": "f60b01df2c4240b1c285b66b4ab287c1d9f2a2049364f7ec0885d2d843beaf43",
+    "src/games/glider-ridge-guidance.js": "0d759c63cb8211fe54f6c79cfd9d2f9b77136a91130e43a32d73f61654caafcc",
+    "src/games/glider-ridge-draw.js": "b0c06fcc8d3b2b5bc6d6e998f832a882dd2c7481c819d8643b53c39049b46c78",
+    "src/games/glider-ridge-menu.js": "7715121c2246fccd4a9c476546b24612554072665812b6c91a370cef5eb27586",
+    "tests/glider-ridge.test.js": "48fafb183bc3bb9c35540030f3642aab50266ee83b1d7c211dc8c59692a475e5",
+    "tests/glider-ridge-quality.test.js": "114c2137d8ec87e825a20d79591089a026f68d868ca17a29d6e14fa60a7103ab"
+  },
+  "tests": {
+    "command": "node --experimental-test-coverage --test-coverage-include='src/games/glider-ridge*.js' --test tests/glider-ridge.test.js tests/glider-ridge-quality.test.js",
+    "passed": 67,
+    "failed": 0,
+    "lineCoverage": 98.41,
+    "log": "glider-ridge-coverage.txt"
+  },
+  "independentProbes": "On the final files the reviewer's prompt-following pilot (status line seen 0.35 s late, 60 Hz, 20 seeds) cleared the mastery courses 15-20 in 112 of 120 runs (93.3%), losing 0.91 attempts per run, with the final Grand Ridge at 18 of 20. Ninety-eight blind patterns per course on courses 3-20 cleared 13 of 1,764 runs (0.74%), the softest being course 12 at 11%. In the review round courses 1-14 cleared at or near 100% with almost no attempts lost; pitch pumping in still air gained no energy, circling a thermal for 600 s topped out 23 m above it, a full dive at 30 Hz never tunnelled, scripted flights matched across five frame rates, a 20,000-frame hostile fuzz was clean, and progress stores, the queued crash-pause confirm and text fit all passed.",
+  "findings": [
+    {
+      "id": "R1",
+      "severity": "blocking",
+      "status": "fixed",
+      "observation": "Only 3 courses in a partial table, with no select or continue. There are now 20 data-driven courses (teaching 1-7, combination 8-14, mastery 15-20) with thermals, crosswinds, gusts, sink zones, gates, windows and shelf and pin landings, accurate EN/ZH tips, a course select and env.progress continue; a confirm during the crash pause is queued, gates and sink zones carry ticks, pointers and labels, and the 1,381-line file is split into seven modules."
+    },
+    {
+      "id": "M1",
+      "severity": "medium",
+      "status": "fixed",
+      "observation": "Review finding: at 0.35 s the hardest courses were tight (mastery 78.3%, Grand Ridge 12 of 20). Gates on Needle Crest, Long Haul and Grand Ridge were widened and Grand Ridge's post-thermal windows retuned, so mastery clears 93% while still costing about 0.9 attempts per run."
+    },
+    {
+      "id": "L1",
+      "severity": "low",
+      "status": "fixed",
+      "observation": "The final win text now says all twenty ridges (二十条山脊) instead of three, and clearing course 20 is saved and shown as cleared."
+    }
+  ],
+  "openNotes": [
+    "Course 12 (Leeward Gate) is the softest against blind periodic pitch patterns at about 11%, under the 25% cap.",
+    "Razor Windows is the hardest course, clearing 16 of 20 for the 0.35 s pilot.",
+    "A missed gate is only recoverable by flying back, which the prompts guide but can feel slow."
+  ],
+  "browser": {
+    "method": "Official Claude in Chrome extension, local server; real clicks on Start, synthetic in-page keys; only DOM text and the canvas were read.",
+    "servedSha256Prefixes": "45e49a05 a6c8a8d9 925a1af4 f60b01df 0d759c63 b0c06fcc 7715121c",
+    "observed": [
+      "English: Start opened course 1 of 20 (Warm-up Spur) with the air, vertical-speed and altitude readout, a numbered gate marker with distance and pointer, the plan inset and the course tip, the glider unobscured.",
+      "Holding nose-down flew through all three gates of the gentle first course without a crash; the status then prompted 'Too fast: hold Up'.",
+      "English 390 px phone frame (388 px inner, no horizontal overflow): touch buttons Nose up, Nose down, Bank left, Bank right and Flare, with the course and inset readable.",
+      "Not covered in the browser: a crash-out loss and a landing win; the reviewer's pilot and the quality tests cover them."
+    ],
+    "screenshots": ["screenshots/glider-ridge-en.jpg", "screenshots/glider-ridge-phone-en.png"]
+  }
+}

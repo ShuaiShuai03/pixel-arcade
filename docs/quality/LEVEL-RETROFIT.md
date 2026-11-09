@@ -13,7 +13,7 @@ Effort: S = level data only, M = data plus some mechanics or tests, L = structur
 | crate-keeper     |             20 | `LEVELS`, solver |   S    | done (final review) |
 | wallrunner-relay |              3 | `COURSES`        |   S    | queued              |
 | clockwork-bridge |              3 | `MACHINES`       |   S    | queued              |
-| glider-ridge     |              3 | `COURSE_DATA`    |   S    | queued              |
+| glider-ridge     |             20 | `COURSES`        |   S    | done (final review) |
 | burrow-rescue    |              3 | `SECTORS`        |   S    | queued              |
 | raft-rush        |              3 | `SECTION_DATA`   |   S    | queued              |
 | shield-sentinel  |   3 + Guardian | `WAVES`          |   S    | queued              |
