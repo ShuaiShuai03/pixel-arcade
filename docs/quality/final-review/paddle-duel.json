@@ -1,0 +1,58 @@
+{
+  "game": "paddle-duel",
+  "date": "2026-11-09",
+  "reviewedRevision": "eb5efe6 plus the hardening in this commit",
+  "owner": "coordinator (small hardening fix after the review)",
+  "reviewer": "final-paddle",
+  "rounds": 1,
+  "process": "Not level-based (a single match), so no retrofit. One independent review round passed it; its one MEDIUM hardening item and two cheap LOW items were fixed by the coordinator and verified by re-running the reviewer's own physics and pilot probes, one clean-worktree run and the browser check, without a second review round.",
+  "verdict": "pass",
+  "approvedSha256": {
+    "src/games/paddle-duel.js": "1a85373939f96b958fa8837d60cbab016392039abd3a38cbc98aae758444451b",
+    "tests/paddle-duel.test.js": "a60a58c29aa6e605f4ffd8b508c4c6101588b5d1c57d2a47ff27bda651c381da"
+  },
+  "tests": {
+    "command": "node --experimental-test-coverage --test-coverage-include='src/games/paddle-duel*.js' --test tests/paddle-duel.test.js",
+    "passed": 33,
+    "failed": 0,
+    "lineCoverage": 100,
+    "log": "paddle-duel-coverage.txt"
+  },
+  "independentProbes": "The reviewer's reaction-limited bot beat the computer in 30 of 30 matches at 0.25 s and 0.35 s (about 7-0); with sloppy aim it still won 27 of 30. Idle, mash, random keys and held patterns at five periods won 0 of 30 each. 800 shots from 400 to 6000 px/s at frame times up to 0.1 s produced no tunnelling. On the final file the same physics probe ran its hostile-input fuzz without a non-finite value, capped two-player ramming at 900 px/s, and reported the solo loss as 'The computer wins 2–7.'",
+  "findings": [
+    {
+      "id": "M1",
+      "severity": "medium",
+      "status": "fixed",
+      "observation": "A NaN pointer y while the pointer was down set a paddle's position to NaN for the rest of the match. Pointer steering now requires finite coordinates, with a regression test."
+    },
+    {
+      "id": "L1",
+      "severity": "low",
+      "status": "fixed",
+      "observation": "Repeated two-player ramming could pump the ball to about 32,800 px/s. Ball speed is now capped at 900 px/s (about four times the serve); the extreme-speed tunnelling test still proves the first contact returns the ball."
+    },
+    {
+      "id": "L2",
+      "severity": "low",
+      "status": "fixed",
+      "observation": "Found in the browser check: a solo loss read 'Player 2 wins'. Solo results now name the computer ('The computer wins 0–7.' / '电脑以0–7获胜。'), while duels keep 'Player N wins'."
+    }
+  ],
+  "openNotes": [
+    "The computer is beatable but easy: a reaction-limited bot wins about 7-0, and the three CPU tiers add only mild pressure.",
+    "Purely defensive play can rally until the 45 s let and replay points, so matches can run long.",
+    "Final scores for the same scripted input differ slightly between 30, 60 and 120 Hz; the host always steps at 1/120 s."
+  ],
+  "browser": {
+    "method": "Official Claude in Chrome extension, local server; real clicks on Start, Play again, the language switch and the touch buttons, synthetic in-page keys; only DOM text and the canvas were read.",
+    "servedSha256Prefixes": "1a853739",
+    "observed": [
+      "Chinese: Start opened a solo match (电脑 1 级); W moved the paddle and Space served, and the player scored the first point before idling.",
+      "Loss: left idle, the computer won; on the final file the English overlay read 'The computer wins 0–7.' and Play again restarted at 0 : 0 against CPU tier 1.",
+      "Chinese 390 px phone frame (388 px inner, no horizontal overflow): touch buttons 上 下 发球 and the 单人/双人 mode toggle; the Serve button launched the ball.",
+      "Not covered in the browser: a full win and the two-player mode; the reviewer's bots and the quality tests cover both."
+    ],
+    "screenshots": ["screenshots/paddle-duel-loss-en.jpg", "screenshots/paddle-duel-phone-zh.png"]
+  }
+}

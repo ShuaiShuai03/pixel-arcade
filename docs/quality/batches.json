@@ -243,7 +243,8 @@
       "river-hop",
       "minefield",
       "crate-keeper",
-      "gem-match"
+      "gem-match",
+      "paddle-duel"
     ],
     "records": [
       "final-review/snowball-siege.json",
@@ -259,7 +260,8 @@
       "final-review/river-hop.json",
       "final-review/minefield.json",
       "final-review/crate-keeper.json",
-      "final-review/gem-match.json"
+      "final-review/gem-match.json",
+      "final-review/paddle-duel.json"
     ]
   }
 }

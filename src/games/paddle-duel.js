@@ -122,10 +122,7 @@ function point(s, env, scorer) {
     env.end({
       won: scorer === 0,
       score: s.score,
-      message: env.t(
-        `Player ${scorer + 1} wins ${s.points[0]}–${s.points[1]}!`,
-        `玩家${scorer + 1}以${s.points[0]}–${s.points[1]}赢得比赛！`,
-      ),
+      message: matchMessage(s, scorer, env),
     });
   } else {
     s.server = 1 - scorer;
@@ -146,6 +143,25 @@ function drive(p, desired, dt, maxSpeed = 220) {
     p.vy = 0;
   }
 }
+// Solo matches name the computer; two-player matches name the winning player.
+function matchMessage(s, scorer, env) {
+  const [a, b] = s.points;
+  if (s.mode === 1)
+    return scorer === 0
+      ? env.t(`You beat the computer ${a}–${b}!`, `你以${a}–${b}战胜电脑！`)
+      : env.t(`The computer wins ${a}–${b}.`, `电脑以${a}–${b}获胜。`);
+  return env.t(`Player ${scorer + 1} wins ${a}–${b}!`, `玩家${scorer + 1}以${a}–${b}赢得比赛！`);
+}
+
+// Repeated two-player ramming can pump energy into the ball without bound; keep it playable.
+const MAX_BALL_SPEED = 900;
+function capBallSpeed(b) {
+  const speed = Math.hypot(b.vx, b.vy);
+  if (speed <= MAX_BALL_SPEED) return;
+  b.vx *= MAX_BALL_SPEED / speed;
+  b.vy *= MAX_BALL_SPEED / speed;
+}
+
 function seek(p, target, maxSpeed = 220) {
   const delta = clamp(target, 32, 232) - p.y;
   return Math.sign(delta) * Math.min(maxSpeed, Math.sqrt(2 * 1400 * Math.abs(delta)));
@@ -242,13 +258,16 @@ export function stepPaddle(s, dt, i, env) {
     Math.ceil(dt * Math.max(600, (Math.hypot(s.ball.vx, s.ball.vy) + 220) / 1.5)),
   );
   const h = dt / slices;
+  // A non-finite pointer (hostile or broken input) must never steer a paddle to NaN.
+  const pointerHeld =
+    Boolean(i.pointer?.down) && Number.isFinite(i.pointer.x) && Number.isFinite(i.pointer.y);
   for (let n = 0; n < slices && s.phase === 'playing'; n++) {
     if (s.mode === 1) cpuTarget(s, h, env);
     const leftDesired =
-      i.pointer.down && i.pointer.x < 240 ? seek(s.left, i.pointer.y - 28) : p1 * 220;
+      pointerHeld && i.pointer.x < 240 ? seek(s.left, i.pointer.y - 28) : p1 * 220;
     const rightDesired =
       s.mode === 2
-        ? i.pointer.down && i.pointer.x >= 240
+        ? pointerHeld && i.pointer.x >= 240
           ? seek(s.right, i.pointer.y - 28)
           : p2 * 220
         : seek(s.right, s.ai.target, 105 + s.aiTier * 12);
@@ -285,6 +304,7 @@ export function stepPaddle(s, dt, i, env) {
     }
     hitPaddle(s, s.left, false, env);
     hitPaddle(s, s.right, true, env);
+    capBallSpeed(b);
     if (b.x < -RADIUS || b.x > 480 + RADIUS) {
       point(s, env, b.x > 480 ? 0 : 1);
       break;
@@ -303,7 +323,7 @@ export function stepPaddle(s, dt, i, env) {
   }
 }
 
-function drawPaddle(ctx, s, env) {
+export function drawPaddle(ctx, s, env) {
   const themes = [
     ['#12333e', '#1b4550'],
     ['#173342', '#234854'],

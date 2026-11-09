@@ -6,6 +6,7 @@ import {
   stepPaddle,
   paddleOutline,
   paddleContact,
+  drawPaddle,
 } from '../src/games/paddle-duel.js';
 import { harness, input, mockContext, seeded } from './harness.js';
 test('Paddle player movement is clamped and solo opponent tracks ball', () => {
@@ -354,9 +355,10 @@ test('Paddle ball can cross several paddle widths per frame without tunneling', 
   stepPaddle(s, 1 / 30, input(), env);
   assert.equal(s.phase, 'playing');
   assert.deepEqual(s.points, [0, 0]);
-  assert.ok(s.rally >= 2);
+  // The first contact returns the ball and the speed cap then holds it to a playable pace.
+  assert.ok(s.rally >= 1);
   assert.ok(s.ball.x > 44 && s.ball.x < 436);
-  assert.ok(Math.hypot(s.ball.vx, s.ball.vy) <= 20000 + 1e-6);
+  assert.ok(Math.hypot(s.ball.vx, s.ball.vy) <= 900 + 1e-6);
 });
 test('Paddle 45-second rally limit is a non-scoring visible let', () => {
   const { env } = harness({ mode: 2 });
@@ -434,4 +436,64 @@ test('Paddle return bonus is capped per completed point and lets cannot bank it'
   stepPaddle(letState, 1 / 120, input(), env);
   assert.equal(letState.score, 0);
   assert.deepEqual(letState.pointHits, [0, 0]);
+});
+
+test('Paddle non-finite pointer values never corrupt a paddle', () => {
+  const { env } = harness();
+  const s = createPaddleState(env);
+  for (const bad of [NaN, Infinity, -Infinity]) {
+    stepPaddle(s, 1 / 60, input([], [], { x: 10, y: bad, down: true }), env);
+    stepPaddle(s, 1 / 60, input([], [], { x: bad, y: 120, down: true }), env);
+  }
+  assert.ok(Number.isFinite(s.left.y));
+  assert.ok(Number.isFinite(s.right.y));
+});
+
+test('Paddle ball speed stays playable under repeated ramming', () => {
+  const { env } = harness({ mode: 2 });
+  const s = createPaddleState(env);
+  let top = 0;
+  for (let n = 0; n < 60 * 120; n++) {
+    const up = Math.floor(n / 12) % 2 === 0;
+    stepPaddle(s, 1 / 60, input(up ? ['KeyW', 'ArrowUp'] : ['KeyS', 'ArrowDown'], ['Space']), env);
+    top = Math.max(top, Math.hypot(s.ball.vx, s.ball.vy));
+  }
+  assert.ok(top <= 900 + 1e-9, `ball reached ${top} px/s`);
+});
+
+test('Paddle end message names the computer in solo play and the player in duels', () => {
+  for (const [mode, lang, expected] of [
+    [1, 'en', /computer wins 0–7/],
+    [1, 'zh', /电脑以0–7获胜/],
+    [2, 'en', /Player 2 wins 0–7/],
+  ]) {
+    const h = harness({ mode, lang });
+    const s = createPaddleState(h.env);
+    s.points = [0, 6];
+    s.serve = 0;
+    s.ball = { x: 10, y: 160, vx: -900, vy: 0, spin: 0 };
+    s.left.y = 280;
+    for (let n = 0; n < 30 && s.phase === 'playing'; n++) stepPaddle(s, 1 / 60, input(), h.env);
+    assert.equal(h.ends.length, 1);
+    assert.equal(h.ends[0].won, false);
+    assert.match(h.ends[0].message, expected);
+  }
+});
+
+test('Paddle draws every let and replay notice in both languages', () => {
+  for (const lang of ['en', 'zh']) {
+    const { env } = harness({ lang });
+    const cases = [
+      { serve: 1.5, letReason: 'time' },
+      { serve: 1.5, letReason: 'slow' },
+      { serve: 1.5, letReason: '', lastScorer: 1 },
+      { serve: 0, slowTime: 1.5 },
+      { serve: 0, rallyTime: 42 },
+    ];
+    for (const patch of cases) {
+      const s = Object.assign(createPaddleState(env), patch);
+      const ctx = mockContext();
+      assert.doesNotThrow(() => drawPaddle(ctx, s, env));
+    }
+  }
 });

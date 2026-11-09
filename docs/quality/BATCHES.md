@@ -22,6 +22,9 @@ Phase Tiles completed batch 18 and the 50-game target, Pixel Parkour included. T
 | Gem Match      | Passed in one round: 20 gardens, shape-coded beds ([record](final-review/gem-match.json))                 |
 | Crate Keeper   | Passed in one round: 20 solver-proven rooms ([record](final-review/crate-keeper.json))                    |
 | Minefield      | Passed in one round: 20 fields, no guessing ([record](final-review/minefield.json))                       |
+| Memory Grove   | Retrofitting to 20+ levels (3 levels)                                                                     |
+| Pixel Rally    | In review (one continuous course)                                                                         |
+| Paddle Duel    | Passed in one round: single match, hardened input ([record](final-review/paddle-duel.json))               |
 
 ## Completed batch 18
 
