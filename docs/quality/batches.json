@@ -249,7 +249,8 @@
       "memory-grove",
       "pinball-pocket",
       "dungeon-dash",
-      "bubble-pop"
+      "bubble-pop",
+      "lantern-climber"
     ],
     "records": [
       "final-review/snowball-siege.json",
@@ -271,7 +272,8 @@
       "final-review/memory-grove.json",
       "final-review/pinball-pocket.json",
       "final-review/dungeon-dash.json",
-      "final-review/bubble-pop.json"
+      "final-review/bubble-pop.json",
+      "final-review/lantern-climber.json"
     ]
   }
 }

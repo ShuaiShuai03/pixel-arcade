@@ -1,6 +1,11 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { createGame, createClimbState, stepClimb } from '../src/games/lantern-climber.js';
+import {
+  createGame,
+  createClimbState,
+  stepClimb,
+  REST_RATE,
+} from '../src/games/lantern-climber.js';
 import { harness, input, mockContext, seeded } from './harness.js';
 function on(s, id, offset = 40) {
   const l = s.ledges[id],
@@ -43,7 +48,7 @@ test('lantern: reachable-edge grace is once per supported launch and cannot crea
   assert.equal(far.jumpCount, 0);
 });
 test('lantern: both moving-deck edges carry an idle passenger without added velocity or drift', () => {
-  for (const offset of [0, 96]) {
+  for (const offset of [0, 80]) {
     const s = createClimbState();
     on(s, 8, offset);
     const l = s.ledges[8],
@@ -170,8 +175,8 @@ test('lantern: release and re-grip after cleared held input work near the rail w
 test('lantern: an ordinary low-stamina rail slip can return to a real ledge and recover', () => {
   const s = createClimbState(),
     l = s.ledges[13],
-    r = s.rails[1];
-  Object.assign(s.player, { x: r.x - 7, y: l.y - 22 - 36, vx: 0, vy: 0, ground: null, grip: 1 });
+    r = s.rails[2];
+  Object.assign(s.player, { x: r.x - 7, y: l.y - 22 - 36, vx: 0, vy: 0, ground: null, grip: 2 });
   s.stamina = 0.2;
   run(s, 0.6, ['KeyZ', 'ArrowRight']);
   assert.equal(s.lives, 4);
@@ -180,14 +185,14 @@ test('lantern: an ordinary low-stamina rail slip can return to a real ledge and 
   assert.ok(s.stamina < 1);
   run(s, 2);
   assert.equal(s.player.ground, 13);
-  assert.ok(s.stamina > 50);
+  assert.ok(s.stamina > REST_RATE && s.stamina <= 2 * REST_RATE + 0.2);
 });
 test('lantern: stamina recovers only in supported low-speed rest, and X only refills at a resting brazier', () => {
   const s = createClimbState();
   s.stamina = 30;
   s.light = 20;
   run(s, 0.5);
-  assert.ok(s.stamina > 45);
+  assert.ok(Math.abs(s.stamina - (30 + 0.5 * REST_RATE)) < 1e-6);
   const score = s.score;
   stepClimb(s, 1 / 240, input([], ['KeyX']));
   assert.ok(s.light > 99);
@@ -342,7 +347,7 @@ test('lantern: seeded bounded legal runs stay deterministic, finite and nonpenet
       assert.ok(s.stamina >= 0 && s.stamina <= 100 && s.light >= 0 && s.light <= 100);
       assert.ok(s.player.x >= 32 - 1e-6 && s.player.x <= 434 + 1e-6);
       assert.equal(s.ledges.length, 19);
-      assert.equal(s.rails.length, 2);
+      assert.equal(s.rails.length, 4);
       assert.ok(JSON.stringify(s).length < 12000);
       if (s.respawn === 0 && s.phase === 'playing')
         for (const l of s.ledges) {
@@ -367,5 +372,21 @@ test('lantern: holding Grip away from a rail does not invalidate a real supporte
   run(s, 1, ['KeyZ']);
   assert.equal(s.player.grip, null);
   assert.equal(s.player.ground, 0);
-  assert.ok(Math.abs(s.stamina - 62) < 1e-7);
+  assert.ok(Math.abs(s.stamina - (30 + REST_RATE)) < 1e-7);
+});
+
+test('lantern: touching a ledge corner exactly counts as support instead of stalling the solver', () => {
+  const s = createClimbState(),
+    l = s.ledges[13];
+  Object.assign(s.player, { x: l.x - 14, y: l.y - 22, vx: 0, vy: 0, ground: null });
+  s.edge = null;
+  run(s, 0.05, ['ArrowRight']);
+  assert.equal(s.player.ground, 13);
+  assert.equal(s.lives, 4);
+  const right = createClimbState(),
+    r = right.ledges[13];
+  Object.assign(right.player, { x: r.x + r.w, y: r.y - 22, vx: 0, vy: 0, ground: null });
+  right.edge = null;
+  run(right, 0.05, ['ArrowLeft']);
+  assert.equal(right.player.ground, 13);
 });
