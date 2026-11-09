@@ -1,0 +1,79 @@
+{
+  "game": "iron-bastion",
+  "date": "2026-11-09",
+  "reviewedRevision": "2739506 plus the rework in this commit",
+  "owner": "owner-iron, then owner-iron2 after a session restart",
+  "reviewer": "final-iron (round 1), final-iron2 (rounds 2-3)",
+  "rounds": 3,
+  "verdict": "pass",
+  "approvedSha256": {
+    "src/games/iron-bastion.js": "83778e4a4ec3682323b40b39f0986b94d1192afa963a9309ecfc39ec90fd1b96",
+    "src/games/iron-bastion-ai.js": "c6b8cde72ca2d327a5c9f2c348a7adc568d71175ac0c0a2fb89fdceff1bfe5f3",
+    "src/games/iron-bastion-data.js": "ac8b4196830426cb33fe2939ab8e6652caff20e5ae37b844c9b3d40c537f0eb5",
+    "src/games/iron-bastion-draw.js": "470c6fda59e71fd722503c02b1b94fb07df3c16a00be4737b3a859a66ad1784c",
+    "src/games/iron-bastion-menu.js": "b30bb4744e1ff099895abf4aafe883d9c28c3578a71f686f21c88a2430ded831",
+    "src/games/iron-bastion-physics.js": "9310c9576884b8fe47e6580c24270aef026b875266a3edf1a744aa78421c109c",
+    "src/games/iron-bastion-rules.js": "1d370e885ecdfac41105a8951335805b1749e678bdf78d86542a215397c82a3e",
+    "tests/iron-bastion.test.js": "00014ae81c1042210d21b67acafb4d0d2f83a7e0259bb61dc51e0c047a8a1ea7",
+    "tests/iron-bastion-quality.test.js": "e3af5d26176789fdd9e510049baf97198ca28d0380bde8b5a29952a3797bbe40"
+  },
+  "reviewNote": "Round 3 approved earlier hashes of iron-bastion.js, -data.js and the quality test. The final change only gives fields 1 and 2 a later first arrival and slower enemy reload after the browser check found an idle tank lost field 1 in 11.5 s; at the user's request to reduce reviews it was verified by one suite run and a browser check, not a fourth review round.",
+  "tests": {
+    "command": "node --experimental-test-coverage --test-coverage-include='src/games/iron-bastion*.js' --test tests/iron-bastion.test.js tests/iron-bastion-quality.test.js",
+    "passed": 81,
+    "failed": 0,
+    "lineCoverage": 100,
+    "log": "iron-bastion-coverage.txt"
+  },
+  "independentProbes": "The reviewer's own reaction-limited aiming bot, reading only public state, cleared every field by keyboard and pointer at 60 and 120 Hz and won 6 of 6 full 24-field campaigns; at 30 Hz the keyboard bot missed 4 of 144 late-field runs because of coarse turret keying. Twenty blind policies (pointer sweeps, random taps, mash, idle and others) won at most 12% of any field from field 3 at 100 seeds. 29,000 construction positions trapped no tank; fuzz with hostile dt and pointer values (178,000 frames) broke no invariant; trajectories were bit-equal at 30, 60, 120 and 240 Hz.",
+  "findings": [
+    {
+      "id": "B1",
+      "severity": "blocking",
+      "status": "fixed",
+      "observation": "Only 3 battlefields and no select or continue. There are now 24 data-driven fields (raiders, gunners, brick and steel, heavies, weaving scouts, kit drops, chasing raiders, armored heavies, mixed rosters) with accurate bilingual tips, a level select and env.progress continue; broken stores are safe."
+    },
+    {
+      "id": "B2",
+      "severity": "blocking",
+      "status": "fixed",
+      "observation": "Blind pointer play won: sweeping the spawn row won 38.5% of campaigns and random taps 65%. Rounds are now scarce per field, the cannon has a four-shell magazine, later enemies weave or carry armor, and env.random varies lanes and timing; no blind policy exceeds 12% of any field from field 3."
+    },
+    {
+      "id": "M1",
+      "severity": "medium",
+      "status": "fixed",
+      "observation": "Added tests/iron-bastion-quality.test.js: blind and mash bounds, frame-rate trajectory equality, EN/ZH identical play, hostile dt and pointer values, broken progress stores, per-field scripted clears and unconditional terminal assertions."
+    },
+    {
+      "id": "L",
+      "severity": "low",
+      "status": "fixed",
+      "observation": "Exported data is deep-frozen, dead code removed, a 6 px pointer dead zone stops the turret snapping east, the 1,143-line file is split into seven modules, late-field pressure no longer eases from field 13, cover skipped at a field change is rebuilt once the slot is clear, and the cover-layout tests were tightened to the measured margins."
+    },
+    {
+      "id": "BR1",
+      "severity": "medium",
+      "status": "fixed",
+      "observation": "Found in the browser check: an idle tank lost the tutorial field in 11.5 s, before a new player could read the tip. Fields 1 and 2 now hold the first arrival (13 s and 4 s) and slow enemy reload; an idle tank lasts about 31 s on field 1 and 25 s on field 2, and a test asserts it."
+    }
+  ],
+  "openNotes": [
+    "Late fields are about as demanding as the middle, not clearly harder: pressure is flat from field 20 and the ammo budget is not monotonic (field 24 has 52 rounds).",
+    "Every full clear scores about the same, so the score does not separate skilled from average play.",
+    "The beacon-front test counts reachable cells in a box rather than checking a specific approach.",
+    "The 30 Hz keyboard bot misses about 1 in 36 late-field runs; the app always steps at 1/120 s."
+  ],
+  "browser": {
+    "method": "Official Claude in Chrome extension, local server; real clicks on Start, Play again, the language switch, the touch buttons and the field, synthetic in-page keys; only DOM text and the canvas were read.",
+    "servedSha256Prefixes": "83778e4a c6b8cde7 ac8b4196 470c6fda b30bb474 9310c957 1d370e88",
+    "observed": [
+      "English: Start opened field 1 of 24 (Courtyard); Up drove the tank and Space fired four shells (29 to 25 rounds).",
+      "English loss: armor ran out and the loss screen explained it; Space on the loss screen changed nothing, and Play again restarted field 1 with full armor and 29 rounds.",
+      "Chinese 390 px phone frame (388 px inner, no horizontal overflow): the Fire touch button and a tap on the field fired (29 to 26 rounds); the seven touch buttons are 左 右 上 下 射击 刹车瞄准 维修. The Chinese loss message was shown.",
+      "After the teaching-field fix (served hashes 83778e4a and ac8b4196): an idle tank on field 1 took its first hit at 18.1 s and lost at 31.6 s, against 5.5 s and 11.5 s before.",
+      "Not covered in the browser: a field win, the level select and touch driving, which the reviewer's pointer and keyboard bots and the quality tests cover."
+    ],
+    "screenshots": ["screenshots/iron-bastion-loss-en.jpg", "screenshots/iron-bastion-phone-zh.png"]
+  }
+}

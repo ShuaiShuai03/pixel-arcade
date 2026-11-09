@@ -6,13 +6,13 @@ At the user's direction, at most **three games** may be under development and ac
 
 Phase Tiles completed batch 18 and the 50-game target, Pixel Parkour included. The [required final review](#required-final-review) of every game is under way, three games at a time.
 
-| Game           | Final review                                                                                         |
-| -------------- | ---------------------------------------------------------------------------------------------------- |
-| Snowball Siege | Passed after three rounds ([record](final-review/snowball-siege.json))                               |
-| Ember Knights  | Passed after three rounds: 20 stages, reactive champions ([record](final-review/ember-knights.json)) |
-| Bomb Garden    | Passed after four rounds: 22 gardens, barrel previews ([record](final-review/bomb-garden.json))      |
-| Iron Bastion   | Passed round 2; re-checking three low fixes (curve, tests, cover rebuild)                            |
-| Sky Raiders    | Passed after two rounds: 24 sectors, aimed strike zones ([record](final-review/sky-raiders.json))    |
+| Game           | Final review                                                                                              |
+| -------------- | --------------------------------------------------------------------------------------------------------- |
+| Snowball Siege | Passed after three rounds ([record](final-review/snowball-siege.json))                                    |
+| Ember Knights  | Passed after three rounds: 20 stages, reactive champions ([record](final-review/ember-knights.json))      |
+| Bomb Garden    | Passed after four rounds: 22 gardens, barrel previews ([record](final-review/bomb-garden.json))           |
+| Iron Bastion   | Passed after three rounds: 24 fields, blind pointer play fixed ([record](final-review/iron-bastion.json)) |
+| Sky Raiders    | Passed after two rounds: 24 sectors, aimed strike zones ([record](final-review/sky-raiders.json))         |
 
 ## Completed batch 18
 

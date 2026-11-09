@@ -1,15 +1,84 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { createGame, meta, bulletHitsTile } from '../src/games/iron-bastion.js';
+import { createBastionState, createGame, meta, stepBastion } from '../src/games/iron-bastion.js';
+import {
+  FIELD_COUNT,
+  LANES,
+  MAGAZINE,
+  START_KITS,
+  coverFor,
+  fieldOf,
+} from '../src/games/iron-bastion-data.js';
+import {
+  circleHitsRect,
+  fireShell,
+  resolveTankContacts,
+  stepShells,
+  sweepCircleRect,
+} from '../src/games/iron-bastion-physics.js';
 import { harness, input, mockContext, seeded } from './harness.js';
-test('Bastion shell has real radius at narrow brick gaps', () => {
-  assert.equal(
-    bulletHitsTile({ x: 227, y: 265 }, [
-      { x: 204, y: 257, w: 22, h: 22 },
-      { x: 228, y: 257, w: 22, h: 22 },
-    ]),
-    0,
-  );
+
+function enemy(id, x, y, hp = 2) {
+  return {
+    id,
+    x,
+    y,
+    r: 12,
+    mass: 100,
+    rounds: 120,
+    vx: 0,
+    vy: 0,
+    angle: Math.PI / 2,
+    omega: 0,
+    turret: Math.PI / 2,
+    turretOmega: 0,
+    bearing: Math.PI / 2,
+    role: 'raider',
+    hp,
+    cooldown: 999,
+    charge: 0,
+    aim: 0,
+    think: 999,
+    jink: 1,
+    jinkTime: 999,
+    flash: 0,
+    muzzle: 0,
+  };
+}
+const shell = (id, x, y, vx, vy, extra = {}) => ({
+  id,
+  x,
+  y,
+  vx,
+  vy,
+  r: 2,
+  mass: 0.02,
+  owner: 'enemy',
+  shooter: 'offscreen',
+  life: 2,
+  ...extra,
+});
+// An empty bench on field 1: no cover, no enemies, nothing scheduled to arrive.
+function empty() {
+  const s = createBastionState();
+  s.tiles = [];
+  s.enemies = [];
+  s.player.x = 100;
+  s.player.y = 200;
+  s.spawnClock = 999;
+  return s;
+}
+
+test('Bastion shell has real radius at a narrow brick gap, reached through the public step path', () => {
+  const s = empty();
+  s.tiles = [
+    { id: 'left', x: 204, y: 257, w: 22, h: 22, hp: 2, steel: false },
+    { id: 'right', x: 228, y: 257, w: 22, h: 22, hp: 2, steel: false },
+  ];
+  s.bullets = [shell('gap', 227, 200, 0, 300, { owner: 'player', shooter: 'player' })];
+  stepShells(s, 0.3, harness().env);
+  assert.equal(s.bullets.length, 0);
+  assert.deepEqual(s.tiles.map((t) => t.hp).sort(), [1, 2]);
 });
 test('Bastion starts and stops through finite acceleration with opposing keys cancelling', () => {
   const game = createGame(harness().env),
@@ -32,68 +101,17 @@ test('Bastion holds kits when no repair is needed and publishes every essential 
   for (const code of ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Space', 'KeyX', 'KeyH'])
     assert.ok(meta.touchControls.some((c) => c.code === code && c.side));
 });
-
-const core = () => import('../src/games/iron-bastion.js');
-function enemy(id, x, y, hp = 2) {
-  return {
-    id,
-    x,
-    y,
-    r: 12,
-    mass: 100,
-    rounds: 120,
-    vx: 0,
-    vy: 0,
-    angle: Math.PI / 2,
-    omega: 0,
-    turret: Math.PI / 2,
-    turretOmega: 0,
-    bearing: Math.PI / 2,
-    role: 'raider',
-    hp,
-    cooldown: 999,
-    charge: 0,
-    aim: 0,
-    think: 999,
-    flash: 0,
-    muzzle: 0,
-  };
-}
-const shell = (id, x, y, vx, vy, extra = {}) => ({
-  id,
-  x,
-  y,
-  vx,
-  vy,
-  r: 2,
-  mass: 0.02,
-  owner: 'enemy',
-  shooter: 'offscreen',
-  life: 2,
-  armed: true,
-  ...extra,
-});
-async function empty() {
-  const { createBastionState } = await core();
-  const s = createBastionState();
-  s.tiles = [];
-  s.enemies = [];
-  s.player.x = 100;
-  s.player.y = 200;
-  s.spawnClock = 999;
-  return s;
-}
-
-test('Bastion circle sweep respects a rounded corner rather than an expanded-box false hit', async () => {
-  const { sweepCircleRect } = await core();
+test('Bastion circle sweep respects a rounded corner rather than an expanded-box false hit', () => {
   const t = sweepCircleRect(0, 0, 20, 20, 2, { x: 10, y: 10, w: 10, h: 10 });
   assert.ok(Math.abs(t - (10 - Math.sqrt(2)) / 20) < 1e-10);
   assert.equal(sweepCircleRect(0, 7.9, 20, 0, 2, { x: 10, y: 10, w: 10, h: 10 }), Infinity);
+  assert.equal(sweepCircleRect(0, 0, 0, 5, 2, { x: 10, y: 10, w: 10, h: 10 }), Infinity);
+  assert.equal(sweepCircleRect(15, 15, 1, 1, 2, { x: 10, y: 10, w: 10, h: 10 }), 0);
+  assert.equal(circleHitsRect(8, 15, 2, { x: 10, y: 10, w: 10, h: 10 }), true);
 });
-test('Bastion firing removes carried-round mass and conserves momentum in translated frames', async () => {
-  const { fireShell } = await core();
+test('Bastion firing removes carried-round mass and conserves momentum in translated frames', () => {
   for (const velocity of [0, 100, -70]) {
-    const s = await empty(),
+    const s = empty(),
       p = s.player;
     p.vx = velocity;
     p.vy = 35;
@@ -101,17 +119,16 @@ test('Bastion firing removes carried-round mass and conserves momentum in transl
     const mass = p.mass,
       px = mass * p.vx,
       py = mass * p.vy;
-    fireShell(s, p, 'player', harness().env);
+    assert.equal(fireShell(s, p, 'player', harness().env), true);
     const b = s.bullets[0];
     assert.ok(Math.abs(p.mass + b.mass - mass) < 1e-10);
     assert.ok(Math.abs(p.mass * p.vx + b.mass * b.vx - px) < 1e-10);
     assert.ok(Math.abs(p.mass * p.vy + b.mass * b.vy - py) < 1e-10);
   }
 });
-test('Bastion a captured round adds mass, preserves momentum and cannot create passive kinetic energy', async () => {
-  const { stepShells } = await core();
+test('Bastion a captured round adds mass, preserves momentum and cannot create passive kinetic energy', () => {
   for (const speed of [100, 160]) {
-    const s = await empty(),
+    const s = empty(),
       p = s.player;
     p.vx = 100;
     const oldMass = p.mass,
@@ -123,12 +140,11 @@ test('Bastion a captured round adds mass, preserves momentum and cannot create p
     assert.ok(Math.abs(p.mass - oldMass - 0.02) < 1e-10);
     assert.ok(Math.abs(p.mass * p.vx - momentum) < 1e-9);
     assert.ok(0.5 * p.mass * p.vx ** 2 <= energy + 1e-8);
-    if (speed === 100) assert.equal(p.vx, 100);
+    assert.equal(s.lives, 3);
   }
 });
-test('Bastion muzzle next to a wall cannot shoot through it', async () => {
-  const { fireShell, stepShells } = await core(),
-    s = await empty();
+test('Bastion muzzle next to a wall cannot shoot through it', () => {
+  const s = empty();
   s.player.x = 100;
   s.player.y = 150;
   s.player.turret = 0;
@@ -138,9 +154,8 @@ test('Bastion muzzle next to a wall cannot shoot through it', async () => {
   assert.equal(s.bullets.length, 0);
   assert.equal(s.tiles[0].hp, 1);
 });
-test('Bastion fast shells hit nearest brick/steel geometry and expire before distant targets', async () => {
-  const { stepShells } = await core(),
-    s = await empty();
+test('Bastion fast shells hit nearest brick/steel geometry and expire before distant targets', () => {
+  const s = empty();
   s.tiles = [
     { id: 'steel', x: 160, y: 90, w: 22, h: 22, hp: null, steel: true },
     { id: 'brick', x: 100, y: 90, w: 22, h: 22, hp: 2, steel: false },
@@ -154,18 +169,24 @@ test('Bastion fast shells hit nearest brick/steel geometry and expire before dis
   assert.equal(s.lives, 4);
   assert.equal(s.bullets.length, 0);
 });
-test('Bastion inactive shells still stop at solids without becoming attacks', async () => {
-  const { stepShells } = await core(),
-    s = await empty();
-  s.tiles = [{ id: 'brick', x: 150, y: 90, w: 22, h: 22, hp: 2, steel: false }];
-  s.bullets = [shell('inert', 100, 100, 1000, 0, { armed: false })];
-  stepShells(s, 0.1, harness().env);
+test('Bastion shells stop on steel without damaging it and on the arena wall', () => {
+  const s = empty();
+  s.tiles = [{ id: 'steel', x: 150, y: 90, w: 22, h: 22, hp: null, steel: true }];
+  s.bullets = [
+    shell('into-steel', 100, 100, 1000, 0, { owner: 'player', shooter: 'player' }),
+    shell('into-wall', 300, 100, 0, -500, { owner: 'player', shooter: 'player' }),
+    shell('into-side', 300, 150, -800, 0, { owner: 'player', shooter: 'player' }),
+    shell('into-right', 300, 170, 800, 0, { owner: 'player', shooter: 'player' }),
+    shell('into-floor', 300, 180, 0, 800, { owner: 'player', shooter: 'player' }),
+  ];
+  stepShells(s, 0.5, harness().env);
   assert.equal(s.bullets.length, 0);
-  assert.equal(s.tiles[0].hp, 2);
+  assert.equal(s.tiles.length, 1);
+  assert.equal(s.tiles[0].hp, null);
+  assert.equal(s.score, 0);
 });
-test('Bastion passive solid tank contact preserves momentum without damaging armor', async () => {
-  const { resolveTankContacts } = await core(),
-    s = await empty();
+test('Bastion passive solid tank contact preserves momentum without damaging armor', () => {
+  const s = empty();
   s.player.x = 100;
   s.player.y = 150;
   s.player.vx = 80;
@@ -184,11 +205,32 @@ test('Bastion passive solid tank contact preserves momentum without damaging arm
   assert.ok(Math.hypot(s.player.x - s.enemies[0].x, s.player.y - s.enemies[0].y) >= 24 - 1e-8);
   assert.equal(s.lives, 4);
 });
-test('Bastion simultaneous last-enemy and beacon impacts resolve all damage before one terminal result', async () => {
-  const { stepShells } = await core();
+test('Bastion tanks pressed into a corner or a brick stay inside the arena and outside solids', () => {
+  const s = empty();
+  s.tiles = [{ id: 'brick', x: 60, y: 100, w: 22, h: 22, hp: 2, steel: false }];
+  for (const [x, y, vx, vy] of [
+    [5, 40, -50, -50],
+    [475, 320, 50, 50],
+    [5, 320, -50, 50],
+    [475, 40, 50, -50],
+    [71, 111, 0, 0],
+    [71, 111.0000001, 0, 0],
+  ]) {
+    s.player.x = x;
+    s.player.y = y;
+    s.player.vx = vx;
+    s.player.vy = vy;
+    resolveTankContacts(s);
+    const p = s.player;
+    assert.ok(p.x >= 20 && p.x <= 460 && p.y >= 56 && p.y <= 300);
+    assert.ok(!circleHitsRect(p.x, p.y, 11.9, s.tiles[0]));
+    assert.ok(Number.isFinite(p.vx) && Number.isFinite(p.vy));
+  }
+});
+test('Bastion simultaneous last-enemy and beacon impacts resolve all damage before one terminal result', () => {
   const results = [];
   for (const reverse of [false, true]) {
-    const s = await empty();
+    const s = empty();
     s.baseHealth = 1;
     s.enemies = [enemy('last', 200, 100, 1)];
     s.bullets = [
@@ -210,11 +252,9 @@ test('Bastion simultaneous last-enemy and beacon impacts resolve all damage befo
   }
   assert.deepEqual(results[0], results[1]);
 });
-test('Bastion tied brick damage and shell interception are order-independent', async () => {
-  const { stepShells } = await core();
-  const scores = [];
+test('Bastion tied brick damage and shell interception are order-independent', () => {
   for (const reverse of [false, true]) {
-    const s = await empty();
+    const s = empty();
     s.tiles = [{ id: 'brick', x: 100, y: 90, w: 22, h: 22, hp: 1, steel: false }];
     s.bullets = [
       shell('a', 80, 95, 1000, 0, { owner: 'player', shooter: 'player' }),
@@ -224,20 +264,19 @@ test('Bastion tied brick damage and shell interception are order-independent', a
     stepShells(s, 0.03, harness().env);
     assert.equal(s.tiles.length, 0);
     assert.equal(s.score, 10);
-    scores.push(s.score);
   }
-  const s = await empty();
+  const s = empty();
   s.bullets = [
     shell('left', 150, 120, 1000, 0, { owner: 'player', shooter: 'player' }),
     shell('right', 180, 120, -1000, 0),
   ];
   stepShells(s, 0.03, harness().env);
   assert.equal(s.bullets.length, 0);
-  assert.equal(s.interceptions, 1);
+  assert.ok(s.particles.some((p) => p.kind === 'intercept'));
   assert.equal(s.score, 0);
+  assert.equal(s.lives, 4);
 });
-test('Bastion repair covers tank, beacon, both and preserves full or out-of-range kits', async () => {
-  const { stepBastion } = await core();
+test('Bastion repair covers tank, beacon, both and preserves full or out-of-range kits', () => {
   for (const [armor, base, near, expectedArmor, expectedBase, spent] of [
     [4, 4, true, 4, 5, 1],
     [2, 5, false, 4, 5, 1],
@@ -245,7 +284,7 @@ test('Bastion repair covers tank, beacon, both and preserves full or out-of-rang
     [4, 5, true, 4, 5, 0],
     [4, 3, false, 4, 3, 0],
   ]) {
-    const s = await empty();
+    const s = empty();
     s.lives = armor;
     s.baseHealth = base;
     s.player.x = near ? 166 : 100;
@@ -253,28 +292,41 @@ test('Bastion repair covers tank, beacon, both and preserves full or out-of-rang
     stepBastion(s, 1 / 120, input([], ['KeyH']), harness().env);
     assert.equal(s.lives, expectedArmor);
     assert.equal(s.baseHealth, expectedBase);
-    assert.equal(s.kits, 2 - spent);
+    assert.equal(s.kits, START_KITS - spent);
   }
+  const s = empty();
+  s.kits = 0;
+  stepBastion(s, 1 / 120, input([], ['KeyE']), harness().env);
+  assert.match(s.toast.en, /No repair kits/);
 });
-test('Bastion reinforcement warnings cannot materialize a tank into an occupied lane', async () => {
-  const { stepBastion } = await core(),
-    s = await empty();
+test('Bastion reinforcement warnings cannot materialize a tank into an occupied lane', () => {
+  const s = empty();
   s.player.x = 100;
   s.player.y = 60;
-  s.pendingSpawn = { x: 100, y: 60, warning: 0.001, role: 'raider' };
+  s.pendingSpawn = { x: 100, y: 60, warning: 0.001, role: 'raider', hp: 1 };
   stepBastion(s, 1 / 120, input(), harness().env);
   assert.equal(s.enemies.length, 0);
   assert.ok(s.pendingSpawn.warning > 1);
-  assert.notEqual(s.pendingSpawn.x, 100);
+  assert.ok(LANES.includes(s.pendingSpawn.x));
   for (let n = 0; n < 120; n++) stepBastion(s, 1 / 120, input(), harness().env);
   assert.equal(s.enemies.length, 0);
   for (let n = 0; n < 24; n++) stepBastion(s, 1 / 120, input(), harness().env);
   assert.equal(s.enemies.length, 1);
   assert.ok(Math.hypot(s.enemies[0].x - s.player.x, s.enemies[0].y - s.player.y) > 24);
 });
-test('Bastion engineers preserve tank position and retained-kit reachability', async () => {
-  const { stepBastion, circleHitsRect } = await core(),
-    s = await empty();
+test('Bastion waits and retries when every lane is blocked at arrival', () => {
+  const s = empty(),
+    h = harness();
+  s.player.x = 240;
+  s.player.y = 60;
+  s.enemies = LANES.filter((x) => x !== 240).map((x, n) => enemy(`blocker${n}`, x, 60));
+  s.pendingSpawn = { x: 240, y: 60, warning: 0.001, role: 'raider', hp: 1 };
+  stepBastion(s, 1 / 120, input(), h.env);
+  assert.equal(s.enemies.length, 4);
+  assert.ok(s.pendingSpawn.warning > 0 && s.pendingSpawn.warning <= 0.2);
+});
+test('Bastion engineers preserve tank position and retained-kit reachability', () => {
+  const s = empty();
   s.player.x = 119;
   s.player.y = 147;
   s.transition = 0.001;
@@ -283,99 +335,27 @@ test('Bastion engineers preserve tank position and retained-kit reachability', a
   s.pickups = [{ id: 'retained', x: 119, y: 147, kind: 'kit' }];
   const old = { x: s.player.x, y: s.player.y };
   stepBastion(s, 1 / 120, input(), harness().env);
-  assert.equal(s.wave, 2);
-  assert.equal(s.engineerCrates, 1);
+  assert.equal(s.field, 2);
   assert.ok(Math.hypot(s.player.x - old.x, s.player.y - old.y) < 1e-8);
   assert.ok(s.tiles.every((t) => !circleHitsRect(old.x, old.y, 12, t)));
   assert.ok(s.tiles.every((t) => !circleHitsRect(119, 147, 22, t)));
+  assert.ok(s.constructionSkipped.length > 0);
+  assert.equal(s.kits, 2);
+  assert.equal(s.pickups.length, 0);
 });
-test('Bastion depletion of carried rounds has a visible terminal outcome instead of silent lost controls', async () => {
-  const { stepBastion } = await core(),
-    s = await empty();
+test('Bastion depletion of carried rounds has a visible terminal outcome instead of silent lost controls', () => {
+  const s = empty();
   s.player.rounds = 0;
   const h = harness();
   stepBastion(s, 1 / 120, input(['Space']), h.env);
   assert.equal(s.phase, 'lost');
   assert.equal(h.ends.length, 1);
-  assert.match(h.ends[0].message, /ammunition/i);
+  assert.match(h.ends[0].message, /rounds/i);
 });
-
-function keyboardGuard(state, frame, hz, started) {
-  const p = state.player,
-    target = state.enemies.toSorted((a, b) => b.y - a.y)[0],
-    held = frame < hz * 0.8 ? ['ArrowRight'] : ['KeyX'];
-  if (target && started && frame >= hz * 0.8) {
-    const flight = Math.hypot(target.x - p.x, target.y - p.y) / 300,
-      aim = Math.atan2(target.y + target.vy * flight - p.y, target.x + target.vx * flight - p.x),
-      stop = p.turret + (p.turretOmega * Math.abs(p.turretOmega)) / 48,
-      wrap = (a) => Math.atan2(Math.sin(a), Math.cos(a)),
-      error = wrap(aim - stop);
-    if (error > 0.025) held.push('ArrowRight');
-    else if (error < -0.025) held.push('ArrowLeft');
-    if (Math.abs(wrap(aim - p.turret)) < 0.065) held.push('Space');
-  }
-  return held;
-}
-test('Bastion complete keyboard-only three-field campaigns and missed-defense recovery at 30/60/120Hz', () => {
-  for (const hz of [30, 60, 120])
-    for (const mistake of [false, true]) {
-      const h = harness(),
-        game = createGame(h.env);
-      let started = !mistake,
-        repaired = false,
-        callbackState = null,
-        lastWave = 1,
-        transitions = 0;
-      h.env.end = (r) => {
-        h.ends.push(r);
-        callbackState = game.getState();
-      };
-      for (let frame = 0; frame < hz * 180 && game.getState().phase === 'playing'; frame++) {
-        const s = game.getState(),
-          pressed = [];
-        if (!started && (s.lives < 4 || s.baseHealth < 5)) {
-          started = true;
-          pressed.push('KeyH');
-        }
-        if (s.lives <= 2 || s.baseHealth <= 3) pressed.push('KeyH');
-        game.update(1 / hz, input(keyboardGuard(s, frame, hz, started), pressed));
-        const next = game.getState();
-        if (next.kits < s.kits) repaired = true;
-        assert.ok(
-          Math.hypot(next.player.x - s.player.x, next.player.y - s.player.y) < 5,
-          'no hit or engineering teleport',
-        );
-        assert.ok(
-          next.enemies.length <= 3 && next.bullets.length < 80 && next.particles.length <= 120,
-        );
-        if (next.wave !== lastWave) {
-          transitions++;
-          lastWave = next.wave;
-          assert.ok(next.player.rounds > 500);
-        }
-        if (frame % (hz * 10) === 0) game.draw(mockContext());
-      }
-      const s = game.getState();
-      assert.equal(s.phase, 'won', `rate ${hz}, missed defense ${mistake}`);
-      assert.equal(s.wave, 3);
-      assert.equal(s.defeated, 15);
-      assert.ok(s.player.x > 180);
-      assert.ok(s.lives > 0 && s.baseHealth > 0);
-      assert.equal(s.engineerCrates, 0);
-      assert.equal(transitions, 2);
-      assert.equal(h.ends.length, 1);
-      assert.deepEqual(s, callbackState);
-      if (mistake) assert.ok(repaired);
-      const frozen = game.getState();
-      game.update(1 / hz, input(['ArrowDown', 'Space'], ['KeyH']));
-      assert.deepEqual(game.getState(), frozen);
-    }
-});
-test('Bastion last live round resolves before depletion and can secure the final field or rearm the next', async () => {
-  const { stepBastion } = await core();
-  for (const wave of [1, 3]) {
-    const s = await empty();
-    s.wave = wave;
+test('Bastion last live round resolves before depletion and can secure the final field or rearm the next', () => {
+  for (const field of [1, FIELD_COUNT]) {
+    const s = empty();
+    s.field = field;
     s.spawned = s.toSpawn;
     s.player.rounds = 0;
     s.enemies = [enemy('last', 200, 100, 1)];
@@ -383,18 +363,18 @@ test('Bastion last live round resolves before depletion and can secure the final
     const h = harness();
     stepBastion(s, 1 / 30, input(), h.env);
     assert.notEqual(s.phase, 'lost');
-    if (wave === 3) {
+    if (field === FIELD_COUNT) {
       assert.equal(s.phase, 'won');
       assert.equal(h.ends.length, 1);
     } else {
       assert.ok(s.transition > 0);
       for (let n = 0; n < 260; n++) stepBastion(s, 1 / 120, input(), h.env);
-      assert.equal(s.wave, 2);
-      assert.equal(s.player.rounds, 600);
+      assert.equal(s.field, 2);
+      assert.equal(s.player.rounds, fieldOf(2).ammo);
       assert.equal(s.phase, 'playing');
     }
   }
-  const miss = await empty();
+  const miss = empty();
   miss.player.rounds = 0;
   miss.bullets = [
     shell('miss', 100, 100, 100, 0, { owner: 'player', shooter: 'player', life: 0.02 }),
@@ -404,13 +384,13 @@ test('Bastion last live round resolves before depletion and can secure the final
   assert.equal(miss.phase, 'playing');
   stepBastion(miss, 1 / 30, input(), h.env);
   assert.equal(miss.phase, 'lost');
-  assert.match(h.ends[0].message, /ammunition/i);
+  assert.match(h.ends[0].message, /rounds/i);
 });
-test('Bastion full stock exhausts finitely and engineer ammunition load conserves vehicle momentum', async () => {
-  const { fireShell, stepBastion } = await core(),
-    s = await empty();
-  for (let n = 0; n < 700; n++) fireShell(s, s.player, 'player', harness().env);
-  assert.equal(s.bullets.length, 600);
+test('Bastion full stock exhausts finitely and engineer ammunition load conserves vehicle momentum', () => {
+  const s = empty(),
+    stock = s.player.rounds;
+  for (let n = 0; n < stock + 100; n++) fireShell(s, s.player, 'player', harness().env);
+  assert.equal(s.bullets.length, stock);
   assert.equal(s.player.rounds, 0);
   assert.ok(s.player.mass > 80);
   s.bullets = [];
@@ -420,28 +400,30 @@ test('Bastion full stock exhausts finitely and engineer ammunition load conserve
   s.player.vy = 0;
   const oldX = s.player.x,
     oldMass = s.player.mass;
-  stepBastion(s, 0.001, input(), harness().env);
-  assert.equal(s.wave, 2);
-  assert.equal(s.player.rounds, 600);
+  stepBastion(s, 1 / 60, input(), harness().env);
+  assert.equal(s.field, 2);
+  assert.equal(s.player.rounds, fieldOf(2).ammo);
   assert.ok(s.player.mass > oldMass);
   const momentum = s.player.mass * s.player.vx;
   assert.ok(momentum <= oldMass * 40 + 1e-8);
-  assert.ok(momentum >= oldMass * (40 - 260 * 0.001) - 1e-8);
+  assert.ok(momentum >= oldMass * (40 - 350 / 60) - 1e-8);
   assert.ok(Math.abs(s.player.x - oldX) < 1);
 });
 test('Bastion ordinary steel-stop movement recovers through real steering without passive damage', () => {
-  const game = createGame(harness().env);
-  for (let n = 0; n < 120; n++) game.update(1 / 60, input(['ArrowUp', 'Space']));
-  const stopped = game.getState();
-  for (let n = 0; n < 60; n++) game.update(1 / 60, input(['ArrowRight']));
-  const recovered = game.getState();
-  assert.ok(recovered.player.x > stopped.player.x + 15);
-  assert.equal(recovered.lives, 4);
-  assert.equal(recovered.baseHealth, 5);
+  const s = empty();
+  s.player.x = 166;
+  s.player.y = 284;
+  s.tiles = [{ id: 'steel', x: 150, y: 200, w: 40, h: 22, hp: null, steel: true }];
+  for (let n = 0; n < 120; n++) stepBastion(s, 1 / 60, input(['ArrowUp']), harness().env);
+  const stopped = { ...s.player };
+  assert.ok(stopped.y > 222 + 11);
+  for (let n = 0; n < 60; n++) stepBastion(s, 1 / 60, input(['ArrowRight']), harness().env);
+  assert.ok(s.player.x > stopped.x + 15);
+  assert.equal(s.lives, 4);
+  assert.equal(s.baseHealth, 5);
 });
-test('Bastion empty kit inventory can recover from floor supply and full packs leave it available', async () => {
-  const { stepBastion } = await core(),
-    s = await empty();
+test('Bastion empty kit inventory can recover from floor supply and full packs leave it available', () => {
+  const s = empty();
   s.kits = 0;
   s.lives = 2;
   s.pickups = [{ id: 'supply', x: 121.99, y: 200, kind: 'kit' }];
@@ -455,11 +437,10 @@ test('Bastion empty kit inventory can recover from floor supply and full packs l
   stepBastion(s, 1 / 120, input(), harness().env);
   assert.equal(s.pickups.length, 1);
 });
-test('Bastion body-contact and shell outcomes do not depend on array order', async () => {
-  const { resolveTankContacts, stepShells } = await core(),
-    results = [];
+test('Bastion body-contact and shell outcomes do not depend on array order', () => {
+  const results = [];
   for (const reverse of [false, true]) {
-    const s = await empty();
+    const s = empty();
     s.player.x = 100;
     s.player.y = 150;
     s.player.vx = 100;
@@ -477,7 +458,7 @@ test('Bastion body-contact and shell outcomes do not depend on array order', asy
   assert.deepEqual(results[0], results[1]);
   const outcome = [];
   for (const reverse of [false, true]) {
-    const s = await empty();
+    const s = empty();
     s.tiles = [
       { id: 'near', x: 100, y: 100, w: 22, h: 22, hp: 2, steel: false },
       { id: 'far', x: 160, y: 100, w: 22, h: 22, hp: 2, steel: false },
@@ -489,11 +470,10 @@ test('Bastion body-contact and shell outcomes do not depend on array order', asy
   }
   assert.deepEqual(outcome[0], outcome[1]);
 });
-test('Bastion driving/steering are frame-rate invariant and brake dissipates kinetic energy', async () => {
-  const { stepBastion } = await core(),
-    states = [];
+test('Bastion driving/steering are frame-rate invariant and brake dissipates kinetic energy', () => {
+  const states = [];
   for (const hz of [30, 60, 120]) {
-    const s = await empty();
+    const s = empty();
     s.player.angle = 0;
     s.player.bearing = 0;
     s.player.turret = 0;
@@ -527,11 +507,12 @@ test('Bastion actual idle losses, resets and terminal callbacks remain stable', 
     game.update(1 / hz, input(['Space'], ['KeyH']));
     assert.deepEqual(game.getState(), final);
     const fresh = createGame(h.env).getState();
-    assert.equal(fresh.wave, 1);
+    assert.equal(fresh.field, 1);
     assert.equal(fresh.lives, 4);
     assert.equal(fresh.baseHealth, 5);
-    assert.equal(fresh.player.rounds, 600);
-    assert.equal(fresh.kits, 2);
+    assert.equal(fresh.player.rounds, fieldOf(1).ammo);
+    assert.equal(fresh.player.charge, MAGAZINE);
+    assert.equal(fresh.kits, START_KITS);
   }
 });
 test('Bastion seeded public-input simulations are finite, deterministic and drawable in both languages', () => {
@@ -551,10 +532,19 @@ test('Bastion seeded public-input simulations are finite, deterministic and draw
     if (n % 120 === 0) {
       const a = games[0].getState();
       finite(a);
-      assert.ok(a.enemies.length <= 3 && a.bullets.length < 100 && a.particles.length <= 120);
+      assert.ok(a.enemies.length <= 4 && a.bullets.length < 100 && a.particles.length <= 120);
       assert.deepEqual(a, games[1].getState());
       games[0].draw(mockContext());
     }
   }
   createGame(harness({ lang: 'zh' }).env).draw(mockContext());
+});
+test('Bastion cover is rebuilt fresh for every field and never shares objects with the table', () => {
+  const a = coverFor(3),
+    b = coverFor(3);
+  a[0].hp = 0;
+  assert.notEqual(b[0].hp, 0);
+  assert.ok(fieldOf(3).tiles.every((t) => t.hp !== 0));
+  assert.equal(fieldOf(0).n, 1);
+  assert.equal(fieldOf(999).n, FIELD_COUNT);
 });

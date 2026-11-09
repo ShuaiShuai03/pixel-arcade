@@ -27,7 +27,7 @@ Effort: S = level data only, M = data plus some mechanics or tests, L = structur
 | ember-knights    |             20 | `STAGES`                  |   M    | done (final review) |
 | bomb-garden      |             22 | `GARDENS`                 |   M    | done (final review) |
 | sky-raiders      |             24 | `SECTORS`                 |   M    | done (final review) |
-| iron-bastion     |              3 | inline plans              |   M    | queued              |
+| iron-bastion     |             24 | `FIELDS`                  |   M    | done (final review) |
 | orbit-invaders   |              4 | fleet if-chain            |   M    | queued              |
 | bubble-pop       |              3 | `CAVERNS` (partial)       |   M    | queued              |
 | blockfall        |              3 | `DISTRICTS` (partial)     |   M    | queued              |

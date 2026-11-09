@@ -1,0 +1,25 @@
+ℹ tests 81
+ℹ suites 0
+ℹ pass 81
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 60869.75925
+ℹ start of coverage report
+ℹ --------------------------------------------------------------------------
+ℹ file                      | line % | branch % | funcs % | uncovered lines
+ℹ --------------------------------------------------------------------------
+ℹ src                       |        |          |         |
+ℹ  games                    |        |          |         |
+ℹ   iron-bastion-ai.js      | 100.00 |    97.59 |  100.00 |
+ℹ   iron-bastion-data.js    | 100.00 |    90.32 |  100.00 |
+ℹ   iron-bastion-draw.js    | 100.00 |    99.05 |  100.00 |
+ℹ   iron-bastion-menu.js    | 100.00 |   100.00 |  100.00 |
+ℹ   iron-bastion-physics.js | 100.00 |    95.97 |  100.00 |
+ℹ   iron-bastion-rules.js   | 100.00 |    92.31 |  100.00 |
+ℹ   iron-bastion.js         | 100.00 |   100.00 |   96.30 |
+ℹ --------------------------------------------------------------------------
+ℹ all files                 | 100.00 |    97.48 |   98.96 |
+ℹ --------------------------------------------------------------------------
+ℹ end of coverage report
