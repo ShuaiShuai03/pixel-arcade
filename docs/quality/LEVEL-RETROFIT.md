@@ -28,7 +28,7 @@ Effort: S = level data only, M = data plus some mechanics or tests, L = structur
 | bomb-garden      |             22 | `GARDENS`               |   M    | done (final review) |
 | sky-raiders      |             24 | `SECTORS`               |   M    | done (final review) |
 | iron-bastion     |             24 | `FIELDS`                |   M    | done (final review) |
-| orbit-invaders   |              4 | fleet if-chain          |   M    | queued              |
+| orbit-invaders   |             20 | `LEVELS`                |   M    | done (final review) |
 | bubble-pop       |              3 | `CAVERNS` (partial)     |   M    | queued              |
 | blockfall        |              3 | `DISTRICTS` (partial)   |   M    | queued              |
 | gem-match        |              3 | per-stage goal logic    |   M    | queued              |

@@ -15,7 +15,7 @@ Phase Tiles completed batch 18 and the 50-game target, Pixel Parkour included. T
 | Sky Raiders    | Passed after two rounds: 24 sectors, aimed strike zones ([record](final-review/sky-raiders.json))         |
 | Neon Snake     | Passed in one round: 20 levels, countdown starts ([record](final-review/neon-snake.json))                 |
 | Starbreaker    | Passed in one round: 20 fields, docked launch ([record](final-review/starbreaker.json))                   |
-| Orbit Invaders | Retrofitting to 20+ levels (4 levels)                                                                     |
+| Orbit Invaders | Passed in one round: 20 levels, aimed crossfire ([record](final-review/orbit-invaders.json))              |
 
 ## Completed batch 18
 

@@ -1,0 +1,25 @@
+ℹ tests 68
+ℹ suites 0
+ℹ pass 68
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 116170.038042
+ℹ start of coverage report
+ℹ ----------------------------------------------------------------------------
+ℹ file                        | line % | branch % | funcs % | uncovered lines
+ℹ ----------------------------------------------------------------------------
+ℹ src                         |        |          |         |
+ℹ  games                      |        |          |         |
+ℹ   orbit-invaders-ai.js      | 100.00 |    98.48 |  100.00 |
+ℹ   orbit-invaders-draw.js    | 100.00 |    97.03 |  100.00 |
+ℹ   orbit-invaders-menu.js    | 100.00 |   100.00 |  100.00 |
+ℹ   orbit-invaders-physics.js | 100.00 |    96.69 |  100.00 |
+ℹ   orbit-invaders-sprites.js | 100.00 |    95.24 |  100.00 |
+ℹ   orbit-invaders-waves.js   | 100.00 |   100.00 |  100.00 |
+ℹ   orbit-invaders.js         | 100.00 |    99.31 |  100.00 |
+ℹ ----------------------------------------------------------------------------
+ℹ all files                   | 100.00 |    98.01 |  100.00 |
+ℹ ----------------------------------------------------------------------------
+ℹ end of coverage report
