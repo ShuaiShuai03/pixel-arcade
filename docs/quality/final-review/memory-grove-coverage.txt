@@ -1,0 +1,25 @@
+ℹ tests 36
+ℹ suites 0
+ℹ pass 36
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2830.739208
+ℹ start of coverage report
+ℹ -------------------------------------------------------------------------
+ℹ file                     | line % | branch % | funcs % | uncovered lines
+ℹ -------------------------------------------------------------------------
+ℹ src                      |        |          |         |
+ℹ  games                   |        |          |         |
+ℹ   memory-grove-art.js    | 100.00 |   100.00 |  100.00 |
+ℹ   memory-grove-draw.js   | 100.00 |    99.14 |  100.00 |
+ℹ   memory-grove-levels.js | 100.00 |   100.00 |  100.00 |
+ℹ   memory-grove-menu.js   |  97.50 |    93.75 |  100.00 | 24
+ℹ   memory-grove-rules.js  | 100.00 |    99.48 |  100.00 |
+ℹ   memory-grove-text.js   | 100.00 |   100.00 |  100.00 |
+ℹ   memory-grove.js        | 100.00 |   100.00 |  100.00 |
+ℹ -------------------------------------------------------------------------
+ℹ all files                |  99.93 |    99.30 |  100.00 |
+ℹ -------------------------------------------------------------------------
+ℹ end of coverage report

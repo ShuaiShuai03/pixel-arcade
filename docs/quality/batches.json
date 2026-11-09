@@ -245,7 +245,8 @@
       "crate-keeper",
       "gem-match",
       "paddle-duel",
-      "pixel-rally"
+      "pixel-rally",
+      "memory-grove"
     ],
     "records": [
       "final-review/snowball-siege.json",
@@ -263,7 +264,8 @@
       "final-review/crate-keeper.json",
       "final-review/gem-match.json",
       "final-review/paddle-duel.json",
-      "final-review/pixel-rally.json"
+      "final-review/pixel-rally.json",
+      "final-review/memory-grove.json"
     ]
   }
 }
