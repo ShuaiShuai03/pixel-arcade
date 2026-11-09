@@ -1,0 +1,36 @@
+{
+  "game": "pinball-pocket",
+  "date": "2026-11-09",
+  "reviewedRevision": "b795919 (unchanged since the batch 1 acceptance)",
+  "owner": "none needed",
+  "reviewer": "final-pinball",
+  "rounds": 1,
+  "process": "Not level-based (one table), so no retrofit. One independent review round found no BLOCKING or MEDIUM issue, so the game is unchanged; the record adds a short browser check.",
+  "verdict": "pass",
+  "approvedSha256": {
+    "src/games/pinball-pocket.js": "e362b21e6adc3bee3d1f6656d795ee7c6e72dd83db5e3674b0735369b3164447",
+    "tests/pinball-pocket.test.js": "7ac2e93e8a9612b9937024802d3add24074ad242deb73ade385e4bb9df9023ba"
+  },
+  "tests": {
+    "command": "node --experimental-test-coverage --test-coverage-include='src/games/pinball-pocket*.js' --test tests/pinball-pocket.test.js",
+    "passed": 20,
+    "failed": 0,
+    "lineCoverage": 97.06
+  },
+  "independentProbes": "Pinball Pocket is a score game with no win condition: the run ends as a loss when the third ball drains, so blind play cannot win. Over 400 random-flipper games no ball drained straight off the plunger (shortest ball life 5.0 s, median 8.4 s). Across 1,400+ games and 4,680 placed-ball cases no ball tunnelled through a flipper or wall, left the table or ran forever. A reaction-limited flipper bot using only public state averaged 13.0k at 0.25 s and 17.6k at 0.35 s, two to three times the averages of idle (0), mashing and random keys (about 0-10k). Same-input runs repeat exactly, a 300-seed hostile-input fuzz threw nothing and ended once, EN/ZH text fits, and two touch buttons hold both flippers independently.",
+  "findings": [],
+  "openNotes": [
+    "A ball placed at about (394.5, 202.2), between the launch-lane wall and the right slingshot rail, can rest forever; no natural play reached it.",
+    "A finger on the canvas overrides a held flipper touch button; the dedicated left and right buttons handle two fingers correctly.",
+    "The 'STAR BONUS!' banner draws over the mid-table ball path for 1.5 s, and ramp shots are rare."
+  ],
+  "browser": {
+    "method": "Official Claude in Chrome extension, local server; synthetic in-page keys; only DOM text and the canvas were read.",
+    "servedSha256Prefixes": "e362b21e",
+    "observed": [
+      "Chinese: Start showed the STAR table with 3 balls and multiplier x1; Space launched the ball into play and both flippers rose on Left and Right.",
+      "The batch 1 acceptance record covers the English run, a full game to the third drain, restart and the phone frame."
+    ],
+    "screenshots": ["screenshots/pinball-pocket-zh.jpg"]
+  }
+}

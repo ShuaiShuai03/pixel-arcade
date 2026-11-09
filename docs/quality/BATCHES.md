@@ -25,6 +25,9 @@ Phase Tiles completed batch 18 and the 50-game target, Pixel Parkour included. T
 | Memory Grove   | Passed in one round: 20 clearings, four memory rules ([record](final-review/memory-grove.json))           |
 | Pixel Rally    | Passed in one round with no changes ([record](final-review/pixel-rally.json))                             |
 | Paddle Duel    | Passed in one round: single match, hardened input ([record](final-review/paddle-duel.json))               |
+| Pinball Pocket | Passed in one round with no changes ([record](final-review/pinball-pocket.json))                          |
+| Dungeon Dash   | Retrofitting to 20+ levels (5 rooms)                                                                      |
+| Bubble Pop     | Retrofitting to 20+ levels (3 caverns)                                                                    |
 
 ## Completed batch 18
 

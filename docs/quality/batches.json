@@ -246,7 +246,8 @@
       "gem-match",
       "paddle-duel",
       "pixel-rally",
-      "memory-grove"
+      "memory-grove",
+      "pinball-pocket"
     ],
     "records": [
       "final-review/snowball-siege.json",
@@ -265,7 +266,8 @@
       "final-review/gem-match.json",
       "final-review/paddle-duel.json",
       "final-review/pixel-rally.json",
-      "final-review/memory-grove.json"
+      "final-review/memory-grove.json",
+      "final-review/pinball-pocket.json"
     ]
   }
 }
