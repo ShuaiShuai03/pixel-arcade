@@ -1,0 +1,37 @@
+{
+  "game": "pixel-rally",
+  "date": "2026-11-09",
+  "reviewedRevision": "eb5efe6 (unchanged since the batch 2 acceptance)",
+  "owner": "none needed",
+  "reviewer": "final-rally",
+  "rounds": 1,
+  "process": "Not level-based (one continuous six-section course), so no retrofit. One independent review round found no BLOCKING or MEDIUM issue, so the game is unchanged; the record adds a short browser check.",
+  "verdict": "pass",
+  "approvedSha256": {
+    "src/games/pixel-rally.js": "8acc508316072022b2cbb01e872ea4bbfab39311c2ad86150b486a89ed353a30",
+    "tests/pixel-rally.test.js": "5dc48a75e877e07225588de37fdaea891500a7fcd27230f72b51e9719fc60619"
+  },
+  "tests": {
+    "command": "node --experimental-test-coverage --test-coverage-include='src/games/pixel-rally*.js' --test tests/pixel-rally.test.js",
+    "passed": 59,
+    "failed": 0,
+    "lineCoverage": 98.69
+  },
+  "independentProbes": "The reviewer's reaction-limited bot, reading only public state with lagged traffic, finished 20 of 20 races at 0.25 s and 0.35 s at 60 Hz (87-110 s on the 120 s clock), also when limited to the 33 m of road on screen, and 19-20 of 20 at 30 and 120 Hz. Idle, mash, random keys and hold-plus-alternate patterns from 0.1 to 4 s won 0% over 30 seeds; holding only the throttle wins 21.3% over 300 seeds, under the 25% cap. Exactly one end fires, the terminal state freezes, play matches across 30, 60 and 120 Hz, a 20,000-step hostile-input fuzz stayed finite, random driving never overlapped or tunnelled through traffic, and steering into the rail never stalls the car.",
+  "findings": [],
+  "openNotes": [
+    "Holding only the throttle finishes 21% of races, a thin margin under the 25% cap.",
+    "The screen shows about 33 m of road ahead, roughly 0.8 s at top speed; bots limited to that view still won every race.",
+    "The 1,070-line source is above the 800-line guideline but is organised into clear blocks (route data, collision, physics, spawning, tick, drawing).",
+    "There are no rival racers, only traffic."
+  ],
+  "browser": {
+    "method": "Official Claude in Chrome extension, local server; a real click on Start, synthetic in-page keys; only DOM text and the canvas were read.",
+    "servedSha256Prefixes": "8acc5083",
+    "observed": [
+      "Chinese: Start opened section 1/6 (果园) with condition 4/4 and the 120 s clock; holding the throttle for 4 s drove 32 m at 56 km/h with the HUD, road and car unobscured.",
+      "The batch 2 acceptance record covers the English desktop run, a loss, restart and the Chinese phone frame with touch controls."
+    ],
+    "screenshots": ["screenshots/pixel-rally-zh.jpg"]
+  }
+}
