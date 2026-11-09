@@ -13,6 +13,9 @@ Phase Tiles completed batch 18 and the 50-game target, Pixel Parkour included. T
 | Bomb Garden    | Passed after four rounds: 22 gardens, barrel previews ([record](final-review/bomb-garden.json))           |
 | Iron Bastion   | Passed after three rounds: 24 fields, blind pointer play fixed ([record](final-review/iron-bastion.json)) |
 | Sky Raiders    | Passed after two rounds: 24 sectors, aimed strike zones ([record](final-review/sky-raiders.json))         |
+| Neon Snake     | Retrofitting to 20+ levels (3 levels)                                                                     |
+| Starbreaker    | Passed in one round: 20 fields, docked launch ([record](final-review/starbreaker.json))                   |
+| Orbit Invaders | Retrofitting to 20+ levels (4 levels)                                                                     |
 
 ## Completed batch 18
 

@@ -1,0 +1,63 @@
+{
+  "game": "starbreaker",
+  "date": "2026-11-09",
+  "reviewedRevision": "8b601fe plus the rework in this commit",
+  "owner": "owner-star",
+  "reviewer": "final-star",
+  "rounds": 1,
+  "process": "Lean final review at the user's request: the known 3-level shortfall went straight to a retrofit, followed by one independent review round, one clean-worktree test run and a short browser check.",
+  "verdict": "pass",
+  "approvedSha256": {
+    "src/games/starbreaker.js": "56187e6ea767f1564a70110ed467a9dad9e9a04bccc962f89ef2a7e502741d1a",
+    "src/games/starbreaker-levels.js": "795f2394c17a225f88c74914a92c2e093b0870d550a2a07eee9134aa6a3a2653",
+    "src/games/starbreaker-step.js": "7aebf7eddd0e32a8fe7f62a1c4a2a8962f1e4001de0ccfbd5b1a2b99d5d4f719",
+    "src/games/starbreaker-draw.js": "f3b49955a662ebb608b5eaf8247d1833c89541ef84d838503bd96749628918c2",
+    "src/games/starbreaker-menu.js": "4a388681a9d64c1a7f54922a7150a72950e2da908b634c994d75b5ba2a0a51ce",
+    "tests/starbreaker.test.js": "20bd5471695dcabc94b5f9e3eb626592f980906101368ad0975c7a885778ecb4",
+    "tests/starbreaker-quality.test.js": "6b06dcdaa26b0557ac83064e4b8637678979b5fef17ab8921938306d1a628de2"
+  },
+  "tests": {
+    "command": "node --experimental-test-coverage --test-coverage-include='src/games/starbreaker*.js' --test tests/starbreaker.test.js tests/starbreaker-quality.test.js",
+    "passed": 51,
+    "failed": 0,
+    "lineCoverage": 100,
+    "log": "starbreaker-coverage.txt"
+  },
+  "independentProbes": "The reviewer's own reaction-limited paddle bot cleared all 20 fields on 3 seeds at both 0.25 s and 0.35 s reaction at 60 Hz, the slowest clear taking 170 s. Idle, mash and random-key policies won 0 of 72 runs each on fields 3-20. Scripted input matched across 30, 60 and 120 Hz on four fields; four 120 s runs showed no tunnelling or escape; 30 fuzz runs with hostile dt and pointer values threw nothing; a loss ended exactly once and stayed frozen; junk and throwing progress stores were safe.",
+  "findings": [
+    {
+      "id": "R1",
+      "severity": "blocking",
+      "status": "fixed",
+      "observation": "Only 3 hard-coded fields and no select or continue. There are now 20 data-driven fields (teaching 1-7, combination 8-14, mastery 15-20) built from plain, armoured, reactor and drifting bricks, each with an accurate EN/ZH tip, plus a field select and env.progress continue."
+    },
+    {
+      "id": "R2",
+      "severity": "medium",
+      "status": "fixed",
+      "observation": "Fair start and physics: the ball stays docked until launch, field 1 has a two-save training net, rough walls and ceiling break endless vertical or horizontal loops, paddle hits cap ball speed, reactors chain, and fixed 1/240 s steps make every frame rate play the same."
+    },
+    {
+      "id": "R3",
+      "severity": "medium",
+      "status": "fixed",
+      "observation": "Added tests/starbreaker-quality.test.js: per-field clears, blind-policy bars, a reaction-limited bot at 30, 60 and 120 Hz, determinism, hostile input, broken progress stores, EN/ZH end messages and a frozen terminal state."
+    }
+  ],
+  "openNotes": [
+    "Launching while the paddle slides at full speed sends the ball off at about 449 px/s for its first rise, above the 360 cap that applies after the first paddle contact.",
+    "A pointer that tracks the ball wins every field, as in classic breakout; this is treated as skill.",
+    "Some fields take a bot over two minutes; human clear times are unmeasured."
+  ],
+  "browser": {
+    "method": "Official Claude in Chrome extension, local server; real clicks on Start, Play again, the language switch and the touch buttons, synthetic in-page keys; only DOM text and the canvas were read.",
+    "servedSha256Prefixes": "56187e6e 795f2394 7aebf7ed f3b49955 4a388681",
+    "observed": [
+      "Chinese: Start opened field 1 of 20 with the ball docked and the field tip shown; Space launched it.",
+      "Chinese loss: with the paddle idle the training net saved the first ball, which was lost at 16.8 s; after relaunches the balls ran out and the loss screen showed score 535 and 小球用完了，再次挑战星空吧。 Play again restarted field 1 with 3 balls.",
+      "Chinese 390 px phone frame (388 px inner, no horizontal overflow): the Launch touch button launched the ball and the Left button moved the paddle; bricks broke and the score reached 150.",
+      "Not covered in the browser: a field win and the field select, which appears only after a first clear; the reviewer's bots and the quality tests cover both."
+    ],
+    "screenshots": ["screenshots/starbreaker-loss-zh.jpg", "screenshots/starbreaker-phone-zh.png"]
+  }
+}

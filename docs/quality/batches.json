@@ -234,14 +234,16 @@
       "ember-knights",
       "sky-raiders",
       "bomb-garden",
-      "iron-bastion"
+      "iron-bastion",
+      "starbreaker"
     ],
     "records": [
       "final-review/snowball-siege.json",
       "final-review/ember-knights.json",
       "final-review/sky-raiders.json",
       "final-review/bomb-garden.json",
-      "final-review/iron-bastion.json"
+      "final-review/iron-bastion.json",
+      "final-review/starbreaker.json"
     ]
   }
 }
