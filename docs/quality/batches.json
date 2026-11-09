@@ -255,7 +255,8 @@
       "grapnel-gorge",
       "glider-ridge",
       "clockwork-bridge",
-      "wallrunner-relay"
+      "wallrunner-relay",
+      "shield-sentinel"
     ],
     "records": [
       "final-review/snowball-siege.json",
@@ -283,7 +284,8 @@
       "final-review/grapnel-gorge.json",
       "final-review/glider-ridge.json",
       "final-review/clockwork-bridge.json",
-      "final-review/wallrunner-relay.json"
+      "final-review/wallrunner-relay.json",
+      "final-review/shield-sentinel.json"
     ]
   }
 }

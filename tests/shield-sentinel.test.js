@@ -19,6 +19,7 @@ import {
   createWorld,
   drawWorld,
   inArc,
+  LEVEL_COUNT,
   laneHalfWidth,
   meta,
   promptKey,
@@ -27,21 +28,25 @@ import {
   segmentCircleEntry,
   shieldContact,
   snapshot,
-  startWave,
+  startLevel,
   stepWorld,
 } from '../src/games/shield-sentinel.js';
 import { harness, input, mockContext, seeded } from './harness.js';
 
 const SHOT_R = { orb: 5, slug: 4, lance: 3 };
+const CRAWLER_LEVEL = 4,
+  LANCE_LEVEL = 5,
+  WALL_LEVEL = 6,
+  GUARDIAN_LEVEL = 10;
 const mk2 = (seed = 1) => {
   const w = mk(seed);
-  startWave(w, 1);
+  startLevel(w, CRAWLER_LEVEL);
   w.introT = 0;
   w.atk.wait = 1e9;
   return w;
 };
 const mk = (seed = 1) => {
-  const w = createWorld(seeded(seed));
+  const w = createWorld(seeded(seed), 2);
   w.introT = 0;
   w.atk.wait = 1e9;
   return w;
@@ -135,12 +140,13 @@ test('shield sentinel: zero, negative, NaN, infinite and huge dt never advance s
 test('shield sentinel: a sub-tick dt waits for a full tick instead of reading or losing input', () => {
   const w = mk();
   let reads = 0;
-  const spy = { held: () => (reads++, false), pressed: () => (reads++, false) };
+  const spy = { held: () => (reads++, false), pressed: (code) => code === 'KeyX' };
   stepWorld(w, STEP / 4, spy);
   assert.equal(reads, 0);
   assert.equal(w.tick, 0);
   stepWorld(w, STEP, input(['ArrowRight']));
   assert.equal(w.tick, 1);
+  assert.equal(w.p.bashT > 0, true, 'a bash tapped in a sub-tick frame still fires');
 });
 
 test('shield sentinel: a long frame is capped to 1/30 second of simulation', () => {
@@ -366,12 +372,12 @@ test('shield sentinel: every attack is telegraphed with a human-length warning',
   }
   assert.ok(seen.has('orb'));
   const lance = mk();
-  startWave(lance, 1);
+  startLevel(lance, LANCE_LEVEL);
   lance.introT = 0;
   lance.atk.wait = 0;
-  const turretWithLance = lance.foes[2];
+  const turretWithLance = lance.foes[0];
   turretWithLance.k = 1;
-  lance.atk.step = 2;
+  lance.atk.step = 0;
   tickN(lance, 1);
   assert.equal(turretWithLance.charge.kind, 'lance');
   assert.ok(Math.hypot(turretWithLance.charge.dirx, turretWithLance.charge.diry) > 0.99);
@@ -431,7 +437,7 @@ test('shield sentinel: the invulnerability window is visible and prevents back-t
 test('shield sentinel: the shield drains, recharges, breaks at zero and recovers visibly', () => {
   const w = mk();
   tickN(w, 120, ['Space']);
-  assert.ok(Math.abs(w.p.energy - 92) < 0.01);
+  assert.ok(Math.abs(w.p.energy - 95) < 0.01);
   tickN(w, 120);
   assert.equal(w.p.energy, 100);
   w.p.energy = 0.05;
@@ -519,25 +525,25 @@ test('shield sentinel: crawlers spawn behind a portal, hurt on contact, and the 
   tickN(behind, 240, ['Space']);
   assert.equal(behind.hp, 4, 'a crawler behind the shield still hurts');
   const spawn = createWorld(seeded(4));
-  startWave(spawn, 1);
+  startLevel(spawn, CRAWLER_LEVEL);
   spawn.introT = 0;
   spawn.atk.wait = 1e9;
-  tickN(spawn, 120 * 8 + 5);
+  tickN(spawn, 120 * 5);
   assert.equal(spawn.crawlers.length, 1);
   assert.ok(spawn.crawlers[0].portal > 0 || spawn.crawlers[0].x !== undefined);
   const pinned = mk();
-  startWave(pinned, 1);
+  startLevel(pinned, CRAWLER_LEVEL);
   pinned.introT = 0;
   pinned.atk.wait = 1e9;
   pinned.p.x = 52;
   pinned.random = () => 0;
-  tickN(pinned, 120 * 8 + 5);
+  tickN(pinned, 120 * 3 + 5);
   assert.equal(pinned.crawlers[0].x, 428, 'spawns on the side away from the sentinel');
 });
 
-test('shield sentinel: waves clear in order, heal one point, show a visible intro timer, then the guardian', () => {
+test('shield sentinel: levels clear in order, heal two points, show a visible intro timer, then the guardian', () => {
   const w = createWorld(seeded(3));
-  assert.equal(snapshot(w).introLeft, 2.2);
+  assert.equal(snapshot(w).introLeft, 3);
   assert.equal(promptKey(w), 'intro');
   w.introT = 0;
   w.atk.wait = 1e9;
@@ -545,11 +551,11 @@ test('shield sentinel: waves clear in order, heal one point, show a visible intr
   for (const f of w.foes) f.hp = 0;
   tickN(w, 1);
   const s = snapshot(w);
-  assert.equal(s.wave, 2);
-  assert.equal(s.hp, 4);
+  assert.equal(s.level, 2);
+  assert.equal(s.hp, 5);
   assert.equal(s.score, 300);
   assert.ok(s.introLeft > 2);
-  assert.equal(w.foes.length, 3);
+  assert.equal(w.foes.length, 2);
   assert.equal(w.shots.length, 0);
   tickN(w, 120);
   assert.equal(
@@ -557,15 +563,15 @@ test('shield sentinel: waves clear in order, heal one point, show a visible intr
     true,
     'nothing attacks during the intro',
   );
-  startWave(w, 3);
-  assert.equal(snapshot(w).guardianWave, true);
-  assert.match(snapshot(w).status.en, /Guardian 8\/8/);
+  startLevel(w, GUARDIAN_LEVEL);
+  assert.equal(snapshot(w).guardianLevel, true);
+  assert.match(snapshot(w).status.en, /Guardian 6\/6/);
 });
 
 test('shield sentinel: the guardian slam is telegraphed, breaks the shield, exposes the guardian and can be dodged', () => {
   const setup = () => {
     const w = mk();
-    startWave(w, 3);
+    startLevel(w, GUARDIAN_LEVEL);
     w.introT = 0;
     w.atk.wait = 0;
     w.foes[0].k = 4;
@@ -596,13 +602,13 @@ test('shield sentinel: the guardian slam is telegraphed, breaks the shield, expo
   orb.y = 100;
   orb.vy = -300;
   tickN(dodge, 30);
-  assert.equal(dodge.foes[0].hp, 6, 'exposed guardians take double reflected damage');
+  assert.equal(dodge.foes[0].hp, 4, 'exposed guardians take double reflected damage');
   const plain = mk();
-  startWave(plain, 3);
+  startLevel(plain, GUARDIAN_LEVEL);
   plain.introT = 0;
   addShot(plain, 'orb', 240, 100, 0, -300, { owner: 'player', reflected: true });
   tickN(plain, 30);
-  assert.equal(plain.foes[0].hp, 7);
+  assert.equal(plain.foes[0].hp, 5);
 });
 
 test('shield sentinel: defeating the guardian wins once, freezes state and ignores input', () => {
@@ -625,12 +631,12 @@ test('shield sentinel: defeating the guardian wins once, freezes state and ignor
   assert.equal(fresh.phase, 'playing');
   assert.equal(fresh.hp, 5);
   assert.equal(fresh.score, 0);
-  assert.equal(fresh.wave, 1);
+  assert.equal(fresh.level, 1);
 });
 
-test('shield sentinel: clearing the guardian is a win with a bonus', () => {
+test('shield sentinel: clearing the last level is a win with a bonus', () => {
   const w = mk();
-  startWave(w, 3);
+  startLevel(w, LEVEL_COUNT);
   w.introT = 0;
   w.foes[0].hp = 1;
   addShot(w, 'orb', 240, 100, 0, -300, { owner: 'player', reflected: true });
@@ -660,8 +666,8 @@ test('shield sentinel: wave and guardian prompts exist for every threat in both 
   assert.equal(promptKey(w), 'idle');
   const s = snapshot(w);
   assert.equal(typeof s.status.en, 'string');
-  assert.match(s.status.en, /^Wave 1\/3 · HP 5 · /);
-  assert.match(s.status.zh, /^第1\/3波 · 生命 5 · /);
+  assert.match(s.status.en, /^Level 2\/20 · HP 5 · /);
+  assert.match(s.status.zh, /^第2\/20关 · 生命 5 · /);
 });
 
 test('shield sentinel: entities stay in the playfield, clear of the HUD bands', () => {
@@ -684,7 +690,7 @@ test('shield sentinel: entities stay in the playfield, clear of the HUD bands', 
     }
   }
   assert.deepEqual(bad.slice(0, 3), []);
-  startWave(w, 3);
+  startLevel(w, GUARDIAN_LEVEL);
   assert.ok(w.foes[0].y - w.foes[0].hh >= PLAY_TOP);
   assert.ok(255 + 36 + 1 <= PLAY_BOTTOM + 40);
 });
@@ -700,7 +706,7 @@ test('shield sentinel: draw smoke covers every state, uses 14-16 px text and sta
     const env = harness({ lang }).env;
     const w = createWorld(seeded(6));
     drawWorld(proxy, w, env);
-    startWave(w, 2);
+    startLevel(w, WALL_LEVEL);
     w.introT = 0;
     w.p.shieldUp = true;
     w.p.bashT = 0.1;
@@ -716,7 +722,7 @@ test('shield sentinel: draw smoke covers every state, uses 14-16 px text and sta
     w.foes[1].charge = { kind: 'orb', t: 0.3, dur: 0.7, dirx: 0, diry: 1, lx: 0, ly: 0 };
     w.fx.push({ kind: 'hurt', x: 50, y: 50, t: 0.1, life: 0.35 });
     drawWorld(proxy, w, env);
-    startWave(w, 3);
+    startLevel(w, GUARDIAN_LEVEL);
     w.introT = 0;
     w.foes[0].exposed = 2;
     w.foes[0].charge = {
@@ -808,7 +814,7 @@ test('shield sentinel: a turret destroyed mid-charge cancels its attack and rest
   tickN(w, 30);
   assert.equal(f.hp, 0);
   assert.equal(f.charge, null);
-  assert.equal(w.atk.wait, 0.9);
+  assert.equal(w.atk.wait, 1.2);
 });
 
 test('shield sentinel: the game wrapper draws and reports sounds for the actions taken', () => {
@@ -866,27 +872,27 @@ test('shield sentinel: drawn plates are bold and match the blocking geometry', (
 });
 
 test('shield sentinel: no shot can spawn inside the shield catch radius at any reachable position', () => {
-  for (let wave = 0; wave < 4; wave++) {
+  for (let level = 1; level <= LEVEL_COUNT; level++) {
     const w = mk();
-    startWave(w, wave);
+    startLevel(w, level);
     for (const f of w.foes) {
       const nx = Math.min(Math.max(f.x, WALK.x0), WALK.x1),
         ny = Math.min(Math.max(f.y, WALK.y0), WALK.y1);
       assert.ok(
         Math.hypot(f.x - nx, f.y - ny) >= SHIELD_OUTER + 5 + 3,
-        `wave ${wave + 1} foe at ${f.x},${f.y}`,
+        `level ${level} foe at ${f.x},${f.y}`,
       );
     }
   }
 });
 
 test('shield sentinel: a sentinel against the wall still blocks the wall turret orb', () => {
-  for (const [wave, fx, px, face, key] of [
-    [1, 16, WALK.x0, 'ArrowLeft', 'left'],
-    [2, 464, WALK.x1, 'ArrowRight', 'right'],
+  for (const [fx, px, face, key] of [
+    [16, WALK.x0, 'ArrowLeft', 'left'],
+    [464, WALK.x1, 'ArrowRight', 'right'],
   ]) {
     const w = mk();
-    startWave(w, wave);
+    startLevel(w, WALL_LEVEL);
     w.introT = 0;
     w.crawlers = [];
     w.foes = w.foes.filter((f) => f.x === fx);

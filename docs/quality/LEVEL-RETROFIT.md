@@ -16,7 +16,7 @@ Effort: S = level data only, M = data plus some mechanics or tests, L = structur
 | glider-ridge     |             20 | `COURSES`        |   S    | done (final review) |
 | burrow-rescue    |              3 | `SECTORS`        |   S    | queued              |
 | raft-rush        |              3 | `SECTION_DATA`   |   S    | queued              |
-| shield-sentinel  |   3 + Guardian | `WAVES`          |   S    | queued              |
+| shield-sentinel  |             20 | `LEVELS`         |   S    | done (final review) |
 | dash-duelist     |              3 | `RIVALS`         |   S    | queued              |
 | tether-twins     |              3 | `ROOMS`          |   S    | queued              |
 | vine-warden      |              3 | `PLOTS`          |   S    | queued              |

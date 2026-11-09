@@ -1,0 +1,83 @@
+✔ quality: there are 20 data-driven levels on a teaching, combination and mastery curve (0.974875ms)
+✔ quality: exported level data is frozen (0.128667ms)
+✔ quality: every level has accurate bilingual names and tips that fit the 480 px canvas (1.146458ms)
+✔ quality: tips only name what the level really contains, and the first appearance is taught (0.36675ms)
+✔ quality: a reaction-limited, public-state player clears every level at 30, 60 and 120 Hz (2880.740667ms)
+✔ quality: a player who never acts survives the opening and then loses fairly (12.296125ms)
+✔ quality: the level banner never covers the sentinel or any foe (0.161708ms)
+✔ quality: prompts name keys, stay put long enough to read and never flip back and forth (28.9175ms)
+✔ quality: idle, mash, random and hold-plus-alternate players win nothing from level 3 (2292.997459ms)
+✔ quality: the level select lists the saved progress, starts the chosen level and clamps junk (0.533291ms)
+✔ quality: clearing a level unlocks the next, survives a throwing store and never lowers progress (14.391459ms)
+✔ quality: a shield key still held from the level select does not raise the shield until released (0.104375ms)
+✔ quality: a bash tapped just before it is ready, or between ticks, is buffered (0.188875ms)
+✔ quality: hostile dt and pointer values never throw or corrupt the game (3.197792ms)
+✔ quality: draw covers the select screen and every level in both languages (2.684541ms)
+✔ quality: the final level ends the game exactly once with an EN or ZH win, then freezes (27.0095ms)
+✔ quality: losing ends the game exactly once with an EN or ZH message, then freezes (2.567ms)
+✔ quality: the same scripted input gives the same game at every frame rate (2.763792ms)
+✔ shield sentinel: metadata is bilingual and every action has a touch control (0.765834ms)
+✔ shield sentinel: zero, negative, NaN, infinite and huge dt never advance state or read input (0.816375ms)
+✔ shield sentinel: a sub-tick dt waits for a full tick instead of reading or losing input (0.400792ms)
+✔ shield sentinel: a long frame is capped to 1/30 second of simulation (0.161708ms)
+✔ shield sentinel: geometry helpers behave as documented (0.176958ms)
+✔ shield sentinel: collider and sprite size match and meet the readability range (0.759917ms)
+✔ shield sentinel: movement is 8-way, bounded, normalised, and rooted while the shield is up (2.85125ms)
+✔ shield sentinel: only the shield arc blocks, by actual geometry (2.549292ms)
+✔ shield sentinel: a shot already inside the shield radius is not blocked retroactively (0.090917ms)
+✔ shield sentinel: very fast shots are swept and cannot tunnel through the arc or the body (0.759334ms)
+✔ shield sentinel: reflection mirrors about the shield normal and boosts speed (0.364ms)
+✔ shield sentinel: a straight shot returns to the turret that fired it and damages it once (1.245875ms)
+✔ shield sentinel: a reflected shot damages each target once and credits once (0.772208ms)
+✔ shield sentinel: slugs are blocked but never reflected, and lances ignore the shield (0.40875ms)
+✔ shield sentinel: lance telegraph lanes match the hitbox exactly (0.676583ms)
+✔ shield sentinel: every attack is telegraphed with a human-length warning (3.503917ms)
+✔ shield sentinel: event times are ordered, so an earlier fatal hit is not undone by a later block (0.128583ms)
+✔ shield sentinel: a fatal hit earlier than the final kill wins the tick (0.057625ms)
+✔ shield sentinel: the invulnerability window is visible and prevents back-to-back damage (0.240416ms)
+✔ shield sentinel: the shield drains, recharges, breaks at zero and recovers visibly (0.816875ms)
+✔ shield sentinel: bash is short, costs shield energy, has a visible cooldown and cannot spam (0.215708ms)
+✔ shield sentinel: bash defeats crawlers in front only, within its reach (0.106708ms)
+✔ shield sentinel: crawlers spawn behind a portal, hurt on contact, and the arc bounces them (2.021084ms)
+✔ shield sentinel: levels clear in order, heal two points, show a visible intro timer, then the guardian (0.183917ms)
+✔ shield sentinel: the guardian slam is telegraphed, breaks the shield, exposes the guardian and can be dodged (0.809625ms)
+✔ shield sentinel: defeating the guardian wins once, freezes state and ignores input (2.630958ms)
+✔ shield sentinel: clearing the last level is a win with a bonus (0.151875ms)
+✔ shield sentinel: wave and guardian prompts exist for every threat in both languages (0.105916ms)
+✔ shield sentinel: entities stay in the playfield, clear of the HUD bands (2.512791ms)
+✔ shield sentinel: draw smoke covers every state, uses 14-16 px text and stays finite (1.792208ms)
+✔ shield sentinel: the same aligned input script gives identical full state at 30, 60 and 120 Hz (7.792791ms)
+✔ shield sentinel: seeded random play stays finite and bounded, and ends exactly once (26.263334ms)
+✔ shield sentinel: a crawler bounce that empties the shield breaks it (0.102917ms)
+✔ shield sentinel: a turret destroyed mid-charge cancels its attack and restarts the rest timer (0.099833ms)
+✔ shield sentinel: the game wrapper draws and reports sounds for the actions taken (0.1885ms)
+✔ shield sentinel: drawn plates are bold and match the blocking geometry (0.908709ms)
+✔ shield sentinel: no shot can spawn inside the shield catch radius at any reachable position (0.235375ms)
+✔ shield sentinel: a sentinel against the wall still blocks the wall turret orb (1.06075ms)
+✔ shield sentinel: swept shots agree with the drawn plate sector, including both end faces (1096.539208ms)
+✔ shield sentinel: a lateral graze of either plate end is blocked at several speeds (0.644042ms)
+✔ shield sentinel: words match the telegraph colours (1.804709ms)
+ℹ tests 59
+ℹ suites 0
+ℹ pass 59
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 5321.445125
+ℹ start of coverage report
+ℹ ------------------------------------------------------------------------------
+ℹ file                          | line % | branch % | funcs % | uncovered lines
+ℹ ------------------------------------------------------------------------------
+ℹ src                           |        |          |         | 
+ℹ  games                        |        |          |         | 
+ℹ   shield-sentinel-draw.js     | 100.00 |    91.43 |  100.00 | 
+ℹ   shield-sentinel-geometry.js | 100.00 |    97.73 |  100.00 | 
+ℹ   shield-sentinel-levels.js   | 100.00 |   100.00 |  100.00 | 
+ℹ   shield-sentinel-menu.js     |  97.50 |    94.44 |  100.00 | 24
+ℹ   shield-sentinel-world.js    | 100.00 |    94.91 |  100.00 | 
+ℹ   shield-sentinel.js          | 100.00 |   100.00 |  100.00 | 
+ℹ ------------------------------------------------------------------------------
+ℹ all files                     |  99.94 |    94.97 |  100.00 | 
+ℹ ------------------------------------------------------------------------------
+ℹ end of coverage report
