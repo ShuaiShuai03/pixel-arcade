@@ -1,0 +1,68 @@
+{
+  "game": "neon-snake",
+  "date": "2026-11-09",
+  "reviewedRevision": "309f50d plus the rework in this commit",
+  "owner": "owner-snake",
+  "reviewer": "final-snake",
+  "rounds": 1,
+  "process": "Lean final review at the user's request: the known 3-level shortfall went straight to a retrofit, followed by one independent review round. Its one MEDIUM finding (the countdown panel) was fixed and verified by an overlap test, one clean-worktree run and the browser check, without a second review round.",
+  "verdict": "pass",
+  "approvedSha256": {
+    "src/games/neon-snake.js": "e45c4876089ad0310c48b5f0748841e2901d590b62f67e066d53c47ddf8b677c",
+    "src/games/neon-snake-draw.js": "30aa4ef400fb9e1f0b638f9eee05450e41f6b920866bfbba73f2f2bf3fcd389f",
+    "src/games/neon-snake-hud.js": "d39ebacc3fbdda28f067c61999afa67906aa963dd2f4e3267519d7d5dd37c22f",
+    "src/games/neon-snake-levels.js": "73cfc6228ed41017c4dd1a1136dd51372fd2ece1297865715b5b4824ee82bb2a",
+    "src/games/neon-snake-menu.js": "e07e248ecabf571e52d60394c9b27f06c90b88a53d2d2485132f6b8a6c4b5f8a",
+    "src/games/neon-snake-rules.js": "8ea95df960257ab9997e47c64d7c11c5183a748f31ea4018cf66db1aeff62bfb",
+    "src/games/neon-snake-text.js": "2fe1c77389eabf59f8e5cb81d49f6793efd764a36d39d3db7e7af53b8bfa99a4",
+    "tests/neon-snake.test.js": "20de4e743251aa4af5dcfa0161ebf65231561dd26808444572ef238dd4ab5f4f",
+    "tests/neon-snake-quality.test.js": "21f64a8dc7531e8d0d2a4dd27c10b2df52f9c62a471a3236ee22e039e24c8a2a"
+  },
+  "tests": {
+    "command": "node --experimental-test-coverage --test-coverage-include='src/games/neon-snake*.js' --test tests/neon-snake.test.js tests/neon-snake-quality.test.js",
+    "passed": 45,
+    "failed": 0,
+    "lineCoverage": 99.76,
+    "log": "neon-snake-coverage.txt"
+  },
+  "independentProbes": "The reviewer's own planner bot, reading only public state, cleared all 20 levels at 30, 60 and 120 Hz on 6 seeds and at 60 Hz on 12, and cleared 80 of 80 runs with a 0.4 s reaction, including when it first looked at the board only after the countdown. Straight, random-turn, spiral and zigzag policies won 0 of 108 runs on levels 3-20. 150 fuzz runs with hostile dt, pointers and progress stores threw nothing and every terminal run ended exactly once; recorded runs replayed identically at 30, 60 and 120 Hz; every EN/ZH tip matched the level data.",
+  "findings": [
+    {
+      "id": "R1",
+      "severity": "blocking",
+      "status": "fixed",
+      "observation": "Only 3 levels built from about 23 per-level branches, with no select or continue. There are now 20 data-driven levels (teaching 1-7, combination 8-14, mastery 15-20) with stones, gates on 4-, 3- and 2-move clocks, tunnels, queued turns and Focus, each with an authored start, an accurate EN/ZH tip, a level select and env.progress continue."
+    },
+    {
+      "id": "R2",
+      "severity": "medium",
+      "status": "fixed",
+      "observation": "Every level opens with a countdown (4 s on level 1, 2.4 s elsewhere) during which turns can be queued, and the 800-line file is split into seven modules with a quality test file."
+    },
+    {
+      "id": "M1",
+      "severity": "medium",
+      "status": "fixed",
+      "observation": "Review finding: the countdown panel covered board rows 10-13 at 94% opacity, hiding the head on 8 levels and the first fruit on level 7. The panel now moves to the top or middle when the snake, the cells ahead or the first fruit are low, and a test checks every level; level 20's snake is one cell shorter so it starts with 3 free cells ahead."
+    }
+  ],
+  "openNotes": [
+    "Level 20's opening is tight: a player who reads the board only at the end of the countdown needs about a 0.4 s reaction.",
+    "Some fruit on Needle and Four Rooms sit one cell from the edge and need a planned approach.",
+    "The bots plan with the whole board in view, which is more than a human sees at a glance."
+  ],
+  "browser": {
+    "method": "Official Claude in Chrome extension, local server; real clicks on Start, Play again and the touch buttons, synthetic in-page keys; only DOM text and the canvas were read.",
+    "servedSha256Prefixes": "e45c4876 30aa4ef4 d39ebacc 73cfc622 e07e248e 8ea95df9 2fe1c773",
+    "observed": [
+      "Chinese: Start opened level 1 of 20 (草地) with the countdown panel below the snake and fruit, which stayed visible.",
+      "Chinese loss: an Up turn steered into a stone block and the loss screen explained it (第1关：花园障碍格挡住了路线。).",
+      "Chinese 390 px phone frame (388 px inner, no horizontal overflow): the Down touch button queued a turn during the countdown, shown in the HUD, and the snake turned down when play began; after the loss, Play again restarted level 1.",
+      "Not covered in the browser: a level win and the level select, which appears only after a first clear; the reviewer's bots and the quality tests cover both."
+    ],
+    "screenshots": [
+      "screenshots/neon-snake-countdown-zh.jpg",
+      "screenshots/neon-snake-phone-zh.png"
+    ]
+  }
+}

@@ -235,7 +235,8 @@
       "sky-raiders",
       "bomb-garden",
       "iron-bastion",
-      "starbreaker"
+      "starbreaker",
+      "neon-snake"
     ],
     "records": [
       "final-review/snowball-siege.json",
@@ -243,7 +244,8 @@
       "final-review/sky-raiders.json",
       "final-review/bomb-garden.json",
       "final-review/iron-bastion.json",
-      "final-review/starbreaker.json"
+      "final-review/starbreaker.json",
+      "final-review/neon-snake.json"
     ]
   }
 }
