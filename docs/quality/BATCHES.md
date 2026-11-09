@@ -17,7 +17,7 @@ Mirror Lab, a laser-and-mirror puzzle with 22 rooms, passed two rounds of indepe
 
 Circuit Weaver, a copper-tile wiring puzzle with 24 boards, voltages, shorts and fuses, passed five rounds of independent review and browser acceptance, bringing the accepted total to 47. A prompt-following driver wired all 24 boards in English at the maximum score, a budget board was played to a loss in Chinese, and touch play was checked on a phone layout. See the [Circuit Weaver evidence](batch-17/circuit-weaver/ACCEPTANCE.md). Commit `66c26b5` is live; all seven checked assets match, and the published game accepted real input. See the [deployment receipt](batch-17/circuit-weaver/deployment.json).
 
-Tide Lock, a canal-lock puzzle with 22 locks, valves, gates, tides and a hull budget, passed seven rounds of independent review and browser acceptance, bringing the accepted total to 48. A prompt-following driver cleared all 22 locks in English without a reset or a lost hull, a Chinese lock was played to a loss, and touch play was checked on a phone layout. See the [Tide Lock evidence](batch-17/tide-lock/ACCEPTANCE.md).
+Tide Lock, a canal-lock puzzle with 22 locks, valves, gates, tides and a hull budget, passed seven rounds of independent review and browser acceptance, bringing the accepted total to 48. A prompt-following driver cleared all 22 locks in English without a reset or a lost hull, a Chinese lock was played to a loss, and touch play was checked on a phone layout. See the [Tide Lock evidence](batch-17/tide-lock/ACCEPTANCE.md). Commit `ade214b` is live; all eight checked assets match, and the published game accepted real input. See the [deployment receipt](batch-17/tide-lock/deployment.json).
 
 ## Completed batch 16
 

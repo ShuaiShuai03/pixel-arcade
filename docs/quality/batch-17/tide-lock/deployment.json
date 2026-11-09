@@ -1,0 +1,79 @@
+{
+  "date": "2026-11-09",
+  "commit": "ade214b",
+  "url": "https://shuaishuai03.github.io/pixel-arcade/",
+  "workflow": {
+    "runId": 42550080474,
+    "url": "https://github.com/ShuaiShuai03/pixel-arcade/actions/runs/42550080474",
+    "conclusion": "success",
+    "jobs": {
+      "build": "success",
+      "report-build-status": "success",
+      "deploy": "success"
+    },
+    "completedAt": "2026-11-09T02:17:42Z"
+  },
+  "assets": [
+    {
+      "path": "index.html",
+      "bytes": 9421,
+      "sha256": "b660ce3e50c66ade22d92971dc42aa72295778a8e411e91429d1b35a7e007768",
+      "matchesCommit": true
+    },
+    {
+      "path": "src/catalog.js",
+      "bytes": 4244,
+      "sha256": "76a064a011f27e04cc1a1a0d44405946e46cedc610001c4bdc644a46d3fcf3d6",
+      "matchesCommit": true
+    },
+    {
+      "path": "src/app.js",
+      "bytes": 24072,
+      "sha256": "f968ec9582f04b3461d9cd81aba7286ecd0e449754acb14fbc3e86171b111d33",
+      "matchesCommit": true
+    },
+    {
+      "path": "src/games/tide-lock-draw.js",
+      "bytes": 14501,
+      "sha256": "79e1c7c33132bda941db35b319817c4dfda79614a647522c18b577bdb8344cb8",
+      "matchesCommit": true,
+      "matchesApproved": true
+    },
+    {
+      "path": "src/games/tide-lock-levels.js",
+      "bytes": 20274,
+      "sha256": "6acd43a7fb9674ee3d2c4580d6fe793dd062408b6dab268b40ebd97df0bbdc08",
+      "matchesCommit": true,
+      "matchesApproved": true
+    },
+    {
+      "path": "src/games/tide-lock-plan.js",
+      "bytes": 9823,
+      "sha256": "3979bb788a8da932815a9218ae347881ca07832cb5c56cecbb0e1abfd446e3d2",
+      "matchesCommit": true,
+      "matchesApproved": true
+    },
+    {
+      "path": "src/games/tide-lock-world.js",
+      "bytes": 16210,
+      "sha256": "4020d180aa48e246234653d33e9aa2f1189fecd4e559a63d74c81b9e31927e4c",
+      "matchesCommit": true,
+      "matchesApproved": true
+    },
+    {
+      "path": "src/games/tide-lock.js",
+      "bytes": 36297,
+      "sha256": "3de9ca34e49ee168f36f3450496dd3b2b0365b69bf48cd0f41b6c9764aa78837",
+      "matchesCommit": true,
+      "matchesApproved": true
+    }
+  ],
+  "publishedInput": {
+    "method": "The user's Chrome through the official Claude in Chrome extension; Start was a real click, keys were real key presses sent by the extension, and only the status line and canvas pixels were read.",
+    "observed": [
+      "Tide Lock: Start opened lock 1 of 22 with 'Space: open V1 (Pond into Basin)'; one Space opened the valve and changed the line to 'Press X to select gate G1'. A second Space, against the prompt, closed the valve, and the line changed to 'Wait: working out the next step' while the planner re-planned."
+    ],
+    "screenshots": ["../screenshots/published-tide.jpg"]
+  },
+  "notes": "Assets were fetched with a cache-busting query string and compared with the committed files."
+}
