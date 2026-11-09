@@ -1,0 +1,86 @@
+✔ twenty frozen, distinct, bilingual levels with a legal layout (2.845083ms)
+✔ difficulty rises across the four tiers: more gear turns and more routes to get wrong (0.338292ms)
+✔ machine 1 First Winding: scripted escape clears without a fall and unlocks the next (21.443666ms)
+✔ machine 2 Boiler Gate: scripted escape clears without a fall and unlocks the next (18.95575ms)
+✔ machine 3 Lift Shaft: scripted escape clears without a fall and unlocks the next (18.552416ms)
+✔ machine 4 Down Elevator: scripted escape clears without a fall and unlocks the next (18.933625ms)
+✔ machine 5 Two Ferries: scripted escape clears without a fall and unlocks the next (22.117458ms)
+✔ machine 6 Piston Hall: scripted escape clears without a fall and unlocks the next (30.78025ms)
+✔ machine 7 Summon: scripted escape clears without a fall and unlocks the next (17.396959ms)
+✔ machine 8 Counterweight: scripted escape clears without a fall and unlocks the next (17.8825ms)
+✔ machine 9 Stairwell: scripted escape clears without a fall and unlocks the next (21.546959ms)
+✔ machine 10 Stepping Stones: scripted escape clears without a fall and unlocks the next (10.087583ms)
+✔ machine 11 Swing Shift: scripted escape clears without a fall and unlocks the next (34.177375ms)
+✔ machine 12 Ferry Then Lift: scripted escape clears without a fall and unlocks the next (29.279792ms)
+✔ machine 13 Master Clockwork: scripted escape clears without a fall and unlocks the next (26.468958ms)
+✔ machine 14 Seesaw: scripted escape clears without a fall and unlocks the next (31.65725ms)
+✔ machine 15 Long Haul: scripted escape clears without a fall and unlocks the next (46.461667ms)
+✔ machine 16 Press Gates: scripted escape clears without a fall and unlocks the next (46.226125ms)
+✔ machine 17 Gate Tower: scripted escape clears without a fall and unlocks the next (69.531125ms)
+✔ machine 18 Gate Ferries: scripted escape clears without a fall and unlocks the next (63.435042ms)
+✔ machine 19 Three Steps: scripted escape clears without a fall and unlocks the next (69.84275ms)
+✔ machine 20 Grand Mechanism: scripted escape clears without a fall and unlocks the next (64.172833ms)
+✔ a reaction-limited player (0.25 s and 0.35 s) clears every machine at 30, 60 and 120 Hz (3677.8755ms)
+✔ the whole campaign is winnable in one run, in order, from the select screen (1188.457792ms)
+✔ idle, mashing and timed hold-and-alternate patterns win at most 25% of any machine from 3 (6577.477708ms)
+✔ an idle player never loses anything, and machine 1 cannot be lost by waiting (67.03525ms)
+✔ aligned scripted input is bit-identical at 30, 60 and 120 Hz on every machine (23.184166ms)
+✔ hostile dt values change nothing and hostile pointers never start or move the select (1.915334ms)
+✔ broken, missing and junk progress stores are survived and clamped (8.659375ms)
+✔ select screen: keyboard, taps, locked machines, continue and clamped cursor (0.195042ms)
+✔ winning ends exactly once in English and Chinese and then the state is frozen (150.278333ms)
+✔ five falls lose once in English and Chinese, freeze, and a new game starts fresh (56.547042ms)
+✔ Q rewinds the machine for free, the host keys stay free, and every action has a touch control (0.326916ms)
+✔ an input pressed while time is too short to step is latched, not dropped (0.078667ms)
+✔ every opening screen, the select screen and every message fit and are localized (16.379042ms)
+✔ the select screen and the top and bottom bars never cover play (0.399292ms)
+✔ a gear shows its state by shape as well as colour (0.526459ms)
+✔ random play on every machine stays finite and out of the walls (203.827208ms)
+✔ a stranded player always sees the rewind key and gets a stuck hint after waiting (14.996542ms)
+✔ meta is bilingual and touch controls cover every action (1.193542ms)
+✔ invalid, zero, negative, NaN and huge dt do not advance or consume input (1.995292ms)
+✔ a press during a sub-step dt is latched instead of lost (0.332833ms)
+✔ scripted runs agree at 30, 60 and 120 Hz (16.808166ms)
+✔ gears only respond when the player is near, nearest wins, and toggling flips bridge targets (0.814416ms)
+✔ bridges move at a finite speed and the linked group stops exactly at the end (5.710042ms)
+✔ a passenger is carried without drift and without leaving the deck (5.302834ms)
+✔ launch inherits platform velocity exactly once (1.14475ms)
+✔ walking off a moving deck inherits its velocity once, and rising lifts add jump speed (2.460083ms)
+✔ crush rule: a descending press jams on the player instead of pushing or crushing (19.87425ms)
+✔ crush rule: a pinned key and a blocked rider also jam the mechanism (21.331041ms)
+✔ key actions: take, reject far take, drop only on ground, ride a deck, unlock near door only (4.841333ms)
+✔ a locked door does not end the machine; an unlocked one does (0.479958ms)
+✔ jump buffering, coyote grace once per support exit, no double jump (2.260625ms)
+✔ swept collisions: extreme speed cannot tunnel through a deck, wall or underside (1.113666ms)
+✔ recovery: a stranded player can recall the bridge; a mid-travel crank reverses it (5.466292ms)
+✔ falling costs a life and rewinds the machine; five falls lose once and freeze (38.378375ms)
+✔ zh and en status/messages and draw smoke across every machine and state (5.119334ms)
+✔ presentation: actor collider equals the large sprite and canvas text is localized (0.604375ms)
+✔ regression F1: standing needs the body centre over a support and keys always rest on one (0.569208ms)
+✔ regression F2: landing on a rising lift is not a jam, for any gap above the deck (7.325042ms)
+✔ regression F3: unlock score cannot be farmed by falling and re-unlocking (0.24225ms)
+✔ regression F4: no hint plate is drawn over the playfield (0.33675ms)
+ℹ tests 62
+ℹ suites 0
+ℹ pass 62
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 12755.604583
+ℹ start of coverage report
+ℹ ---------------------------------------------------------------------------------------------
+ℹ file                         | line % | branch % | funcs % | uncovered lines
+ℹ ---------------------------------------------------------------------------------------------
+ℹ src                          |        |          |         | 
+ℹ  games                       |        |          |         | 
+ℹ   clockwork-bridge-draw.js   |  96.61 |    94.62 |   92.59 | 197-201 205-207 311-312 315 318
+ℹ   clockwork-bridge-levels.js | 100.00 |   100.00 |  100.00 | 
+ℹ   clockwork-bridge-menu.js   | 100.00 |   100.00 |  100.00 | 
+ℹ   clockwork-bridge-routes.js | 100.00 |   100.00 |  100.00 | 
+ℹ   clockwork-bridge-step.js   | 100.00 |    98.78 |  100.00 | 
+ℹ   clockwork-bridge.js        | 100.00 |   100.00 |  100.00 | 
+ℹ ---------------------------------------------------------------------------------------------
+ℹ all files                    |  99.40 |    98.02 |   98.29 | 
+ℹ ---------------------------------------------------------------------------------------------
+ℹ end of coverage report

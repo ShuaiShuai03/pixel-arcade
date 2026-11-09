@@ -10,6 +10,9 @@ import {
 import { harness, input, mockContext } from './harness.js';
 
 const DT = 1 / 120;
+const BOILER = 1;
+const PISTON = 5;
+const MASTER = 12;
 const run = (s, seconds, held = [], pressed = []) => {
   const n = Math.round(seconds / DT);
   for (let i = 0; i < n; i++) stepMachine(s, DT, input(held, i === 0 ? pressed : []));
@@ -20,6 +23,13 @@ const place = (s, x, y, extra = {}) => {
 const onBridge = (s, id, offset = 20) => {
   const b = s.bridges[id];
   place(s, b.x + offset, b.y - s.player.h, { grounded: true, ground: id });
+};
+const startAt = (level, opts) => {
+  const h = harness(opts);
+  h.env.progress = { unlocked: () => level, unlock() {} };
+  const g = createGame(h.env);
+  if (level > 1) g.update(1 / 60, input([], ['Space']));
+  return { g, h };
 };
 const overlap = (a, b) =>
   a.x < b.x + b.w - 1e-6 &&
@@ -45,7 +55,7 @@ test('meta is bilingual and touch controls cover every action', () => {
 });
 
 test('invalid, zero, negative, NaN and huge dt do not advance or consume input', () => {
-  const s = createMachine(0);
+  const s = createMachine(BOILER);
   place(s, 140, 230);
   const before = JSON.stringify(s);
   for (const dt of [0, -1, NaN, Infinity, -Infinity, 0.5, 10, undefined, '0.01']) {
@@ -59,7 +69,7 @@ test('invalid, zero, negative, NaN and huge dt do not advance or consume input',
 });
 
 test('a press during a sub-step dt is latched instead of lost', () => {
-  const s = createMachine(0);
+  const s = createMachine(BOILER);
   place(s, 140, 230);
   stepMachine(s, 1 / 1000, input([], ['KeyX']));
   assert.equal(s.stats.cranks, 0);
@@ -69,7 +79,7 @@ test('a press during a sub-step dt is latched instead of lost', () => {
 
 test('scripted runs agree at 30, 60 and 120 Hz', () => {
   const finals = [30, 60, 120].map((hz) => {
-    const s = createMachine(0);
+    const s = createMachine(BOILER);
     const frames = hz * 4;
     for (let i = 0; i < frames; i++) {
       const t = i / hz;
@@ -86,7 +96,7 @@ test('scripted runs agree at 30, 60 and 120 Hz', () => {
 });
 
 test('gears only respond when the player is near, nearest wins, and toggling flips bridge targets', () => {
-  const s = createMachine(0);
+  const s = createMachine(BOILER);
   place(s, 20, 230);
   run(s, 0.05, [], ['KeyX']);
   assert.equal(s.stats.cranks, 0);
@@ -99,7 +109,7 @@ test('gears only respond when the player is near, nearest wins, and toggling fli
   assert.equal(s.bridges[0].target, 1);
   run(s, 0.05, [], ['KeyX']);
   assert.equal(s.bridges[0].target, 0);
-  const m2 = createMachine(1);
+  const m2 = createMachine(PISTON);
   place(m2, 244, 156);
   run(m2, 0.02, [], ['KeyX']);
   assert.equal(m2.gears[2].state, 1);
@@ -109,7 +119,7 @@ test('gears only respond when the player is near, nearest wins, and toggling fli
 });
 
 test('bridges move at a finite speed and the linked group stops exactly at the end', () => {
-  const s = createMachine(0);
+  const s = createMachine(BOILER);
   place(s, 120, 230);
   run(s, 0.02, [], ['KeyX']);
   const b = s.bridges[0];
@@ -123,7 +133,7 @@ test('bridges move at a finite speed and the linked group stops exactly at the e
 });
 
 test('a passenger is carried without drift and without leaving the deck', () => {
-  const s = createMachine(0);
+  const s = createMachine(BOILER);
   onBridge(s, 0, 6);
   place(s, 160, 230, { grounded: true, ground: 0 });
   const offset = s.player.x - s.bridges[0].x;
@@ -138,7 +148,7 @@ test('a passenger is carried without drift and without leaving the deck', () => 
 });
 
 test('launch inherits platform velocity exactly once', () => {
-  const a = createMachine(0);
+  const a = createMachine(BOILER);
   onBridge(a, 0, 10);
   run(a, 0.02, [], ['KeyX']);
   run(a, 0.5);
@@ -157,7 +167,7 @@ test('launch inherits platform velocity exactly once', () => {
 });
 
 test('walking off a moving deck inherits its velocity once, and rising lifts add jump speed', () => {
-  const s = createMachine(0);
+  const s = createMachine(BOILER);
   onBridge(s, 0, 20);
   run(s, 0.02, [], ['KeyX']);
   run(s, 0.3);
@@ -166,7 +176,7 @@ test('walking off a moving deck inherits its velocity once, and rising lifts add
   run(s, 0.2, ['ArrowRight']);
   assert.ok(s.player.vx > 0);
   assert.ok(s.player.vx <= v + 80 + 1e-6);
-  const l = createMachine(1);
+  const l = createMachine(PISTON);
   onBridge(l, 0, 20);
   run(l, 0.02, [], ['KeyX']);
   run(l, 0.3);
@@ -177,7 +187,7 @@ test('walking off a moving deck inherits its velocity once, and rising lifts add
 });
 
 test('crush rule: a descending press jams on the player instead of pushing or crushing', () => {
-  const s = createMachine(2);
+  const s = createMachine(MASTER);
   const press = s.bridges[2];
   place(s, 280, 240, { grounded: true, ground: -1 });
   s.bridges[2].target = 1;
@@ -210,7 +220,7 @@ test('crush rule: a descending press jams on the player instead of pushing or cr
 });
 
 test('crush rule: a pinned key and a blocked rider also jam the mechanism', () => {
-  const s = createMachine(2);
+  const s = createMachine(MASTER);
   s.keys[0].x = 285;
   s.keys[0].y = 248;
   s.keys[0].on = -1;
@@ -220,7 +230,7 @@ test('crush rule: a pinned key and a blocked rider also jam the mechanism', () =
   run(s, 3);
   assert.equal(s.bridges[2].jam, 'key');
   assert.equal(s.keys[0].y, 248);
-  const r = createMachine(1);
+  const r = createMachine(PISTON);
   onBridge(r, 0, 20);
   r.solids.push({ x: 110, y: 200, w: 60, h: 20, style: 'stone' });
   r.bridges[0].target = 1;
@@ -230,7 +240,7 @@ test('crush rule: a pinned key and a blocked rider also jam the mechanism', () =
   assert.equal(r.bridges[0].jam, 'player');
   assert.ok(r.player.y <= y0 + 1e-9 && r.player.y > y0 - 90);
   assert.ok(!r.solids.some((o) => overlap(r.player, o)));
-  const w = createMachine(0);
+  const w = createMachine(BOILER);
   w.solids.push({ x: 200, y: 230, w: 20, h: 30, style: 'stone' });
   w.bridges[0].target = 1;
   run(w, 3);
@@ -238,7 +248,7 @@ test('crush rule: a pinned key and a blocked rider also jam the mechanism', () =
 });
 
 test('key actions: take, reject far take, drop only on ground, ride a deck, unlock near door only', () => {
-  const s = createMachine(0);
+  const s = createMachine(BOILER);
   place(s, 100, 230);
   run(s, 0.02, [], ['KeyZ']);
   assert.equal(s.keys[0].state, 'floor');
@@ -281,20 +291,20 @@ test('key actions: take, reject far take, drop only on ground, ride a deck, unlo
 });
 
 test('a locked door does not end the machine; an unlocked one does', () => {
-  const s = createMachine(0);
+  const s = createMachine(BOILER);
   place(s, 438, 230, { grounded: true, ground: -1 });
   run(s, 0.1);
-  assert.equal(s.level, 1);
+  assert.equal(s.level, BOILER + 1);
   s.door.locked = false;
   run(s, 0.1);
-  assert.equal(s.level, 2);
+  assert.equal(s.level, BOILER + 2);
   assert.equal(s.cleared, 1);
   assert.equal(s.score, 1200);
   assert.ok(s.message.en === 'Machine escaped');
 });
 
 test('jump buffering, coyote grace once per support exit, no double jump', () => {
-  const s = createMachine(0);
+  const s = createMachine(BOILER);
   run(s, 0.05);
   stepMachine(s, DT, input([], ['Space']));
   assert.equal(s.stats.jumps, 1);
@@ -311,11 +321,11 @@ test('jump buffering, coyote grace once per support exit, no double jump', () =>
   const before = s.stats.jumps;
   run(s, 0.1, [], ['Space']);
   assert.equal(s.stats.jumps, before + 1, 'buffered press fires on touchdown');
-  const e = createMachine(0);
+  const e = createMachine(BOILER);
   place(e, 200, 230);
   run(e, 0.5, ['ArrowRight']);
   assert.equal(e.stats.edgeExits, 1);
-  const c = createMachine(0);
+  const c = createMachine(BOILER);
   c.bridges[0].x = 400;
   place(c, 140, 230);
   run(c, 0.02, ['ArrowRight']);
@@ -327,31 +337,31 @@ test('jump buffering, coyote grace once per support exit, no double jump', () =>
 });
 
 test('swept collisions: extreme speed cannot tunnel through a deck, wall or underside', () => {
-  const s = createMachine(0);
+  const s = createMachine(BOILER);
   place(s, 180, 100, { grounded: false, ground: null, vy: 1e5 });
   run(s, 1);
   assert.equal(s.player.ground, 0);
   assert.equal(s.player.y, 250 - 20);
-  const u = createMachine(0);
+  const u = createMachine(BOILER);
   place(u, 180, 300, { grounded: false, ground: null, vy: -1e5 });
   u.bridges[0].x = 160;
   run(u, 0.02);
   assert.ok(u.player.y >= 260 - 1e-6 || u.player.y > 330);
-  const w = createMachine(0);
+  const w = createMachine(BOILER);
   place(w, 440, 100, { vx: 1e5, grounded: false, ground: null });
   stepMachine(w, DT, input(['ArrowRight']));
   assert.ok(w.player.x <= 470 + 1e-6);
   place(w, 40, 100, { vx: -1e5, grounded: false, ground: null });
   stepMachine(w, DT, input(['ArrowLeft']));
   assert.ok(w.player.x >= -1e-6);
-  const ceil = createMachine(0);
+  const ceil = createMachine(BOILER);
   place(ceil, 100, 100, { vy: -1e5, grounded: false, ground: null });
   run(ceil, 0.05);
   assert.ok(ceil.player.y >= -1e-6);
 });
 
 test('recovery: a stranded player can recall the bridge; a mid-travel crank reverses it', () => {
-  const s = createMachine(0, [1, 0]);
+  const s = createMachine(BOILER, [1, 0]);
   assert.equal(s.bridges[0].p, 1);
   place(s, 120, 230);
   run(s, 0.02, [], ['KeyX']);
@@ -367,8 +377,7 @@ test('recovery: a stranded player can recall the bridge; a mid-travel crank reve
 });
 
 test('falling costs a life and rewinds the machine; five falls lose once and freeze', () => {
-  const h = harness();
-  const g = createGame(h.env);
+  const { g, h } = startAt(BOILER + 1);
   const stepAll = (held = [], pressed = []) => g.update(DT, input(held, pressed));
   for (let i = 0; i < 20; i++) stepAll(['ArrowRight']);
   stepAll([], ['KeyZ']);
@@ -396,7 +405,7 @@ test('falling costs a life and rewinds the machine; five falls lose once and fre
   assert.equal(fresh.lives, 5);
   assert.equal(fresh.phase, 'playing');
   assert.equal(fresh.score, 0);
-  assert.equal(fresh.player.x, 24);
+  assert.equal(fresh.player.x, 20);
 });
 
 test('zh and en status/messages and draw smoke across every machine and state', () => {
@@ -410,7 +419,7 @@ test('zh and en status/messages and draw smoke across every machine and state', 
     assert.equal(st.nearGear, null);
     assert.ok(st.jumpEnvelope.height > 40);
   }
-  for (let level = 0; level < 3; level++) {
+  for (const level of [0, BOILER, PISTON, MASTER]) {
     for (const lang of ['en', 'zh']) {
       const s = createMachine(level);
       const env = harness({ lang }).env;
@@ -434,7 +443,7 @@ test('presentation: actor collider equals the large sprite and canvas text is lo
   ctx.fillText = (t) => drawn.push(t);
   for (const lang of ['zh', 'en']) {
     drawn.length = 0;
-    createGame(harness({ lang }).env).draw(ctx);
+    startAt(BOILER + 1, { lang }).g.draw(ctx);
     assert.ok(drawn.includes(lang === 'zh' ? '出口' : 'EXIT'));
     assert.ok(!drawn.includes(lang === 'zh' ? 'EXIT' : '出口'));
     assert.ok(drawn.includes('A'), 'bridge and gear letters mark the drive linkage');
@@ -442,7 +451,7 @@ test('presentation: actor collider equals the large sprite and canvas text is lo
 });
 
 test('regression F1: standing needs the body centre over a support and keys always rest on one', () => {
-  const s = createMachine(0, [1, 0]);
+  const s = createMachine(BOILER, [1, 0]);
   place(s, 136, 230);
   for (let i = 0; i < 120 && s.player.x < 146; i++) stepMachine(s, 1 / 60, input(['ArrowRight']));
   for (let i = 0; i < 60; i++) stepMachine(s, 1 / 60, input());
@@ -450,7 +459,7 @@ test('regression F1: standing needs the body centre over a support and keys alwa
     s.player.x + s.player.w / 2 <= 150 + 1e-6 || s.player.y > 230,
     'no hovering over the pit',
   );
-  const t = createMachine(0, [1, 0]);
+  const t = createMachine(BOILER, [1, 0]);
   place(t, 140, 230);
   t.keys[0].state = 'carried';
   run(t, 0.02, [], ['KeyZ']);
@@ -462,13 +471,13 @@ test('regression F1: standing needs the body centre over a support and keys alwa
   k.state = 'carried';
   run(t, 0.01, [], ['KeyZ']);
   assert.ok(k.x + k.w <= 150 + 1e-9);
-  const air = createMachine(0, [1, 0]);
+  const air = createMachine(BOILER, [1, 0]);
   place(air, 220, 100);
   air.player.grounded = false;
   air.keys[0].state = 'carried';
   run(air, 0.01, [], ['KeyZ']);
   assert.equal(air.keys[0].state, 'carried');
-  const tight = createMachine(0);
+  const tight = createMachine(BOILER);
   tight.solids.push({ x: 90, y: 238, w: 14, h: 12, style: 'crate' });
   place(tight, 84, 230);
   tight.keys[0].state = 'carried';
@@ -478,7 +487,7 @@ test('regression F1: standing needs the body centre over a support and keys alwa
 
 test('regression F2: landing on a rising lift is not a jam, for any gap above the deck', () => {
   for (let gap = 0.01; gap < 2; gap += 0.07) {
-    const s = createMachine(1);
+    const s = createMachine(PISTON);
     s.gears[0].state = 1;
     s.bridges[0].target = 1;
     const deck = s.bridges[0];
@@ -496,7 +505,7 @@ test('regression F2: landing on a rising lift is not a jam, for any gap above th
 });
 
 test('regression F3: unlock score cannot be farmed by falling and re-unlocking', () => {
-  const s = createMachine(0);
+  const s = createMachine(BOILER);
   for (let cycle = 0; cycle < 3; cycle++) {
     s.keys[0].state = 'carried';
     place(s, 420, 230, { grounded: true, ground: -1 });
