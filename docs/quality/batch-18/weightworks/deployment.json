@@ -1,0 +1,72 @@
+{
+  "date": "2026-11-09",
+  "commit": "08a4d01",
+  "url": "https://shuaishuai03.github.io/pixel-arcade/",
+  "workflow": {
+    "runId": 42556968616,
+    "url": "https://github.com/ShuaiShuai03/pixel-arcade/actions/runs/42556968616",
+    "conclusion": "success",
+    "jobs": {
+      "build": "success",
+      "deploy": "success",
+      "report-build-status": "success"
+    },
+    "completedAt": "2026-11-09T03:33:02Z"
+  },
+  "assets": [
+    {
+      "path": "index.html",
+      "bytes": 9421,
+      "sha256": "b660ce3e50c66ade22d92971dc42aa72295778a8e411e91429d1b35a7e007768",
+      "matchesCommit": true
+    },
+    {
+      "path": "src/catalog.js",
+      "bytes": 4320,
+      "sha256": "2184abb8cb219659e957817d414f6c819f2202a10ede292435402a317828ab3b",
+      "matchesCommit": true
+    },
+    {
+      "path": "src/app.js",
+      "bytes": 24072,
+      "sha256": "f968ec9582f04b3461d9cd81aba7286ecd0e449754acb14fbc3e86171b111d33",
+      "matchesCommit": true
+    },
+    {
+      "path": "src/games/weightworks-draw.js",
+      "bytes": 14962,
+      "sha256": "36fcddccf6401e1d8e7ba1bd354e5823cd218784010e2aa957294d4b72ef2b3f",
+      "matchesCommit": true,
+      "matchesApproved": true
+    },
+    {
+      "path": "src/games/weightworks-engine.js",
+      "bytes": 15504,
+      "sha256": "93254ea10a84e022bbe983ec44a3ae4e2cc028c62c681525977d9c2e209e9e59",
+      "matchesCommit": true,
+      "matchesApproved": true
+    },
+    {
+      "path": "src/games/weightworks-machines.js",
+      "bytes": 10585,
+      "sha256": "475675389c2b24a3154d8fdbd5aac7734113e9db3bd7c41ac55d7f4180665cbe",
+      "matchesCommit": true,
+      "matchesApproved": true
+    },
+    {
+      "path": "src/games/weightworks.js",
+      "bytes": 17961,
+      "sha256": "b31102f7551395e2a2533b0e8ee3f8fa5b2ca661df7936c55d89920f7e72559e",
+      "matchesCommit": true,
+      "matchesApproved": true
+    }
+  ],
+  "publishedInput": {
+    "method": "The user's Chrome through the official Claude in Chrome extension; Start was a real click, keys were real key presses sent by the extension, and only the status line and canvas pixels were read.",
+    "observed": [
+      "Weightworks: Start opened machine 1 of 24 with 'Move → 2 to beam A peg +3'; two Right presses changed it to 'Space: place the 2 kg mass on beam A peg +3', and one Space balanced the machine ('Machine balanced! The next one is coming', score 100)."
+    ],
+    "screenshots": ["../screenshots/published-weightworks.jpg"]
+  },
+  "notes": "Assets were fetched with a cache-busting query string and compared with the committed files."
+}

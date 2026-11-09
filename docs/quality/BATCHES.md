@@ -11,7 +11,7 @@ At the user's direction, at most **three games** may be under development and ac
 
 Tide Lock brought the accepted total to 48, so these two games reach the 50-game target. Fold Map, first scheduled for this batch, is not needed for the target.
 
-Weightworks, a balance-machine puzzle with 24 machines, hanging beams, sliders, tippers and move budgets, passed two rounds of independent review and browser acceptance, bringing the accepted total to 49. A prompt-following driver balanced all 24 machines in Chinese at the maximum score, a budget machine was played to a loss in English, and touch play was checked on a phone layout. See the [Weightworks evidence](batch-18/weightworks/ACCEPTANCE.md).
+Weightworks, a balance-machine puzzle with 24 machines, hanging beams, sliders, tippers and move budgets, passed two rounds of independent review and browser acceptance, bringing the accepted total to 49. A prompt-following driver balanced all 24 machines in Chinese at the maximum score, a budget machine was played to a loss in English, and touch play was checked on a phone layout. See the [Weightworks evidence](batch-18/weightworks/ACCEPTANCE.md). Commit `08a4d01` is live; all seven checked assets match, and the published game accepted real input. See the [deployment receipt](batch-18/weightworks/deployment.json).
 
 ## Completed batch 17
 
