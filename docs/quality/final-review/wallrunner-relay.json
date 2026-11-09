@@ -1,0 +1,67 @@
+{
+  "game": "wallrunner-relay",
+  "date": "2026-11-10",
+  "reviewedRevision": "927535d plus the rework in this commit",
+  "owner": "owner-wallrunner",
+  "reviewer": "final-wallrunner",
+  "rounds": 1,
+  "process": "Lean final review at the user's request: the known 3-course shortfall went straight to a retrofit, followed by one independent review round. Its MEDIUM finding and one LOW item were fixed and verified by re-running the reviewer's own mechanic, pilot and blind scripts, one clean-worktree run and the browser check, without a second review round.",
+  "verdict": "pass",
+  "approvedSha256": {
+    "src/games/wallrunner-relay.js": "2bde7372d190659cd3fb37630ae8480ad34e4e2806b69ce0c6ac729721623d09",
+    "src/games/wallrunner-relay-levels.js": "f0dafade36e585ec5ca5aced1359d7076afb4be1f13090c69f24640669ff4ca5",
+    "src/games/wallrunner-relay-step.js": "a7763df07c1dc672480b53d4d29023ec8fac07df98b115a55c70535803c1f30b",
+    "src/games/wallrunner-relay-draw.js": "b4a4651f34df48906ce09ff251ed596578503d971a6b7f0b19341df61a368dce",
+    "src/games/wallrunner-relay-menu.js": "0ff533ef94052e6d806bfc9ca49b665550ca737cb1740e5ed53d5a81b94d946f",
+    "tests/wallrunner-relay.test.js": "52077df1c8870edc7768dee2519c2da0dd892ee2cb5bc86f9e5c3b6c165dbc75",
+    "tests/wallrunner-relay-quality.test.js": "d122b2c1c4d353419e868033b390e4ba9346c1f1098ef94380c35c99cad65881"
+  },
+  "tests": {
+    "command": "node --experimental-test-coverage --test-coverage-include='src/games/wallrunner-relay*.js' --test tests/wallrunner-relay.test.js tests/wallrunner-relay-quality.test.js",
+    "passed": 36,
+    "failed": 0,
+    "lineCoverage": 100,
+    "log": "wallrunner-relay-coverage.txt"
+  },
+  "independentProbes": "On the final files the reviewer's mechanic bots (jump only; jump plus wall-run; jump, wall-run and kick at edges) all fail courses 5, 6, 9, 12, 16 and 20, and courses 3, 4, 8, 11, 14, 18 and 19 need the wall-run. The reviewer's pilot (state seen 0.35 s late, 8 px jitter, 6 seeds) cleared mastery courses 16-20 in 29 of 30 runs (97%), losing up to about 1.2 lives per run on Storm Line, and cleared the rebuilt courses 6 and 12 in 6 of 6 runs each. Eighty-seven blind policies won at most 4.6% of runs on any course (cap 25%). In the review round physics, determinism, progress stores and text fit passed, the pilot cleared 120 of 120 runs at 0.25 s and 119 of 120 at 0.35 s, and jump windows were 26-38 px (240-345 ms).",
+  "findings": [
+    {
+      "id": "R1",
+      "severity": "blocking",
+      "status": "fixed",
+      "observation": "Only 3 courses, with no select or continue. There are now 20 data-driven courses with chalk walls for wall-running, bare walls for kicks, slick faces, relay pads that refill energy, accurate EN/ZH tips, a course select and env.progress continue, and the file is split into five modules."
+    },
+    {
+      "id": "M1",
+      "severity": "medium",
+      "status": "fixed",
+      "observation": "Review finding: courses 6 (Slick Ledge), 12 (Pit Climb) and 16 (Slick Spire) started on a top roof with a 26 px gap, so one ordinary jump skipped the kick, chalk and slick content. The runner now starts inside the pit on all three, a slick mark on the left boundary wall forces a low kick on 6 and 16, course 12 needs a kick across before the chalk run, and the tips for 5, 6, 9, 12 and 16 describe the real routes."
+    },
+    {
+      "id": "L1",
+      "severity": "low",
+      "status": "fixed",
+      "observation": "Review finding: a player following the bare-wall prompt could not discover the kick-climb rhythm on the shafts of 5 and 9. The prompt now reads 'Space: kick across, then kick the opposite wall.' (空格：蹬向对面，再蹬对面墙。) and the tips explain the rhythm."
+    }
+  ],
+  "openNotes": [
+    "Courses 15 (Needle Roofs) and 17 (Thin Air) are precision-jump courses that need no wall mechanic.",
+    "Storm Line (18) is the hardest course for the 0.35 s pilot, which lost one run of six there.",
+    "Course 20 was left unchanged; it already defeats all three mechanic bots."
+  ],
+  "browser": {
+    "method": "Official Claude in Chrome extension, local server; real clicks on Start and the language toggle, synthetic in-page keys; only DOM text and the canvas were read.",
+    "servedSha256Prefixes": "2bde7372 f0dafade a7763df0 b4a4651f 0ff533ef",
+    "observed": [
+      "English: Start opened course 1 of 20 (Gutter Row) with energy, lives, relay pads and the prompt 'Hold Right and tap Space to jump the gaps.' unobscured.",
+      "Loss: holding Right without jumping fell into the gaps, costing lives (5 to 3) and returning the runner to the relay pad with 'RELAY pad: energy refills here.'",
+      "Chinese: the HUD, course name (滴水檐巷), status line, prompt and how-to-play text switched fully to Chinese.",
+      "Chinese 390 px phone frame (388 px inner, no horizontal overflow): touch buttons 左, 右, 跳跃 / 蹬墙 and 沿墙跑（按住） with course 1 readable.",
+      "Not covered in the browser: a course win and the rebuilt courses 6, 12 and 16; the reviewer's pilot and the quality tests cover them."
+    ],
+    "screenshots": [
+      "screenshots/wallrunner-relay-en.jpg",
+      "screenshots/wallrunner-relay-phone-zh.png"
+    ]
+  }
+}

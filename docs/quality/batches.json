@@ -254,7 +254,8 @@
       "gravity-courier",
       "grapnel-gorge",
       "glider-ridge",
-      "clockwork-bridge"
+      "clockwork-bridge",
+      "wallrunner-relay"
     ],
     "records": [
       "final-review/snowball-siege.json",
@@ -281,7 +282,8 @@
       "final-review/gravity-courier.json",
       "final-review/grapnel-gorge.json",
       "final-review/glider-ridge.json",
-      "final-review/clockwork-bridge.json"
+      "final-review/clockwork-bridge.json",
+      "final-review/wallrunner-relay.json"
     ]
   }
 }

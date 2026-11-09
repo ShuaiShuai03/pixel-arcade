@@ -31,7 +31,7 @@ Phase Tiles completed batch 18 and the 50-game target, Pixel Parkour included. T
 | Lantern Climber  | Passed in one round: deeper tower, four rail climbs ([record](final-review/lantern-climber.json))         |
 | Gravity Courier  | Passed in one round: 20 chambers, field reversal ([record](final-review/gravity-courier.json))            |
 | Grapnel Gorge    | Passed in one round: 20 routes, still-stand hooks ([record](final-review/grapnel-gorge.json))             |
-| Wallrunner Relay | Retrofitting to 20+ levels (3 courses)                                                                    |
+| Wallrunner Relay | Passed in one round: 20 courses, kick and wall-run routes ([record](final-review/wallrunner-relay.json))  |
 | Clockwork Bridge | Passed in one round: 20 machines, Q rewind ([record](final-review/clockwork-bridge.json))                 |
 | Glider Ridge     | Passed in one round: 20 courses, thermals and gates ([record](final-review/glider-ridge.json))            |
 

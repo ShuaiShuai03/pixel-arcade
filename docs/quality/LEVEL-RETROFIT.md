@@ -11,7 +11,7 @@ Effort: S = level data only, M = data plus some mechanics or tests, L = structur
 | Game             | Current levels | Data             | Effort | Status              |
 | ---------------- | -------------: | ---------------- | :----: | ------------------- |
 | crate-keeper     |             20 | `LEVELS`, solver |   S    | done (final review) |
-| wallrunner-relay |              3 | `COURSES`        |   S    | queued              |
+| wallrunner-relay |             20 | `COURSES`        |   S    | done (final review) |
 | clockwork-bridge |             20 | `LEVELS`         |   S    | done (final review) |
 | glider-ridge     |             20 | `COURSES`        |   S    | done (final review) |
 | burrow-rescue    |              3 | `SECTORS`        |   S    | queued              |

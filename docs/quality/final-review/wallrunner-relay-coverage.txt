@@ -1,0 +1,59 @@
+✔ every course has a scripted public-input clear without losing a life at 30, 60 and 120 Hz (2537.565208ms)
+✔ a reaction-limited bot (0.25 s and 0.35 s late) clears courses 1-15 at 30, 60 and 120 Hz (3476.781333ms)
+✔ the mastery tier (16-20) costs the bot at least one life per run yet it still clears most runs (7772.421792ms)
+✔ an idle player is safe at the start of course 1 and blind play wins at most 25% from course 3 (8981.973959ms)
+✔ results agree between frame rates for the same timed inputs (10.025541ms)
+✔ hostile dt values never advance or corrupt the game (0.34675ms)
+✔ hostile pointer values on the course select never throw or start a locked course (2.622ms)
+✔ random play stays finite, bounded and never overlaps a solid (126.663417ms)
+✔ clearing a course unlocks the next one and a later visit continues from it (38.822166ms)
+✔ broken or hostile progress stores fall back to course 1 and never stop the game (25.188292ms)
+✔ the course select moves, refuses locked courses and starts the chosen course (0.405125ms)
+✔ winning and losing each report once, in both languages, then freeze (121.096417ms)
+✔ every opening frame shows its tip, fits the canvas, is localized and shows the first hazard (6.144375ms)
+✔ the course select, hud and every moving state fit in both languages (209.928625ms)
+✔ no overlay ever covers the runner or the beacon during legal play (151.005334ms)
+✔ a flash, trail, banner and every runner pose draw without error (73.815083ms)
+✔ metadata is bilingual and every action has a touch control (0.549041ms)
+✔ the course table has at least twenty frozen, distinct, well-formed courses (0.409667ms)
+✔ zero, negative, NaN, infinite and huge dt never advance state or read input (0.231125ms)
+✔ a long frame is capped to 1/30 second and sub-steps stay stable (0.614084ms)
+✔ horizontal control accelerates to a finite speed and opposite keys cancel (1.608875ms)
+✔ a jump fires once per press and peaks at the published height (1.450291ms)
+✔ the jump buffer fires on landing and coyote time allows a late jump once (2.5995ms)
+✔ falling at terminal speed lands on the roof instead of tunnelling (1.744833ms)
+✔ walls are solid: running into a roof end or a tall wall never overlaps it (8.255958ms)
+✔ wall-run needs X, real chalk contact and no push away from the wall (8.079417ms)
+✔ a wall-run tops out on the roof, costs energy and ends with a grounded runner (4.391291ms)
+✔ energy drains with wall-runs and kicks, and refills only on relay pads (8.219458ms)
+✔ kicks need contact, cost energy, push a bounded amount and lock the same face until landing (1.133709ms)
+✔ slick faces refuse both kicks and wall-runs, and kicks need more energy than their cost (0.405834ms)
+✔ exhausting energy off a pad costs a life and returns to the last pad without free energy (0.480208ms)
+✔ falling costs a life, respawns on the last pad and pads score once (2.622291ms)
+✔ input is never dropped around a respawn or a new course (0.266916ms)
+✔ touching the beacon clears the course, resets lives and energy and starts the next course (0.515125ms)
+✔ losing the last life ends the run, freezes state and ignores input (0.058042ms)
+✔ snapshots are JSON-safe, detached from internals and describe the course (0.21725ms)
+ℹ tests 36
+ℹ suites 0
+ℹ pass 36
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 23598.629333
+ℹ start of coverage report
+ℹ -----------------------------------------------------------------------------
+ℹ file                         | line % | branch % | funcs % | uncovered lines
+ℹ -----------------------------------------------------------------------------
+ℹ src                          |        |          |         | 
+ℹ  games                       |        |          |         | 
+ℹ   wallrunner-relay-draw.js   | 100.00 |    90.23 |  100.00 | 
+ℹ   wallrunner-relay-levels.js | 100.00 |    97.14 |  100.00 | 
+ℹ   wallrunner-relay-menu.js   | 100.00 |   100.00 |  100.00 | 
+ℹ   wallrunner-relay-step.js   | 100.00 |   100.00 |  100.00 | 
+ℹ   wallrunner-relay.js        | 100.00 |    98.33 |  100.00 | 
+ℹ -----------------------------------------------------------------------------
+ℹ all files                    | 100.00 |    96.56 |  100.00 | 
+ℹ -----------------------------------------------------------------------------
+ℹ end of coverage report
