@@ -1,0 +1,64 @@
+{
+  "date": "2026-11-09",
+  "status": "complete",
+  "workspace": "Checks ran in a clean detached worktree of HEAD 1b70bd3 plus exactly the seven Tide Lock files and its catalog entry.",
+  "checks": {
+    "focused game tests with coverage": {
+      "command": "node --experimental-test-coverage --test-coverage-include='src/games/tide-lock*.js' --test tests/tide-lock.test.js tests/tide-lock-quality.test.js",
+      "exitCode": 0,
+      "passed": 73,
+      "failed": 0,
+      "coverageLines": {
+        "tide-lock": 98.55,
+        "tide-lock-world": 97.18,
+        "tide-lock-plan": 99.33,
+        "tide-lock-levels": 100,
+        "tide-lock-draw": 100
+      },
+      "coverageBranches": {
+        "tide-lock": 96.8,
+        "tide-lock-world": 98.72,
+        "tide-lock-plan": 99.39,
+        "tide-lock-levels": 100,
+        "tide-lock-draw": 99.47
+      },
+      "log": "coverage.txt"
+    },
+    "shared input, simulation and platform lifecycle": {
+      "command": "node --test tests/input.test.js tests/simulation.test.js tests/platform-lifecycle.test.js",
+      "exitCode": 0,
+      "passed": 28,
+      "failed": 0,
+      "log": "shared-tests.txt"
+    },
+    "scoped catalog tests": {
+      "command": "node --test --test-name-pattern='release contains|Pixel Parkour|^tide' tests/catalog.test.js",
+      "exitCode": 0,
+      "passed": 3,
+      "failed": 0,
+      "log": "catalog-tests.txt"
+    },
+    "static check": {
+      "command": "npm run check",
+      "exitCode": 0,
+      "log": "static-check.txt"
+    },
+    "format check": {
+      "command": "npm run format:check",
+      "exitCode": 0,
+      "log": "format-check.txt"
+    },
+    "build": {
+      "command": "npm run build",
+      "exitCode": 0,
+      "log": "build.txt"
+    },
+    "diff check": {
+      "command": "git diff --check",
+      "exitCode": 0
+    }
+  },
+  "catalog": "One entry added (Tide Lock, 1 player, puzzle); the release assertion rises from 46 to 47 JavaScript games.",
+  "hostChanges": "None.",
+  "uncommittedExcluded": "A stray untracked greedy.mjs is not part of this release."
+}

@@ -1,7 +1,7 @@
 {
   "maxActiveGames": 3,
-  "activeBatch": 17,
-  "acceptedGames": 47,
+  "activeBatch": 18,
+  "acceptedGames": 48,
   "batches": [
     {
       "number": 1,
@@ -114,14 +114,25 @@
     {
       "number": 17,
       "games": ["mirror-lab", "circuit-weaver", "tide-lock"],
-      "status": "in_progress",
-      "notes": "Mirror Lab and Circuit Weaver were accepted and released ahead of Tide Lock; see batch-17/mirror-lab/ACCEPTANCE.md and batch-17/circuit-weaver/ACCEPTANCE.md.",
-      "released": ["mirror-lab", "circuit-weaver"]
+      "status": "complete",
+      "notes": "Mirror Lab and Circuit Weaver were released ahead of Tide Lock, which completed the batch.",
+      "released": ["mirror-lab", "circuit-weaver", "tide-lock"],
+      "acceptance": [
+        "batch-17/mirror-lab/ACCEPTANCE.md",
+        "batch-17/circuit-weaver/ACCEPTANCE.md",
+        "batch-17/tide-lock/ACCEPTANCE.md"
+      ],
+      "deployment": [
+        "batch-17/mirror-lab/deployment.json",
+        "batch-17/circuit-weaver/deployment.json",
+        "batch-17/tide-lock/deployment.json"
+      ]
     },
     {
       "number": 18,
-      "games": ["phase-tiles", "weightworks", "fold-map"],
-      "status": "queued"
+      "games": ["phase-tiles", "weightworks"],
+      "status": "in_progress",
+      "notes": "Tide Lock brought the accepted total to 48, so two games reach the 50-game target; Fold Map, first scheduled here, is not needed for the target."
     },
     {
       "number": 19,

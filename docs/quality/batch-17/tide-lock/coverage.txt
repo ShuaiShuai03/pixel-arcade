@@ -1,0 +1,108 @@
+per-lock wins, fast: 1:30 2:30 3:30 4:30 5:30 6:30 7:30 8:30 9:30 10:30 11:30 12:30 13:30 14:30 15:30 16:30 17:30 18:30 19:30 20:30 21:30 22:30
+per-lock wins, slow: 1:30 2:30 3:30 4:30 5:30 6:30 7:30 8:30 9:30 10:30 11:30 12:30 13:30 14:30 15:30 16:30 17:30 18:30 19:30 20:30 21:30 22:30
+crude policies, wins per lock:
+  idle     (of 1) 1:0 2:0 3:0 4:0 5:0 6:0 7:0 8:0 9:0 10:0 11:0 12:0 13:0 14:0 15:0 16:0 17:0 18:0 19:0 20:0 21:0 22:0
+  mash     (of 1) 1:0 2:0 3:0 4:0 5:0 6:0 7:0 8:0 9:0 10:0 11:0 12:0 13:0 14:0 15:0 16:0 17:0 18:0 19:0 20:0 21:0 22:0
+  every6   (of 1) 1:0 2:0 3:0 4:0 5:0 6:0 7:0 8:0 9:0 10:0 11:0 12:0 13:0 14:0 15:0 16:0 17:0 18:0 19:0 20:0 21:0 22:0
+  every10  (of 1) 1:0 2:0 3:0 4:0 5:0 6:0 7:0 8:0 9:0 10:0 11:0 12:0 13:0 14:0 15:0 16:0 17:0 18:0 19:0 20:0 21:0 22:0
+  sweep    (of 1) 1:1 2:1 3:0 4:0 5:0 6:0 7:0 8:0 9:0 10:0 11:0 12:0 13:0 14:0 15:0 16:0 17:0 18:0 19:0 20:0 21:0 22:0
+  random   (of 40) 1:31 2:31 3:1 4:5 5:0 6:1 7:0 8:0 9:2 10:0 11:0 12:0 13:0 14:0 15:0 16:0 17:0 18:0 19:0 20:0 21:0 22:0
+simple reader wins locks: 1 2 3 4 5 7 10
+strong reader wins locks from 11: none
+supplier-first reader wins locks from 11: none
+✔ quality: a prompt-following player (0.15-0.35 s lag) clears every lock in at least 27 of 30 runs at 30, 60 and 120 Hz (98193.376208ms)
+✔ quality: a slow prompt-following player (0.4-0.6 s lag) clears every lock in at least 24 of 30 runs at 30, 60 and 120 Hz (97991.702667ms)
+✔ quality: a literal follower at lag 0, 0.25 and 0.5 s clears every lock with every hull intact and is never told the water is wasted (6192.12575ms)
+✔ quality: the Chinese interface plays exactly like the English one (341.34075ms)
+✔ quality: the prompt recovers from deliberate mistakes on every lock, resetting the lock when the water is gone (36989.481042ms)
+✔ quality: every prompt is held half a second unless the player acts, names its key, control and arrow, and agrees in both languages (5999.135209ms)
+✔ quality: the water mark sits on the level of the far side of the next gate and never on the sea (2371.166ms)
+✔ quality: from lock 3 on, idling, mashing, timed toggling, sweeping and random keys each clear at most a quarter of runs; idle never wins (284649.596042ms)
+✔ quality: the screen-reading players who ignore the prompt win at most half the locks and none of the last third (79715.58525ms)
+✔ quality: after opening every valve at a random moment the prompt recovers on every lock (23438.927208ms)
+✔ quality: after idling 7 to 60 s at the start, following the prompt still clears every lock (16497.639209ms)
+✔ quality: a fresh lock is never called hopeless while it sits untouched, and a plan that stands still is replaced (2966.857875ms)
+✔ quality: after a burst of stray keys on locks 12 to 18 the prompt never loops (5654.546ms)
+✔ quality: the early locks teach, the middle locks add one idea each, and no lock is a copy of another (0.193542ms)
+✔ quality: the same key schedule gives the identical state at 30, 60 and 120 Hz on every lock (18781.867334ms)
+✔ quality: jittered frame times (down to half a frame) still give a stable, finite and bounded game (316.717625ms)
+✔ quality: HUD, status and counters always match the real state (4976.917875ms)
+✔ meta follows the game contract and the controls reach every action by touch (0.690958ms)
+✔ there are at least 20 locks, each with bilingual text, a legal layout and starting states that float every boat (3.406791ms)
+✔ the tide alone never puts a boat waiting at sea on the bottom (0.092625ms)
+✔ compileLevel rejects a boat with no gate on its way and slotX spreads boats that share a chamber (0.230833ms)
+✔ text helpers measure CJK wide and wrap at spaces or between characters (0.456ms)
+✔ a packed world unpacks to exactly its clone, and a search over packed worlds finds the same plan (10.923792ms)
+✔ a valve moves water downhill at a rate set by the head, and equal volumes make different heights (0.158792ms)
+✔ a valve never overshoots: the two sides settle at one level and stay there (2.800292ms)
+✔ water never flows uphill, nothing flows below a sill, and a drain only loses water (0.482917ms)
+✔ a chamber spills over its wall and the loss is counted (0.232917ms)
+✔ the sea follows its tide and exchanges water with a chamber through the ledger (1.853834ms)
+✔ a pump lifts water uphill only while it has energy, and cannot start empty (2.812ms)
+✔ volume is conserved to rounding over long random sequences of valves, gates and pumps on every lock (151.987792ms)
+✔ a gate opens only when the water on both sides is level, and shuts again when nobody needs it (1.975875ms)
+✔ boats never cross a closed gate, never enter water shallower than their draught, and cannot overfill a chamber (214.662417ms)
+✔ a boat waits for water at least as deep as its draught, and a gate nobody can use shuts again (0.426375ms)
+✔ a boat left in water shallower than its draught is aground after the grace time (0.395209ms)
+✔ busy gates cannot be closed under a crossing boat (1.203833ms)
+✔ cloneWorld is a deep copy (0.057083ms)
+✔ every lock has a plan that works perfectly timed, and the planner can say when the water is gone (18795.530375ms)
+✔ features and waits describe events and steps are replayed faithfully (0.621541ms)
+✔ the authored solution of each lock finishes it, survives a round trip and is what the first prompt follows (491.604583ms)
+✔ a search can be made in slices, gives the same plan as one go, and says null when nothing can be done (43.555583ms)
+✔ the game starts at once on lock 1 and reports a JSON-safe, complete snapshot (0.257ms)
+✔ getState returns copies (0.13ms)
+✔ pause (a zero, negative, huge or invalid dt) is inert, and the clock only moves with real frames (0.401833ms)
+✔ the fixed step makes the outcome independent of how frames are cut (1.590333ms)
+✔ arrows, A/D, X and Space select and operate valves and gates; the selection clamps (0.436625ms)
+✔ a gate that will not open explains why, and an open pump with no battery says so (5.115083ms)
+✔ tapping a valve or a gate selects it, and tapping it again operates it (0.531583ms)
+✔ Enter resets the lock without cost, but only on a second press once the water is moving (3.402375ms)
+✔ wasted water is spotted, explained in both languages, and a reset puts it right (120.255208ms)
+✔ a boat aground costs a hull, again every few seconds; three hulls lose the fleet and freeze the game (150.539417ms)
+✔ clearing a lock scores, unlocks the next, shows the cleared line and moves on after a pause (6.953625ms)
+✔ the final lock ends the game once with a win, scores the whole run and then freezes (217.294208ms)
+✔ every lock can be played to its end with the prompt, in order, from a fresh game (10.790875ms)
+✔ the lock menu appears when progress is saved, clamps to unlocked locks and starts the chosen one (1.05ms)
+✔ progress that is missing, zero or nonsense starts on lock 1 (0.360417ms)
+✔ only the allowed sounds are used (2.081208ms)
+✔ prompts recover after a mistake: opening a wrong valve changes the plan, not the rules (3470.061208ms)
+✔ every kind of prompt appears, in both languages, with a matching highlight (1034.151875ms)
+✔ drawing works for every lock, language and phase with finite coordinates and a legible HUD (279.379ms)
+✔ the end screens, the cleared hold, tide, spill, pump and aground warnings all draw (7694.592542ms)
+✔ a seeded long run with random keys stays finite, bounded and ends at most once (494.275417ms)
+✔ every valve and gate can be tapped on the scene: no two tap points coincide and boats stay between the walls (0.483958ms)
+✔ infinite or huge saved progress opens the menu on the last lock (0.16975ms)
+✔ no text on the canvas is smaller than 11 px, so it stays readable on a phone (3.107584ms)
+✔ a boat on the bottom does not stop the search: it ends in a plan or a proof (3145.350416ms)
+✔ the prompt asks for a reset only when the water is gone or no hint turns up, and says so plainly (61.63275ms)
+✔ a boat that cannot float in time asks for the reset that saves its hull, and one press does it (1.511583ms)
+✔ the search spends a bounded amount of work in any one frame, even in an emergency at 30 Hz (10512.461958ms)
+✔ a boat already sailing into its dock is not proof of ruin, even while it drags the bottom (1.325167ms)
+✔ a timed wait half done is checked with only its remaining time, so a good plan is kept (19.455ms)
+✔ a plan that stands still on a wait is replaced, and a tide left alone for a minute is followed on (1799.586875ms)
+✔ a gate that no boat can use (the lock is full) is not a step of any plan (0.106125ms)
+✔ the prompt owns up to a missing hint without resetting for the player, then asks for a reset (1242.203416ms)
+ℹ tests 73
+ℹ suites 0
+ℹ pass 73
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 685136.963875
+ℹ start of coverage report
+ℹ ------------------------------------------------------------------------
+ℹ file                  | line % | branch % | funcs % | uncovered lines
+ℹ ------------------------------------------------------------------------
+ℹ src                   |        |          |         | 
+ℹ  games                |        |          |         | 
+ℹ   tide-lock-draw.js   | 100.00 |    99.47 |  100.00 | 
+ℹ   tide-lock-levels.js | 100.00 |   100.00 |  100.00 | 
+ℹ   tide-lock-plan.js   |  99.33 |    99.39 |  100.00 | 
+ℹ   tide-lock-world.js  |  97.18 |    98.72 |  100.00 | 
+ℹ   tide-lock.js        |  98.55 |    96.80 |   97.65 | 69-79 442 487-489
+ℹ ------------------------------------------------------------------------
+ℹ all files             |  98.98 |    98.08 |   99.21 | 
+ℹ ------------------------------------------------------------------------
+ℹ end of coverage report

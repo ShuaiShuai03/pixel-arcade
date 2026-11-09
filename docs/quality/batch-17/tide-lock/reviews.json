@@ -1,0 +1,79 @@
+{
+  "date": "2026-11-09",
+  "phase": "complete",
+  "finalCollectionReview": false,
+  "levelRule": "Level-based games need at least 20 authored levels with level select through env.progress.",
+  "records": [
+    {
+      "game": "tide-lock",
+      "owner": "owner-tide",
+      "reviewer": "review-tide",
+      "rounds": 7,
+      "verdict": "approved",
+      "approvedSha256": {
+        "src/games/tide-lock.js": "3de9ca34e49ee168f36f3450496dd3b2b0365b69bf48cd0f41b6c9764aa78837",
+        "src/games/tide-lock-world.js": "4020d180aa48e246234653d33e9aa2f1189fecd4e559a63d74c81b9e31927e4c",
+        "src/games/tide-lock-plan.js": "3979bb788a8da932815a9218ae347881ca07832cb5c56cecbb0e1abfd446e3d2",
+        "src/games/tide-lock-levels.js": "6acd43a7fb9674ee3d2c4580d6fe793dd062408b6dab268b40ebd97df0bbdc08",
+        "src/games/tide-lock-draw.js": "79e1c7c33132bda941db35b319817c4dfda79614a647522c18b577bdb8344cb8",
+        "tests/tide-lock.test.js": "f2a5b3a52ec301744a390434d7581d294ffa2293482459ba3b6dbd49c1b4e945",
+        "tests/tide-lock-quality.test.js": "fdbfedf4d1b87936de10b3899c387dcf0f400d8bb1e5e9eb64519779e792f979"
+      },
+      "hashCheck": "The round-7 reviewer recorded all seven hashes at the start, at the end and again before its final verdict; all three sets were identical, and the files were frozen throughout. The served modules matched the same hashes in Chrome.",
+      "verdictNote": "Round 7 first rejected on frame time alone: raw single passes showed 22-50 ms frames while other sessions loaded the machine. Replaying each case three times gave a worst per-frame minimum of 3.6 ms, every traced frame over 10 ms overlapped a 6.5-11 ms mark-compact pause, and three reruns of the three worst cases at load 4-5 found no frame over 16 ms (worst 14.0 ms at 30 Hz). The reviewer then approved, recording that the untraced spikes are attributed to GC and contention by inference, not proof.",
+      "findings": [
+        {
+          "id": "tide-gc-pauses",
+          "severity": "high",
+          "status": "closed",
+          "observation": "The search kept every waiting world as a full object graph, up to 77 MB live, giving mark-compact pauses up to 75 ms. Waiting worlds are now packed into Float64Arrays: live search memory fell from 38 MB to 16 MB per 20,000 nodes and peak heap from 455 MB to 141 MB."
+        },
+        {
+          "id": "tide-emergency-spikes",
+          "severity": "high",
+          "status": "closed",
+          "observation": "A grounded boat ran the search at four times its normal work every tick, giving 29 ms frames. Emergencies now spend half the normal work per tick, a deterministic per-tick budget that keeps 30, 60 and 120 Hz identical; a test bounds the worst frame at 30 Hz."
+        },
+        {
+          "id": "tide-watch-only-ruin",
+          "severity": "high",
+          "status": "closed",
+          "observation": "Followers stalled on watch-only 'stranded' and 'No hint yet' prompts while a hull was being lost. 'Stranded' now asks for Enter, and a long fruitless search ends in a pressable reset offer."
+        },
+        {
+          "id": "tide-rescue-reversal",
+          "severity": "medium",
+          "status": "closed",
+          "observation": "The rescue prompt could ask to undo the player's last move. Rescue is rechecked after every toggle and returns nothing when no toggle is needed; 486 reviewer runs showed 0 reversals."
+        },
+        {
+          "id": "tide-late-lock-depth",
+          "severity": "medium",
+          "status": "closed",
+          "observation": "An 8-second look-ahead bot won locks 16 and 20. Both were redesigned by parameter search with new reference solutions; the bot now wins 10 of 22 locks (1-8, 10, 13) and none from lock 15."
+        },
+        {
+          "id": "tide-tide-grounding",
+          "severity": "medium",
+          "status": "closed",
+          "observation": "A first lock-20 redesign let low tide ground a boat waiting at sea. A test now requires every tidal lock to leave water under each waiting boat at the lowest tide."
+        },
+        {
+          "id": "tide-fleet-loss",
+          "severity": "medium",
+          "status": "closed",
+          "observation": "On lock 11 a plan kept costing hulls until the fleet was lost. A plan may now cost a hull only while the fleet is whole; afterwards the line asks for the reset."
+        }
+      ],
+      "openNotes": [
+        "False 'stuck' prompts: 2 of 272 decided by the reviewer's oracle (0.7%), within the 2% limit; they occur when the search runs while a just-used gate is still open (repro lock 6, sweep, seed 13). 43 events were undecided within the oracle budget.",
+        "The 'No hint after a long search: press Enter to reset' offer fell on states the oracle could still solve in 21 of 33 events (9 with a calm plan); it claims no ruin and costs only time (repro lock 22 after 22 s idle).",
+        "Two lock-17 'stranded' prompts appeared while a non-calm hull-safe plan existed; no 1-2-control rescue existed in either.",
+        "About 6% of lock-17 mistake runs lose a hull without a warning prompt; no fleet was lost in about 3,600 reviewer runs.",
+        "The lock-11 idle skip and comment in tests/tide-lock-quality.test.js are stale: lock 11 clears after 41-60 s idle.",
+        "tide-lock.js is 1,034 lines, above the 800-line guideline.",
+        "Frame spikes of 22-50 ms seen only under heavy machine load were not GC-traced; a 10-11 ms major GC on a slow device could still exceed 16 ms, though not the 33 ms budget at 30 Hz."
+      ]
+    }
+  ]
+}

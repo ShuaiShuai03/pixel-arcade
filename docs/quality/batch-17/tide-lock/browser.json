@@ -1,0 +1,37 @@
+{
+  "date": "2026-11-09",
+  "browser": "The user's stable Google Chrome, driven through the official Claude in Chrome extension in its own tab-group window. Keys were synthetic in-page keydown/keyup events; touch buttons, Start, the language switch, menu cells on the canvas and Play again were real mouse clicks. Only visible DOM text and the drawn canvas were read; no game state was read or injected.",
+  "status": "complete",
+  "stateInjection": false,
+  "phoneLayouts": "Checked in a same-origin 390-wide portrait frame on the page (371 px inner width, no horizontal overflow).",
+  "servedSourceCheck": "The SHA-256 of all five served tide-lock modules was computed in the page and matched 3de9ca34, 4020d180, 3979bb78, 6acd43a7 and 79e1c7c3.",
+  "games": [
+    {
+      "id": "tide-lock",
+      "sourceSha256": {
+        "src/games/tide-lock.js": "3de9ca34e49ee168f36f3450496dd3b2b0365b69bf48cd0f41b6c9764aa78837",
+        "src/games/tide-lock-world.js": "4020d180aa48e246234653d33e9aa2f1189fecd4e559a63d74c81b9e31927e4c",
+        "src/games/tide-lock-plan.js": "3979bb788a8da932815a9218ae347881ca07832cb5c56cecbb0e1abfd446e3d2",
+        "src/games/tide-lock-levels.js": "6acd43a7fb9674ee3d2c4580d6fe793dd062408b6dab268b40ebd97df0bbdc08",
+        "src/games/tide-lock-draw.js": "79e1c7c33132bda941db35b319817c4dfda79614a647522c18b577bdb8344cb8"
+      },
+      "levels": 22,
+      "observed": [
+        "A driver that reads only the status line, with a 0.35 s reaction delay, played locks 1 to 22 in English back to back in 29 minutes and reached 'Nicely played! Every lock is cleared. The whole fleet is home!' with a score of 11361. It never pressed Enter: no reset, stuck, stranded or give-up prompt appeared, and no hull was lost.",
+        "When X or an arrow must be pressed more than once to reach a control, the prompt names the target and keeps the same text, so the driver repeated the key after 1.5 s without a change (115 repeats over the campaign), as a player would.",
+        "The game paused itself twice when the browser window lost focus; the driver pressed the visible Resume button, and play continued where it stopped.",
+        "Chinese lock select listed all 22 locks; one tap on the canvas selected lock 4 and a second tap entered it.",
+        "Chinese: on lock 4, opening the drain with the boat inside (three Right presses and Space) first showed the rescue '空格：关闭 V4，保持水位', then '船搁浅了，来不及浮起：按回车重置'. Ignoring it lost all three hulls in about 9 s and ended the run with '三条船体都损毁了，船队覆没！'. Arrows, X and Space on the loss screen changed nothing, and Play again returned to lock select.",
+        "Chinese phone frame: real taps on the touch buttons alone, following the prompt, cleared locks 1 and 2. On lock 3 the Valve+ button moved the selection, and two taps on Reset while water was moving (the first showing the press-again warning on the canvas) reset the lock.",
+        "At 371 px the Chinese header '船闸 3/22 停在标记处 · 选择 V2（→）' fits without clipping."
+      ],
+      "screenshots": [
+        "../screenshots/tide-22-win-en.jpg",
+        "../screenshots/tide-select-zh.jpg",
+        "../screenshots/tide-loss-zh.jpg",
+        "../screenshots/tide-phone-zh-touch.png"
+      ]
+    }
+  ],
+  "limitations": "Physical phones, other browsers, the English phone header and audio were not tested; console output was not captured. Synthetic pointer events cannot drive the touch buttons because they call setPointerCapture, so touch play used real clicks."
+}

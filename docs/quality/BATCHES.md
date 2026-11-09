@@ -2,17 +2,22 @@
 
 At the user's direction, at most **three games** may be under development and acceptance testing at one time. Do not begin the next batch until all games in the active batch satisfy the gates below. The collection target is 50 games, including Pixel Parkour (reduced from 100 at the user's direction on 2026-11-05). Roster themes are not work assignments.
 
-## Active batch 17
+## Active batch 18
 
-| Game           | Implementation owner | Independent reviewer | Current state                           |
-| -------------- | -------------------- | -------------------- | --------------------------------------- |
-| Mirror Lab     | `owner-mirror`       | `review-mirror`      | Accepted and released (batch 17 record) |
-| Circuit Weaver | `owner-circuit`      | `review-circuit`     | Accepted and released (batch 17 record) |
-| Tide Lock      | `owner-tide`         | `review-tide`        | In development                          |
+| Game        | Implementation owner | Independent reviewer | Current state  |
+| ----------- | -------------------- | -------------------- | -------------- |
+| Phase Tiles | `owner-phase`        | `review-phase`       | In development |
+| Weightworks | `owner-weight`       | `review-weight`      | In development |
+
+Tide Lock brought the accepted total to 48, so these two games reach the 50-game target. Fold Map, first scheduled for this batch, is not needed for the target.
+
+## Completed batch 17
 
 Mirror Lab, a laser-and-mirror puzzle with 22 rooms, passed two rounds of independent review and browser acceptance, bringing the accepted total to 46. A prompt-following driver solved all 22 rooms in Chinese at the optimal score, a budget room was played to a loss in English, and touch play was checked on a phone layout. See the [Mirror Lab evidence](batch-17/mirror-lab/ACCEPTANCE.md). Commit `1562ac8` is live after a Pages redeploy; all five checked assets match, and the published game accepted real input. See the [deployment receipt](batch-17/mirror-lab/deployment.json).
 
 Circuit Weaver, a copper-tile wiring puzzle with 24 boards, voltages, shorts and fuses, passed five rounds of independent review and browser acceptance, bringing the accepted total to 47. A prompt-following driver wired all 24 boards in English at the maximum score, a budget board was played to a loss in Chinese, and touch play was checked on a phone layout. See the [Circuit Weaver evidence](batch-17/circuit-weaver/ACCEPTANCE.md). Commit `66c26b5` is live; all seven checked assets match, and the published game accepted real input. See the [deployment receipt](batch-17/circuit-weaver/deployment.json).
+
+Tide Lock, a canal-lock puzzle with 22 locks, valves, gates, tides and a hull budget, passed seven rounds of independent review and browser acceptance, bringing the accepted total to 48. A prompt-following driver cleared all 22 locks in English without a reset or a lost hull, a Chinese lock was played to a loss, and touch play was checked on a phone layout. See the [Tide Lock evidence](batch-17/tide-lock/ACCEPTANCE.md).
 
 ## Completed batch 16
 
