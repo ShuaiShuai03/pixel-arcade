@@ -1,0 +1,59 @@
+{
+  "game": "frost-forge",
+  "date": "2026-11-10",
+  "reviewedRevision": "ea4c8529 (accepted build) plus the fixes in this commit",
+  "owner": "owner-frost",
+  "reviewer": "final-frost",
+  "rounds": 1,
+  "process": "Lean final review at the user's request. The game already had 22 workshops, so it went straight to one independent review round. Its MEDIUM progress-store finding, a mastery tier that was longer but not harder, and cheap LOW items were fixed and verified by a separate verification agent re-running the reviewer's own pilot, blind, correctness and text-fit scripts plus one clean-worktree run, and by the browser check, without a second review round.",
+  "verdict": "pass",
+  "approvedSha256": {
+    "src/games/frost-forge.js": "82f5e5e76e1222b964bcdee8804871928631c10aebe95ef3f1ed183142db6e1f",
+    "tests/frost-forge.test.js": "9e63e70178bb7318e96fbaf240c39e4e2f0ccae0826a2cb02f42f02eec1fc4c6",
+    "tests/frost-forge-quality.test.js": "84ada6a543c73b2d33c1afda5c48b5992e891eedbcdf2cd8552456f06f06ea89"
+  },
+  "tests": {
+    "command": "node --experimental-test-coverage --test-coverage-include='src/games/frost-forge*.js' --test tests/frost-forge.test.js tests/frost-forge-quality.test.js",
+    "passed": 92,
+    "failed": 0,
+    "lineCoverage": 99.74,
+    "log": "frost-forge-coverage.txt"
+  },
+  "independentProbes": "On the final files the reviewer's reaction-limited bot (public getState only, BFS pathing, brake control on ice, jittered reaction delay, 60 Hz) cleared 440 of 440 workshop runs at 0.35 s and 176 of 176 at 0.25 s. The engine clock left at 0.35 s fell from about 102 s in workshops 1-7 and 81 s in 8-14 to about 41 s in 15-22, where the review had found 67-92 s in the finale. At 1.0 s reaction the bot cleared 89% of workshops 15-22 and 1 of 8 runs of the finale. Blind play (idle, mash, random keys, sweeps and hold-and-alternate patterns) cleared 0% of workshops 3-22. Final states matched at 30, 60 and 120 Hz on workshops 1, 4, 8, 13, 20 and 22, hostile dt and pointer fuzz produced no errors or non-finite values, an idle run ended exactly once at about 119 s and froze, every broken progress store was safe, and no EN or ZH text overflows.",
+  "findings": [
+    {
+      "id": "M1",
+      "severity": "medium",
+      "status": "fixed",
+      "observation": "Review finding: createGame and the workshop-clear unlock called env.progress without try/catch, so a throwing store crashed the game at start or at the first clear. Both calls are now guarded as in Shield Sentinel, with quality tests through a full clear of workshop 1 and the finale."
+    },
+    {
+      "id": "M2",
+      "severity": "medium",
+      "status": "fixed",
+      "observation": "Review observation: workshops 18-22 were longer but not harder; the bot cleared every workshop at every reaction time up to 1.5 s with at least 67 s left on the clock, the finale being among the most generous. Mastery engine clocks are now 76-126 s instead of 112-154 s, temperature windows are narrower, workshops 20 and 22 use pass-through windows where a part must be taken within about 1.7 s, and workshops 15-17 are lightly tightened."
+    },
+    {
+      "id": "L1",
+      "severity": "low",
+      "status": "fixed",
+      "observation": "Review findings: furnace, chiller and warm plate shared one tile shape, two prompts were within 2 px of the canvas edge, and nothing told players to torch a frozen socket before fetching its part. Pads now carry a flame, snowflake or dot glyph, the prompts are shorter (worst case 468 px), and the EN and ZH description explains the thaw order and pass-through windows."
+    }
+  ],
+  "openNotes": [
+    "Mastery pressure comes from the engine clock and the finale's pass-through windows; glove HP still never drops in normal play, because no window needs a part hot enough to hurt.",
+    "A bot that only thaws a socket with the part in hand still clears the mastery tier, with about 38 s to spare.",
+    "The source is a single file of about 1,500 lines, over the repository's 800-line soft ceiling; the review found no defect hidden by it."
+  ],
+  "browser": {
+    "method": "Official Claude in Chrome extension, local server; real clicks on Start and the language toggle, synthetic in-page keys; only DOM text and the canvas were read.",
+    "servedSha256Prefixes": "82f5e5e7",
+    "observed": [
+      "English: Start opened workshop 1 of 22 (Cold Start) with HP, the engine temperature and seize countdown, the furnace pad with a flame glyph at 105, the chiller with a snowflake at -52, the 70-115 socket window and the prompt 'Space: take the Gear to the furnace'.",
+      "X cycled the tool with status text 'Torch on: heats a part 20 per second.', 'Frost spray on: cools a part 20 per second.' and 'Tool off.' while the engine clock counted down.",
+      "Chinese 390 px phone frame (388 px inner, no horizontal overflow): workshop 1 in Chinese with touch buttons 左, 上, 下, 右, 操作 and 工具.",
+      "Not covered in the browser: a workshop win and a loss; the reviewer's pilot, its idle-loss check and the quality tests cover them."
+    ],
+    "screenshots": ["screenshots/frost-forge-en.png", "screenshots/frost-forge-phone-zh.png"]
+  }
+}

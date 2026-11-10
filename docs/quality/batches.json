@@ -262,7 +262,8 @@
       "dash-duelist",
       "vine-warden",
       "tether-twins",
-      "magnet-marauder"
+      "magnet-marauder",
+      "frost-forge"
     ],
     "records": [
       "final-review/snowball-siege.json",
@@ -297,7 +298,8 @@
       "final-review/dash-duelist.json",
       "final-review/vine-warden.json",
       "final-review/tether-twins.json",
-      "final-review/magnet-marauder.json"
+      "final-review/magnet-marauder.json",
+      "final-review/frost-forge.json"
     ]
   }
 }

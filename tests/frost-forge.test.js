@@ -530,6 +530,30 @@ test('the engine cools by Newton cooling and seizes at the printed time', () => 
   assert.equal(engineEta({ stage: 0, engine: RULES.seize }), 0);
 });
 
+// A window whose settling pad lies beyond it: the part only passes through the take band.
+const passThrough = (st, k) => {
+  const band = takeAt(k);
+  return !st.pads.some(([ch]) => PADS[ch].temp >= band.lo && PADS[ch].temp <= band.hi);
+};
+
+test('only the last workshops have pass-through windows, and each one is long enough to catch', () => {
+  const found = STAGES.flatMap((st, i) =>
+    st.sockets.filter((k) => passThrough(st, k)).map((k) => [i + 1, k.kind]),
+  );
+  assert.deepEqual(found, [
+    [20, 'gear'],
+    [22, 'gear'],
+    [22, 'piston'],
+  ]);
+  for (const [n, kind] of found) {
+    const k = STAGES[n - 1].sockets.find((q) => q.kind === kind);
+    const band = takeAt(k);
+    const pad = STAGES[n - 1].pads.map(([ch]) => PADS[ch]).find((p) => p.temp >= k.hi);
+    const cross = Math.log((pad.temp - band.lo) / (pad.temp - band.hi)) / pad.k;
+    assert.ok(cross >= 1.5, `${kind} in workshop ${n} stays takeable for ${cross.toFixed(2)} s`);
+  }
+});
+
 test('22 authored workshops teach, combine and master temperature windows', () => {
   assert.ok(STAGES.length >= 20, 'level-based games ship at least 20 levels');
   assert.equal(STAGES.length, 22);
@@ -576,10 +600,16 @@ test('22 authored workshops teach, combine and master temperature windows', () =
   );
   assert.ok(scarce.length >= 3);
   assert.ok(STAGES.some((st) => st.pads.filter(([ch]) => ch === 'F').length === 2));
-  // Engine clocks: always above 90 s, long for the lone-part workshops.
+  // Engine clocks: long for the teaching workshops, shorter when combining, short for mastery.
   const budget = (st) =>
     Math.log((RULES.engineStart - RULES.frost) / (RULES.seize - RULES.frost)) / st.frostRate;
-  STAGES.forEach((st) => assert.ok(budget(st) >= 100, `${st.name.en}: ${budget(st)}`));
+  const mean = (list) => list.reduce((sum, st) => sum + budget(st), 0) / list.length;
+  STAGES.slice(0, 14).forEach((st) => assert.ok(budget(st) >= 100, `${st.name.en}: ${budget(st)}`));
+  STAGES.slice(14, 17).forEach((st) => assert.ok(budget(st) >= 85, `${st.name.en}: ${budget(st)}`));
+  STAGES.slice(17).forEach((st) => assert.ok(budget(st) >= 70, `${st.name.en}: ${budget(st)}`));
+  assert.ok(mean(STAGES.slice(17)) < mean(STAGES.slice(11, 17)), 'mastery clocks are tighter');
+  assert.ok(mean(STAGES.slice(11, 17)) < mean(STAGES.slice(0, 11)) - 10, 'so are combining clocks');
+  assert.ok(budget(STAGES[21]) > budget(STAGES[20]), 'the finale route is the longest of the tier');
   const narrowest = (list) => Math.min(...list.flatMap((st) => st.sockets.map((k) => k.hi - k.lo)));
   assert.ok(
     narrowest(STAGES.slice(17)) < narrowest(STAGES.slice(0, 11)),
@@ -590,12 +620,14 @@ test('22 authored workshops teach, combine and master temperature windows', () =
     for (const k of st.sockets) {
       assert.ok(PARTS[k.kind].en && PARTS[k.kind].zh);
       assert.ok(12 < k.lo || 12 > k.hi, 'ambient temperature never satisfies a window');
-      assert.ok(k.hi - k.lo >= 20, 'window wide enough to hit by hand');
+      assert.ok(k.hi - k.lo >= 16, 'window wide enough to hit by hand');
       // A pad sits inside the take band, so a part resting on it ends up ready and stays ready.
-      const band = takeAt(k);
-      assert.ok(
-        st.pads.some(([ch]) => PADS[ch].temp >= band.lo && PADS[ch].temp <= band.hi),
-        `${st.name.en}: no pad settles the ${k.kind} window ${k.lo}~${k.hi}`,
+      // The finale-level exceptions are pass-through windows: the pad lies beyond the window, so
+      // the part crosses it and has to be taken while it does (see the next test).
+      assert.equal(
+        st.pads.some(([ch]) => PADS[ch].temp >= takeAt(k).lo && PADS[ch].temp <= takeAt(k).hi),
+        !passThrough(st, k),
+        `${st.name.en}: ${k.kind} window ${k.lo}~${k.hi}`,
       );
     }
   });
@@ -806,7 +838,7 @@ test('the prompt follows the situation and never tells the player into a hazard'
   assert.match(snapshot(s).prompt.zh, /齿轮.*熔炉/);
   s.comps[0].T = 130;
   assert.equal(settle(s).key, 'settle', 'an overheated gear on the floor evens out by itself');
-  assert.match(snapshot(s).prompt.en, /settling on the floor: take it at \d+~115/);
+  assert.match(snapshot(s).prompt.en, /settling on floor: take it at \d+~115/);
   put(s.comps[0], 3, 2, 130);
   assert.equal(settle(s).key, 'lift');
   assert.match(snapshot(s).prompt.en, /lift the Gear off the furnace/);
@@ -922,6 +954,40 @@ function fontsOf(ctx, fonts) {
   });
 }
 
+test('the three pad kinds differ in shape, not only in colour or number', () => {
+  const s = stage(index('Triple Play'));
+  const kinds = {};
+  const ctx = new Proxy(mockContext(), {
+    get: (t, p) =>
+      p === 'fillRect'
+        ? (x, y, w, h) => (kinds[ctx.fillStyle] ??= []).push([x, y, w, h])
+        : p in t
+          ? t[p]
+          : () => {},
+    set: (t, p, v) => ((t[p] = v), true),
+  });
+  render(ctx, s, harness().env);
+  const ink = { F: '#ff7a2f', C: '#7fd0ff', W: '#ffc45a' };
+  const shape = (pad) => {
+    const x0 = pad.c * TILE;
+    const y0 = RULES.top + pad.r * TILE;
+    return new Set(
+      kinds[ink[pad.ch]]
+        .filter(([x, y]) => x >= x0 + 4 && x < x0 + 20 && y >= y0 + 4 && y < y0 + 20)
+        .map(([x, y, w, h]) => `${x - x0},${y - y0},${w},${h}`),
+    );
+  };
+  const shapes = snapshot(s).pads.map((pad) => [pad.ch, shape(pad)]);
+  assert.deepEqual(shapes.map(([ch]) => ch).sort(), ['C', 'F', 'W']);
+  for (const [, cells] of shapes) assert.ok(cells.size >= 20, 'a glyph, not a stripe');
+  for (const [a, x] of shapes)
+    for (const [b, y] of shapes) {
+      if (a >= b) continue;
+      const apart = [...x].filter((c) => !y.has(c)).length + [...y].filter((c) => !x.has(c)).length;
+      assert.ok(apart >= 12, `${a} and ${b} look alike (${apart} cells apart)`);
+    }
+});
+
 test('every state draws with 14 px or larger text in both languages', () => {
   for (const lang of ['en', 'zh']) {
     const h = harness({ lang });
@@ -1024,7 +1090,7 @@ test('a scorching part can be carried to a pad after a 0.6 s hesitation without 
   assert.equal(snapshot(s).player.glow, 'hot', 'the part itself still shows its warning');
 });
 
-test('a part resting on its intended pad reaches its take band and then stays in it', () => {
+test('a part resting on its intended pad reaches its take band and, unless it passes through, stays', () => {
   STAGES.forEach((st, index) => {
     st.sockets.forEach((k, part) => {
       const s = stage(index);
@@ -1037,7 +1103,7 @@ test('a part resting on its intended pad reaches its take band and then stays in
         advance(s, STEP, input([]));
         const ready = snapshot(s).comps[part].takeReady;
         if (ready && entered === null) entered = s.ticks;
-        if (entered !== null)
+        if (entered !== null && !passThrough(st, k))
           assert.ok(ready, `${k.kind} left its take band at ${s.ticks * STEP}s`);
         if (s.phase !== 'playing') break;
       }
@@ -1132,6 +1198,35 @@ test('the start screen opens only when more than workshop 1 is unlocked, and fre
   assert.equal(createGame(huge.env).getState().menu.cursor, 22, 'clamped to the catalog');
   const odd = progressEnv(-3);
   assert.equal(createGame(odd.env).getState().menu, null, 'nonsense values mean workshop 1');
+});
+
+test('a progress store that throws or answers nonsense never stops the game', () => {
+  const stores = [
+    () => {
+      throw new Error('storage is unavailable');
+    },
+    () => 'abc',
+    () => NaN,
+    () => null,
+    () => ({}),
+    () => Infinity,
+  ];
+  for (const unlocked of stores) {
+    const h = harness();
+    h.env.progress = { unlocked, unlock: () => {} };
+    const game = createGame(h.env);
+    for (let i = 0; i < 60; i++) game.update(1 / 60, input(['ArrowRight']));
+    const s = game.getState();
+    assert.equal(s.menu, null, 'an unreadable store means workshop 1');
+    assert.equal(s.stage, 1);
+    assert.ok(s.time > 0.9, 'the world runs');
+    assert.equal(h.ends.length, 0);
+  }
+  const h = harness();
+  h.env.progress = { unlocked: () => 7.9 };
+  assert.equal(createGame(h.env).getState().menu.cursor, 7, 'a store with no unlock() still reads');
+  h.env.progress = {};
+  assert.equal(createGame(h.env).getState().menu, null, 'a store with no methods at all');
 });
 
 test('arrows and WASD move the cursor inside the open workshops; Space or Enter starts it', () => {

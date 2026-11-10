@@ -397,7 +397,8 @@ function literal(s) {
 // ---------------------------------------------------------------------------------------------
 // One scripted legal solution per workshop. Tokens: `gear@F` carries the gear to the nearest free
 // furnace (F), chiller (C) or warm plate (W) and leaves it there; `gear!` waits until the gear is
-// ready to take, takes it, walks to its socket, torches the socket if it is frozen and installs.
+// ready to take, takes it, walks to its socket, torches the socket if it is frozen and installs;
+// `gear^` torches the gear's frozen socket first, with nothing in hand.
 // ---------------------------------------------------------------------------------------------
 const SOLUTIONS = [
   'gear@F gear!', // 1 Cold Start
@@ -419,15 +420,15 @@ const SOLUTIONS = [
   'gear@F valve@C coil@W gear! valve! coil!', // 17 Cold Chain
   'gear@F valve@C coil@W piston@F gear! valve! coil! piston!', // 18 Four Square (two furnaces)
   'gear@F valve@C coil@W gear! piston@F valve! coil! piston!', // 19 Juggler
-  'gear@F valve@C coil@W gear! piston@F valve! coil! piston!', // 20 Snap Freeze
+  'valve@C coil@W gear@F gear! piston@F valve! coil! piston!', // 20 Snap Freeze: the gear passes through its window
   'gear@F valve@C coil@W gear! piston@F valve! coil! piston!', // 21 Glacier
-  'gear@F valve@C coil@W gear! piston@F valve! coil! piston!', // 22 Master Forge
+  'gear^ piston^ valve@C coil@W gear@F gear! piston@F piston! valve! coil!', // 22 Master Forge: thaw first, then gear and piston pass through
 ];
 
-function runScript(workshop, hz = 60) {
+function runScript(workshop, hz = 60, wrapProgress = (progress) => progress) {
   const h = harness({ seed: workshop });
   const stub = progressStub(workshop);
-  h.env.progress = stub.progress;
+  h.env.progress = wrapProgress(stub.progress);
   const g = createGame(h.env);
   const dt = 1 / hz;
   const step = (keys = [], pressed = []) => g.update(dt, input(keys, pressed));
@@ -452,7 +453,18 @@ function runScript(workshop, hz = 60) {
   assert.equal(state().menu, null);
   assert.equal(state().stage, workshop);
   for (const token of SOLUTIONS[workshop - 1].split(' ')) {
-    const [kind, op] = token.split(/(?=[@!])/);
+    const [kind, op] = token.split(/(?=[@!^])/);
+    if (op[0] === '^') {
+      // Thaw this part's frozen socket ahead of time: the torch needs no part in hand.
+      const frozen = state().sockets.find((q) => q.kind === kind);
+      assert.ok(frozen.ice > 0, `${token}: the socket is frozen`);
+      goTo({ x: frozen.x - TILE, y: frozen.y, tol: 8 });
+      step([], ['KeyX']);
+      assert.equal(state().player.tool, 'torch');
+      for (let n = 0; n < 200 && state().player.tool === 'torch'; n++) wait(0.1);
+      assert.equal(state().sockets.find((q) => q.kind === kind).ice, 0, `${token}: thawed`);
+      continue;
+    }
     const before = comp(kind);
     goTo({ x: before.x, y: before.y, tol: 14 });
     if (op[0] === '@') {
@@ -538,7 +550,7 @@ test('quality: every workshop has a scripted legal solution that clears it witho
   });
 });
 
-test('quality: scripted solutions hold at 30 and 120 Hz too, and leave a fair slice of the clock', () => {
+test('quality: scripted solutions hold at 30 and 120 Hz too, and leave a slice of the clock', () => {
   for (const hz of [30, 120]) {
     for (const i of [0, 7, 15, 21]) {
       const r = runScript(i + 1, hz);
@@ -552,31 +564,44 @@ test('quality: scripted solutions hold at 30 and 120 Hz too, and leave a fair sl
       return r.final.time;
     })();
     assert.ok(
-      used < budgetOf(st) * 0.7,
+      used < budgetOf(st) * 0.75,
       `${st.name.en}: ${used.toFixed(0)} of ${budgetOf(st).toFixed(0)} s`,
     );
   });
 });
 
-test('quality: a prompt-literal human with 0.4-0.6 s reactions clears every workshop at every rate', () => {
+test('quality: a prompt-literal human with 0.4-0.6 s reactions clears the teaching and combining workshops, and mastery bites', () => {
   const ratios = [];
+  const masteryRatios = [];
+  const masteryWins = [];
   STAGES.forEach((st, i) => {
     for (const hz of HZ) {
       const sampled = SAMPLED.includes(i);
       const seeds = sampled ? 30 : 6;
       const r = rate(i + 1, hz, SLOW, seeds);
-      assert.ok(r.won >= (sampled ? 24 : 6), `${st.name.en} ${hz} Hz: ${r.won}/${seeds}`);
       assert.equal(r.lowest, RULES.hpMax, 'the prompts keep the hands safe');
-      ratios.push(r.slowest / budgetOf(st));
+      if (i < 17) {
+        assert.ok(r.won >= (sampled ? 24 : 6), `${st.name.en} ${hz} Hz: ${r.won}/${seeds}`);
+        ratios.push([i, r.slowest / budgetOf(st)]);
+      } else {
+        masteryWins.push([i + 1, r.won]);
+        if (r.won) masteryRatios.push(r.slowest / budgetOf(st));
+      }
     }
   });
-  // The slowest successful run never needs more than 72% of the clock; lone-part workshops far less.
-  ratios.forEach((v) => assert.ok(v <= 0.72, `${v}`));
-  assert.ok(Math.max(...ratios.slice(0, 6)) <= 0.45, 'the first workshops are generous');
-  assert.ok(Math.max(...ratios.slice(-15)) > 0.6, 'the clock tightens towards mastery');
+  // The slowest successful run never needs more than 72% of the clock up to workshop 14 (lone-part
+  // workshops far less) and 85% in the last three combining workshops.
+  ratios.forEach(([i, v]) => assert.ok(v <= (i < 14 ? 0.72 : 0.85), `W${i + 1}: ${v}`));
+  const upTo = (n) => ratios.filter(([i]) => i < n).map(([, v]) => v);
+  assert.ok(Math.max(...upTo(6)) <= 0.45, 'the first workshops are generous');
+  assert.ok(Math.max(...upTo(17)) > 0.75, 'the clock tightens towards mastery');
+  // Mastery: whoever wins does so with a sliver of the clock left, and a reader this slow loses
+  // the two workshops whose routes are longest in relation to their clock.
+  masteryRatios.forEach((v) => assert.ok(v > 0.85, `a mastery win leaves ${1 - v} of the clock`));
+  for (const [n, won] of masteryWins) if (n === 20 || n === 21) assert.equal(won, 0, `W${n}`);
 });
 
-test('quality: faster 0.15-0.35 s reactions clear them too, 27 of 30 on the sampled workshops', () => {
+test('quality: faster 0.15-0.35 s reactions clear them all, 27 of 30 on the sampled workshops', () => {
   STAGES.forEach((st, i) => {
     for (const hz of HZ) {
       const sampled = SAMPLED.includes(i);
@@ -653,7 +678,7 @@ test('quality: the whole campaign, played in order, unlocks every workshop and e
   const r = play({
     hz: 60,
     seed: 5,
-    delayRange: SLOW,
+    delayRange: FAST,
     pick: literal,
     maxSeconds: 3000,
     stopAfter: false,
@@ -692,6 +717,35 @@ test('quality: coming back later offers the select screen and continues from the
   g.update(1 / 60, input([], ['Space']));
   assert.equal(g.getState().stage, 10);
   assert.deepEqual(stub.log.calls, [], 'starting does not touch the stored progress');
+});
+
+test('quality: a progress store that throws never stops a played workshop, a clear or the finish', () => {
+  const broken = () => {
+    throw new Error('storage is unavailable');
+  };
+  const wrap = (progress) => ({ unlocked: progress.unlocked, unlock: broken });
+  const r = runScript(1, 60, wrap);
+  assert.equal(r.final.stage, 2, 'workshop 1 cleared and workshop 2 loaded');
+  assert.equal(r.final.phase, 'playing');
+  assert.equal(r.final.stats.installs, 1);
+  // The finale ends the run once even when saving fails.
+  const last = runScript(STAGES.length, 60, wrap);
+  assert.equal(last.final.phase, 'won');
+  assert.equal(last.h.ends.length, 1);
+  // A store that cannot be read at all starts workshop 1 and does not touch the write side.
+  const h = harness({ seed: 2 });
+  let writes = 0;
+  h.env.progress = {
+    unlocked: broken,
+    unlock: () => {
+      writes++;
+      throw new Error('read-only');
+    },
+  };
+  const g = createGame(h.env);
+  assert.equal(g.getState().menu, null);
+  assert.equal(g.getState().stage, 1);
+  assert.equal(writes, 0);
 });
 
 // A random settled state: parts anywhere on the floor or pads at any temperature the tools can
@@ -1133,10 +1187,12 @@ test('quality: a pinned sweep case where two strays used to trade places is clea
     [0.3, 0.3],
   ]) {
     const s = settledState(index('Long Haul'), 60, [12, 12], false);
-    assert.ok(finishFrom(s, 20, false, literal, delay), `delay ${delay[0]}`);
+    assert.ok(finishFrom(s, 20, true, literal, delay), `delay ${delay[0]}`);
   }
 });
 
+// These layout tests hold the engine at its starting temperature (keepWarm): they ask whether a
+// layout can be sorted out at all, which the mastery clocks would otherwise confound.
 test('quality: random layouts of strays at room temperature are cleared by a 0.5 s and a 0.3 s reader', () => {
   let cleared = 0;
   let total = 0;
@@ -1149,7 +1205,7 @@ test('quality: random layouts of strays at room temperature are cleared by a 0.5
       for (let seed = 1; seed <= 3; seed++) {
         total++;
         const s = settledState(i, seed + 40, [12, 12], false);
-        if (finishFrom(s, seed, false, literal, delay)) cleared++;
+        if (finishFrom(s, seed, true, literal, delay)) cleared++;
       }
     });
   assert.ok(cleared >= total * 0.97, `${cleared}/${total}`);
@@ -1188,7 +1244,7 @@ test('quality: adjacent wrong pads never trap a part: the stray-first livelock l
   Object.assign(s.player, { x: 10 * 24 + 12, y: 28 + 5 * 24 + 12 });
   headStraight = true;
   try {
-    assert.ok(finishFrom(s, 3, false, literal, [0.3, 0.3]));
+    assert.ok(finishFrom(s, 3, true, literal, [0.3, 0.3]));
   } finally {
     headStraight = false;
   }
@@ -1221,7 +1277,7 @@ test('quality: every layout of the four parts on the pads or the floor is sorted
       else Object.assign(c, { ...bare[(i * 7 + n * 3) % bare.length], T: 12 });
     });
     Object.assign(s.player, { x: 10 * 24 + 12, y: 28 + 5 * 24 + 12 });
-    if (finishFrom(s, n + 1, false, literal, [0.3, 0.3])) cleared++;
+    if (finishFrom(s, n + 1, true, literal, [0.3, 0.3])) cleared++;
     else failed.push(assign.join());
   });
   headStraight = false;

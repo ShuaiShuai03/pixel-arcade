@@ -7,8 +7,8 @@ export const meta = {
   players: '1',
   touch: true,
   description: {
-    en: 'Repair freezing engines across 22 workshops, from one part to four: clearing a workshop unlocks the next, and the start screen lets you continue or replay any open one. Each socket accepts one part, and only while the part is inside its printed temperature window (for example 70~115). Parts warm on the red furnace pad, cool on the blue chiller pad and settle on the amber warm plate; every temperature moves toward its source by Newton cooling. Space picks up, puts down on a pad, or installs. X cycles the tool: off, torch (+20 degrees per second) or frost spray (-20 per second). Held parts heat or chill your gloves: at 65 degrees or above, or at -10 or below, the gauge flashes a warning; past 85 or -25 you lose 8 HP per second. A pad holds one part at a time, so share it by taking turns. Ice is slippery and melts under a hot part. Some engine sockets are frozen shut: stand at one with a part ready and press X for the torch, which melts the socket ice in about 3 seconds and then shuts itself off. The engine seizes at -30 degrees, so watch its clock.',
-    zh: '在22间工坊里修好冻僵的发动机，从一个零件到四个零件：通关一间会解锁下一间，开局菜单可继续或重玩任何已开放的工坊。每个插槽只接受一个零件，并且零件温度必须落在标出的温度窗口内（例如 70~115）。零件在红色熔炉台升温，在蓝色冷却台降温，在琥珀色温热板上趋于稳定；所有温度都按牛顿冷却定律趋向热源。空格键拾取、放到台上或安装。X键切换工具：关闭、喷灯（每秒+20度）、冷冻喷雾（每秒-20度）。手持零件会加热或冻伤手套：达到65度以上或-10度以下时仪表闪烁警告，超过85度或低于-25度每秒损失8点生命。一个台子同一时间只放一个零件，要轮流使用。冰面很滑，热零件会把冰融化。有些发动机插槽被冻住了：带着合适的零件站在插槽前按X开启喷灯，约3秒融化插槽冰，随后喷灯自动关闭。发动机降到-30度就会卡死，请留意倒计时。',
+    en: 'Repair freezing engines across 22 workshops, from one part to four: clearing a workshop unlocks the next, and the start screen lets you continue or replay any open one. Each socket accepts one part, and only while the part is inside its printed temperature window (for example 70~115). Parts warm on the red furnace pad (flame), cool on the blue chiller pad (snowflake) and settle on the amber warm plate (dot); every temperature moves toward its source by Newton cooling. In the last workshops a pad can lie beyond the window, so the part only passes through it: take it while its number is inside, or lift it onto bare floor to let it drift back. Space picks up, puts down on a pad, or installs. X cycles the tool: off, torch (+20 degrees per second) or frost spray (-20 per second). Held parts heat or chill your gloves: at 65 degrees or above, or at -10 or below, the gauge flashes a warning; past 85 or -25 you lose 8 HP per second. A pad holds one part at a time, so share it by taking turns. Ice is slippery and melts under a hot part. Some engine sockets are frozen shut: stand beside one and press X for the torch, which melts the socket ice in about 3 seconds and then shuts itself off. Do it before you fetch the part: it needs no part in hand, and waiting at the socket with a cold part chills your gloves. The engine seizes at -30 degrees, so watch its clock.',
+    zh: '在22间工坊里修好冻僵的发动机，从一个零件到四个零件：通关一间会解锁下一间，开局菜单可继续或重玩任何已开放的工坊。每个插槽只接受一个零件，并且零件温度必须落在标出的温度窗口内（例如 70~115）。零件在红色熔炉台（火焰）升温，在蓝色冷却台（雪花）降温，在琥珀色温热板（圆点）上趋于稳定；所有温度都按牛顿冷却定律趋向热源。最后几间工坊里，台子的温度可能超出窗口，零件只会路过窗口：趁数字在窗口内时拿起，或把它放到空地上让温度回落。空格键拾取、放到台上或安装。X键切换工具：关闭、喷灯（每秒+20度）、冷冻喷雾（每秒-20度）。手持零件会加热或冻伤手套：达到65度以上或-10度以下时仪表闪烁警告，超过85度或低于-25度每秒损失8点生命。一个台子同一时间只放一个零件，要轮流使用。冰面很滑，热零件会把冰融化。有些发动机插槽被冻住了：站在插槽旁按X开启喷灯，约3秒融化插槽冰，随后喷灯自动关闭。最好在取零件之前先做：不用拿着零件，而且带着冷零件在插槽前等待会冻伤手套。发动机降到-30度就会卡死，请留意倒计时。',
   },
   keys: [
     { label: { en: 'Move (ice is slippery)', zh: '移动（冰面很滑）' }, keys: 'WASD / Arrows' },
@@ -283,7 +283,7 @@ export const STAGES = freeze([
   stage(
     'Plate Share',
     '共用温板',
-    0.008,
+    0.0105,
     [6, 5],
     'W 3 4, F 3 7',
     '9 3, 9 4, 9 5',
@@ -297,7 +297,7 @@ export const STAGES = freeze([
   stage(
     'Deep Freeze',
     '深冻车间',
-    0.0085,
+    0.0108,
     [6, 4],
     'F 2 2, C 2 7, W 8 8',
     '9 3, 9 4, 12 5, 12 6',
@@ -314,7 +314,7 @@ export const STAGES = freeze([
   stage(
     'Cold Chain',
     '冷链',
-    0.0075,
+    0.0092,
     [5, 4],
     'F 2 2, C 2 7, W 2 4',
     '8 3, 8 4, 8 5, 12 5, 12 6, 12 7',
@@ -329,52 +329,52 @@ export const STAGES = freeze([
   stage(
     'Four Square',
     '四方阵',
-    0.0085,
+    0.0126,
     [6, 4],
     'F 2 2, F 2 7, C 3 4, W 3 5',
     '8 3, 8 6, 11 2, 11 7',
     [],
     [
-      win('gear', 2, 70, 115, [9, 4]),
-      win('valve', 4, -55, -25, [10, 6]),
-      win('coil', 6, 38, 62, [10, 2]),
-      win('piston', 8, 80, 120, [13, 5]),
+      win('gear', 2, 84, 112, [9, 4]),
+      win('valve', 4, -62, -36, [10, 6]),
+      win('coil', 6, 42, 58, [10, 2]),
+      win('piston', 8, 88, 114, [13, 5]),
     ],
   ),
   stage(
     'Juggler',
     '杂耍',
-    0.0085,
+    0.0128,
     [6, 5],
     'F 3 2, C 3 7, W 3 5',
     '8 4, 8 5',
     [],
     [
-      win('gear', 2, 85, 120, [9, 3]),
-      win('piston', 4, 85, 120, [9, 6]),
-      win('valve', 6, -60, -34, [12, 7]),
-      win('coil', 8, 40, 60, [12, 2]),
+      win('gear', 2, 86, 114, [9, 3]),
+      win('piston', 4, 88, 114, [9, 6]),
+      win('valve', 6, -64, -36, [12, 7]),
+      win('coil', 8, 43, 59, [12, 2]),
     ],
   ),
   stage(
     'Snap Freeze',
     '骤冷',
-    0.007,
+    0.01,
     [6, 4],
     'F 2 2, C 2 7, W 3 4',
     '7 3, 7 4, 11 5, 11 6',
     [[8, 1, 9, 8]],
     [
-      win('valve', 1, -60, -30, [12, 7], 100),
-      win('gear', 3, 80, 120, [12, 2]),
-      win('coil', 5, 38, 62, [13, 7]),
-      win('piston', 7, 80, 120, [13, 3], 100),
+      win('valve', 1, -62, -36, [12, 7], 100),
+      win('gear', 3, 62, 88, [12, 2]),
+      win('coil', 5, 42, 58, [13, 7]),
+      win('piston', 7, 86, 114, [13, 3], 100),
     ],
   ),
   stage(
     'Glacier',
     '冰川',
-    0.0065,
+    0.0109,
     [7, 5],
     'F 2 2, C 2 7, W 3 4',
     '8 4, 8 5',
@@ -383,25 +383,25 @@ export const STAGES = freeze([
       [12, 1, 15, 8],
     ],
     [
-      win('gear', 2, 80, 120, [9, 2], 100),
-      win('valve', 4, -60, -30, [9, 7]),
-      win('coil', 6, 38, 62, [10, 4]),
-      win('piston', 8, 80, 120, [10, 6], 100),
+      win('gear', 2, 84, 112, [9, 2], 100),
+      win('valve', 4, -64, -36, [9, 7]),
+      win('coil', 6, 44, 60, [10, 4]),
+      win('piston', 8, 86, 114, [10, 6], 100),
     ],
   ),
   stage(
     'Master Forge',
     '大师熔炉',
-    0.0062,
+    0.0076,
     [4, 4],
     'F 2 2, C 2 7, W 4 5',
     '7 1, 7 2, 7 3, 7 4, 7 5, 7 6',
     [[12, 1, 15, 8]],
     [
-      win('gear', 2, 85, 120, [10, 7], 100),
-      win('valve', 4, -62, -34, [9, 2]),
-      win('coil', 6, 40, 60, [11, 8]),
-      win('piston', 8, 85, 120, [9, 5], 100),
+      win('gear', 2, 60, 86, [10, 7], 100),
+      win('valve', 4, -64, -36, [9, 2]),
+      win('coil', 6, 43, 59, [11, 8]),
+      win('piston', 8, 62, 88, [9, 5], 100),
     ],
   ),
 ]);
@@ -1000,7 +1000,7 @@ export const PROMPTS = freeze({
   install: ['Carry the {p} to its engine socket: Space', '把{p}送到发动机插槽：空格'],
   tooHot: ['{p} {t}C is too hot: the {s}, or X frost', '{p}{t}度太热：去{s}或按X冷冻'],
   tooCold: ['{p} {t}C is too cold: the {s}, or X torch', '{p}{t}度太冷：去{s}或按X喷灯'],
-  partHot: ['{p} {t}C is scorching: hurry to the {s}, Space', '{p}{t}度很烫：快到{s}按空格'],
+  partHot: ['{p} {t}C scorching: hurry to the {s}, Space', '{p}{t}度很烫：快到{s}按空格'],
   floorHot: [
     '{p} {t}C is too hot: bare floor, Space, or X frost',
     '{p}{t}度太热：放空地按空格，或按X冷冻',
@@ -1011,7 +1011,7 @@ export const PROMPTS = freeze({
   ],
   padBusy: ['{p} {t}C: {s} busy. Space: put on bare floor', '{p}{t}度：{s}被占用，空格放空地'],
   lift: ['Space: lift the {p} off the {s} to even out', '空格：把{p}从{s}上拿开，让它回稳'],
-  settle: ['{p} {t}C settling on the floor: take it at {m}', '{p}{t}度在地面回稳：到{m}时拿起'],
+  settle: ['{p} {t}C settling on floor: take it at {m}', '{p}{t}度在地面回稳：到{m}时拿起'],
   partCold: ['{p} {t}C is frozen: hurry to the {s}, Space', '{p}{t}度已冻透：快到{s}按空格'],
   take: ['Space: pick up the ready {p} ({t}C)', '空格：拿起合适的{p}（{t}度）'],
   bring: ['Space: take the {p} to the {s}', '空格：把{p}拿到{s}'],
@@ -1211,6 +1211,12 @@ const SPRITES = {
   coil: sheet('bbbbbbbb baaaaaab bbbbbbbb .baaaab. bbbbbbbb baaaaaab bbbbbbbb ........'),
   piston: sheet('..bbbb.. ..baab.. ..baab.. ..bbbb.. ...bb... ...bb... .bbbbbb. .baaaab.'),
 };
+// One glyph per pad kind, so the pads differ by shape and not only by colour or number.
+const PAD_GLYPH = {
+  F: sheet('...a.... ...aa... ..aaaa.. .aaaaaa. .aabbaa. aaabbaaa .aabbaa. ..aaaa..'),
+  C: sheet('...aa... .a.aa.a. ..aaaa.. aaaaaaaa aaaaaaaa ..aaaa.. .a.aa.a. ...aa...'),
+  W: sheet('..aaaa.. .aaaaaa. aaabbaaa aabbbbaa aabbbbaa aaabbaaa .aaaaaa. ..aaaa..'),
+};
 const PLAYER = sheet('..oooo.. .oooooo. .offffo. .offffo. goooooog g.oooo.g ..oooo.. ..kk.kk.');
 const rect = (ctx, color, x, y, w, h) => {
   ctx.fillStyle = color;
@@ -1258,8 +1264,8 @@ function drawPad(ctx, pad, f) {
     W: ['#5c4a1f', '#ffc45a'],
   }[pad.ch];
   rect(ctx, palette[0], x + 1, y + 1, TILE - 2, TILE - 2);
-  for (let i = 0; i < 4; i++) rect(ctx, palette[1], x + 4, y + 4 + i * 5, TILE - 8, 2);
-  if (pad.ch === 'F') rect(ctx, '#ffe08a', x + 8 + (f % 14 < 7 ? 0 : 4), y + 2, 4, 3);
+  pixelSprite(ctx, PAD_GLYPH[pad.ch], x + 4, y + 4, 2, { a: palette[1], b: '#fff1c4' });
+  if (pad.ch === 'F' && f % 14 < 7) rect(ctx, '#ffe08a', x + 11, y + 2, 2, 3);
   if (pad.ch === 'C' && f % 40 < 20) rect(ctx, '#ffffff', x + 10, y + 3, 3, 3);
   for (let i = 0; i < 2; i++) {
     const rise = (f * 0.4 + i * 14) % 22;
@@ -1450,9 +1456,26 @@ export function render(ctx, s, env) {
 // Public game
 // ---------------------------------------------------------------------------
 
+// The host's progress store is a convenience: a store that throws must never stop the game.
+function readUnlocked(progress) {
+  try {
+    const n = Math.floor(Number(progress?.unlocked?.()));
+    return Number.isFinite(n) ? Math.max(1, Math.min(STAGES.length, n)) : 1;
+  } catch {
+    return 1;
+  }
+}
+function saveUnlocked(progress, level) {
+  try {
+    progress?.unlock?.(level);
+  } catch {
+    // Keep playing: the next clear tries to save again.
+  }
+}
+
 export function createGame(env) {
   const s = newState();
-  let unlocked = Math.max(1, Math.min(STAGES.length, Math.floor(env.progress?.unlocked?.()) || 1));
+  let unlocked = readUnlocked(env.progress);
   if (unlocked > 1) openMenu(s, unlocked);
   let ended = false;
   const emit = (name) => env.sound(name);
@@ -1461,7 +1484,7 @@ export function createGame(env) {
       advance(s, dt, input, emit);
       if (s.unlockTo > unlocked) {
         unlocked = s.unlockTo;
-        env.progress?.unlock?.(unlocked);
+        saveUnlocked(env.progress, unlocked);
       }
       if (s.phase === 'playing' || ended) return;
       ended = true;
