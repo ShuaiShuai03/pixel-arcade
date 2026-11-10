@@ -16,6 +16,10 @@ export const RULES = Object.freeze({
   menuCols: 8,
   undoLimit: 200, // older turns drop off the undo stack
   tipTime: 6, // s a board's tip is shown while nothing has been turned
+  hintFreeBoards: 7, // boards 1 to 7 always show the next move; later boards need the H key
+  hintPenalty: 12, // score taken for each hint asked for on a board
+  minBoardScore: 20, // a cleared board never scores less than this, whatever the hints cost
+  inputBuffer: 6, // key presses kept from the lit and blown pauses
 });
 
 // --- Ports ---

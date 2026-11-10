@@ -122,6 +122,7 @@ function follow(level, hz, opts = {}) {
   let changed = 0;
   let actions = 0;
   let blownFuses = 0;
+  let hintsAsked = 0;
   const holds = [];
   let lastLine = null;
   let lineSince = 0;
@@ -132,6 +133,12 @@ function follow(level, hz, opts = {}) {
     blownFuses = Math.max(blownFuses, 3 - st.fuses);
     if (st.stage !== 'play') {
       g.update(1 / hz, input());
+      continue;
+    }
+    if (!st.hintShown) {
+      // A later board shows only its goal: a player who wants the next move asks for it.
+      g.update(1 / hz, input([], ['KeyH']));
+      hintsAsked++;
       continue;
     }
     const now = `${st.tiles.map((x) => x.rot).join('')}|${st.cursor.c},${st.cursor.r}|${st.moves}`;
@@ -169,6 +176,7 @@ function follow(level, hz, opts = {}) {
     cleared: st.level > level || st.phase === 'won',
     fuses: st.fuses,
     blown: blownFuses,
+    hintsAsked,
     actions,
     t,
     holds,
@@ -216,6 +224,37 @@ test('quality: the follower recovers from at least 10 random mistaken states per
   assert.equal(runs, BOARD_COUNT * SCRAMBLES);
   assert.ok(undos > 0, 'some recoveries used the undo prompt');
   console.log(`scrambled runs: ${runs}, undo presses followed: ${undos}`);
+});
+
+test('quality: a follower that never asks for a hint is told only the goal from the first asked board on', () => {
+  for (let level = RULES.hintFreeBoards + 1; level <= BOARD_COUNT; level++)
+    for (const lang of ['en', 'zh']) {
+      const { g } = begin(level, { lang });
+      const st = g.getState();
+      assert.equal(keyFor(st.line[lang], lang), null, `board ${level} ${lang}: ${st.line[lang]}`);
+      assert.equal(st.hint, null);
+      for (let f = 0; f < 600; f++) g.update(1 / 60, input());
+      assert.equal(g.getState().moves, 0);
+      assert.equal(g.getState().level, level);
+    }
+});
+
+test('quality: every hint costs the penalty, so a hint-led follower earns little on the later boards', () => {
+  let asked = 0;
+  for (let level = 1; level <= BOARD_COUNT; level++) {
+    const r = follow(level, 60, { seed: level });
+    assert.ok(r.cleared);
+    asked += r.hintsAsked > 0 ? 1 : 0;
+    const full = RULES.clearScore + RULES.perfectScore + 3 * RULES.fuseScore;
+    const expected = Math.max(RULES.minBoardScore, full - RULES.hintPenalty * r.hintsAsked);
+    assert.equal(r.st.score, expected, `board ${level}`);
+    if (level > RULES.hintFreeBoards) {
+      // One hint covers one move, so a hint-led run pays for most of its turns.
+      assert.ok(r.hintsAsked >= r.st.stats.turns / 3, `board ${level}: ${r.hintsAsked} hints`);
+      assert.ok(r.st.score < full / 2, `board ${level} scored ${r.st.score}`);
+    } else assert.equal(r.hintsAsked, 0);
+  }
+  assert.equal(asked, BOARD_COUNT - RULES.hintFreeBoards);
 });
 
 test('quality: a follower reading the Chinese prompt clears every board too', () => {

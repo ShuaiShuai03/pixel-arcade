@@ -56,6 +56,7 @@ Phase Tiles completed batch 18 and the 50-game target, Pixel Parkour included. T
 | Weightworks       | Passed in one round: 24 machines, opt-in hints from machine 8 ([record](final-review/weightworks.json))               |
 | Pixel Parkour     | Passed in one round with no changes: vendored web build verified ([record](final-review/pixel-parkour.json))          |
 | Phase Tiles       | Passed in one round: 26 boards, opt-in hints, exact mastery ([record](final-review/phase-tiles.json))                 |
+| Circuit Weaver    | Passed in one round: 24 boards, per-move paid hints from board 8 ([record](final-review/circuit-weaver.json))         |
 
 ## Completed batch 18
 

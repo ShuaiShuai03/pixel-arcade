@@ -1,0 +1,80 @@
+{
+  "game": "circuit-weaver",
+  "date": "2026-11-10",
+  "reviewedRevision": "32215f3e (accepted build) plus the fixes in this commit",
+  "owner": "owner-circuit",
+  "reviewer": "circuit-fair, circuit-robust and circuit-present (parallel split review; the coordinator finished the fairness probe run when its reviewer stopped)",
+  "rounds": 1,
+  "process": "Lean final review at the user's request, with the review split across three parallel reviewers (fairness, robustness, presentation) as the user asked. The game already had 24 boards. Five MEDIUM findings and one LOW were fixed; the coordinator then asked for the hint to be charged per move, as in the other puzzle games. A separate verification agent re-ran the reviewers' probes against the repository files (a hint-requesting copy of the fairness bot changed only to press H) plus one clean-worktree run, followed by the browser check, without a second review round.",
+  "verdict": "pass",
+  "approvedSha256": {
+    "src/games/circuit-weaver.js": "30e1a0ef847347b43eb23169e73fe3809f16f610c034be24fb067e5073a45f6a",
+    "src/games/circuit-weaver-boards.js": "76e9ea05c750b5ff6216e07c944fed57c4dcac99dfb47705b2567238c4da0351",
+    "src/games/circuit-weaver-draw.js": "bb63b2cc2d393a554be9cce378b9cccd7732f5debecccfa3ce19f6cfde10ee4d",
+    "src/games/circuit-weaver-engine.js": "261fdc7db27b02392badd8b7d391c793043fda685f05bef61e2296b24c841960",
+    "tests/circuit-weaver.test.js": "bde9ff403886ae9964cfbf9dae600711d119fbe6e99e0801a6198aa8ce3604e8",
+    "tests/circuit-weaver-quality.test.js": "1f809f93c6d120771ee36cb6a31e266350975537b9b28011aa28a7055ff26cf3"
+  },
+  "tests": {
+    "command": "node --experimental-test-coverage --test-coverage-include='src/games/circuit-weaver*.js' --test tests/circuit-weaver.test.js tests/circuit-weaver-quality.test.js",
+    "passed": 81,
+    "failed": 0,
+    "lineCoverage": 100,
+    "log": "circuit-weaver-coverage.txt"
+  },
+  "independentProbes": "On the final files the fairness reviewer's solver bot won all 24 boards at 0.25 s and 0.35 s with no blown fuses in 815 presses; budgeted boards leave 3-4 spare turns at combination level and 1-2 at mastery (one on board 23). A bot that only follows the opt-in hint wins every board but scores 1,500 against 3,840 without hints, where the review had found the always-on hint solving every board for free. Blind policies cleared 0% of boards 3-24, play matched across 30, 60 and 120 Hz, hostile input produced no throws or NaN, the ending and loss fire once, 12 broken progress-store cases did not throw, input is held during pauses and applied on resume, every board is solvable within budget with 0 of 200 random dead states, every numeric tip claim matches its board, and EN and ZH text fits with no overlaps.",
+  "findings": [
+    {
+      "id": "M1",
+      "severity": "medium",
+      "status": "fixed",
+      "observation": "Fairness finding: the always-on hint showed the next rotation, so following it solved every board. Boards 1-7 keep the step hint; from board 8 the line states the goal ('Light all 2 lamps, no open ends [H] hint -12') and H or the Hint touch button reveals one move for 12 points, hiding again after a turn, undo or new board; getState exposes the hint and optimal count only while shown; each cleared board still scores at least 20."
+    },
+    {
+      "id": "M2",
+      "severity": "medium",
+      "status": "fixed",
+      "observation": "Robustness finding: a throwing progress store crashed reading or saving unlocks. Both are now wrapped, as in the other games."
+    },
+    {
+      "id": "M3",
+      "severity": "medium",
+      "status": "fixed",
+      "observation": "Robustness finding: key presses during the lit and blown pauses were dropped. The latest six are kept and applied in the first fixed step after resume, so play stays deterministic across frame rates; pointer clicks aimed at the old board are ignored."
+    },
+    {
+      "id": "M4",
+      "severity": "medium",
+      "status": "fixed",
+      "observation": "Presentation finding: the Narrow Margin tip promised two spare turns where the board allows three. It now says three, and a test checks every spare-turn tip against budget minus par."
+    },
+    {
+      "id": "M5",
+      "severity": "medium",
+      "status": "fixed",
+      "observation": "Presentation finding: locked and selected boards on the picker differed by colour only. Locked boards show a pixel padlock and the selection a 2 px border."
+    },
+    {
+      "id": "L1",
+      "severity": "low",
+      "status": "fixed",
+      "observation": "The win sound played twice on the final board; it now plays once per board and only the end-of-game win on the last."
+    }
+  ],
+  "openNotes": [
+    "A player can still buy every hint; the cost is score, not progress.",
+    "The Chinese wording of the hint line and the 提示 button was written by the owner and has not been checked by a native reader.",
+    "The browser profile already had every board unlocked from earlier testing, so the padlocks were checked by the presentation probe and tests rather than on screen."
+  ],
+  "browser": {
+    "method": "Official Claude in Chrome extension, local server; real clicks on Start and the language toggle, synthetic in-page keys; only DOM text and the canvas were read.",
+    "servedSha256Prefixes": "30e1a0ef 76e9ea05 bb63b2cc 261fdc7d",
+    "observed": [
+      "English: Start opened the board picker (24 boards, selection outlined) and the description explained hints are bought with H for 12 points each, one move per hint.",
+      "Board 8 (Bolted Down): H showed 'Press Space to turn this corner (2x)' with the tile outlined; after one turn the line returned to 'Light all 2 lamps, no open ends [H] hint -12', so the hint covers one move.",
+      "Chinese 390 px phone frame (388 px inner, no horizontal overflow): the board picker titled 电路织匠 and touch buttons 左, 右, 上, 下, 转动, 检查, 撤销 and 提示.",
+      "Not covered in the browser: a blown fuse, a win and the final board; the probes and quality tests cover them."
+    ],
+    "screenshots": ["screenshots/circuit-weaver-en.png", "screenshots/circuit-weaver-phone-zh.png"]
+  }
+}

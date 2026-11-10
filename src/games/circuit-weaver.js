@@ -27,6 +27,7 @@ export {
 export { BOARDS, BOARD_COUNT } from './circuit-weaver-boards.js';
 export { layoutOf, menuLayout } from './circuit-weaver-draw.js';
 
+const R = RULES;
 const touch = (rows) => rows.map(([code, en, zh, side]) => ({ code, side, label: { en, zh } }));
 
 export const meta = {
@@ -36,14 +37,21 @@ export const meta = {
   players: '1',
   touch: true,
   description: {
-    en: 'Rotate etched copper tiles until every lamp glows at its own voltage. Two neighbouring tiles only connect when BOTH show a port on the shared edge, so a bend that points at a wall or a gap is an open end. Different voltages that meet make a SHORT, and a short blocks the win. Bridges let two tracks cross without touching, locked tiles will not turn, and some boards give a limited number of turns before a fuse blows (three fuses per run). Arrows move the cursor, Space rotates, X inspects a network, Z undoes; on a phone tap a tile to select it and tap again to turn it. Wire up all boards; progress is saved.',
-    zh: '转动蚀刻的铜线块，让每盏灯都以自己的电压亮起。相邻两块只有在公共边上两边都有接口时才会连通，所以对着墙或空格的弯头只是断头。不同电压相遇会造成短路，短路时无法通关。桥接块能让两条线交叉而不相连，锁定的块无法转动，有些电路板限制转动次数，用完会烧断保险丝（每局三根）。方向键移动光标，空格转动，X 检查线网，Z 撤销；手机上点一下选中块，再点一下转动。完成所有电路板，进度会被保存。',
+    en: `Rotate etched copper tiles until every lamp glows at its own voltage. Two neighbouring tiles only connect when BOTH show a port on the shared edge, so a bend that points at a wall or a gap is an open end. Different voltages that meet make a SHORT, and a short blocks the win. Bridges let two tracks cross without touching, locked tiles will not turn, and some boards give a limited number of turns before a fuse blows (three fuses per run). Arrows move the cursor, Space rotates, X inspects a network, Z undoes; on a phone tap a tile to select it and tap again to turn it. The first ${R.hintFreeBoards} boards highlight the next move for you; after that the goal is yours to work out, and the H key (or the Hint button) shows the next move for ${R.hintPenalty} points each time, one move per hint. Wire up all boards; progress is saved.`,
+    zh: `转动蚀刻的铜线块，让每盏灯都以自己的电压亮起。相邻两块只有在公共边上两边都有接口时才会连通，所以对着墙或空格的弯头只是断头。不同电压相遇会造成短路，短路时无法通关。桥接块能让两条线交叉而不相连，锁定的块无法转动，有些电路板限制转动次数，用完会烧断保险丝（每局三根）。方向键移动光标，空格转动，X 检查线网，Z 撤销；手机上点一下选中块，再点一下转动。前 ${R.hintFreeBoards} 块电路板会高亮下一步；之后要靠自己思考，按 H 键（或点“提示”按钮）每次花 ${R.hintPenalty} 分显示一步，一次只提示一步。完成所有电路板，进度会被保存。`,
   },
   keys: [
     { label: { en: 'Move the cursor', zh: '移动光标' }, keys: 'Arrows / WASD' },
     { label: { en: 'Rotate the tile', zh: '转动块' }, keys: 'Space' },
     { label: { en: 'Inspect a network', zh: '检查线网' }, keys: 'X' },
     { label: { en: 'Undo a turn', zh: '撤销转动' }, keys: 'Z' },
+    {
+      label: {
+        en: `Show the next move (board ${R.hintFreeBoards + 1} on, -${R.hintPenalty} points each)`,
+        zh: `显示下一步（第 ${R.hintFreeBoards + 1} 块起，每次扣 ${R.hintPenalty} 分）`,
+      },
+      keys: 'H',
+    },
   ],
   touchControls: touch([
     ['ArrowLeft', 'Left', '左', 'left'],
@@ -53,10 +61,10 @@ export const meta = {
     ['Space', 'Turn', '转动', 'right'],
     ['KeyX', 'Inspect', '检查', 'right'],
     ['KeyZ', 'Undo', '撤销', 'right'],
+    ['KeyH', 'Hint', '提示', 'right'],
   ]),
 };
 
-const R = RULES;
 const STEP = R.step;
 const clamp = (n, lo, hi) => Math.max(lo, Math.min(hi, n));
 
@@ -163,6 +171,28 @@ export function adviceFor(board, rots, cursor, left, canUndo, plan = solve(board
   };
 }
 
+// What the default line says on the boards that do not hand out the next move: the goal only.
+export function goalAdvice(board) {
+  const n = board.sinks.length;
+  const mixed = new Set(board.sources.map((j) => board.cells[j].volt)).size > 1;
+  const en = [n === 1 ? 'Light the lamp' : `Light all ${n} lamps`];
+  const zh = [n === 1 ? '点亮这盏灯' : `点亮全部 ${n} 盏灯`];
+  if (mixed) {
+    en.push('no shorts');
+    zh.push('不短路');
+  }
+  if (board.sealed) {
+    en.push('no open ends');
+    zh.push('不留断头');
+  }
+  return {
+    id: 'goal',
+    en: `${en.join(', ')}  [H] hint -${R.hintPenalty}`,
+    zh: `${zh.join('，')}  [H] 提示 -${R.hintPenalty}`,
+    hint: null,
+  };
+}
+
 // --- State ---
 const KEYS = {
   left: ['ArrowLeft', 'KeyA'],
@@ -172,13 +202,18 @@ const KEYS = {
   turn: ['Space', 'Enter'],
   inspect: ['KeyX'],
   undo: ['KeyZ'],
+  hint: ['KeyH'],
 };
+const PAUSE_ACTIONS = ['left', 'right', 'up', 'down', 'turn', 'inspect', 'undo', 'hint'];
+
+// Hints are free on the teaching boards; on later ones they are shown once asked for.
+const hintShown = (s) => s.level < R.hintFreeBoards || s.hintOn;
 
 function say(s, en, zh) {
   s.msg = { en, zh, time: R.msgTime };
 }
 
-function enterBoard(s, level) {
+function enterBoard(s, level, keepHint = false) {
   const b = BOARDS[level];
   s.level = level;
   s.board = b;
@@ -191,6 +226,8 @@ function enterBoard(s, level) {
   s.freeze = 0;
   s.menu = null;
   s.adviceKey = null;
+  s.hintOn = keepHint && s.hintOn;
+  s.boardHints = keepHint ? s.boardHints : 0;
   s.tipLeft = R.tipTime;
   refresh(s);
   const first = b.cells.findIndex((cell) => canTurn(cell));
@@ -202,6 +239,24 @@ function refresh(s) {
   s.shorted = s.an.shorts.length > 0;
 }
 
+// Progress is a convenience: a broken store must not stop the game.
+function readUnlocked(progress) {
+  try {
+    const raw = Number(progress?.unlocked?.());
+    return Number.isNaN(raw) ? 1 : clamp(Math.floor(raw), 1, BOARD_COUNT);
+  } catch {
+    return 1;
+  }
+}
+
+function saveUnlocked(progress, level) {
+  try {
+    progress?.unlock?.(level);
+  } catch {
+    // Ignored on purpose: see readUnlocked.
+  }
+}
+
 export function newState(env = {}) {
   const s = {
     phase: 'playing',
@@ -210,14 +265,16 @@ export function newState(env = {}) {
     acc: 0,
     ticks: 0,
     fuses: R.fuses,
+    hintOn: false,
+    boardHints: 0,
+    queue: [],
     best: BOARDS.map(() => 0),
     progress: env.progress || null,
     prev: {},
     msg: null,
-    stats: { turns: 0, undos: 0, shorts: 0, blown: 0, cleared: 0, locked: 0 },
+    stats: { turns: 0, undos: 0, shorts: 0, blown: 0, cleared: 0, locked: 0, hints: 0 },
   };
-  const raw = Number(s.progress?.unlocked?.());
-  const unlocked = Number.isNaN(raw) ? 1 : clamp(Math.floor(raw), 1, BOARD_COUNT);
+  const unlocked = readUnlocked(s.progress);
   enterBoard(s, 0);
   if (unlocked > 1) {
     s.stage = 'menu';
@@ -261,6 +318,7 @@ function turnTile(s, emit) {
   rots[i] = (rots[i] + 1) % TILE_TYPES[cell.type].period;
   s.rots = rots;
   s.moves++;
+  s.hintOn = false;
   s.stats.turns++;
   emit('move');
   settle(s, emit);
@@ -276,6 +334,7 @@ function undoTurn(s, emit) {
   s.moves = last.moves;
   s.cursor = { ...last.cursor };
   s.stats.undos++;
+  s.hintOn = false;
   emit('move');
   refresh(s);
 }
@@ -305,14 +364,17 @@ function settle(s, emit) {
   }
 }
 
-function finishBoard(s) {
+function finishBoard(s, emit) {
   const b = s.board;
   const par = solve(b, b.start).cost;
   const extra = s.moves - par;
-  const gained =
+  const gained = Math.max(
+    R.minBoardScore,
     R.clearScore +
-    (extra <= 0 ? R.perfectScore : extra <= 2 ? R.closeScore : 0) +
-    s.fuses * R.fuseScore;
+      (extra <= 0 ? R.perfectScore : extra <= 2 ? R.closeScore : 0) +
+      s.fuses * R.fuseScore -
+      R.hintPenalty * s.boardHints,
+  );
   s.best[s.level] = Math.max(s.best[s.level], gained);
   s.score = clamp(
     s.best.reduce((a, v) => a + v, 0),
@@ -320,9 +382,13 @@ function finishBoard(s) {
     R.maxScore,
   );
   s.stats.cleared++;
-  s.progress?.unlock?.(Math.min(BOARD_COUNT, s.level + 2));
-  if (s.level === BOARD_COUNT - 1) s.phase = 'won';
-  else enterBoard(s, s.level + 1);
+  saveUnlocked(s.progress, Math.min(BOARD_COUNT, s.level + 2));
+  if (s.level === BOARD_COUNT - 1) {
+    s.phase = 'won';
+    return;
+  }
+  emit('win');
+  enterBoard(s, s.level + 1);
 }
 
 function menuInput(s, input, emit) {
@@ -354,6 +420,45 @@ function menuInput(s, input, emit) {
   }
 }
 
+// A hint covers one move: a turn, an undo or a new board hides it, and the next one costs again.
+function requestHint(s, emit) {
+  if (hintShown(s) || s.an.solved) return;
+  s.hintOn = true;
+  s.boardHints++;
+  s.stats.hints++;
+  say(s, `Hint: -${R.hintPenalty} points`, `提示：扣 ${R.hintPenalty} 分`);
+  emit('coin');
+}
+
+const MOVES = { left: [-1, 0], right: [1, 0], up: [0, -1], down: [0, 1] };
+
+// One key press kept from a pause, applied the way a live press would be.
+function applyKept(s, name, emit) {
+  if (MOVES[name]) moveCursor(s, ...MOVES[name], emit);
+  else if (name === 'turn') turnTile(s, emit);
+  else if (name === 'inspect') s.inspect = !s.inspect;
+  else if (name === 'undo') undoTurn(s, emit);
+  else requestHint(s, emit);
+}
+
+// During the lit and blown pauses presses are kept (the newest few) and used when play resumes.
+function keepPresses(s, input) {
+  const fired = PAUSE_ACTIONS.filter((name) => trigger(s, input, name));
+  // A lit board needs no hint, so asking then is dropped rather than charged on the next board.
+  if (s.stage === 'powered' && fired.includes('hint')) fired.splice(fired.indexOf('hint'), 1);
+  s.queue = [...s.queue, ...fired].slice(-R.inputBuffer);
+}
+
+// Used the moment play resumes, inside the fixed step, so the frame rate cannot change the result.
+function useKeptPresses(s, emit) {
+  const kept = s.queue;
+  s.queue = [];
+  for (const name of kept) {
+    if (s.stage !== 'play') return;
+    applyKept(s, name, emit);
+  }
+}
+
 function playInput(s, input, emit) {
   const dx = (trigger(s, input, 'right') ? 1 : 0) - (trigger(s, input, 'left') ? 1 : 0);
   const dy = (trigger(s, input, 'down') ? 1 : 0) - (trigger(s, input, 'up') ? 1 : 0);
@@ -373,12 +478,14 @@ function playInput(s, input, emit) {
   if (trigger(s, input, 'turn')) turnTile(s, emit);
   if (trigger(s, input, 'inspect')) s.inspect = !s.inspect;
   if (trigger(s, input, 'undo')) undoTurn(s, emit);
+  if (trigger(s, input, 'hint')) requestHint(s, emit);
 }
 
 export function advance(s, dt, input, emit = () => {}) {
   if (s.phase !== 'playing' || !Number.isFinite(dt) || dt <= 0 || dt > R.maxDt) return false;
   if (s.stage === 'menu') menuInput(s, input, emit);
   else if (s.stage === 'play') playInput(s, input, emit);
+  else if (s.stage === 'powered' || s.stage === 'blown') keepPresses(s, input);
   s.acc += dt;
   const steps = Math.floor(s.acc / STEP + 1e-6);
   s.acc = Math.max(0, s.acc - steps * STEP);
@@ -390,12 +497,10 @@ function tick(s, emit) {
   s.ticks++;
   if (s.msg && (s.msg.time -= STEP) <= 0) s.msg = null;
   if (s.stage === 'play' && s.tipLeft > 0) s.tipLeft = Math.max(0, s.tipLeft - STEP);
-  if (s.stage === 'powered' && (s.freeze -= STEP) <= 0) {
-    emit('win');
-    finishBoard(s);
-  } else if (s.stage === 'blown' && (s.freeze -= STEP) <= 0) {
-    if (s.phase === 'playing') enterBoard(s, s.level);
-  }
+  if (s.stage === 'powered' && (s.freeze -= STEP) <= 0) finishBoard(s, emit);
+  else if (s.stage === 'blown' && (s.freeze -= STEP) <= 0 && s.phase === 'playing')
+    enterBoard(s, s.level, true);
+  if (s.stage === 'play' && s.queue.length) useKeptPresses(s, emit);
 }
 
 export function createGame(env) {
@@ -440,10 +545,13 @@ function planOfState(s) {
 }
 
 function adviceOfState(s) {
-  const key = `${s.level}:${s.rots.join('')}:${s.cursor.c},${s.cursor.r}:${s.moves}`;
+  const shown = hintShown(s);
+  const key = `${s.level}:${shown}:${s.rots.join('')}:${s.cursor.c},${s.cursor.r}:${s.moves}`;
   if (s.adviceKey !== key) {
     const left = s.board.budget === null ? null : s.board.budget - s.moves;
-    s.advice = adviceFor(s.board, s.rots, s.cursor, left, s.undo.length > 0, planOfState(s));
+    s.advice = shown
+      ? adviceFor(s.board, s.rots, s.cursor, left, s.undo.length > 0, planOfState(s))
+      : goalAdvice(s.board);
     s.adviceKey = key;
   }
   return s.advice;
@@ -488,6 +596,8 @@ export function snapshotOf(s) {
     tipShown: s.stage === 'play' && s.tipLeft > 0 && s.moves === 0,
     sealed: b.sealed,
     moves: s.moves,
+    hintShown: hintShown(s),
+    queued: s.queue.length,
     budget: b.budget,
     left: b.budget === null ? null : Math.max(0, b.budget - s.moves),
     fuses: clamp(s.fuses, 0, R.fuses),
@@ -551,7 +661,10 @@ export function snapshotOf(s) {
         return { en: part('en'), zh: part('zh') };
       },
     },
-    optimal: { enumerable: true, get: () => planOfState(s)?.cost ?? null },
+    optimal: {
+      enumerable: true,
+      get: () => (hintShown(s) ? (planOfState(s)?.cost ?? null) : null),
+    },
   });
   return out;
 }

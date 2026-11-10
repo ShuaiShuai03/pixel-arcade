@@ -24,6 +24,7 @@ import {
   masksOf,
   layoutOf,
   menuLayout,
+  goalAdvice,
 } from '../src/games/circuit-weaver.js';
 import { harness, input, mockContext, seeded } from './harness.js';
 
@@ -658,10 +659,14 @@ test('a turn budget burns a fuse, resets the board, and three burns lose the gam
       const rot = rotsOf(g);
       tap(g, 'Space');
       assert.deepEqual(rotsOf(g), rot, 'frozen while the fuse is shown');
+      assert.equal(g.getState().queued, 1, 'the press is kept, not lost');
       wait(g, RULES.blowPause + 0.1);
       const back = g.getState();
       assert.equal(back.stage, 'play');
-      assert.equal(back.moves, 0);
+      assert.equal(back.moves, 1, 'the kept press turns a tile once play resumes');
+      assert.equal(back.queued, 0);
+      tap(g, 'KeyZ');
+      assert.equal(g.getState().moves, 0);
       assert.deepEqual(
         rotsOf(g),
         start.tiles.map((t) => t.rot),
@@ -979,6 +984,7 @@ test('draw smoke: every stage in both languages renders without throwing', () =>
     // a dead hint (undo prompt) and an inspected bridge
     const u = begin(10, { lang }).g;
     for (let k = 0; k < BOARDS[9].budget - 3; k++) tap(u, 'Space');
+    tap(u, 'KeyH');
     assert.equal(u.getState().prompt.id, 'undo');
     u.draw(mockContext());
   }
@@ -1268,4 +1274,342 @@ test('the status line keeps the plain banner in the menu and on the lit, blown, 
   driveTo(g, solve(BOARDS[0], BOARDS[0].start).target);
   assert.equal(g.getState().status.en, 'Every lamp is lit!');
   assert.equal(g.getState().status.zh, '所有灯都亮了！');
+});
+
+// ---------------------------------------------------------------------------------------------
+// Final review: asked-for hints, kept presses, broken progress stores, tips, menu padlocks
+// ---------------------------------------------------------------------------------------------
+const FIRST_ASKED = RULES.hintFreeBoards + 1;
+
+test('the teaching boards always show the next move; later boards show only the goal', () => {
+  for (let level = 1; level <= BOARD_COUNT; level++) {
+    const { g } = begin(level);
+    const st = g.getState();
+    if (level < FIRST_ASKED) {
+      assert.equal(st.hintShown, true, `board ${level}`);
+      assert.ok(st.hint, `board ${level} hint`);
+      assert.notEqual(st.prompt.id, 'goal');
+      assert.equal(st.optimal, OPTIMAL[level - 1]);
+      continue;
+    }
+    assert.equal(st.hintShown, false, `board ${level}`);
+    assert.equal(st.hint, null, `board ${level} must not expose the move`);
+    assert.equal(st.optimal, null, `board ${level} must not expose the optimum`);
+    assert.equal(st.prompt.id, 'goal');
+    assert.ok(
+      st.line.en.startsWith('Light ') && st.line.en.endsWith(`[H] hint -${RULES.hintPenalty}`),
+    );
+    assert.ok(
+      st.line.zh.startsWith('点亮') && st.line.zh.endsWith(`[H] 提示 -${RULES.hintPenalty}`),
+    );
+    assert.ok(
+      !/Move the cursor|Press Space/.test(JSON.stringify(st.status)),
+      'status keeps the goal',
+    );
+  }
+});
+
+test('the goal line names the lamps and only the rules that apply to the board', () => {
+  const one = goalAdvice(board(['S3E I1 K3W'], { sealed: false }));
+  assert.ok(one.en.startsWith('Light the lamp  [H]') && one.zh.startsWith('点亮这盏灯  [H]'));
+  const mixed = goalAdvice(board(['S3E I1 K3W', 'S9E I1 K9W'], { sealed: false }));
+  assert.ok(mixed.en.startsWith('Light all 2 lamps, no shorts  [H]'), mixed.en);
+  assert.ok(mixed.zh.startsWith('点亮全部 2 盏灯，不短路  [H]'), mixed.zh);
+  const sealed = goalAdvice(board(['S3E I1 K3W', 'S3E I1 K3W']));
+  assert.ok(sealed.en.startsWith('Light all 2 lamps, no open ends  [H]'), sealed.en);
+  assert.equal(sealed.hint, null);
+});
+
+test('H shows the next move for a score cost, and pressing it again while shown is free', () => {
+  const { g, h } = begin(FIRST_ASKED);
+  const b = BOARDS[FIRST_ASKED - 1];
+  tap(g, 'KeyH');
+  let st = g.getState();
+  assert.equal(st.hintShown, true);
+  assert.ok(st.hint && st.optimal === OPTIMAL[FIRST_ASKED - 1]);
+  assert.notEqual(st.prompt.id, 'goal');
+  assert.equal(st.stats.hints, 1);
+  assert.ok(st.message.en.includes(`-${RULES.hintPenalty}`) && /扣/.test(st.message.zh));
+  assert.ok(h.sounds.includes('coin'));
+  tap(g, 'KeyH');
+  assert.equal(g.getState().stats.hints, 1, 'asking again costs nothing more');
+  driveTo(g, solve(b, rotsOf(g)).target);
+  wait(g, RULES.clearPause + 0.1);
+  const par = solve(b, b.start).cost;
+  const extra = g.getState().stats.turns - par;
+  assert.equal(extra, 0);
+  assert.equal(
+    g.getState().score,
+    RULES.clearScore + RULES.perfectScore + 3 * RULES.fuseScore - RULES.hintPenalty,
+  );
+  assert.equal(g.getState().level, FIRST_ASKED + 1);
+  assert.equal(g.getState().hintShown, false, 'the next board hides it again');
+  assert.equal(g.getState().hint, null);
+});
+
+test('a hint shows one move: a turn or an undo hides it, and each new request costs again', () => {
+  const { g } = begin(FIRST_ASKED);
+  tap(g, 'KeyH');
+  assert.equal(g.getState().stats.hints, 1);
+  tap(g, 'ArrowRight');
+  assert.equal(g.getState().hintShown, true, 'walking the cursor keeps the hint');
+  tap(g, 'KeyH');
+  assert.equal(g.getState().stats.hints, 1, 'asking while it is shown is free');
+  tap(g, 'Space');
+  let st = g.getState();
+  assert.equal(st.hintShown, false, 'a turn hides it');
+  assert.equal(st.hint, null);
+  assert.equal(st.optimal, null);
+  assert.equal(st.prompt.id, 'goal');
+  tap(g, 'KeyH');
+  assert.equal(g.getState().stats.hints, 2, 'the next one is charged again');
+  tap(g, 'KeyZ');
+  assert.equal(g.getState().hintShown, false, 'an undo hides it');
+  tap(g, 'KeyH');
+  assert.equal(g.getState().stats.hints, 3);
+  driveTo(g, solve(BOARDS[FIRST_ASKED - 1], rotsOf(g)).target);
+  assert.equal(g.getState().stage, 'powered');
+  tap(g, 'KeyH');
+  assert.equal(g.getState().stats.hints, 3, 'a solved board needs no hint');
+  assert.equal(g.getState().queued, 0, 'and the request is not carried to the next board');
+  wait(g, RULES.clearPause + 0.1);
+  st = g.getState();
+  assert.equal(st.stats.hints, 3);
+  assert.equal(st.hintShown, false);
+  assert.ok(
+    st.score <= RULES.clearScore + RULES.perfectScore + 3 * RULES.fuseScore - 3 * RULES.hintPenalty,
+  );
+});
+
+test('a hint-driven board still scores at least the board floor, and hints bought before a blown fuse stay charged', () => {
+  const { g } = begin(FIRST_ASKED);
+  for (let k = 0; k < 10; k++) {
+    tap(g, 'KeyH');
+    tap(g, 'Space');
+  }
+  assert.equal(g.getState().stats.hints, 10);
+  driveTo(g, solve(BOARDS[FIRST_ASKED - 1], rotsOf(g)).target);
+  wait(g, RULES.clearPause + 0.1);
+  assert.equal(g.getState().score, RULES.minBoardScore);
+  const level = BOARDS.findIndex((b, i) => b.budget !== null && i + 1 >= FIRST_ASKED) + 1;
+  const blown = begin(level).g;
+  tap(blown, 'KeyH');
+  for (let k = 0; k < BOARDS[level - 1].budget; k++) tap(blown, 'Space');
+  assert.equal(blown.getState().stage, 'blown');
+  wait(blown, RULES.blowPause + 0.1);
+  assert.equal(blown.getState().fuses, 2);
+  assert.equal(blown.getState().hintShown, false, 'the turn that blew the fuse hid it');
+  driveTo(blown, solve(BOARDS[level - 1], rotsOf(blown)).target);
+  wait(blown, RULES.clearPause + 0.1);
+  assert.equal(
+    blown.getState().score,
+    RULES.clearScore + RULES.perfectScore + 2 * RULES.fuseScore - RULES.hintPenalty,
+  );
+  const free = begin(1).g;
+  tap(free, 'KeyH');
+  assert.equal(free.getState().stats.hints, 0, 'H does nothing where hints are free');
+  assert.equal(free.getState().message, null);
+});
+
+test('the hint button exists for touch and the key is documented', () => {
+  const touchH = meta.touchControls.find((c) => c.code === 'KeyH');
+  assert.ok(touchH && touchH.label.en === 'Hint' && /[一-鿿]/.test(touchH.label.zh));
+  const key = meta.keys.find((k) => k.keys === 'H');
+  assert.ok(
+    key && /[一-鿿]/.test(key.label.zh) && key.label.en.includes(String(RULES.hintPenalty)),
+  );
+  assert.ok(meta.description.en.includes('H key') && meta.description.zh.includes('H 键'));
+  assert.ok(meta.description.en.includes(String(RULES.hintPenalty)));
+  assert.ok(meta.description.zh.includes(String(RULES.hintPenalty)));
+  assert.ok(meta.description.en.includes(`first ${RULES.hintFreeBoards} boards`));
+  assert.ok(meta.description.zh.includes(`前 ${RULES.hintFreeBoards} 块`));
+});
+
+test('the hint highlight is drawn only while the hint is shown', () => {
+  const gold = (g) => {
+    let hits = 0;
+    let style = '';
+    const base = mockContext();
+    const ctx = new Proxy(base, {
+      get: (t, p) =>
+        p === 'fillRect'
+          ? () => {
+              if (style === '#ffd166' || style === '#fff2c4') hits++;
+            }
+          : t[p],
+      set: (t, p, v) => {
+        if (p === 'fillStyle') style = v;
+        t[p] = v;
+        return true;
+      },
+    });
+    g.draw(ctx);
+    return hits;
+  };
+  const { g } = begin(FIRST_ASKED);
+  const hidden = gold(g);
+  tap(g, 'KeyH');
+  assert.ok(gold(g) > hidden, 'the gold highlight appears after H');
+});
+
+test('presses during the lit pause are kept and used when the next board starts', () => {
+  const { g } = begin(1);
+  driveTo(g, solve(BOARDS[0], BOARDS[0].start).target);
+  assert.equal(g.getState().stage, 'powered');
+  const before = g.getState();
+  tap(g, 'ArrowRight');
+  tap(g, 'Space');
+  assert.equal(g.getState().queued, 2);
+  assert.deepEqual(g.getState().cursor, before.cursor, 'nothing moves while the board is lit');
+  wait(g, RULES.clearPause + 0.1);
+  const st = g.getState();
+  assert.equal(st.level, 2);
+  assert.equal(st.queued, 0);
+  const start = BOARDS[1];
+  const first = start.cells.findIndex((c) => ['straight', 'corner', 'tee'].includes(c.type));
+  const c0 = first % start.cols;
+  assert.deepEqual(st.cursor, {
+    c: Math.min(c0 + 1, start.cols - 1),
+    r: Math.floor(first / start.cols),
+  });
+  assert.equal(st.moves, st.stats.turns - before.stats.turns, 'the kept turn counts on board 2');
+  assert.ok(st.moves <= 1);
+});
+
+test('kept presses are limited, in order, and a held key does not repeat after the pause', () => {
+  const { g } = begin(1);
+  driveTo(g, solve(BOARDS[0], BOARDS[0].start).target);
+  for (let k = 0; k < RULES.inputBuffer + 5; k++) tap(g, 'ArrowDown');
+  assert.equal(g.getState().queued, RULES.inputBuffer);
+  for (let t = 0; t < RULES.clearPause + 0.1; t += 1 / 60) g.update(1 / 60, input(['Space'], []));
+  const st = g.getState();
+  assert.equal(st.stage, 'play');
+  assert.ok(st.moves <= 1, 'a held key counts once, not every frame');
+});
+
+test('kept presses of every kind are used in order on the new board', () => {
+  const { g } = begin(1);
+  const sol = solve(BOARDS[0], BOARDS[0].start).target;
+  driveTo(g, sol);
+  tap(g, 'KeyZ');
+  tap(g, 'KeyX');
+  tap(g, 'KeyH');
+  assert.equal(g.getState().queued, 2, 'H is not kept while a board is lit');
+  wait(g, RULES.clearPause + 0.1);
+  const st = g.getState();
+  assert.equal(st.level, 2);
+  assert.ok(st.inspect, 'the kept inspect switched the inspector on');
+  assert.equal(st.stats.undos, 0, 'undo found nothing to undo on the new board');
+  assert.equal(st.moves, 0);
+  assert.equal(st.stats.hints, 0, 'H is free on a teaching board');
+});
+
+test('presses during the blown pause are kept; clicks during a pause are ignored', () => {
+  const level = FIRST_ASKED + 2;
+  const { g } = begin(level);
+  for (let k = 0; k < BOARDS[level - 1].budget; k++) tap(g, 'Space');
+  assert.equal(g.getState().stage, 'blown');
+  tap(g, 'KeyH');
+  g.update(1 / 60, input([], [], { x: 100, y: 100, clicked: true }));
+  assert.equal(g.getState().queued, 1, 'only the key press is kept');
+  wait(g, RULES.blowPause + 0.1);
+  assert.equal(g.getState().hintShown, true, 'the kept H is used after the reset');
+  assert.equal(g.getState().stats.hints, 1);
+});
+
+test('the final board plays the win sound once', () => {
+  const { g, h } = begin(BOARD_COUNT);
+  const b = BOARDS[BOARD_COUNT - 1];
+  driveTo(g, solve(b, b.start).target);
+  wait(g, RULES.clearPause + 0.5);
+  assert.equal(g.getState().phase, 'won');
+  assert.equal(h.sounds.filter((s) => s === 'win').length, 1);
+  assert.equal(h.sounds.filter((s) => s === 'lose').length, 0);
+  const mid = begin(1);
+  driveTo(mid.g, solve(BOARDS[0], BOARDS[0].start).target);
+  wait(mid.g, RULES.clearPause + 0.1);
+  assert.equal(mid.h.sounds.filter((s) => s === 'win').length, 1);
+});
+
+test('a progress store that throws never crashes the game', () => {
+  const broken = (over) => {
+    const h = harness();
+    h.env.progress = {
+      unlocked: () => {
+        throw new Error('store down');
+      },
+      unlock: () => {
+        throw new Error('write failed');
+      },
+      ...over,
+    };
+    return h;
+  };
+  const h = broken();
+  const g = createGame(h.env);
+  assert.equal(g.getState().stage, 'play');
+  assert.equal(g.getState().level, 1);
+  driveTo(g, solve(BOARDS[0], BOARDS[0].start).target);
+  wait(g, RULES.clearPause + 0.1);
+  const st = g.getState();
+  assert.equal(st.level, 2, 'clearing a board still moves on when saving fails');
+  assert.equal(st.stats.cleared, 1);
+  assert.equal(st.phase, 'playing');
+  const only = broken({ unlocked: () => 3 });
+  const menu = createGame(only.env);
+  assert.equal(menu.getState().stage, 'menu', 'a working read still opens the menu');
+  const none = harness();
+  none.env.progress = { unlocked: () => 1 };
+  const bare = createGame(none.env);
+  driveTo(bare, solve(BOARDS[0], BOARDS[0].start).target);
+  wait(bare, RULES.clearPause + 0.1);
+  assert.equal(bare.getState().level, 2, 'a store without unlock() is fine too');
+});
+
+test('a tip that counts spare turns tells the truth', () => {
+  const WORDS = { one: 1, two: 2, three: 3, four: 4 };
+  let checked = 0;
+  BOARDS.forEach((b, i) => {
+    const m = /\b(one|two|three|four) spare turns?\b/.exec(b.tip.en);
+    if (!m) return;
+    checked++;
+    const spare = b.budget - solve(b, b.start).cost;
+    assert.equal(WORDS[m[1]], spare, `${b.name.en}: ${b.tip.en}`);
+    const zh = '一两三四'[WORDS[m[1]] - 1];
+    assert.ok(b.tip.zh.includes(`多${zh}次转动`), `${b.name.en}: ${b.tip.zh} (board ${i + 1})`);
+  });
+  assert.ok(checked >= 3);
+  assert.ok(BOARDS[15].tip.en.includes('three spare turns'));
+});
+
+test('closed boards in the menu carry a padlock and the selected board a border, not just a colour', () => {
+  const fills = [];
+  let style = '';
+  const ctx = new Proxy(mockContext(), {
+    get: (t, p) =>
+      p === 'fillRect' ? (x, y, w, hh) => fills.push({ style, x, y, w, h: hh }) : t[p],
+    set: (t, p, v) => {
+      if (p === 'fillStyle') style = v;
+      t[p] = v;
+      return true;
+    },
+  });
+  const h = harness();
+  h.env.progress = { unlocked: () => 3, unlock() {} };
+  createGame(h.env).draw(ctx);
+  const locks = fills.filter((f) => f.style === '#8aa39a');
+  assert.equal(
+    locks.length,
+    (BOARD_COUNT - 3) * 4,
+    'four shapes per padlock, one per closed board',
+  );
+  const lay = menuLayout(BOARD_COUNT);
+  const frame = fills.filter(
+    (f) =>
+      f.style === '#e6f0e8' && f.x >= lay.x && f.y >= lay.y && f.y < lay.y + lay.rows * lay.cell,
+  );
+  assert.equal(frame.length, 4, 'the selected cell gets a four-sided border');
+  const sel = fills.filter((f) => f.style === '#ffd166' && f.w === lay.cell - 6);
+  assert.equal(sel.length, 1);
+  assert.ok(frame.every((f) => f.x >= sel[0].x - 2 && f.x <= sel[0].x + lay.cell));
 });

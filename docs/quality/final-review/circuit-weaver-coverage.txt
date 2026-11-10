@@ -1,0 +1,130 @@
+follower actions per board (60 Hz): 1:2 2:7 3:20 4:14 5:20 6:23 7:22 8:23 9:21 10:28 11:27 12:20 13:25 14:23 15:27 16:21 17:38 18:31 19:30 20:52 21:33 22:56 23:42 24:59
+scrambled runs: 240, undo presses followed: 560
+blind policies: random 0/66, mash 0/66, sweep 0/66
+greedy wins out of 5 per board: 1:5 2:5 3:1 4:1 5:3 6:0 7:1 8:1 9:0 10:0 11:0 12:0 13:0 14:0 15:0 16:0 17:0 18:0 19:0 20:0 21:0 22:0 23:0 24:0
+optimal rotations per board: 1:1 2:4 3:11 4:8 5:9 6:9 7:11 8:12 9:10 10:14 11:16 12:10 13:13 14:12 15:14 16:13 17:22 18:18 19:17 20:24 21:18 22:30 23:22 24:33
+informed wins /40: 3:0 4:0 5:0 6:1 7:0 8:0 9:0 10:0 11:0 12:0 13:0 14:0 15:0 16:0 17:0 18:0 19:0 20:0 21:0 22:0 23:0 24:0
+informed (0.25 s look) wins /40: 3:0 4:1 5:1 6:0 7:0 8:0 9:0 10:0 11:0 12:0 13:0 14:0 15:0 16:0 17:0 18:0 19:0 20:0 21:0 22:0 23:0 24:0
+mash wins /40: 3:0 4:0 5:0 6:0 7:0 8:0 9:0 10:0 11:0 12:0 13:0 14:0 15:0 16:0 17:0 18:0 19:0 20:0 21:0 22:0 23:0 24:0
+plain climber wins /20: 1:20 2:20 3:20 4:20 5:14 6:15 7:20 8:7 9:19 10:0 11:0 12:1 13:0 14:1 15:0 16:0 17:0 18:0 19:0 20:0 21:0 22:0 23:0 24:0
+pairs climber wins /20: 1:20 2:20 3:20 4:20 5:20 6:20 7:20 8:20 9:20 10:0 11:1 12:11 13:0 14:3 15:0 16:0 17:0 18:0 19:0 20:0 21:2 22:0 23:0 24:0
+pairs2 climber wins /20: 1:20 2:20 3:20 4:20 5:20 6:20 7:20 8:20 9:20 10:0 11:1 12:13 13:6 14:3 15:0 16:0 17:2 18:0 19:0 20:0 21:2 22:0 23:0 24:0
+pairs2+undo climber wins /20: 1:20 2:20 3:0 4:17 5:20 6:5 7:14 8:13 9:20 10:0 11:0 12:20 13:0 14:14 15:0 16:0 17:4 18:0 19:0 20:1 21:0 22:1 23:0 24:0
+reachable shorts per multi-voltage board:
+6:open 1-turn=3 2-turn=19 random=0.28%
+7:open 1-turn=2 2-turn=20 random=0.53%
+10:sealed 1-turn=0 2-turn=1 random=0.03%
+11:open 1-turn=2 2-turn=26 random=0.28%
+14:open 1-turn=2 2-turn=28 random=1.18%
+15:open 1-turn=3 2-turn=57 random=3.63%
+16:open 1-turn=4 2-turn=21 random=0.35%
+17:sealed 1-turn=0 2-turn=2 random=0.15%
+19:sealed 1-turn=0 2-turn=1 random=0.50%
+20:sealed 1-turn=0 2-turn=2 random=0.00%
+21:sealed 1-turn=0 2-turn=2 random=0.63%
+22:sealed 1-turn=0 2-turn=2 random=0.17%
+23:sealed 1-turn=0 2-turn=2 random=0.07%
+24:sealed 1-turn=0 2-turn=3 random=3.17%
+✔ quality: a literal prompt follower clears every board from the start at 30, 60 and 120 Hz without a blown fuse (3171.5195ms)
+✔ quality: the follower recovers from at least 10 random mistaken states per board and never loses a fuse (10174.912667ms)
+✔ quality: a follower that never asks for a hint is told only the goal from the first asked board on (16.247667ms)
+✔ quality: every hint costs the penalty, so a hint-led follower earns little on the later boards (408.298458ms)
+✔ quality: a follower reading the Chinese prompt clears every board too (406.625042ms)
+✔ quality: a touch-only player (tap to select, tap to turn) clears every board following the highlight (415.741292ms)
+✔ quality: tight budgets never trap the follower: even with the maximum mistakes it is led to undo (3104.64275ms)
+✔ quality: prompts only change after the player acts and are held at least half a second (181.879375ms)
+✔ quality: random, mash-Space and rotate-everything play solve at most 25% of boards 3 to 24 (698.562208ms)
+✔ quality: a greedy no-prompt player wins at most half the boards and none of the last third (2836.700083ms)
+✔ quality: the difficulty curve rises across the boards and every feature appears (22.609875ms)
+✔ quality: informed random play (live tiles only, 1 s or 0.25 s look) and 50/50 mashing solve at most 25% of any board from board 3 (15774.997791ms)
+✔ quality: port-pair hill climbing (three weightings, one that probes with undo) wins at most half the boards and under half of each of boards 17 to 24 (79825.83425ms)
+✔ quality: shorts bite: wrong turns near the solution join two voltages on every multi-voltage board (open boards after one wrong turn) (1074.899708ms)
+✔ meta follows the contract and documents every action with a touch control (0.81125ms)
+✔ ships at least 20 boards with bilingual names, tips and a recorded optimum (0.094667ms)
+✔ port table: every tile type exposes exactly the right ports at every rotation (0.585417ms)
+✔ parseBoard rejects bad boards and reads every token (0.336333ms)
+✔ two neighbours connect only when BOTH show a port on the shared edge (0.367875ms)
+✔ connectivity ignores reflections: light-style reflections do not exist, only ports (0.092916ms)
+✔ sealed boards report open ends on live networks only; unsealed boards allow them (0.109542ms)
+✔ a short is two voltages in one network, is reported, and blocks the win (0.110625ms)
+✔ a lamp on the wrong voltage is wrong, and one on a shorted network is not lit (0.07775ms)
+✔ isolated decorative wires never count: no source, no lamp credit, no shorts, no leaks (0.08175ms)
+✔ a bridge crosses two tracks without joining them; a cross joins them (0.095167ms)
+✔ networkAt returns both tracks of a bridge, an idle wire and the live network (0.147833ms)
+✔ every board is solvable and its optimal rotation count is the recorded one (26.712292ms)
+✔ the solver matches brute force on small and random boards (2403.76325ms)
+✔ the solver gives up cleanly on an impossible board and respects a node limit (0.417416ms)
+✔ advice names the tile, a direction and the key; it is empty-handed when nothing is left (2.559333ms)
+✔ a new game starts on board 1 with three fuses, a cursor on a turnable tile, no end call (0.785917ms)
+✔ Space rotates the tile under the cursor, arrows move it, edges clamp (0.649ms)
+✔ held-only input fires once per press and Enter also turns (0.153791ms)
+✔ locked and fixed tiles refuse to turn without spending a turn (0.408209ms)
+✔ Z undoes one turn and restores the exact earlier state, cursor included (0.469042ms)
+✔ getState returns copies: mutating a snapshot never changes the game (0.162417ms)
+✔ X toggles an inspector that reports the voltage of the network under the cursor (0.71275ms)
+✔ time is fixed-step: invalid, zero and oversized dt do nothing and keep the key press (0.109333ms)
+✔ determinism: the same timed script gives the same result at 30, 60 and 120 Hz (7.843792ms)
+✔ the lit board pauses, scores, unlocks the next board and loads it (0.472042ms)
+✔ bonus scoring: extra turns lower the bonus but never the base score (0.614416ms)
+✔ a turn budget burns a fuse, resets the board, and three burns lose the game once (1.043833ms)
+✔ solving on the very last allowed turn wins instead of blowing the fuse (0.7625ms)
+✔ clearing the last board wins once and freezes the game (5.116ms)
+✔ without saved progress play starts on board 1; with progress a menu offers the unlocked boards (0.363959ms)
+✔ the level menu works by touch: tap a board to select, tap again to start it (0.108875ms)
+✔ touch: tapping a tile selects it, tapping it again rotates it, outside taps are ignored (0.14ms)
+✔ every board fits a 390-px phone with tiles of at least 24 CSS pixels (0.050625ms)
+✔ a short is shown on the board, announced, and the board cannot be won while it lasts (4.687708ms)
+✔ open ends on a sealed board are listed in the state and the banner (1.305375ms)
+✔ banner and counters always match the real state (0.305042ms)
+✔ prompts exist in both languages and stay inside the canvas (5.71325ms)
+✔ draw smoke: every stage in both languages renders without throwing (35.206917ms)
+✔ a seeded mixed-input soak keeps every value finite and every array bounded (53.6395ms)
+✔ each board shows its tip in both languages until the first turn or six seconds pass (2.37275ms)
+✔ the short flag follows undo: a short that was undone is announced again when it returns (3.583416ms)
+✔ the undo stack keeps the latest 200 turns (4.951625ms)
+✔ saved progress beyond the last board is clamped to it; junk falls back to board 1 (0.156333ms)
+✔ the board table is deeply frozen (0.108334ms)
+✔ every tile of a kind has its own name: a landmark is used only when no twin shares it (7.360958ms)
+✔ a named landmark fits exactly one tile of its kind within two cells of that voltage and role (1.146125ms)
+✔ every sealed board has exactly one wiring that lights it (13.892459ms)
+✔ every valid wiring of a board with a turn budget fits the budget, so no legal wiring blows a fuse (20.826667ms)
+✔ tile and direction tables cannot be changed (0.0705ms)
+✔ while playing, the status line is the banner, the tip until the first turn, then the prompt last (7.237542ms)
+✔ the status line keeps the plain banner in the menu and on the lit, blown, lost and won screens (0.107ms)
+✔ the teaching boards always show the next move; later boards show only the goal (2.568667ms)
+✔ the goal line names the lamps and only the rules that apply to the board (0.079834ms)
+✔ H shows the next move for a score cost, and pressing it again while shown is free (1.343792ms)
+✔ a hint shows one move: a turn or an undo hides it, and each new request costs again (0.908834ms)
+✔ a hint-driven board still scores at least the board floor, and hints bought before a blown fuse stay charged (2.255167ms)
+✔ the hint button exists for touch and the key is documented (0.059209ms)
+✔ the hint highlight is drawn only while the hint is shown (0.480917ms)
+✔ presses during the lit pause are kept and used when the next board starts (0.294292ms)
+✔ kept presses are limited, in order, and a held key does not repeat after the pause (0.227959ms)
+✔ kept presses of every kind are used in order on the new board (0.238875ms)
+✔ presses during the blown pause are kept; clicks during a pause are ignored (0.354042ms)
+✔ the final board plays the win sound once (5.023334ms)
+✔ a progress store that throws never crashes the game (0.4075ms)
+✔ a tip that counts spare turns tells the truth (3.698458ms)
+✔ closed boards in the menu carry a padlock and the selected board a border, not just a colour (0.185917ms)
+ℹ tests 81
+ℹ suites 0
+ℹ pass 81
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 118171.792042
+ℹ start of coverage report
+ℹ ---------------------------------------------------------------------------
+ℹ file                       | line % | branch % | funcs % | uncovered lines
+ℹ ---------------------------------------------------------------------------
+ℹ src                        |        |          |         | 
+ℹ  games                     |        |          |         | 
+ℹ   circuit-weaver-boards.js | 100.00 |   100.00 |  100.00 | 
+ℹ   circuit-weaver-draw.js   | 100.00 |    98.70 |  100.00 | 
+ℹ   circuit-weaver-engine.js | 100.00 |   100.00 |  100.00 | 
+ℹ   circuit-weaver.js        | 100.00 |    98.99 |   98.53 | 
+ℹ ---------------------------------------------------------------------------
+ℹ all files                  | 100.00 |    99.26 |   99.25 | 
+ℹ ---------------------------------------------------------------------------
+ℹ end of coverage report

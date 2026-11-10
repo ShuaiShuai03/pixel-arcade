@@ -277,7 +277,8 @@
       "traffic-conductor",
       "weightworks",
       "pixel-parkour",
-      "phase-tiles"
+      "phase-tiles",
+      "circuit-weaver"
     ],
     "records": [
       "final-review/snowball-siege.json",
@@ -327,7 +328,8 @@
       "final-review/traffic-conductor.json",
       "final-review/weightworks.json",
       "final-review/pixel-parkour.json",
-      "final-review/phase-tiles.json"
+      "final-review/phase-tiles.json",
+      "final-review/circuit-weaver.json"
     ]
   }
 }

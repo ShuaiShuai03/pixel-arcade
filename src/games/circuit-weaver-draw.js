@@ -298,6 +298,25 @@ function inspectText(net, env) {
   return env.t('Decorative wire: no source', '装饰导线：没有电源');
 }
 
+// A padlock, so a closed board is never told apart by colour alone. (cx, top) is its top centre.
+function drawPadlock(ctx, cx, top) {
+  ctx.fillStyle = '#8aa39a';
+  ctx.fillRect(cx - 4, top, 8, 2);
+  ctx.fillRect(cx - 4, top, 2, 7);
+  ctx.fillRect(cx + 2, top, 2, 7);
+  ctx.fillRect(cx - 6, top + 6, 12, 9);
+  ctx.fillStyle = '#0a1a15';
+  ctx.fillRect(cx - 1, top + 9, 2, 4);
+}
+
+function drawFrame(ctx, x, y, size, color) {
+  ctx.fillStyle = color;
+  ctx.fillRect(x, y, size, 2);
+  ctx.fillRect(x, y + size - 2, size, 2);
+  ctx.fillRect(x, y, 2, size);
+  ctx.fillRect(x + size - 2, y, 2, size);
+}
+
 function drawMenu(ctx, s, env) {
   background(ctx, PALETTE.board);
   text(ctx, env.t('Circuit Weaver', '电路织匠'), 240, 18, PALETTE.gold, 20, 'center');
@@ -307,17 +326,20 @@ function drawMenu(ctx, s, env) {
     const x = lay.x + ((n - 1) % lay.cols) * lay.cell;
     const y = lay.y + Math.floor((n - 1) / lay.cols) * lay.cell;
     const open = n <= s.menu.unlocked;
-    ctx.fillStyle = n === s.menu.sel ? PALETTE.gold : open ? PALETTE.pad : '#0a1a15';
+    const selected = n === s.menu.sel;
+    if (selected) drawFrame(ctx, x + 1, y + 1, lay.cell - 2, PALETTE.ink);
+    ctx.fillStyle = selected ? PALETTE.gold : open ? PALETTE.pad : '#0a1a15';
     ctx.fillRect(x + 3, y + 3, lay.cell - 6, lay.cell - 6);
     text(
       ctx,
       String(n),
       x + lay.cell / 2,
-      y + 15,
-      n === s.menu.sel ? '#06110d' : open ? PALETTE.ink : '#3b4f48',
+      y + (open ? 15 : 8),
+      selected ? '#06110d' : open ? PALETTE.ink : '#6f8a80',
       14,
       'center',
     );
+    if (!open) drawPadlock(ctx, x + lay.cell / 2, y + 25);
   }
   text(
     ctx,

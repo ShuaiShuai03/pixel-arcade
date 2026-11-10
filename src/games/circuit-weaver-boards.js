@@ -143,7 +143,7 @@ const BOARD_DEFS = [
   ),
   board(
     ['Narrow Margin', '窄边'],
-    ['Open ends are fine; only two spare turns', '断头没关系；只多两次转动'],
+    ['Open ends are fine; only three spare turns', '断头没关系；只多三次转动'],
     [
       '. . . . . . .',
       '. . S3S L3 I0 I1 S9W',
