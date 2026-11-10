@@ -44,6 +44,7 @@ function keyFor(line, lang) {
     if (/^按空格/.test(line)) return 'Space';
     if (/^按 X/.test(line)) return 'KeyX';
     if (/按 Z/.test(line)) return 'KeyZ';
+    if (/\[H\] 提示/.test(line)) return 'KeyH';
     return null;
   }
   const move = /^Move ([←→↑↓])/.exec(line);
@@ -51,6 +52,7 @@ function keyFor(line, lang) {
   if (/^Space:/.test(line)) return 'Space';
   if (/^X:/.test(line)) return 'KeyX';
   if (/press Z/.test(line)) return 'KeyZ';
+  if (/\[H\] hint/.test(line)) return 'KeyH';
   return null;
 }
 
@@ -234,7 +236,9 @@ test('a follower with a 1.5 s reaction is still saved by the undo prompt when ev
     const st = g.getState();
     if (st.phase !== 'playing' || st.solved || st.movesLeft !== 0) continue;
     saved++;
-    assert.match(st.line.en, /press Z/, `machine ${level}`);
+    // From the first unguided machine on, the undo advice comes with a hint; the countdown shows it anyway.
+    if (level <= RULES.hintFreeMachines) assert.match(st.line.en, /press Z/, `machine ${level}`);
+    else assert.notEqual(st.graceLeft, null, `machine ${level}`);
     const out = play({ g, h, level, hz: 60, decide: patient(1.5, 'en') });
     assert.ok(out.cleared, `machine ${level} with every move spent`);
     assert.ok(mach.budget !== null);
@@ -258,7 +262,9 @@ test('the prompt names its action, and the text, the arrow and the highlighted p
         onFrame: (st) => {
           const h = st.hint;
           const key = keyFor(st.line[lang], lang);
-          assert.equal(key, h.key, `machine ${level}: "${st.line[lang]}" vs ${h.key}`);
+          // A hidden hint reads as the goal plus the key that buys the next move.
+          const expectedKey = h.kind === 'hidden' ? 'KeyH' : h.key;
+          assert.equal(key, expectedKey, `machine ${level}: "${st.line[lang]}" vs ${h.key}`);
           assert.equal(st.prompt[lang], st.line[lang]);
           assert.equal(st.prompt.id, h.kind);
           if (h.kind === 'move') {
@@ -291,7 +297,7 @@ test('the prompt names its action, and the text, the arrow and the highlighted p
             assert.equal(peg, h.pos);
             const sign = peg > 0 ? `+${peg}` : String(peg);
             assert.ok(st.line[lang].includes(sign));
-            assert.ok(st.line[lang].includes(`${h.mass} kg`));
+            assert.ok(st.line[lang].includes(`${h.mass} ${lang === 'zh' ? '千克' : 'kg'}`));
             if (h.kind === 'place') {
               assert.equal(st.weights[st.sel].mass, h.mass, 'the selected mass is the one named');
               assert.equal(st.sel, h.weight);
@@ -300,7 +306,7 @@ test('the prompt names its action, and the text, the arrow and the highlighted p
           if (h.kind === 'rotate') {
             assert.ok(st.weights[h.weight].where < 0, 'the named mass is in the tray');
             assert.notEqual(st.sel, h.weight);
-            assert.ok(st.line[lang].includes(`${h.mass} kg`));
+            assert.ok(st.line[lang].includes(`${h.mass} ${lang === 'zh' ? '千克' : 'kg'}`));
             assert.equal(h.presses > 1, /\d+ (presses|次)/.test(st.line[lang]));
             const wanted = st.weights[h.weight];
             if (wanted.rail >= 0) assert.ok(/slider|滑块/.test(st.line[lang]));
@@ -310,6 +316,7 @@ test('the prompt names its action, and the text, the arrow and the highlighted p
             }
           }
           assert.ok(st.status[lang].endsWith(st.line[lang]));
+          if (lang === 'zh') assert.ok(!/kg/.test(st.line.zh), st.line.zh);
           checked++;
         },
       });
@@ -416,6 +423,7 @@ test('a touch-only player clears every machine by tapping the highlighted peg or
         else if (hint.kind === 'move' || hint.kind === 'place' || hint.kind === 'pick')
           pointer = center(mach, hint.row ?? 0, hint.col ?? 0);
         else if (hint.kind === 'undo') keys = ['KeyZ'];
+        else if (hint.kind === 'hidden') keys = ['KeyH'];
       }
       if (pointer) taps++;
       g.update(1 / 60, input([], keys, pointer ? { ...pointer, clicked: true } : {}));
@@ -450,10 +458,11 @@ test('touch targets stay large on a 390 px wide phone and every action has a tou
     'KeyX',
     'KeyZ',
     'KeyQ',
+    'KeyH',
   ])
     assert.ok(codes.includes(code), code);
   assert.ok(meta.touchControls.every((c) => c.side === 'left' || c.side === 'right'));
-  assert.equal(meta.touchControls.length, 8);
+  assert.equal(meta.touchControls.length, 9);
 });
 
 // ---------------------------------------------------------------------------------------------
@@ -873,12 +882,31 @@ test('a full campaign by prompt carries a player through all machines to a won r
   const { g, h } = open(1);
   const follow = follower(0.2, 'en');
   let t = 0;
-  for (; t < 3000 && g.getState().phase === 'playing'; t += 1 / 60)
-    g.update(1 / 60, input([], follow(g.getState(), t)));
+  let level = 1;
+  let hintsBefore = 0;
+  const hintsPerMachine = [];
+  for (; t < 3000 && g.getState().phase === 'playing'; t += 1 / 60) {
+    const now = g.getState();
+    if (now.level !== level) {
+      hintsPerMachine.push(now.hints - hintsBefore);
+      hintsBefore = now.hints;
+      level = now.level;
+    }
+    g.update(1 / 60, input([], follow(now, t)));
+  }
   const st = g.getState();
+  hintsPerMachine.push(st.hints - hintsBefore);
   assert.equal(st.phase, 'won');
   assert.equal(h.ends.length, 1);
   assert.equal(h.ends[0].won, true);
   assert.equal(st.score, h.ends[0].score);
-  assert.equal(st.score, MACHINE_COUNT * RULES.clearScore);
+  // The first machines are free; later ones cost one hint per move, down to the score floor.
+  let expected = 0;
+  MACHINES.forEach((m, i) => {
+    const asked = i < RULES.hintFreeMachines ? 0 : solveMachine(m).optimal;
+    assert.equal(hintsPerMachine[i], asked, `hints asked on machine ${i + 1}`);
+    expected += Math.max(RULES.minMachineScore, RULES.clearScore - RULES.hintPenalty * asked);
+  });
+  assert.equal(st.score, expected);
+  assert.ok(expected < MACHINE_COUNT * RULES.clearScore);
 });

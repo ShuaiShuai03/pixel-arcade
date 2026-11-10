@@ -16,6 +16,7 @@ import {
   stepCursor,
   advise,
   adviceLine,
+  goalLine,
   gateHolds,
   layoutOf,
   cellRect,
@@ -29,6 +30,7 @@ import { harness, input, mockContext, seeded } from './harness.js';
 // The fewest moves each machine needs, as recorded from the solver. A machine edit must update this.
 const OPTIMAL = [1, 2, 3, 3, 3, 3, 4, 4, 4, 5, 5, 5, 5, 6, 6, 6, 6, 7, 7, 7, 8, 8, 8, 8];
 const TUTORIALS = 4;
+const MASTERY_FROM = 16; // index of machine 17, the first one with one spare move
 
 // --- helpers ---------------------------------------------------------------------------------
 const def = (beams, tray, extra = {}) => ({
@@ -157,8 +159,8 @@ test('there are at least 22 machines, each small, bilingual and with the recorde
     const sol = solveMachine(m);
     assert.equal(sol.optimal, OPTIMAL[i], `machine ${i + 1} optimum`);
     assert.ok(sol.count >= 1);
-    // Machines 1 and 2 are unlimited, 3 and 4 give three spare moves, the rest two.
-    const slack = i < 2 ? null : i < TUTORIALS ? 3 : 2;
+    // Machines 1 and 2 are unlimited, 3 and 4 give three spare moves, the mastery machines one, the rest two.
+    const slack = i < 2 ? null : i < TUTORIALS ? 3 : i >= MASTERY_FROM ? 1 : 2;
     assert.equal(m.budget, slack === null ? null : OPTIMAL[i] + slack, `machine ${i + 1} budget`);
     assert.equal(evaluate(m, startOf(m)).solved, false, `machine ${i + 1} starts solved`);
     for (const b of m.beams) {
@@ -601,7 +603,7 @@ test('a look-alike mass is named so that it cannot be mistaken for the one alrea
   assert.ok(found.length > 0);
   for (const [en, zh] of found) {
     assert.match(en, /rotate the tray to the 2 kg slider \(rail B\)/);
-    assert.match(zh, /2 kg 滑块（B 梁滑轨）/);
+    assert.match(zh, /2 千克 滑块（B 梁滑轨）/);
   }
   // Machine 20: the plain 4 kg mass is wanted while the 4 kg slider is selected.
   const m20 = MACHINES[19];
@@ -627,25 +629,25 @@ test('a look-alike mass is named so that it cannot be mistaken for the one alrea
 test('every kind of advice has an English and a Chinese line that name the mass, the beam and the peg', () => {
   const base = { mass: 3, beam: 1, pos: -2 };
   const rot = adviceLine({ kind: 'rotate', mass: 3, presses: 1 });
-  assert.deepEqual(rot, ['X: rotate the tray to the 3 kg mass', '按 X：把托盘转到 3 kg 砝码']);
+  assert.deepEqual(rot, ['X: rotate the tray to the 3 kg mass', '按 X：把托盘转到 3 千克 砝码']);
   assert.ok(adviceLine({ kind: 'rotate', mass: 3, presses: 3 })[0].endsWith('(3 presses)'));
   assert.ok(adviceLine({ kind: 'rotate', mass: 3, presses: 3 })[1].endsWith('（3 次）'));
   // A slider is named with its rail, and a plain mass is named as plain when an equal weight is selected.
   assert.deepEqual(adviceLine({ kind: 'rotate', mass: 2, rail: 1, presses: 1 }), [
     'X: rotate the tray to the 2 kg slider (rail B)',
-    '按 X：把托盘转到 2 kg 滑块（B 梁滑轨）',
+    '按 X：把托盘转到 2 千克 滑块（B 梁滑轨）',
   ]);
   assert.deepEqual(adviceLine({ kind: 'rotate', mass: 4, rail: -1, plain: true, presses: 3 }), [
     'X: rotate the tray to the plain 4 kg mass (3 presses)',
-    '按 X：把托盘转到 普通 4 kg 砝码（3 次）',
+    '按 X：把托盘转到 普通 4 千克 砝码（3 次）',
   ]);
   assert.deepEqual(adviceLine({ ...base, kind: 'place' }), [
     'Space: place the 3 kg mass on beam B peg -2',
-    '按空格：把 3 kg 砝码放到 B 梁 -2 号孔',
+    '按空格：把 3 千克 砝码放到 B 梁 -2 号孔',
   ]);
   assert.deepEqual(adviceLine({ ...base, pos: 3, kind: 'pick' }), [
     'Space: pick up the 3 kg mass from beam B peg +3',
-    '按空格：从 B 梁 +3 号孔取下 3 kg 砝码',
+    '按空格：从 B 梁 +3 号孔取下 3 千克 砝码',
   ]);
   // A vertical step names only the beam it reaches, a step along a beam names the peg.
   assert.deepEqual(adviceLine({ ...base, kind: 'move', dir: 3, steps: 2 }), [
@@ -665,6 +667,176 @@ test('every kind of advice has an English and a Chinese line that name the mass,
   assert.deepEqual(adviceLine({ kind: 'undo' }), PLAIN.undo);
   assert.deepEqual(adviceLine({ kind: 'done' }), PLAIN.watch);
   for (const words of Object.values(PLAIN)) assert.ok(words[0] && /[一-鿿]/.test(words[1]));
+});
+
+test('the goal line names the goal and the hint key, level or tilting, and Chinese never shows kg', () => {
+  const levelOnly = goalLine(
+    MACHINES[findMachine((m) => m.beams.every((b) => b.gate === '=')) - 1],
+    RULES.hintPenalty,
+  );
+  assert.equal(levelOnly[0], `Balance every beam  [H] hint -${RULES.hintPenalty}`);
+  assert.equal(levelOnly[1], `平衡每一根横梁  [H] 提示 -${RULES.hintPenalty}`);
+  const tilting = goalLine(MACHINES[FIRST_HIDDEN - 1], RULES.hintPenalty);
+  assert.ok(/gate lamp/.test(tilting[0]) && /指示灯/.test(tilting[1]));
+  const base = { beam: 1, pos: -2, mass: 3, rail: -1, presses: 2 };
+  for (const adv of [
+    { ...base, kind: 'rotate' },
+    { ...base, kind: 'rotate', plain: true },
+    { ...base, kind: 'rotate', rail: 1 },
+    { ...base, kind: 'place' },
+    { ...base, kind: 'pick' },
+  ]) {
+    const [en, zh] = adviceLine(adv);
+    assert.ok(en.includes('3 kg'), en);
+    assert.ok(zh.includes('3 千克') && !zh.includes('kg'), zh);
+  }
+});
+
+// --- hints ------------------------------------------------------------------------------------------
+const FIRST_HIDDEN = RULES.hintFreeMachines + 1;
+// Idle until the needles settle and the machine is judged solved, leaving the clear pause running.
+function untilCleared(g) {
+  for (let n = 0; n < 60 && !g.getState().cleared; n++) idle(g, 0.1);
+  assert.equal(g.getState().cleared, true);
+}
+
+test('the first machines show the next move; from the next one on the line states the goal and hides the solution', () => {
+  const free = open(RULES.hintFreeMachines).g.getState();
+  assert.notEqual(free.hint.kind, 'hidden');
+  assert.equal(free.optimal, OPTIMAL[RULES.hintFreeMachines - 1]);
+  const { g } = open(FIRST_HIDDEN);
+  const st = g.getState();
+  assert.equal(st.hint.kind, 'hidden');
+  assert.equal(st.prompt.id, 'hidden');
+  assert.equal(st.optimal, null);
+  assert.equal(st.hint.key, null);
+  for (const field of ['row', 'col', 'beam', 'pos', 'dir', 'weight', 'mass'])
+    assert.equal(st.hint[field], null, field);
+  assert.match(st.line.en, /^Match every beam's gate lamp {2}\[H\] hint -12$/);
+  assert.match(st.line.zh, /^让每根横梁的指示灯都亮起 {2}\[H\] 提示 -12$/);
+  // Walking around changes nothing: the line never names a peg, a key or a mass.
+  press(g, 'ArrowRight', 'ArrowDown', 'KeyX');
+  assert.equal(g.getState().hint.kind, 'hidden');
+  assert.ok(!JSON.stringify(g.getState()).includes('Space:'));
+});
+
+test('H buys one hint at a cost, it hides again after a move or an undo, and it is never charged twice', () => {
+  const { g, h } = open(FIRST_HIDDEN);
+  const mach = MACHINES[FIRST_HIDDEN - 1];
+  press(g, 'KeyH');
+  let st = g.getState();
+  assert.notEqual(st.hint.kind, 'hidden');
+  assert.equal(st.optimal, OPTIMAL[FIRST_HIDDEN - 1]);
+  assert.equal(st.hints, 1);
+  assert.match(st.message.en, /Hint: -12 points/);
+  assert.ok(h.sounds.includes('coin'));
+  press(g, 'KeyH');
+  assert.equal(g.getState().hints, 1, 'a hint that is already shown costs nothing more');
+  // Follow the hint to the first move; the move hides it again.
+  for (let n = 0; n < 30 && g.getState().moves === 0; n++) press(g, g.getState().hint.key);
+  st = g.getState();
+  assert.equal(st.moves, 1);
+  assert.equal(st.hint.kind, 'hidden');
+  assert.equal(st.optimal, null);
+  press(g, 'KeyH');
+  assert.equal(g.getState().hints, 2);
+  press(g, 'KeyZ');
+  assert.equal(g.getState().hint.kind, 'hidden', 'undo hides the hint');
+  // The cost is taken from the score when the machine is cleared, and survives a reset.
+  press(g, 'KeyH');
+  press(g, 'KeyQ');
+  assert.equal(g.getState().hint.kind, 'hidden');
+  assert.equal(g.getState().restarts, 1);
+  playPlan(g, mach);
+  untilCleared(g);
+  idle(g, 2);
+  assert.equal(g.getState().level, FIRST_HIDDEN + 1);
+  assert.equal(g.getState().score, RULES.clearScore - 3 * RULES.hintPenalty);
+});
+
+test('a hint is refused on a free machine, a solved machine and during the clear pause', () => {
+  const free = open(1);
+  press(free.g, 'KeyH');
+  assert.equal(free.g.getState().hints, 0);
+  const { g } = open(FIRST_HIDDEN);
+  playPlan(g, MACHINES[FIRST_HIDDEN - 1]);
+  press(g, 'KeyH');
+  assert.equal(g.getState().hints, 0, 'nothing to hint once the machine is solved');
+  untilCleared(g);
+  press(g, 'KeyH');
+  assert.equal(g.getState().hints, 0);
+});
+
+test('arrows, WASD, Z, X and Q end the clear pause instead of being dropped; Space and Enter still do', () => {
+  for (const key of [
+    'ArrowRight',
+    'ArrowLeft',
+    'ArrowUp',
+    'ArrowDown',
+    'KeyW',
+    'KeyA',
+    'KeyS',
+    'KeyD',
+    'KeyZ',
+    'KeyX',
+    'KeyQ',
+    'Space',
+    'Enter',
+  ]) {
+    const { g } = open(1);
+    playPlan(g, MACHINES[0]);
+    untilCleared(g);
+    press(g, key);
+    const st = g.getState();
+    assert.equal(st.level, 2, key);
+    assert.equal(st.cleared, false, key);
+  }
+  const { g } = open(1);
+  playPlan(g, MACHINES[0]);
+  untilCleared(g);
+  press(g, 'KeyH');
+  assert.equal(g.getState().level, 1, 'other keys leave the pause alone');
+});
+
+test('the machine select marks locked cells with a padlock and the selected cell with corner brackets', () => {
+  const fills = (unlocked) => {
+    const h = harness();
+    h.env.progress = { unlocked: () => unlocked, unlock() {} };
+    const g = createGame(h.env);
+    const seen = [];
+    const ctx = mockContext();
+    const spy = new Proxy(ctx, {
+      get: (t, p) => (p === 'fillRect' ? () => seen.push(t.fillStyle) : t[p]),
+      set: (t, p, v) => ((t[p] = v), true),
+    });
+    g.draw(spy);
+    return (color) => seen.filter((c) => c === color).length;
+  };
+  const some = fills(12);
+  const all = fills(MACHINE_COUNT);
+  assert.equal(all('#7b8190'), 0, 'no padlock when nothing is locked');
+  assert.equal(some('#7b8190'), 4 * (MACHINE_COUNT - 12), 'one padlock per locked cell');
+  assert.equal(some('#fff'), 8, 'four brackets of two arms on the selected cell');
+  assert.equal(all('#fff'), 8);
+});
+
+test('Chinese screens say 千克 where English says kg, on the hanging-beam rope label too', () => {
+  const rope = findMachine((m) => m.beams.some((b) => b.hang));
+  for (const lang of ['en', 'zh']) {
+    const { g } = open(rope, { lang });
+    const texts = [];
+    const spy = new Proxy(mockContext(), {
+      get: (t, p) => (p === 'fillText' ? (s) => texts.push(String(s)) : t[p]),
+      set: (t, p, v) => ((t[p] = v), true),
+    });
+    g.draw(spy);
+    const unit = lang === 'zh' ? '千克' : 'kg';
+    assert.ok(
+      texts.some((t) => t.endsWith(` ${unit}`)),
+      lang,
+    );
+    assert.ok(lang === 'en' || !texts.some((t) => t.includes('kg')));
+  }
 });
 
 // --- game: controls -------------------------------------------------------------------------------

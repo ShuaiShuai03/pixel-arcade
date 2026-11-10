@@ -1,0 +1,61 @@
+{
+  "game": "weightworks",
+  "date": "2026-11-10",
+  "reviewedRevision": "b31102f7 (accepted build) plus the fixes in this commit",
+  "owner": "owner-weight",
+  "reviewer": "weight-fair, weight-robust and weight-present (parallel split review)",
+  "rounds": 1,
+  "process": "Lean final review at the user's request, with the review split across three parallel reviewers (fairness, robustness, presentation) as the user asked. The game already had 24 machines; robustness passed outright. Three MEDIUM findings and two LOW items were fixed and verified by a separate verification agent re-running the reviewers' probes against the repository files (with the owner's copies adapted to request the now opt-in hint and to read the budget once the optimal count is hidden) plus one clean-worktree run, then by the browser check, without a second review round.",
+  "verdict": "pass",
+  "approvedSha256": {
+    "src/games/weightworks.js": "0017c96ea8ace3c4b160ebe812ff20a03dc3542b5d3597b67322b8e9ca16734e",
+    "src/games/weightworks-draw.js": "7a905a7d0e8f5dc7b68bae6423b160daf13f4515990baf1a32e1a0744f8c5f34",
+    "src/games/weightworks-engine.js": "cc84ac3698820d834687712c0c48f36220ed8434887e5930113d8659eda05b19",
+    "src/games/weightworks-machines.js": "07d4a38a3962aeadd0fe3f305a2151f4585223e7241b0418325dd4e8780e7824",
+    "tests/weightworks.test.js": "1c423f663a165e9fc778e93dfbf62314b663a42fdea970a594fc68fb8181b65a",
+    "tests/weightworks-quality.test.js": "e17bac2398457f609efacc05778dd61731f6ade3bdcd183d0204f0e618e1dc67"
+  },
+  "tests": {
+    "command": "node --experimental-test-coverage --test-coverage-include='src/games/weightworks*.js' --test tests/weightworks.test.js tests/weightworks-quality.test.js",
+    "passed": 66,
+    "failed": 0,
+    "lineCoverage": 100,
+    "log": "weightworks-coverage.txt"
+  },
+  "independentProbes": "Every machine still has exactly one solution and fits its budget. On the final files a reaction-limited bot that buys the opt-in hint cleared all 24 machines at 0.25 s and 0.35 s, needing no hints on machines 1-7 and 5-17 per machine from machine 8, where the review had found the always-on hint solving every machine at optimal moves for free. Blind policies cleared nothing, scripted play matched across 30, 60 and 120 Hz, hostile input produced no throws or NaN, a hint-buying bot won through all 24 machines, every broken progress store was safe, and EN and ZH text fits with no untranslated units.",
+  "findings": [
+    {
+      "id": "M1",
+      "severity": "medium",
+      "status": "fixed",
+      "observation": "Fairness finding: the hint always showed the exact peg, key and mass for the unique solution, and the budget left a flat 2 spare moves, so following it cleared every machine and mastery was trivial. Machines 1-7 keep step hints; from machine 8 the line states the goal ('Balance every beam') and H or the Hint touch button reveals the next move for 12 points; getState exposes the solution only while shown; machines 17-24 allow one spare move."
+    },
+    {
+      "id": "M2",
+      "severity": "medium",
+      "status": "fixed",
+      "observation": "Presentation findings: Chinese advice lines and rope labels showed 'kg', and the machine picker marked locked and selected machines by colour alone. Chinese text now uses 千克, locked machines show a padlock and the selected machine has corner brackets."
+    },
+    {
+      "id": "L1",
+      "severity": "low",
+      "status": "fixed",
+      "observation": "Arrow, WASD, Z, X and Q presses now skip the 1.8 s clear pause instead of being dropped, and inactive tippers carry a cross rather than only lower opacity."
+    }
+  ],
+  "openNotes": [
+    "A player can still buy every hint; the cost is score, not progress.",
+    "The visible checks of the padlock and tipper cross were done in the browser at menu and play-screen level only."
+  ],
+  "browser": {
+    "method": "Official Claude in Chrome extension, local server; real clicks on Start and the language toggle, synthetic in-page keys driven by the status line; only DOM text and the canvas were read.",
+    "servedSha256Prefixes": "0017c96e 7a905a7d cc84ac36 07d4a38a",
+    "observed": [
+      "English: Start opened machine 1 of 24 (First Balance) with the beam, pegs, gate lamp, tray and the teaching hint 'Move → 2 to beam A peg +3'; the description explained that hints are bought with H from machine 8.",
+      "Win: following the prompts placed the 2 kg mass, the needles settled ('Machine balanced! The next one is coming') and machine 2 (Two Masses) opened.",
+      "Chinese 390 px phone frame (388 px inner, no horizontal overflow): the machine picker in Chinese with padlocks on locked machines, corner brackets on the selection and touch buttons 左, 右, 上, 下, 拿放, 托盘, 撤销, 重置 and 提示.",
+      "Not covered in the browser: a bought hint, a tipper and the final machine; the probes and quality tests cover them."
+    ],
+    "screenshots": ["screenshots/weightworks-en.png", "screenshots/weightworks-phone-zh.png"]
+  }
+}

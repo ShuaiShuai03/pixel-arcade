@@ -274,7 +274,8 @@
       "tilt-lab",
       "stacksmith",
       "mirror-lab",
-      "traffic-conductor"
+      "traffic-conductor",
+      "weightworks"
     ],
     "records": [
       "final-review/snowball-siege.json",
@@ -321,7 +322,8 @@
       "final-review/tilt-lab.json",
       "final-review/stacksmith.json",
       "final-review/mirror-lab.json",
-      "final-review/traffic-conductor.json"
+      "final-review/traffic-conductor.json",
+      "final-review/weightworks.json"
     ]
   }
 }

@@ -1,0 +1,102 @@
+✔ a literal prompt follower clears every machine from the start at 30, 60 and 120 Hz in both languages (277.808334ms)
+✔ followers with fast (0.15-0.35 s) and slow (0.4-0.6 s) reactions clear every machine from the start in every run (446.087958ms)
+✔ a follower clears every machine from at least 10 random mistaken states, with no livelock and never a lost run (417.505875ms)
+✔ a follower never loses a budget machine, even after wasting moves, because the prompt asks for an undo (203.975167ms)
+✔ a follower with a 1.5 s reaction is still saved by the undo prompt when every move is spent (103.301583ms)
+✔ the prompt names its action, and the text, the arrow and the highlighted peg always agree (24.251375ms)
+✔ the prompt only changes when the player acts or a machine changes, never flickers, and fits the canvas (19.876709ms)
+✔ an idle player never sees the prompt change, at any frame rate (7.36675ms)
+✔ English and Chinese runs play out identically (16.882334ms)
+✔ a touch-only player clears every machine by tapping the highlighted peg or tray mass (22.636125ms)
+✔ touch targets stay large on a 390 px wide phone and every action has a touch route (0.291041ms)
+✔ idle never wins a machine (7.56775ms)
+✔ from machine 3 on, mashing, random keys, undo spam and sweeps each win at most a quarter of runs (17028.535041ms)
+ℹ mashSpaceFast    wins of 40 in machines 3-24: 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+ℹ mashSpaceSlow    wins of 40 in machines 3-24: 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+ℹ randomKeys       wins of 40 in machines 3-24: 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+ℹ quickRandom      wins of 40 in machines 3-24: 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+ℹ slowRandom       wins of 40 in machines 3-24: 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+ℹ undoSpam         wins of 40 in machines 3-24: 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+ℹ rotateAndPlace   wins of 40 in machines 3-24: 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+ℹ sweepRows        wins of 40 in machines 3-24: 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+ℹ sweepColumns     wins of 40 in machines 3-24: 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+ℹ sweepBackwards   wins of 40 in machines 3-24: 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+✔ the blind "place the mass that most reduces the gate error" player beats at most half the machines and none of the last third (5057.518583ms)
+ℹ placeOnly beat machines: 1
+ℹ placeAndClimb beat machines: 1
+✔ the informed random placer wins at most 10 of 40 runs of 240 s on every machine from machine 3 (1106.020583ms)
+ℹ informed random placer, machines 3-24, wins of 40: 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0
+✔ a batch-literal follower (press the arrow exactly N times, then re-read) clears every machine, from the start and from scrambles (33.29225ms)
+✔ the optimal move counts rise from 1, every machine is solvable within its budget, and the late machines have one solved layout (0.184709ms)
+ℹ optimal moves per machine: 1 2 3 3 3 3 4 4 4 5 5 5 5 6 6 6 6 7 7 7 8 8 8 8
+✔ every feature appears: tilt gates, hanging beams, locks, sliders, tippers, fixed masses and budgets (0.19475ms)
+✔ a full campaign by prompt carries a player through all machines to a won run with one end call (34.292ms)
+✔ meta describes the game in both languages with working touch controls (0.7345ms)
+✔ there are at least 22 machines, each small, bilingual and with the recorded optimum and budget (29.551166ms)
+✔ machines are frozen and their records carry only what the game uses (0.283459ms)
+✔ torque is mass times signed distance, summed over every mass on the beam (0.465542ms)
+✔ equal masses on unequal arms never satisfy a level gate, and a heavier mass can sit nearer the pivot (0.167458ms)
+✔ a level gate needs a load: an empty beam is not level, and tilt gates read the sign of the torque (0.06325ms)
+✔ linked beams pass their full mass through a chain, whatever their own torque (0.425416ms)
+✔ a tipper drops its mass on the target peg only while its beam tips the marked way (0.104042ms)
+✔ the needle at rest shows the true sign of the net torque of every beam, in every machine (19.030125ms)
+✔ the tray never creates or loses a mass: every mass is in the tray or on exactly one peg (11.202917ms)
+✔ parseMachine rejects malformed machines (0.560541ms)
+✔ the solver lists every solved layout of a small machine and the cheapest way there (0.254ms)
+✔ the tray rotates over the masses that are still in it, in a fixed order (0.039083ms)
+✔ the cursor moves along a beam, between beams to the nearest peg, and down to the tray and back (0.14725ms)
+✔ the advice walks vertically first, then along the beam, and the number is the first leg (0.151375ms)
+✔ the advice asks to pick up a wrongly placed mass and to rotate the tray, and undoes when moves run short (0.17325ms)
+✔ a look-alike mass is named so that it cannot be mistaken for the one already selected (0.330583ms)
+✔ every kind of advice has an English and a Chinese line that name the mass, the beam and the peg (0.13075ms)
+✔ the goal line names the goal and the hint key, level or tilting, and Chinese never shows kg (0.080792ms)
+✔ the first machines show the next move; from the next one on the line states the goal and hides the solution (0.193458ms)
+✔ H buys one hint at a cost, it hides again after a move or an undo, and it is never charged twice (0.610125ms)
+✔ a hint is refused on a free machine, a solved machine and during the clear pause (0.415417ms)
+✔ arrows, WASD, Z, X and Q end the clear pause instead of being dropped; Space and Enter still do (1.68775ms)
+✔ the machine select marks locked cells with a padlock and the selected cell with corner brackets (0.414667ms)
+✔ Chinese screens say 千克 where English says kg, on the hanging-beam rope label too (1.212291ms)
+✔ Space places the selected mass on the peg under the cursor and picks a placed mass back up (0.085125ms)
+✔ placing is refused on locked, fixed, hooked and tipper pegs, on the wrong rail, from an empty tray (0.424167ms)
+✔ X rotates the tray over the masses that are still in it, and a single mass stays put (0.072083ms)
+✔ Z undoes the last move and refunds it, Q resets the machine, and both say so when there is nothing to do (0.15575ms)
+✔ arrows and WASD move the cursor, opposite or diagonal presses do nothing, and the tray row can be reached (0.176834ms)
+✔ tapping a peg selects it, tapping again places or picks, and tapping a tray mass chooses it (0.303125ms)
+✔ every peg and tray socket of every machine has its own on-canvas cell that the hit test finds (2.296792ms)
+✔ the menu grid maps points to machine numbers and rejects everything else (0.0995ms)
+✔ a balanced machine waits for the needles to settle, banks its score, saves progress and moves on (0.665666ms)
+✔ extra moves cost 8 points each, down to a floor of 20 (0.483875ms)
+✔ out of moves, unsolved: a visible 6 s countdown to undo runs once the needles rest, then the run is lost once (1.90825ms)
+✔ clearing the last machine wins the run with the total score and one end call (1.604083ms)
+✔ a machine is also cleared when the final placement leaves some beams already balanced, and play is identical at 30, 60 and 120 Hz (0.670042ms)
+✔ with progress saved the game opens machine select; arrows, Space, Enter and taps choose a machine (0.248167ms)
+✔ saved progress that is huge, negative, missing, not a number or throws is clamped or ignored (0.362042ms)
+✔ bad frame times and hostile input leave the game untouched (0.140833ms)
+✔ getState returns copies that cannot change the game (0.132208ms)
+✔ status always ends with the prompt line and counts moves, gates and the machine number in both languages (0.096334ms)
+✔ every screen draws without error: the menu, every machine in several states, the banners and every hint (87.068125ms)
+✔ the banners, lamps, tippers and every kind of hint draw in a finished, lost and won game (2.850292ms)
+✔ the gate lamps light only after the needles have come to rest, with a chime (0.183125ms)
+✔ the module exports stay in step with the machine data (0.0495ms)
+ℹ tests 66
+ℹ suites 0
+ℹ pass 66
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 24859.059334
+ℹ start of coverage report
+ℹ --------------------------------------------------------------------------
+ℹ file                      | line % | branch % | funcs % | uncovered lines
+ℹ --------------------------------------------------------------------------
+ℹ src                       |        |          |         | 
+ℹ  games                    |        |          |         | 
+ℹ   weightworks-draw.js     | 100.00 |   100.00 |  100.00 | 
+ℹ   weightworks-engine.js   | 100.00 |    99.10 |  100.00 | 
+ℹ   weightworks-machines.js | 100.00 |   100.00 |  100.00 | 
+ℹ   weightworks.js          | 100.00 |    99.16 |  100.00 | 
+ℹ --------------------------------------------------------------------------
+ℹ all files                 | 100.00 |    99.38 |  100.00 | 
+ℹ --------------------------------------------------------------------------
+ℹ end of coverage report

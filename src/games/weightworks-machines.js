@@ -249,7 +249,7 @@ export const MACHINE_DEFS = [
       { span: 2, gate: '=', fixed: [[-1, 1]], locked: [2], hang: [0, 2] },
     ],
     [{ m: 2, rail: 2, at: 1 }, 6, 2, 5, 3],
-    { budget: 8 },
+    { budget: 7 },
   ),
   machine(
     ['Twin Sliders', '双滑块'],
@@ -263,7 +263,7 @@ export const MACHINE_DEFS = [
       { span: 3, gate: '=', fixed: [[-3, 3]], locked: [3, -2], hang: [0, -1] },
     ],
     [{ m: 1, rail: 1, at: 2 }, { m: 3, rail: 0, at: -2 }, 4, 1, 2],
-    { budget: 9 },
+    { budget: 8 },
   ),
   machine(
     ['Cascade', '层叠'],
@@ -283,7 +283,7 @@ export const MACHINE_DEFS = [
       { span: 2, gate: '=', locked: [-1], hang: [0, 1], tips: [['L', 2, 0, -3]] },
     ],
     [{ m: 2, rail: 1, at: 3 }, 3, 4, 5, 1, 2],
-    { budget: 9 },
+    { budget: 8 },
   ),
   machine(
     ['Counterpoise', '配重'],
@@ -297,7 +297,7 @@ export const MACHINE_DEFS = [
       { span: 2, gate: '=', locked: [2], hang: [1, -2] },
     ],
     [{ m: 3, rail: 1, at: 2 }, { m: 4, rail: 2, at: -1 }, 2, 5, 4],
-    { budget: 9 },
+    { budget: 8 },
   ),
   machine(
     ['Brass Maze', '黄铜迷宫'],
@@ -308,7 +308,7 @@ export const MACHINE_DEFS = [
       { span: 2, gate: '>', locked: [1], hang: [1, -2], tips: [['R', 3, 1, 2]] },
     ],
     [{ m: 2, rail: 2, at: -2 }, { m: 6, rail: 0, at: 3 }, 5, 4, 3, 2],
-    { budget: 10 },
+    { budget: 9 },
   ),
   machine(
     ['Clockwork Scale', '发条天平'],
@@ -328,7 +328,7 @@ export const MACHINE_DEFS = [
       { span: 2, gate: '=', locked: [-2], hang: [0, 3] },
     ],
     [{ m: 3, rail: 1, at: -2 }, { m: 5, rail: 2, at: 1 }, 1, 6, 4, 3],
-    { budget: 10 },
+    { budget: 9 },
   ),
   machine(
     ['Master Balance', '大师之衡'],
@@ -339,7 +339,7 @@ export const MACHINE_DEFS = [
       { span: 3, gate: '<', fixed: [[-3, 1]], locked: [-1], hang: [0, -2] },
     ],
     [{ m: 4, rail: 1, at: 1 }, { m: 3, rail: 1, at: -1 }, 2, 3, 5, 1],
-    { budget: 10 },
+    { budget: 9 },
   ),
   machine(
     ['Weightworks', '天平工坊'],
@@ -350,6 +350,6 @@ export const MACHINE_DEFS = [
       { span: 3, gate: '=', fixed: [[-1, 1]], locked: [-2], hang: [0, 2], tips: [['R', 4, 0, 1]] },
     ],
     [{ m: 3, rail: 2, at: 3 }, { m: 1, rail: 0, at: -2 }, 6, 4, 3, 5],
-    { budget: 10 },
+    { budget: 9 },
   ),
 ];

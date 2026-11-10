@@ -53,6 +53,7 @@ Phase Tiles completed batch 18 and the 50-game target, Pixel Parkour included. T
 | Stacksmith        | Passed in one round: 22 jobs, outline-only mastery ([record](final-review/stacksmith.json))                           |
 | Mirror Lab        | Passed in one round: 22 rooms, opt-in hints from room 6 ([record](final-review/mirror-lab.json))                      |
 | Traffic Conductor | Passed in one round: 20 shifts, problem hints on mastery ([record](final-review/traffic-conductor.json))              |
+| Weightworks       | Passed in one round: 24 machines, opt-in hints from machine 8 ([record](final-review/weightworks.json))               |
 
 ## Completed batch 18
 

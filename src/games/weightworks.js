@@ -8,6 +8,7 @@ import {
   startCursor,
   advise,
   adviceLine,
+  goalLine,
   PLAIN,
 } from './weightworks-engine.js';
 import { MACHINE_DEFS } from './weightworks-machines.js';
@@ -22,6 +23,7 @@ export {
   stepCursor,
   advise,
   adviceLine,
+  goalLine,
   costsFrom,
   gateHolds,
 } from './weightworks-engine.js';
@@ -40,6 +42,8 @@ export const RULES = Object.freeze({
   winHold: 0.6, // all needles at rest this long before a machine is judged solved
   loseGrace: 6, // out of moves and unsolved: this long (at rest) to undo before the run is lost
   clearPause: 1.8,
+  hintFreeMachines: 7, // machines 1 to 7 always show the next move; later ones need the H key
+  hintPenalty: 12, // score taken for each hint asked for in a machine
   historyMax: 400,
   movesMax: 999,
   msgTime: 1.6,
@@ -67,8 +71,8 @@ export const meta = {
   players: '1',
   touch: true,
   description: {
-    en: `A wooden workshop of balance machines. Each beam has pegs at set distances from its pivot, and a mass pulls with its weight times its distance, so a light mass far out can outweigh a heavy one near the pivot. Place the masses from the tray until every gate lamp is lit at the same time: some beams must hang level, others must tip left or right. Beams can hang from the pegs of other beams and pass on their whole load, some pegs are locked, some masses slide only along their own beam, and tippers drop a mass onto another beam when a beam tips. Most machines allow only a few moves; undo refunds them and a glowing hint names the next one. Balance all ${MACHINE_COUNT} machines; progress is saved.`,
-    zh: `一间满是天平机器的木工坊。每根横梁在到支点的固定距离上有若干挂孔，砝码的力矩是质量乘以距离，所以远处的轻砝码可以压过近处的重砝码。把托盘里的砝码挂到孔上，让所有指示灯同时亮起：有的横梁要保持水平，有的要偏向左或右。横梁可以挂在别的横梁的孔上并传递全部重量，有的孔被锁住，有的砝码只能沿自己的横梁滑动，翻斗会在某根横梁倾斜时把砝码扔到另一根横梁上。多数机器只给少量步数，撤销会返还步数，发光提示会告诉你下一步。平衡全部 ${MACHINE_COUNT} 台机器，进度会被保存。`,
+    en: `A wooden workshop of balance machines. Each beam has pegs at set distances from its pivot, and a mass pulls with its weight times its distance, so a light mass far out can outweigh a heavy one near the pivot. Place the masses from the tray until every gate lamp is lit at the same time: some beams must hang level, others must tip left or right. Beams can hang from the pegs of other beams and pass on their whole load, some pegs are locked, some masses slide only along their own beam, and tippers drop a mass onto another beam when a beam tips. Most machines allow only a few moves, and undo refunds them. The first ${R.hintFreeMachines} machines glow the next move for you; after that the goal is yours to work out, and the H key buys a hint for ${R.hintPenalty} points. Balance all ${MACHINE_COUNT} machines; progress is saved.`,
+    zh: `一间满是天平机器的木工坊。每根横梁在到支点的固定距离上有若干挂孔，砝码的力矩是质量乘以距离，所以远处的轻砝码可以压过近处的重砝码。把托盘里的砝码挂到孔上，让所有指示灯同时亮起：有的横梁要保持水平，有的要偏向左或右。横梁可以挂在别的横梁的孔上并传递全部重量，有的孔被锁住，有的砝码只能沿自己的横梁滑动，翻斗会在某根横梁倾斜时把砝码扔到另一根横梁上。多数机器只给少量步数，撤销会返还步数。前 ${R.hintFreeMachines} 台机器会用发光提示告诉你下一步；之后要靠自己思考，按 H 键可花 ${R.hintPenalty} 分换一次提示。平衡全部 ${MACHINE_COUNT} 台机器，进度会被保存。`,
   },
   keys: [
     {
@@ -82,6 +86,13 @@ export const meta = {
     { label: { en: 'Rotate the tray to the next mass', zh: '转动托盘选择下一块砝码' }, keys: 'X' },
     { label: { en: 'Undo the last move', zh: '撤销上一步' }, keys: 'Z' },
     { label: { en: 'Reset this machine', zh: '重置本机器' }, keys: 'Q' },
+    {
+      label: {
+        en: `Ask for a hint (machine ${R.hintFreeMachines + 1} on, -${R.hintPenalty} points)`,
+        zh: `请求提示（第 ${R.hintFreeMachines + 1} 台起，扣 ${R.hintPenalty} 分）`,
+      },
+      keys: 'H',
+    },
     {
       label: {
         en: 'Tap a peg to select it, tap again to place or pick; tap a tray mass to choose it',
@@ -99,6 +110,7 @@ export const meta = {
     ['KeyX', 'Tray', '托盘', 'right'],
     ['KeyZ', 'Undo', '撤销', 'right'],
     ['KeyQ', 'Reset', '重置', 'right'],
+    ['KeyH', 'Hint', '提示', 'right'],
   ]),
 };
 
@@ -122,6 +134,7 @@ function saveUnlocked(progress, level) {
 }
 
 const movesLeftOf = (s) => (s.mach.budget === null ? Infinity : s.mach.budget - s.moves);
+const hintShown = (s) => s.index < R.hintFreeMachines || s.hintOn;
 const say = (s, en, zh) => {
   s.msg = { en, zh, time: R.msgTime };
 };
@@ -156,9 +169,12 @@ function refresh(s) {
   else if (s.phase === 'won') words = PLAIN.won;
   else if (s.phase === 'lost') words = PLAIN.lost;
   else if (s.cleared) words = PLAIN.cleared;
-  else {
+  else if (hintShown(s) || s.ev.solved) {
     adv = advise(s.mach, s.where, s.sel, s.cur, movesLeftOf(s), s.history.length > 0);
     words = adviceLine(adv);
+  } else {
+    adv = { kind: 'hidden' };
+    words = goalLine(s.mach, R.hintPenalty);
   }
   s.line = { en: words[0], zh: words[1] };
   s.hint = {
@@ -184,6 +200,8 @@ function loadMachine(s, index) {
   s.cur = startCursor(s.mach);
   s.moves = 0;
   s.history = [];
+  s.hintOn = false;
+  s.roomHints = 0;
   s.cleared = false;
   s.clearT = 0;
   s.msg = null;
@@ -205,6 +223,7 @@ function newState(env) {
     ended: false,
     restarts: 0,
     undos: 0,
+    hints: 0,
     sparks: [],
     clock: 0,
     acc: 0,
@@ -227,7 +246,8 @@ function finish(s, env, won, message) {
 
 function clearMachine(s, env) {
   const extra = Math.max(0, s.moves - solveMachine(s.mach).optimal);
-  s.score += Math.max(R.minMachineScore, R.clearScore - R.extraMovePenalty * extra);
+  const cost = R.extraMovePenalty * extra + R.hintPenalty * s.roomHints;
+  s.score += Math.max(R.minMachineScore, R.clearScore - cost);
   saveUnlocked(s.progress, Math.min(MACHINE_COUNT, s.index + 2));
   s.cleared = true;
   env.sound('win');
@@ -326,6 +346,7 @@ function commit(s, env, where, sel) {
   if (s.history.length > R.historyMax) s.history.shift();
   s.where = where;
   s.sel = sel;
+  s.hintOn = false;
   s.moves = Math.min(R.movesMax, s.moves + 1);
   env.sound('move');
   recompute(s);
@@ -391,17 +412,29 @@ function undoMove(s, env) {
   s.moves = last.moves;
   s.cur = last.cur;
   s.undos++;
+  s.hintOn = false;
   env.sound('move');
   recompute(s);
 }
 
+function requestHint(s, env) {
+  if (hintShown(s) || s.ev.solved || s.cleared) return;
+  s.hintOn = true;
+  s.hints++;
+  s.roomHints++;
+  say(s, `Hint: -${R.hintPenalty} points`, `提示：扣 ${R.hintPenalty} 分`);
+  env.sound('coin');
+  refresh(s);
+}
+
 function restartMachine(s, env) {
-  const { index } = s;
+  const { index, roomHints } = s;
   const restarts = s.restarts + 1;
   const undos = s.undos;
   loadMachine(s, index);
   s.restarts = restarts;
   s.undos = undos;
+  s.roomHints = roomHints;
   say(s, 'Machine reset', '机器已重置');
   env.sound('move');
 }
@@ -439,6 +472,7 @@ function playInput(s, env, input) {
   if (input.pressed('KeyZ')) undoMove(s, env);
   if (input.pressed('Space')) act(s, env);
   if (input.pressed('KeyX')) rotateTray(s, env);
+  if (input.pressed('KeyH')) requestHint(s, env);
   return undefined;
 }
 
@@ -468,10 +502,27 @@ function menuInput(s, env, input) {
   }
 }
 
+// Any control key ends the clear pause early, so a press is never lost to it.
+const SKIP_KEYS = [
+  'Space',
+  'Enter',
+  'ArrowLeft',
+  'ArrowRight',
+  'ArrowUp',
+  'ArrowDown',
+  'KeyA',
+  'KeyD',
+  'KeyW',
+  'KeyS',
+  'KeyZ',
+  'KeyX',
+  'KeyQ',
+];
+
 function frameInput(s, env, input) {
   if (s.menu) return menuInput(s, env, input);
   if (s.cleared) {
-    if (input.pressed('Space', 'Enter') && s.phase === 'playing') loadMachine(s, s.index + 1);
+    if (input.pressed(...SKIP_KEYS) && s.phase === 'playing') loadMachine(s, s.index + 1);
     return undefined;
   }
   return playInput(s, env, input);
@@ -529,12 +580,13 @@ function snapshot(s) {
     moves: s.moves,
     budget: m.budget,
     movesLeft: m.budget === null ? null : m.budget - s.moves,
-    optimal: solveMachine(m).optimal,
+    optimal: hintShown(s) ? solveMachine(m).optimal : null,
     solved: s.ev.solved,
     cleared: s.cleared,
     resting: s.atRest.every(Boolean),
     graceLeft: s.graceLeft,
     undos: s.undos,
+    hints: s.hints,
     restarts: s.restarts,
     menu: s.menu ? { ...s.menu } : null,
     message: s.msg ? { en: s.msg.en, zh: s.msg.zh } : null,

@@ -375,19 +375,32 @@ export const PLAIN = Object.freeze({
   undo: ['Too few moves left: press Z to undo', '剩余步数不足：按 Z 撤销'],
 });
 
+// What the line says when the next move is not shown: the goal only, plus how to ask for a hint.
+export function goalLine(mach, penalty) {
+  const level = mach.beams.every((b) => b.gate === '=');
+  const [en, zh] = level
+    ? ['Balance every beam', '平衡每一根横梁']
+    : ["Match every beam's gate lamp", '让每根横梁的指示灯都亮起'];
+  return [`${en}  [H] hint -${penalty}`, `${zh}  [H] 提示 -${penalty}`];
+}
+
 export function adviceLine(adv) {
   if (adv.kind === 'done') return PLAIN.watch;
   if (adv.kind === 'undo') return PLAIN.undo;
   const mass = `${adv.mass} kg`;
+  const massZh = `${adv.mass} 千克`;
   if (adv.kind === 'rotate') {
     const more = adv.presses > 1;
     // Name the mass so that an equal weight already selected cannot be mistaken for it.
     const [what, whatZh] =
       adv.rail >= 0
-        ? [`${mass} slider (rail ${'ABC'[adv.rail]})`, `${mass} 滑块（${'ABC'[adv.rail]} 梁滑轨）`]
+        ? [
+            `${mass} slider (rail ${'ABC'[adv.rail]})`,
+            `${massZh} 滑块（${'ABC'[adv.rail]} 梁滑轨）`,
+          ]
         : adv.plain
-          ? [`plain ${mass} mass`, `普通 ${mass} 砝码`]
-          : [`${mass} mass`, `${mass} 砝码`];
+          ? [`plain ${mass} mass`, `普通 ${massZh} 砝码`]
+          : [`${mass} mass`, `${massZh} 砝码`];
     return [
       `X: rotate the tray to the ${what}${more ? ` (${adv.presses} presses)` : ''}`,
       `按 X：把托盘转到 ${whatZh}${more ? `（${adv.presses} 次）` : ''}`,
@@ -398,12 +411,12 @@ export function adviceLine(adv) {
   if (adv.kind === 'place')
     return [
       `Space: place the ${mass} mass on beam ${label} peg ${peg}`,
-      `按空格：把 ${mass} 砝码放到 ${label} 梁 ${peg} 号孔`,
+      `按空格：把 ${massZh} 砝码放到 ${label} 梁 ${peg} 号孔`,
     ];
   if (adv.kind === 'pick')
     return [
       `Space: pick up the ${mass} mass from beam ${label} peg ${peg}`,
-      `按空格：从 ${label} 梁 ${peg} 号孔取下 ${mass} 砝码`,
+      `按空格：从 ${label} 梁 ${peg} 号孔取下 ${massZh} 砝码`,
     ];
   // A vertical step only reaches the beam; the peg is named by the horizontal step after it.
   const [to, toZh] =

@@ -235,6 +235,11 @@ function drawLoads(ctx, s, lay) {
       line(ctx, sx, sy - 9, tx, ty - 24, '#8cc2ff', true);
       const active = s.ev.tilt[b.index] === (t.when === 'L' ? -1 : 1);
       block(ctx, tx, ty, t.m, 'steel', active ? 1 : 0.35);
+      if (!active) {
+        const h = 12 + Math.min(t.m, 9);
+        line(ctx, tx - 9, ty - h + 3, tx + 9, ty - 3, C.dim);
+        line(ctx, tx + 9, ty - h + 3, tx - 9, ty - 3, C.dim);
+      }
     });
   }
   s.where.forEach((id, w) => {
@@ -249,7 +254,7 @@ function drawLoads(ctx, s, lay) {
   });
 }
 
-function drawRopes(ctx, s, lay) {
+function drawRopes(ctx, s, lay, lang) {
   for (const b of s.mach.beams) {
     if (!b.hang) continue;
     const parent = lay.rows[b.hang.beam];
@@ -265,7 +270,7 @@ function drawRopes(ctx, s, lay) {
     line(ctx, row.cx, midY, row.cx, hookY, color);
     rect(ctx, row.cx - 6, hookY, 12, 4, C.brass);
     const mass = s.ev.mass[b.index];
-    text(ctx, `${mass} kg`, row.cx + 10, hookY - 3, C.steel, 10);
+    text(ctx, `${mass} ${lang === 'zh' ? '千克' : 'kg'}`, row.cx + 10, hookY - 3, C.steel, 10);
   }
 }
 
@@ -376,6 +381,20 @@ function drawHud(ctx, s, lang, count, lamps) {
   text(ctx, s.line[lang], 240, 298, C.hint, 12, 'center');
 }
 
+// White corner brackets drawn in the gap around the selected menu cell, so selection is not just a colour.
+function cornerBrackets(ctx, x, y, w, h) {
+  const arm = 12;
+  for (const [cx, cy, sx, sy] of [
+    [x, y, 1, 1],
+    [x + w, y, -1, 1],
+    [x, y + h, 1, -1],
+    [x + w, y + h, -1, -1],
+  ]) {
+    rect(ctx, sx > 0 ? cx : cx - arm, sy > 0 ? cy : cy - 3, arm, 3, '#fff');
+    rect(ctx, sx > 0 ? cx : cx - 3, sy > 0 ? cy : cy - arm, 3, arm, '#fff');
+  }
+}
+
 function drawMenu(ctx, s, lang, count) {
   text(
     ctx,
@@ -392,16 +411,12 @@ function drawMenu(ctx, s, lang, count) {
     const x = M.x + ((n - 1) % M.cols) * M.w;
     const y = M.y + Math.floor((n - 1) / M.cols) * M.h;
     const open = n <= s.menu.unlocked;
-    rect(
-      ctx,
-      x + 3,
-      y + 3,
-      M.w - 6,
-      M.h - 6,
-      n === s.menu.sel ? C.hint : open ? C.brassLo : '#2a1c0e',
-    );
+    const selected = n === s.menu.sel;
+    rect(ctx, x + 3, y + 3, M.w - 6, M.h - 6, selected ? C.hint : open ? C.brassLo : '#2a1c0e');
     rect(ctx, x + 6, y + 6, M.w - 12, M.h - 12, open ? C.panel : '#1d1309');
-    text(ctx, String(n), x + M.w / 2, y + 14, open ? C.text : '#5a4730', 14, 'center');
+    text(ctx, String(n), x + M.w / 2, y + (open ? 14 : 9), open ? C.text : '#5a4730', 14, 'center');
+    if (!open) lock(ctx, x + M.w / 2, y + 36);
+    if (selected) cornerBrackets(ctx, x, y, M.w, M.h);
   }
 }
 
@@ -410,7 +425,7 @@ export function drawGame(ctx, s, lang, count) {
   for (let y = 40; y < 240; y += 40) rect(ctx, 0, y, 480, 1, C.plank);
   if (s.menu) return drawMenu(ctx, s, lang, count);
   const lay = layoutOf(s.mach);
-  drawRopes(ctx, s, lay);
+  drawRopes(ctx, s, lay, lang);
   for (const b of s.mach.beams) drawBeam(ctx, s, lay, b, lang);
   drawLoads(ctx, s, lay);
   let lamps = 0;
