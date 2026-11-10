@@ -1,0 +1,49 @@
+{
+  "game": "pixel-parkour",
+  "date": "2026-11-10",
+  "reviewedRevision": "vendor/pixel-parkour (refined copy of upstream a5d147c) and its published build in public/parkour",
+  "owner": "none (no change required)",
+  "reviewer": "parkour-review (read-only, with the coordinator's browser check)",
+  "rounds": 1,
+  "process": "Lean final review at the user's request. Pixel Parkour is a WebAssembly lane runner built from the vendored source in vendor/pixel-parkour, while the upstream ../pixel_parkour project is deliberately left unchanged (docs/PARKOUR.md). One independent read-only review covered the vendored source, its tests and the published build; it found no BLOCKING or MEDIUM issue for the web build, so the game passed without code changes. An endless runner has no levels, so the 20-level rule does not apply.",
+  "verdict": "pass",
+  "approvedSha256": {
+    "public/parkour/pixel_parkour.wasm": "e0a0b9c8602567e20ca6ffbc99c98318a10f59a53bf6ac49bc545ef142bb03c1",
+    "public/parkour/parkour.js": "184e9a392802f23a6f3660df4e2d4405a29ed34f6ee15c18da90b15e71eb56e8",
+    "public/parkour/bridge.js": "2c6fd127e733e1d5fb518c891caa52bdd1707810203a776e6103b337b34fff74",
+    "public/parkour/gl.js": "3e40bcbd9645c264645fcf1d174b8adedc706a9bb45aa72d271d37755005fa15",
+    "public/parkour/audio.js": "764a9bc5634f36d9b508fe2ef6b32befb356b6c797238a8e5cf0d1c881def522",
+    "public/parkour/index.html": "00714712f49333f59daeb505a2d2578b66de658bf3592c4a48bb15eab3ca9be6",
+    "public/parkour/parkour.css": "14bc1b159755cdb6f739a72d1ae8c30e87324b1b0b67ba97bde2b0998065478e",
+    "public/parkour/build-info.json": "d83e97488333df4761129861cfcc529f0f9e3be1bb3b65b3cd140daba3170487"
+  },
+  "tests": {
+    "command": "cargo test (vendor/pixel-parkour, CARGO_TARGET_DIR in a scratch folder so the tree is unchanged)",
+    "passed": 100,
+    "failed": 0,
+    "lineCoverage": null,
+    "log": null
+  },
+  "independentProbes": "The vendored source's 100 tests pass. build-info.json records 30 source-file hashes that all match vendor/pixel-parkour and 7 artifact hashes that match public/parkour, including pixel_parkour.wasm. By code reading, track generation keeps a reachable lane from every entry lane, a run starts with 30 m of clear track (about 2.7 s), speed rises from 11 to a 23 m/s cap near 3000 m with difficulty tiers at 300, 900 and 1800 m, frame time is clamped and simulated in fixed steps, the web save path survives missing, corrupt or throwing browser storage, coin and score totals use saturating arithmetic, and every UI string is defined in both English and Chinese.",
+  "findings": [],
+  "openNotes": [
+    "Revive coins are deducted in memory and saved only at the end of a run, so closing the tab mid-run refunds the revive and loses the run (vendor/pixel-parkour/src/state.rs around 403).",
+    "The 最高分 (best score) label on the Chinese title menu overlaps the bottom edge of the menu panel by about 2 px (state.rs around 779).",
+    "If browser storage refuses writes, play continues in memory and progress is lost on reload without a message; corrupted out-of-range saved values reset to defaults.",
+    "state.rs is about 1,050 lines, over the repository's 800-line soft ceiling.",
+    "The upstream ../pixel_parkour repository is older than the vendored web port by design and was not modified."
+  ],
+  "browser": {
+    "method": "Official Claude in Chrome extension, local server; real clicks and real key presses on the page; only DOM text and the canvas were read.",
+    "servedSha256Prefixes": "e0a0b9c8 184e9a39 2c6fd127 3e40bcbd 764a9bc5 00714712 14bc1b15 d83e9748",
+    "observed": [
+      "English: the page loaded with the title card, controls, touch buttons and description; 'Enter the rail yard' opened the in-game menu and Enter started a run with the controls shown ('Left/Right: change lane, Up: jump, Down: roll').",
+      "Loss: left idle, the runner hit the first barrier and the results screen showed 'CRASHED!' with score, best, distance, coins, missions and Run again, Shop and Title.",
+      "Chinese: the page and the in-game menu (开始, 任务, 商店, 玩法说明, 设置, 退出) are fully translated; the 最高分 label slightly overlaps the menu box edge.",
+      "Chinese 390 px phone frame (388 px inner, no horizontal overflow): all page buttons in Chinese, including the touch controls ← ↑跳跃 ↓翻滚 →.",
+      "All 14 files in public/parkour hash identically to the published site.",
+      "Not covered in the browser: the shop, missions, hoverboard and a long run; the vendored tests and the code review cover them."
+    ],
+    "screenshots": ["screenshots/pixel-parkour-en.png", "screenshots/pixel-parkour-phone-zh.png"]
+  }
+}

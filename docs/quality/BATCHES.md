@@ -54,6 +54,7 @@ Phase Tiles completed batch 18 and the 50-game target, Pixel Parkour included. T
 | Mirror Lab        | Passed in one round: 22 rooms, opt-in hints from room 6 ([record](final-review/mirror-lab.json))                      |
 | Traffic Conductor | Passed in one round: 20 shifts, problem hints on mastery ([record](final-review/traffic-conductor.json))              |
 | Weightworks       | Passed in one round: 24 machines, opt-in hints from machine 8 ([record](final-review/weightworks.json))               |
+| Pixel Parkour     | Passed in one round with no changes: vendored web build verified ([record](final-review/pixel-parkour.json))          |
 
 ## Completed batch 18
 
