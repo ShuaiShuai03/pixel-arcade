@@ -6,52 +6,53 @@ At the user's direction, at most **three games** may be under development and ac
 
 Phase Tiles completed batch 18 and the 50-game target, Pixel Parkour included. The [required final review](#required-final-review) of every game is under way, three games at a time.
 
-| Game             | Final review                                                                                                          |
-| ---------------- | --------------------------------------------------------------------------------------------------------------------- |
-| Snowball Siege   | Passed after three rounds ([record](final-review/snowball-siege.json))                                                |
-| Ember Knights    | Passed after three rounds: 20 stages, reactive champions ([record](final-review/ember-knights.json))                  |
-| Bomb Garden      | Passed after four rounds: 22 gardens, barrel previews ([record](final-review/bomb-garden.json))                       |
-| Iron Bastion     | Passed after three rounds: 24 fields, blind pointer play fixed ([record](final-review/iron-bastion.json))             |
-| Sky Raiders      | Passed after two rounds: 24 sectors, aimed strike zones ([record](final-review/sky-raiders.json))                     |
-| Neon Snake       | Passed in one round: 20 levels, countdown starts ([record](final-review/neon-snake.json))                             |
-| Starbreaker      | Passed in one round: 20 fields, docked launch ([record](final-review/starbreaker.json))                               |
-| Orbit Invaders   | Passed in one round: 20 levels, aimed crossfire ([record](final-review/orbit-invaders.json))                          |
-| River Hop        | Passed in one round: 20 crossings, turtles and ferry ([record](final-review/river-hop.json))                          |
-| Meteor Drift     | Passed in one round: 22 sectors, fixed ammo ([record](final-review/meteor-drift.json))                                |
-| Blockfall        | Passed in one round: 20 districts, four goal kinds ([record](final-review/blockfall.json))                            |
-| Gem Match        | Passed in one round: 20 gardens, shape-coded beds ([record](final-review/gem-match.json))                             |
-| Crate Keeper     | Passed in one round: 20 solver-proven rooms ([record](final-review/crate-keeper.json))                                |
-| Minefield        | Passed in one round: 20 fields, no guessing ([record](final-review/minefield.json))                                   |
-| Memory Grove     | Passed in one round: 20 clearings, four memory rules ([record](final-review/memory-grove.json))                       |
-| Pixel Rally      | Passed in one round with no changes ([record](final-review/pixel-rally.json))                                         |
-| Paddle Duel      | Passed in one round: single match, hardened input ([record](final-review/paddle-duel.json))                           |
-| Pinball Pocket   | Passed in one round with no changes ([record](final-review/pinball-pocket.json))                                      |
-| Dungeon Dash     | Passed in one round: 20 chambers, armoured mastery ([record](final-review/dungeon-dash.json))                         |
-| Bubble Pop       | Passed in one round: 20 caverns, symbol bubbles ([record](final-review/bubble-pop.json))                              |
-| Lantern Climber  | Passed in one round: deeper tower, four rail climbs ([record](final-review/lantern-climber.json))                     |
-| Gravity Courier  | Passed in one round: 20 chambers, field reversal ([record](final-review/gravity-courier.json))                        |
-| Grapnel Gorge    | Passed in one round: 20 routes, still-stand hooks ([record](final-review/grapnel-gorge.json))                         |
-| Wallrunner Relay | Passed in one round: 20 courses, kick and wall-run routes ([record](final-review/wallrunner-relay.json))              |
-| Clockwork Bridge | Passed in one round: 20 machines, Q rewind ([record](final-review/clockwork-bridge.json))                             |
-| Glider Ridge     | Passed in one round: 20 courses, thermals and gates ([record](final-review/glider-ridge.json))                        |
-| Shield Sentinel  | Passed in one round: 20 levels, five Guardians, labelled telegraphs ([record](final-review/shield-sentinel.json))     |
-| Raft Rush        | Passed in one round with no changes: 20 rivers, flags and back-currents ([record](final-review/raft-rush.json))       |
-| Burrow Rescue    | Passed in one round: 20 mines, beams and air planning ([record](final-review/burrow-rescue.json))                     |
-| Dash Duelist     | Passed in one round: 20 duels, timed dash prompt ([record](final-review/dash-duelist.json))                           |
-| Vine Warden      | Passed in one round: 20 greenhouses, tighter early levels ([record](final-review/vine-warden.json))                   |
-| Tether Twins     | Passed in one round: 20 rooms, relay guide fixed ([record](final-review/tether-twins.json))                           |
-| Magnet Marauder  | Passed in one round: 25 chambers, harder mastery, guarded progress ([record](final-review/magnet-marauder.json))      |
-| Frost Forge      | Passed in one round: 22 workshops, tighter mastery clocks, guarded progress ([record](final-review/frost-forge.json)) |
-| Mimic Vault      | Passed in one round: 22 rooms, tighter mastery caps, guarded progress ([record](final-review/mimic-vault.json))       |
-| Comet Catcher    | Passed in one round: 22 contracts, narrowing cones, shape cues ([record](final-review/comet-catcher.json))            |
-| Orbit Gardener   | Passed in one round: 24 gardens, faster mastery rocks, dusk explained ([record](final-review/orbit-gardener.json))    |
-| Conveyor Chef    | Passed in one round: 22 shifts, tighter mastery, 空格 prompts ([record](final-review/conveyor-chef.json))             |
-| Echo Hunter      | Passed in one round: 20 caverns, warned crawler bites ([record](final-review/echo-hunter.json))                       |
-| Rail Switch      | Passed in one round: 20 timetables, late calls on mastery ([record](final-review/rail-switch.json))                   |
-| Firefly Trail    | Passed in one round: 24 meadows, warned trail cuts ([record](final-review/firefly-trail.json))                        |
-| Tilt Lab         | Passed in one round: 22 labs, hidden route on mastery ([record](final-review/tilt-lab.json))                          |
-| Stacksmith       | Passed in one round: 22 jobs, outline-only mastery ([record](final-review/stacksmith.json))                           |
-| Mirror Lab       | Passed in one round: 22 rooms, opt-in hints from room 6 ([record](final-review/mirror-lab.json))                      |
+| Game              | Final review                                                                                                          |
+| ----------------- | --------------------------------------------------------------------------------------------------------------------- |
+| Snowball Siege    | Passed after three rounds ([record](final-review/snowball-siege.json))                                                |
+| Ember Knights     | Passed after three rounds: 20 stages, reactive champions ([record](final-review/ember-knights.json))                  |
+| Bomb Garden       | Passed after four rounds: 22 gardens, barrel previews ([record](final-review/bomb-garden.json))                       |
+| Iron Bastion      | Passed after three rounds: 24 fields, blind pointer play fixed ([record](final-review/iron-bastion.json))             |
+| Sky Raiders       | Passed after two rounds: 24 sectors, aimed strike zones ([record](final-review/sky-raiders.json))                     |
+| Neon Snake        | Passed in one round: 20 levels, countdown starts ([record](final-review/neon-snake.json))                             |
+| Starbreaker       | Passed in one round: 20 fields, docked launch ([record](final-review/starbreaker.json))                               |
+| Orbit Invaders    | Passed in one round: 20 levels, aimed crossfire ([record](final-review/orbit-invaders.json))                          |
+| River Hop         | Passed in one round: 20 crossings, turtles and ferry ([record](final-review/river-hop.json))                          |
+| Meteor Drift      | Passed in one round: 22 sectors, fixed ammo ([record](final-review/meteor-drift.json))                                |
+| Blockfall         | Passed in one round: 20 districts, four goal kinds ([record](final-review/blockfall.json))                            |
+| Gem Match         | Passed in one round: 20 gardens, shape-coded beds ([record](final-review/gem-match.json))                             |
+| Crate Keeper      | Passed in one round: 20 solver-proven rooms ([record](final-review/crate-keeper.json))                                |
+| Minefield         | Passed in one round: 20 fields, no guessing ([record](final-review/minefield.json))                                   |
+| Memory Grove      | Passed in one round: 20 clearings, four memory rules ([record](final-review/memory-grove.json))                       |
+| Pixel Rally       | Passed in one round with no changes ([record](final-review/pixel-rally.json))                                         |
+| Paddle Duel       | Passed in one round: single match, hardened input ([record](final-review/paddle-duel.json))                           |
+| Pinball Pocket    | Passed in one round with no changes ([record](final-review/pinball-pocket.json))                                      |
+| Dungeon Dash      | Passed in one round: 20 chambers, armoured mastery ([record](final-review/dungeon-dash.json))                         |
+| Bubble Pop        | Passed in one round: 20 caverns, symbol bubbles ([record](final-review/bubble-pop.json))                              |
+| Lantern Climber   | Passed in one round: deeper tower, four rail climbs ([record](final-review/lantern-climber.json))                     |
+| Gravity Courier   | Passed in one round: 20 chambers, field reversal ([record](final-review/gravity-courier.json))                        |
+| Grapnel Gorge     | Passed in one round: 20 routes, still-stand hooks ([record](final-review/grapnel-gorge.json))                         |
+| Wallrunner Relay  | Passed in one round: 20 courses, kick and wall-run routes ([record](final-review/wallrunner-relay.json))              |
+| Clockwork Bridge  | Passed in one round: 20 machines, Q rewind ([record](final-review/clockwork-bridge.json))                             |
+| Glider Ridge      | Passed in one round: 20 courses, thermals and gates ([record](final-review/glider-ridge.json))                        |
+| Shield Sentinel   | Passed in one round: 20 levels, five Guardians, labelled telegraphs ([record](final-review/shield-sentinel.json))     |
+| Raft Rush         | Passed in one round with no changes: 20 rivers, flags and back-currents ([record](final-review/raft-rush.json))       |
+| Burrow Rescue     | Passed in one round: 20 mines, beams and air planning ([record](final-review/burrow-rescue.json))                     |
+| Dash Duelist      | Passed in one round: 20 duels, timed dash prompt ([record](final-review/dash-duelist.json))                           |
+| Vine Warden       | Passed in one round: 20 greenhouses, tighter early levels ([record](final-review/vine-warden.json))                   |
+| Tether Twins      | Passed in one round: 20 rooms, relay guide fixed ([record](final-review/tether-twins.json))                           |
+| Magnet Marauder   | Passed in one round: 25 chambers, harder mastery, guarded progress ([record](final-review/magnet-marauder.json))      |
+| Frost Forge       | Passed in one round: 22 workshops, tighter mastery clocks, guarded progress ([record](final-review/frost-forge.json)) |
+| Mimic Vault       | Passed in one round: 22 rooms, tighter mastery caps, guarded progress ([record](final-review/mimic-vault.json))       |
+| Comet Catcher     | Passed in one round: 22 contracts, narrowing cones, shape cues ([record](final-review/comet-catcher.json))            |
+| Orbit Gardener    | Passed in one round: 24 gardens, faster mastery rocks, dusk explained ([record](final-review/orbit-gardener.json))    |
+| Conveyor Chef     | Passed in one round: 22 shifts, tighter mastery, 空格 prompts ([record](final-review/conveyor-chef.json))             |
+| Echo Hunter       | Passed in one round: 20 caverns, warned crawler bites ([record](final-review/echo-hunter.json))                       |
+| Rail Switch       | Passed in one round: 20 timetables, late calls on mastery ([record](final-review/rail-switch.json))                   |
+| Firefly Trail     | Passed in one round: 24 meadows, warned trail cuts ([record](final-review/firefly-trail.json))                        |
+| Tilt Lab          | Passed in one round: 22 labs, hidden route on mastery ([record](final-review/tilt-lab.json))                          |
+| Stacksmith        | Passed in one round: 22 jobs, outline-only mastery ([record](final-review/stacksmith.json))                           |
+| Mirror Lab        | Passed in one round: 22 rooms, opt-in hints from room 6 ([record](final-review/mirror-lab.json))                      |
+| Traffic Conductor | Passed in one round: 20 shifts, problem hints on mastery ([record](final-review/traffic-conductor.json))              |
 
 ## Completed batch 18
 

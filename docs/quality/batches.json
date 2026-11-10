@@ -273,7 +273,8 @@
       "firefly-trail",
       "tilt-lab",
       "stacksmith",
-      "mirror-lab"
+      "mirror-lab",
+      "traffic-conductor"
     ],
     "records": [
       "final-review/snowball-siege.json",
@@ -319,7 +320,8 @@
       "final-review/firefly-trail.json",
       "final-review/tilt-lab.json",
       "final-review/stacksmith.json",
-      "final-review/mirror-lab.json"
+      "final-review/mirror-lab.json",
+      "final-review/traffic-conductor.json"
     ]
   }
 }

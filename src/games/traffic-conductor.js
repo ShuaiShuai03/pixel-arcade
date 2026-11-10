@@ -9,8 +9,8 @@ export const meta = {
   players: '1',
   touch: true,
   description: {
-    en: 'Run the signals of 20 busy junctions. Cars, buses and trucks arrive from every road and show their turn indicators; you decide who gets the green. Arrow keys select a junction, Space moves its signal to the next phase (green, then yellow and a short all-red, so conflicting greens can never happen) and X calls a pedestrian phase that stops all traffic while people cross the zebra. A vehicle enters the junction only on green and only when its conflict zones are clear. Deliver the quota before the clock runs out. Every vehicle, bus, ambulance and pedestrian has a wait limit: break it, let a queue spill off the map or let the junction gridlock and you take a strike, and the third strike ends the shift. Each strike is explained on screen, and the line at the bottom always names the next move. Later levels add protected turns, school crossings, bus priority, ambulances and two linked junctions where a green wave pays off. You can also tap a junction: once to select it, again to advance its signal, or tap a zebra to call pedestrians.',
-    zh: '指挥 20 个繁忙路口的信号灯。小汽车、公交车和卡车从各条道路驶来，并打出转向灯，由你决定谁先放行。方向键选择路口，空格键让信号进入下一相位（先绿灯，再黄灯和短暂全红，不会出现冲突绿灯），X 键呼叫行人相位，让所有车辆停下、行人通过斑马线。车辆只有在绿灯且冲突区空闲时才会驶入路口。在时间用完之前放行足够数量的车辆。每辆车、公交车、救护车和行人都有等待上限：超过上限、排队溢出地图或路口堵死都会记一次失误，第三次失误则本班失败。每次失误都会在屏幕上说明原因，底部一行始终提示下一步操作。后面的关卡会加入保护性转弯、学生过街、公交优先、救护车，以及两个联动路口的绿波。也可以直接点按路口：点一次选中，再点一次切换信号，点斑马线则呼叫行人。',
+    en: 'Run the signals through 20 shifts, from a single crossroads to two linked junctions. Cars, buses and trucks arrive on the roads and show their turn indicators; you decide who gets the green. Arrow keys select a junction, Space (the Signal button on touch) moves its signal to the next phase (green, then yellow and a short all-red, so conflicting greens can never happen) and X (Walk) calls a pedestrian phase that stops all traffic while people cross the zebra. A vehicle enters the junction only on green and only when its conflict zones are clear. Deliver the quota before the clock runs out. Every vehicle, bus, ambulance and pedestrian has a wait limit: break it, let a queue spill off the map or let the junction gridlock and you take a strike, and the third strike ends the shift. Each strike is explained on screen. On the early shifts the line at the bottom names the next move; from shift 14 it only points out the problem, such as a backed-up road or an ambulance on its way, and the decision is yours. Later shifts add left-turn gaps, school crossings, bus priority, ambulances and two linked junctions where a green wave pays off. You can also tap a junction: once to select it, again to advance its signal, or tap a zebra to call pedestrians.',
+    zh: '指挥 20 个班次的信号灯，从单个十字路口到两个联动路口。小汽车、公交车和卡车驶上道路并打出转向灯，由你决定谁先放行。方向键选择路口，空格键（触屏用「信号」键）让信号进入下一相位（先绿灯，再黄灯和短暂全红，不会出现冲突绿灯），X 键（行人）呼叫行人相位，让所有车辆停下、行人通过斑马线。车辆只有在绿灯且冲突区空闲时才会驶入路口。在时间用完之前放行足够数量的车辆。每辆车、公交车、救护车和行人都有等待上限：超过上限、排队溢出地图或路口堵死都会记一次失误，第三次失误则本班失败。每次失误都会在屏幕上说明原因。前几班底部一行会直接告诉你下一步操作；从第 14 班起它只指出问题，例如哪条路排长了、救护车正从哪边驶来，怎么做由你决定。后面的班次会加入左转空档、学生过街、公交优先、救护车，以及两个联动路口的绿波。也可以直接点按路口：点一次选中，再点一次切换信号，点斑马线则呼叫行人。',
   },
   keys: [
     { label: { en: 'Select a junction', zh: '选择路口' }, keys: 'Arrows / WASD' },
@@ -77,6 +77,7 @@ export const RULES = Object.freeze({
   preempt: 12,
   pedLead: 14,
   pedGap: 14,
+  spare: 3,
 });
 const STEP = RULES.step;
 const seeded = (seed) => () => {
@@ -323,6 +324,8 @@ export function compileLevel(def, index = 0) {
     time: def.time,
     junctions,
     lanes,
+    guide: def.guide ?? 'exact',
+    spare: def.spare ?? RULES.spare,
     maxWait: def.maxWait,
     busWait: def.busWait ?? def.maxWait,
     pedMax: def.pedMax ?? 30,
@@ -922,7 +925,7 @@ function upcoming(w, span) {
   return out;
 }
 
-function pressure(w, JW, phase) {
+function pressure(w, JW, phase, seen = false) {
   const P = JW.J.plan[phase];
   let sum = 0;
   for (let d = 0; d < 4; d++) {
@@ -934,7 +937,8 @@ function pressure(w, JW, phase) {
       if (near) sum += v.weight * (1 + Math.min(v.wait, 40) / 10);
     }
   }
-  for (const { c, at } of upcoming(w, RULES.horizon + 4)) {
+  // Arrivals that are not on the map yet are known to the schedule check, never to the prompt.
+  for (const { c, at } of seen ? [] : upcoming(w, RULES.horizon + 4)) {
     const lane = w.lanes[c.lane];
     if (lane.jn !== JW.j || !serves(P, lane.dir, c.moves[0])) continue;
     if (at - w.t + lane.len / (TYPES[c.k].vmax * 0.8) <= RULES.horizon)
@@ -986,8 +990,31 @@ export function ambulances(w, JW) {
   return out;
 }
 
+// How much more the other road must carry than the green road (ratio, then slack) before the
+// controller moves the green. A dead time of about 4 s per switch makes a screen-only controller
+// wait for a clearer lead than one that also reads the schedule.
+const SWITCH_FULL = [1.35, 1.2];
+const SWITCH_SEEN = [3.5, 4];
+// The share of its wait limit after which a waiting vehicle makes its road urgent.
+const STARVE_FULL = 0.55;
+const STARVE_SEEN = 0.45;
+
+// The ambulances a player can know about: the ones on the map and the ones the siren banner has
+// announced (whole seconds to go, as drawn). Nothing else about the schedule is used.
+function announcedAmbulances(w, JW) {
+  return alertsOf(w)
+    .filter((a) => a.jn === JW.j)
+    .map((a) => {
+      const lane = laneOf(w, JW.j, a.d);
+      const ahead = lane.vs.findIndex((v) => v.k === 'amb');
+      return { jn: a.jn, d: a.d, m: 'S', eta: a.eta, queue: ahead >= 0 ? ahead : lane.vs.length };
+    });
+}
+
 // What this junction's signal should do now: null to hold, else {kind, to, urgency, why}.
-export function wantFor(w, JW) {
+// `seen` limits the controller to what is on the screen; without it the controller also reads the
+// schedule, which is how the load-time check proves that a clean shift exists.
+export function wantFor(w, JW, seen = false) {
   const sg = JW.sig;
   if (sg.stage !== 'green' || sg.t < RULES.minGreen) return null;
   const L = w.L;
@@ -997,7 +1024,7 @@ export function wantFor(w, JW) {
   const waiting = pedsWaiting(w, JW.j);
   const oldest = waiting.length ? w.t - Math.min(...waiting.map((p) => p.t0)) : 0;
   const lead = RULES.yellow + RULES.allRed + 1.5 + (w.juncs.length > 1 ? 2 : 0);
-  const amb = ambulances(w, JW);
+  const amb = seen ? announcedAmbulances(w, JW) : ambulances(w, JW);
   // Never leave a phase an ambulance is about to need: the way back costs a full minimum green.
   const hold = RULES.minGreen + RULES.yellow + RULES.allRed + 2;
   if (amb.some((a) => serves(plan[cur], a.d, a.m) && a.eta < hold + 0.7 * a.queue)) return null;
@@ -1007,8 +1034,8 @@ export function wantFor(w, JW) {
   if (urgent) return { kind: 'phase', to: nxt, urgency: 1000, amb: urgent.d };
   const pedForce = waiting.length > 0 && oldest >= L.pedMax - RULES.pedLead;
   if (pedForce) return { kind: 'ped', to: 'ped', urgency: 500 };
-  const pc = pressure(w, JW, cur);
-  const pn = pressure(w, JW, nxt);
+  const pc = pressure(w, JW, cur, seen);
+  const pn = pressure(w, JW, nxt, seen);
   const starving = (() => {
     for (let d = 0; d < 4; d++) {
       const lane = laneOf(w, JW.j, d);
@@ -1023,25 +1050,33 @@ export function wantFor(w, JW) {
         lane.vs.some(
           (v) =>
             serves(plan[nxt], d, v.moves[v.mi]) &&
-            (v.wait >= 0.55 * waitLimit(L, v) || (nearEdge && v === rear)),
+            (v.wait >= (seen ? STARVE_SEEN : STARVE_FULL) * waitLimit(L, v) ||
+              (nearEdge && v === rear)),
         )
       )
         return true;
     }
     return false;
   })();
-  const sw = pn >= 0.5 && (pc < 0.35 || pn > 1.35 * pc + 1.2 || starving || sg.t > RULES.maxGreen);
+  const [ratio, slack] = seen ? SWITCH_SEEN : SWITCH_FULL;
+  const sw =
+    pn >= 0.5 && (pc < 0.35 || pn > ratio * pc + slack || starving || sg.t > RULES.maxGreen);
   if (!sw) return null;
   const pedOk = w.t - sg.lastPed >= RULES.pedGap;
-  if (pedOk && waiting.length && (oldest >= 0.35 * L.pedMax || waiting.length >= 4))
+  if (
+    pedOk &&
+    waiting.length &&
+    !(seen && starving) &&
+    (oldest >= 0.35 * L.pedMax || waiting.length >= 4)
+  )
     return { kind: 'ped', to: 'ped', urgency: 200 };
   return { kind: 'phase', to: nxt, urgency: starving ? 100 : pn - pc };
 }
 
-export function bestWant(w) {
+export function bestWant(w, seen = false) {
   let best = null;
   for (const JW of w.juncs) {
-    const x = wantFor(w, JW);
+    const x = wantFor(w, JW, seen);
     if (x && (!best || x.urgency > best.want.urgency)) best = { j: JW.j, want: x };
   }
   return best;
@@ -1096,10 +1131,12 @@ const STRIKE_TEXT = (s, e) => {
   ];
 };
 
-export function newPlay(L, sched) {
+// `oracle` is only for the load-time check: its prompt is the full solver. Real play never sets it.
+export function newPlay(L, sched, oracle = false) {
   return {
     L,
     sched,
+    oracle,
     w: newWorld(L, sched),
     phase: 'playing',
     cause: null,
@@ -1116,6 +1153,7 @@ export function newPlay(L, sched) {
       zh: `第 ${L.index + 1} 关：${L.name[1]}`,
       tip: L.tip,
       age: 0,
+      n: 0,
       dur: RULES.introTime,
     },
     stats: {
@@ -1130,8 +1168,15 @@ export function newPlay(L, sched) {
 }
 
 function say(s, en, zh, dur = RULES.msgTime) {
-  s.msg = { en, zh, tip: null, age: 0, dur };
+  s.msg = { en, zh, tip: null, age: 0, n: 0, dur };
 }
+
+// Message and prompt ages count simulation steps, so a boundary falls on the same step at any frame rate.
+function ageMessage(msg, steps) {
+  msg.n += steps;
+  msg.age = msg.n * STEP;
+}
+const HOLD_STEPS = Math.round(RULES.promptHold / STEP);
 
 function endPlay(s, phase, cause) {
   s.phase = phase;
@@ -1151,7 +1196,7 @@ function playTick(s, emit) {
       s.last = e.k;
       s.ambulanceDown = e.k === 'wait' && e.kind === 'amb';
       const [en, zh] = STRIKE_TEXT(s, e);
-      s.msg = { en, zh, tip: null, age: 0, dur: RULES.msgTime + 1 };
+      s.msg = { en, zh, tip: null, age: 0, n: 0, dur: RULES.msgTime + 1 };
       s.flash.push({ jn: e.jn, d: e.d, age: 0 });
       emit('hit');
     }
@@ -1257,11 +1302,63 @@ function act(s, input, emit) {
 
 const labelOf = (J, p, lang) => J.plan[p].label[lang];
 
+// The arm of the phase `to` whose traffic is in the worst state: the one a hint points at.
+function worstArm(w, JW, to) {
+  let arm = JW.J.plan[to].allow.findIndex((a) => a);
+  let worst = -1;
+  for (let d = 0; d < 4; d++) {
+    const lane = laneOf(w, JW.j, d);
+    if (!lane || !JW.J.plan[to].allow[d]) continue;
+    const load = lane.vs.reduce((n, v) => n + v.weight * (1 + Math.min(v.wait, 40) / 10), 0);
+    if (load > worst) {
+      worst = load;
+      arm = d;
+    }
+  }
+  return arm;
+}
+
+// A hint names the problem on the board and leaves the move to the player.
+function hintFor(s, best) {
+  const { j, want } = best;
+  const J = s.L.junctions[j];
+  const JW = s.w.juncs[j];
+  const multi = s.L.junctions.length > 1;
+  let arm = -1;
+  let en;
+  let zh;
+  if (want.kind === 'ped') {
+    en = 'pedestrians are running out of patience';
+    zh = '行人快等不及了';
+  } else if (want.amb !== undefined) {
+    arm = want.amb;
+    en = `ambulance coming from the ${DIR_EN[arm]}`;
+    zh = `救护车正从${DIR_ZH[arm]}侧驶来`;
+  } else {
+    arm = worstArm(s.w, JW, want.to);
+    en = `${DIR_EN[arm]} queue backing up`;
+    zh = `${DIR_ZH[arm]}向车队越排越长`;
+  }
+  const head = multi ? [`${J.name[0]} junction: `, `${J.name[1]}路口：`] : ['', ''];
+  const sentence = head[0] + en;
+  return {
+    key: `hint:${want.kind}:${j}:${arm}`,
+    kind: 'hint',
+    target: multi ? J.name[0] : null,
+    press: null,
+    en: sentence[0].toUpperCase() + sentence.slice(1),
+    zh: head[1] + zh,
+    dirs: arm >= 0 ? [arm] : [0, 1, 2, 3].filter((d) => J.arms[d]),
+    junction: j,
+  };
+}
+
 function describe(s) {
   const w = s.w;
   const js = s.L.junctions;
   const multi = js.length > 1;
-  const best = bestWant(w);
+  const best = bestWant(w, !s.oracle);
+  if (best && !s.oracle && s.L.guide === 'hint') return hintFor(s, best);
   if (!best) {
     const JW = w.juncs[s.sel];
     const p = JW.sig.ph;
@@ -1337,36 +1434,39 @@ function describe(s) {
 
 // The prompt is re-evaluated every `thinkTicks` simulation steps, so frame rate never changes
 // when the controller looks at the road.
-function advise(s, dt, steps) {
+function advise(s, steps) {
   const cur = s.line;
   s.think += steps;
-  if (cur && s.think < RULES.thinkTicks && cur.seq === s.actSeq) {
-    cur.age += dt;
-    return;
-  }
+  const shown = cur ? cur.shown : 0;
+  if (cur) cur.shown += steps;
+  if (cur && s.think < RULES.thinkTicks && cur.seq === s.actSeq) return;
   s.think = 0;
   const next = describe(s);
-  if (cur && cur.key === next.key) {
-    cur.age += dt;
-    return;
-  }
-  if (cur && cur.age < RULES.promptHold && cur.seq === s.actSeq) {
-    cur.age += dt;
-    return;
-  }
-  s.line = { ...next, age: 0, seq: s.actSeq };
+  if (cur && cur.key === next.key) return;
+  if (cur && shown < HOLD_STEPS && cur.seq === s.actSeq) return;
+  s.line = { ...next, shown: 0, seq: s.actSeq };
 }
 
-// Advances one shift by dt seconds of the fixed-step simulation.
+// Runs up to `steps` simulation steps and returns how many were left unused when the shift ended.
+function runSteps(s, steps, emit) {
+  let ran = 0;
+  while (ran < steps && s.phase === 'playing') {
+    playTick(s, emit);
+    ran++;
+  }
+  ageMessage(s.msg, ran);
+  if (s.phase === 'playing') advise(s, ran);
+  return steps - ran;
+}
+
+// Advances one shift by dt seconds of the fixed-step simulation; returns the unused steps.
 export function advancePlay(s, dt, input, emit) {
-  if (s.phase !== 'playing') return;
+  if (s.phase !== 'playing') return 0;
   act(s, input, emit);
   s.acc += dt;
   const steps = Math.floor(s.acc / STEP + 1e-6);
   s.acc = Math.max(0, s.acc - steps * STEP);
-  for (let n = 0; n < steps && s.phase === 'playing'; n++) playTick(s, emit);
-  s.msg.age += dt;
-  if (s.phase === 'playing') advise(s, dt, steps);
+  return runSteps(s, steps, emit);
 }
 
 export const pressedOf = (keys) => ({
@@ -1399,7 +1499,7 @@ export function autoplay(lag) {
 
 // Plays a whole shift with the follower; the schedule check at load uses this.
 export function runPrompted(L, sched, lag, hz = 60) {
-  const s = newPlay(L, sched);
+  const s = newPlay(L, sched, true);
   const follow = autoplay(lag);
   for (let f = 0; s.phase === 'playing' && f < (L.time + 2) * hz; f++)
     advancePlay(s, 1 / hz, pressedOf(follow(s, f / hz)), () => {});
@@ -1420,7 +1520,10 @@ const CHECK_RUNS = [
 const cleanRun = (L, sched, [lag, hz]) => {
   const s = runPrompted(L, sched, lag, hz);
   return (
-    s.phase === 'cleared' && s.strikes === 0 && s.w.t <= L.time - 3 && s.w.maxRel <= RULES.margin
+    s.phase === 'cleared' &&
+    s.strikes === 0 &&
+    s.w.t <= L.time - L.spare &&
+    s.w.maxRel <= RULES.margin
   );
 };
 
@@ -1475,6 +1578,9 @@ export function newState(env = {}, levels = BUILT) {
     cause: null,
     menu: null,
     clear: 0,
+    clearAcc: 0,
+    clearSteps: 0,
+    queued: null,
     cleared: 0,
     progress: env.progress || null,
     random: typeof env.random === 'function' ? env.random : () => 0.5,
@@ -1526,7 +1632,7 @@ function menuCellAt(px, py) {
   return row * RULES.menuCols + col + 1;
 }
 
-function finishLevel(g, emit) {
+function finishLevel(g, spare, emit) {
   const s = g.play;
   const w = s.w;
   const delay = w.delivered ? w.delaySum / w.delivered : 0;
@@ -1543,8 +1649,41 @@ function finishLevel(g, emit) {
     g.phase = 'won';
     return;
   }
-  g.clear = RULES.clearTime;
+  // The banner starts on the step that cleared the shift, however the frame was cut.
+  g.clearSteps = Math.round(RULES.clearTime / STEP) - spare;
+  g.clear = g.clearSteps * STEP;
+  g.clearAcc = s.acc;
+  s.acc = 0;
+  g.queued = new Set();
   say(s, 'Shift cleared!', '本班完成！', RULES.clearTime);
+  ageMessage(s.msg, spare);
+}
+
+function settle(g, spare, emit) {
+  g.score = g.banked + g.play.score;
+  if (g.play.phase === 'cleared') finishLevel(g, spare, emit);
+  else if (g.play.phase === 'lost') {
+    g.phase = 'lost';
+    g.cause = g.play.cause;
+  }
+}
+
+// Keys pressed during the "Shift cleared" banner are kept for the first step of the next shift.
+const ACTION_KEYS = [
+  'ArrowUp',
+  'ArrowRight',
+  'ArrowDown',
+  'ArrowLeft',
+  'KeyW',
+  'KeyD',
+  'KeyS',
+  'KeyA',
+  'Space',
+  'Enter',
+  'KeyX',
+];
+function holdPresses(g, input) {
+  for (const code of ACTION_KEYS) if (input.pressed(code)) g.queued.add(code);
 }
 
 export function advance(g, dt, input, emit = () => {}) {
@@ -1555,18 +1694,26 @@ export function advance(g, dt, input, emit = () => {}) {
     return true;
   }
   if (g.clear > 0) {
-    g.clear -= dt;
-    g.play.msg.age += dt;
-    if (g.clear <= 0) loadLevel(g, g.level + 1);
+    holdPresses(g, input);
+    // The banner counts whole simulation steps, so a shift starts on the same step at any frame rate
+    // and the steps left over in the closing frame already belong to it.
+    g.clearAcc += dt;
+    const steps = Math.floor(g.clearAcc / STEP + 1e-6);
+    g.clearAcc = Math.max(0, g.clearAcc - steps * STEP);
+    const used = Math.min(steps, g.clearSteps);
+    g.clearSteps -= used;
+    g.clear = g.clearSteps * STEP;
+    ageMessage(g.play.msg, used);
+    if (g.clearSteps > 0) return true;
+    loadLevel(g, g.level + 1);
+    g.play.acc = g.clearAcc;
+    g.clearAcc = 0;
+    act(g.play, pressedOf([...g.queued]), emit);
+    g.queued = null;
+    settle(g, runSteps(g.play, steps - used, emit), emit);
     return true;
   }
-  advancePlay(g.play, dt, input, emit);
-  g.score = g.banked + g.play.score;
-  if (g.play.phase === 'cleared') finishLevel(g, emit);
-  else if (g.play.phase === 'lost') {
-    g.phase = 'lost';
-    g.cause = g.play.cause;
-  }
+  settle(g, advancePlay(g.play, dt, input, emit), emit);
   return true;
 }
 
@@ -1765,8 +1912,8 @@ export function snapshotOf(g) {
         : { en: `Relieved of duty. Score ${g.score}`, zh: `被换下岗位。得分 ${g.score}` }
       : g.menu
         ? {
-            en: `Traffic Conductor · ${g.menu.unlocked}/${g.levels.length} shifts open · Arrows choose, Space starts`,
-            zh: `路口指挥官 · 已开放 ${g.menu.unlocked}/${g.levels.length} 班 · 方向键选择，空格开始`,
+            en: `Traffic Conductor · ${g.menu.unlocked}/${g.levels.length} shifts open · Arrows choose, Space or Signal starts`,
+            zh: `路口指挥官 · 已开放 ${g.menu.unlocked}/${g.levels.length} 班 · 方向键选择，空格或「信号」键开始`,
           }
         : {
             en: [statusLabel(g, 'en'), tip?.[0], s.line?.en].filter(Boolean).join(' · '),
@@ -1956,7 +2103,7 @@ function crosswalkSpot(J, d, side) {
   return [J.x + OUT[d][0] * 26 + r[0] * k, J.y + OUT[d][1] * 26 + r[1] * k];
 }
 
-function drawPeds(ctx, w, tick) {
+function drawPeds(ctx, w, tick, env) {
   const best = {};
   for (const p of w.peds) {
     const J = w.L.junctions[p.jn];
@@ -2002,7 +2149,7 @@ function drawPeds(ctx, w, tick) {
     const left = Math.max(0, Math.ceil(RULES.pedWalk + RULES.pedFlash - JW.sig.t));
     text(
       ctx,
-      left <= RULES.pedFlash ? `${left}` : 'WALK',
+      left <= RULES.pedFlash ? `${left}` : env.t('WALK', '通行'),
       JW.J.x,
       JW.J.y - 4,
       '#3ddc84',
@@ -2063,8 +2210,8 @@ function drawHud(ctx, g, env) {
     11,
   );
   for (let i = 0; i < RULES.lives; i++)
-    box(ctx, i < s.strikes ? '#e5484d' : '#2d3748', 394 + i * 14, 4, 10, 10);
-  text(ctx, env.t(`Strikes`, `失误`), 388, 3, '#9fb0c8', 11, 'right');
+    box(ctx, i < s.strikes ? '#e5484d' : '#2d3748', 436 + i * 14, 4, 10, 10);
+  text(ctx, env.t(`Strikes`, `失误`), 430, 3, '#9fb0c8', 11, 'right');
   const delay = w.delivered ? w.delaySum / w.delivered : 0;
   text(
     ctx,
@@ -2097,6 +2244,16 @@ function drawHud(ctx, g, env) {
   }
 }
 
+// A closed padlock, so a locked shift is marked by more than its colour.
+function drawPadlock(ctx, cx, top) {
+  const iron = '#9fb0c8';
+  box(ctx, iron, cx - 3, top, 6, 2);
+  box(ctx, iron, cx - 3, top, 2, 6);
+  box(ctx, iron, cx + 1, top, 2, 6);
+  box(ctx, iron, cx - 5, top + 5, 10, 8);
+  box(ctx, '#1a2230', cx - 1, top + 7, 2, 4);
+}
+
 function drawMenu(ctx, g, env) {
   background(ctx, '#101b2d');
   text(ctx, env.t('Choose a shift', '选择班次'), 240, 16, '#ffffff', 16, 'center');
@@ -2108,21 +2265,15 @@ function drawMenu(ctx, g, env) {
     const y = MENU.y + row * MENU.h;
     box(ctx, i + 1 === g.menu.sel ? '#f2c94c' : '#1f3a5a', x, y, MENU.w - 6, MENU.h - 6);
     box(ctx, open ? '#1f3a5a' : '#1a2230', x + 2, y + 2, MENU.w - 10, MENU.h - 10);
-    text(
-      ctx,
-      String(i + 1),
-      x + (MENU.w - 6) / 2,
-      y + 11,
-      open ? '#ffffff' : '#4a5568',
-      14,
-      'center',
-    );
+    const mid = x + (MENU.w - 6) / 2;
+    text(ctx, String(i + 1), mid, y + (open ? 11 : 5), open ? '#ffffff' : '#7d8aa0', 14, 'center');
+    if (!open) drawPadlock(ctx, mid, y + 20);
   });
   const L = g.levels[g.menu.sel - 1];
   text(ctx, env.t(L.name[0], L.name[1]), 240, 246, '#f2c94c', 13, 'center');
   text(
     ctx,
-    env.t('Arrows choose, Space starts', '方向键选择，空格开始'),
+    env.t('Arrows choose, Space or Signal starts', '方向键选择，空格或「信号」键开始'),
     240,
     276,
     '#9fb0c8',
@@ -2151,7 +2302,7 @@ export function drawGame(ctx, g, env) {
   ])
     box(ctx, '#f2c94c', sel.x + dx, sel.y + dy, 2, 2);
   drawVehicles(ctx, w, tick);
-  drawPeds(ctx, w, tick);
+  drawPeds(ctx, w, tick, env);
   drawHighlight(ctx, s, tick);
   for (const f of s.flash) {
     const J = s.L.junctions[f.jn];
@@ -2163,9 +2314,7 @@ export function drawGame(ctx, g, env) {
     const a = alerts[0];
     const J = s.L.junctions[a.jn];
     const where =
-      s.L.junctions.length > 1
-        ? env.t(` at the ${J.name[0]} junction`, `（${J.name[1]}路口）`)
-        : '';
+      s.L.junctions.length > 1 ? env.t(` (${J.name[0]} junction)`, `（${J.name[1]}路口）`) : '';
     const msg = env.t(
       `Ambulance from the ${DIR_EN[a.d]}${where} in ${a.eta} s`,
       `救护车从${DIR_ZH[a.d]}侧驶来${where}，还有 ${a.eta} 秒`,
@@ -2255,7 +2404,7 @@ export const LEVELS = [
     rates: [[5, 5, 5, 5]],
     turns: [[0.7, 0.15, 0.15]],
     mix: [1, 0, 0],
-    cap: { '0N': 60, '0S': 60 },
+    cap: { '0N': 80, '0S': 80 },
     maxWait: 30,
     frac: 0.92,
     pulses: [{ at: [6, 16], len: 26, mult: 5, axes: 'any' }],
@@ -2513,6 +2662,7 @@ export const LEVELS = [
       '用方向键选择路口，驶出一个路口的车会到达下一个路口。',
     ),
     layout: 'row2',
+    guide: 'hint',
     plan: 'two',
     time: 70,
     rates: [
@@ -2540,6 +2690,7 @@ export const LEVELS = [
       '车辆成队行驶，车队到达时恰好放行下一个路口。',
     ),
     layout: 'row2',
+    guide: 'hint',
     plan: 'two',
     time: 75,
     rates: [
@@ -2549,8 +2700,8 @@ export const LEVELS = [
     platoon: 3,
     turns: [[0.88, 0.06, 0.06]],
     mix: [0.8, 0.2, 0],
-    maxWait: 32,
-    frac: 0.85,
+    maxWait: 30,
+    frac: 0.9,
     emerg: [
       [24, 0, -1],
       [40, 1, -1],
@@ -2558,7 +2709,9 @@ export const LEVELS = [
     ],
     emgWait: 5,
     ambJitter: 5,
-    seed: 5,
+    tail: 7,
+    spare: 2,
+    seed: 11,
   },
   {
     name: T('Spillback', '排队回溢'),
@@ -2567,6 +2720,7 @@ export const LEVELS = [
       '路段排满时不要再放行：车辆必须有空间驶出路口才会进入。',
     ),
     layout: 'row2',
+    guide: 'hint',
     plan: 'two',
     time: 75,
     rates: [
@@ -2576,8 +2730,8 @@ export const LEVELS = [
     turns: [[0.8, 0.1, 0.1]],
     mix: [0.8, 0.1, 0.1],
     cap: { '0N': 70, '0S': 70, '1N': 70, '1S': 70 },
-    maxWait: 34,
-    frac: 0.85,
+    maxWait: 32,
+    frac: 0.86,
     emerg: [
       [28, 1, -1],
       [44, 0, -1],
@@ -2586,7 +2740,9 @@ export const LEVELS = [
     emgWait: 5,
     ambJitter: 5,
     pulses: [{ at: [8, 20], len: 22, mult: 2, axes: 'any' }],
-    seed: 1,
+    tail: 6,
+    spare: 2,
+    seed: 7,
   },
   {
     name: T('Linked Lefts', '联动左转'),
@@ -2595,6 +2751,7 @@ export const LEVELS = [
       '两个路口都按单条道路分相位，要统筹联动顺序。',
     ),
     layout: 'row2',
+    guide: 'hint',
     plan: ['split', 'split'],
     time: 100,
     rates: [
@@ -2613,7 +2770,9 @@ export const LEVELS = [
     emgWait: 4.5,
     busWait: 56,
     ambJitter: 6,
-    seed: 40,
+    tail: 7,
+    spare: 2,
+    seed: 13,
   },
   {
     name: T('Market Day', '集市日'),
@@ -2622,6 +2781,7 @@ export const LEVELS = [
       '购物的人流穿过两个路口，公交车还要准点。',
     ),
     layout: 'row2',
+    guide: 'hint',
     plan: 'two',
     time: 80,
     rates: [
@@ -2646,7 +2806,9 @@ export const LEVELS = [
     emgWait: 5,
     ambJitter: 5,
     pulses: [{ at: [8, 20], len: 22, mult: 2, axes: 'any' }],
-    seed: 15,
+    tail: 5,
+    spare: 2,
+    seed: 7,
   },
   {
     name: T('Emergency Corridor', '救援通道'),
@@ -2655,6 +2817,7 @@ export const LEVELS = [
       '救护车要连续穿过两个路口，把整条通道打开。',
     ),
     layout: 'row2',
+    guide: 'hint',
     plan: 'two',
     time: 80,
     rates: [
@@ -2672,10 +2835,12 @@ export const LEVELS = [
     emgWait: 5,
     busWait: 20,
     maxWait: 32,
-    frac: 0.85,
+    frac: 0.83,
     ambJitter: 5,
     pulses: [{ at: [8, 20], len: 22, mult: 2, axes: 'any' }],
-    seed: 8,
+    tail: 6,
+    spare: 2,
+    seed: 10,
   },
   {
     name: T('Grand Rush Hour', '大高峰'),
@@ -2684,6 +2849,7 @@ export const LEVELS = [
       '车流高峰、公交车、救护车和学生同时出现，全部交给你。',
     ),
     layout: 'row2',
+    guide: 'hint',
     plan: 'two',
     time: 100,
     rates: [
@@ -2702,17 +2868,19 @@ export const LEVELS = [
       { jn: 0, rate: 2 },
       { jn: 1, rate: 2 },
     ],
-    pedMax: 46,
+    pedMax: 44,
     emgWait: 6,
-    busWait: 38,
-    maxWait: 72,
-    frac: 0.74,
+    busWait: 36,
+    maxWait: 64,
+    frac: 0.78,
     ambJitter: 5,
     pulses: [
       { at: [6, 16], len: 22, mult: 2, axes: 'any' },
       { at: [46, 56], len: 22, mult: 2, axes: 'any' },
     ],
-    seed: 1,
+    tail: 4,
+    spare: 2,
+    seed: 8,
   },
 ];
 // LEVELS-END

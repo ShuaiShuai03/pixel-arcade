@@ -1,0 +1,67 @@
+{
+  "game": "traffic-conductor",
+  "date": "2026-11-10",
+  "reviewedRevision": "f02a8ca3 (accepted build) plus the fixes in this commit",
+  "owner": "owner-traffic and owner-traffic2",
+  "reviewer": "traffic-fair, traffic-robust and traffic-present (parallel split review)",
+  "rounds": 1,
+  "process": "Lean final review at the user's request, with the review split across three parallel reviewers (fairness, robustness, presentation) as the user asked. The game already had 20 shifts. Five MEDIUM findings and the cheap LOW items were fixed and verified by a separate verification agent re-running the reviewers' probes against the repository file plus one clean-worktree run; the coordinator re-ran the owner's visible-state bot on the repository file for the fairness bar, then did the browser check. No second review round.",
+  "verdict": "pass",
+  "approvedSha256": {
+    "src/games/traffic-conductor.js": "be0b33b95cf6c189e242fdf057d60886bc428e645359af1ad2ec44557ac175a8",
+    "tests/traffic-conductor.test.js": "0fcdaea321c8ef494c35591d13357e465a066f1f6678be847c782be2f4888987",
+    "tests/traffic-conductor-quality.test.js": "bd19236a53b12981500b2a464f1b125c0ddaa0167d4e8cb67b7b88e498def419"
+  },
+  "tests": {
+    "command": "node --experimental-test-coverage --test-coverage-include='src/games/traffic-conductor*.js' --test tests/traffic-conductor.test.js tests/traffic-conductor-quality.test.js",
+    "passed": 74,
+    "failed": 0,
+    "lineCoverage": 99.76,
+    "log": "traffic-conductor-coverage.txt"
+  },
+  "independentProbes": "On the final file a visible-state bot (public getState only: signals, vehicles on the map, queues and announced sirens; 12 seeds) cleared every shift at least 10 of 12 times at both 0.25 s and 0.35 s reaction (teaching 95-96%, combination 92-93%, mastery 97%), with mastery leaving 6.1 s of spare time against 8.7 s in combination. The review's prompt-following bot now clears 0% of mastery shifts, since those shifts no longer name the move, and the reviewer's simpler visible bot remains weaker (about 42-71% per tier) and was not used as the bar. Blind players stayed at or below 21% on every shift, all 63 robustness checks passed (input, determinism across 30, 60 and 120 Hz, hostile input, ending, progress and soft-lock), and EN and ZH text fits with no Latin in Chinese.",
+  "findings": [
+    {
+      "id": "M1",
+      "severity": "medium",
+      "status": "fixed",
+      "observation": "Fairness finding: the prompt emitted the exact key and junction every time, using arrivals not yet on the map, so following it cleared everything. The prompt now uses only what is visible plus the siren banner; shifts 1-13 keep the exact move, shifts 14-20 show a problem hint ('East junction: east queue backing up'), shifts 14-20 were retuned, and the description and tips explain it."
+    },
+    {
+      "id": "M2",
+      "severity": "medium",
+      "status": "fixed",
+      "observation": "Robustness finding: presses during the 2.5 s 'Shift cleared!' banner were dropped. They are buffered and applied on the first step of the next shift."
+    },
+    {
+      "id": "M3",
+      "severity": "medium",
+      "status": "fixed",
+      "observation": "Presentation findings: the Chinese pedestrian countdown showed 'WALK', the English timer overlapped the Strikes label, and the description claimed protected turns that do not exist. The countdown reads 通行, the Strikes label moved right, and the description describes left-turn gaps."
+    },
+    {
+      "id": "L1",
+      "severity": "low",
+      "status": "fixed",
+      "observation": "Banner and message timers count simulation steps so state matches across frame rates, the alert text fits its box, the description's junction wording is accurate, locked menu cells show a padlock, and the menu hint mentions the Signal touch button."
+    }
+  ],
+  "openNotes": [
+    "For a visible-state bot, mastery shows as less spare time rather than a lower clear rate; for people the change is that mastery no longer names the move.",
+    "A prompt-follower that cannot see the schedule takes a few strikes on shifts 9, 10 and 12.",
+    "The source is a single file of about 2,800 lines, over the repository's 800-line soft ceiling."
+  ],
+  "browser": {
+    "method": "Official Claude in Chrome extension, local server; real clicks on Start and the language toggle, synthetic in-page keys; only DOM text and the canvas were read.",
+    "servedSha256Prefixes": "be0b33b9",
+    "observed": [
+      "With progress saved from earlier testing, Start opened the shift chooser; shift 15 (Green Wave) showed two linked crossroads, Out, the clock and Strikes clear of each other, and the hint 'East junction: east queue backing up' with no key named; the description explained that from shift 14 the line only points out the problem.",
+      "Chinese 390 px phone frame (388 px inner, no horizontal overflow): the shift chooser in Chinese with touch buttons 左, 右, 上, 下, 信号 and 行人.",
+      "Not covered in the browser: a strike, a shift clear and an ambulance; the bots, probes and quality tests cover them."
+    ],
+    "screenshots": [
+      "screenshots/traffic-conductor-en.png",
+      "screenshots/traffic-conductor-phone-zh.png"
+    ]
+  }
+}

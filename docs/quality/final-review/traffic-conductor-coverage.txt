@@ -1,0 +1,93 @@
+✔ quality: there is one scripted solution per level, in order, on even frames (0.701541ms)
+✔ quality: every level is cleared with no strike by its scripted solution (60 Hz; 30 and 120 Hz sampled) (18888.39575ms)
+✔ quality: shifts 1-13 name the key and shifts 14-20 only name the problem (552.552625ms)
+✔ quality: a literal prompt follower at lag 0 and 0.25 s clears the teaching shifts and cannot win the mastery shifts (975.925083ms)
+✔ quality: the follower also clears the Chinese interface and a naive repeat-the-key follower (404.084375ms)
+✔ quality: fast followers (0.15-0.35 s) clear the required share of runs on every teaching shift (39517.702083ms)
+✔ quality: slow followers (0.4-0.6 s) clear the required share of runs on every teaching shift (2425.335208ms)
+✔ quality: the prompt is held for at least half a second and never flickers (262.347625ms)
+✔ quality: a scout that ignores the prompt clears at least 75% of runs on every shift at 0.35 s and 0.25 s reaction time (88211.289208ms)
+✔ quality: every authored schedule is itself a clean run for the controller, so the fallback is safe (1881.380417ms)
+✔ quality: standing idle never wins a level (678.454166ms)
+✔ quality: from level 3 on, mashing, random keys, fixed-time cycling and X spam win at most a quarter of runs (71790.331292ms)
+✔ quality: a fixed plan tuned per level beats at most half the levels from level 3 and at most 2 of levels 14-20 (2568.227959ms)
+✔ quality: the longest-queue and longest-wait players each win at most half the levels and none of the last third (3437.193166ms)
+✔ quality: random draws pass the load-time check on every level, so the authored schedule is only a fallback (71366.190917ms)
+✔ quality: the early levels teach and the finale is harder than the first level (246.300125ms)
+✔ meta is bilingual, documents every control and offers a touch button for each action (0.795959ms)
+✔ a movement path crosses the conflict zones its geometry implies (1.19025ms)
+✔ points on a path run from the stop line to the exit lane and extend straight beyond both ends (0.079125ms)
+✔ levels compile into lanes, links and signal plans (0.143917ms)
+✔ difficulty never drops for long and the last level asks the most (1.900208ms)
+✔ there are at least 20 distinct, authored levels with bilingual text and a growing difficulty (0.268708ms)
+✔ seeded schedules are reproducible, ordered and respect the level definition (0.717292ms)
+✔ a signal goes green, yellow, all-red, then the other green; it honours the minimum green (3.353834ms)
+✔ conflicting greens never show: lights belong to one phase and the road axes never overlap (552.602334ms)
+✔ a split plan lights one road at a time and skips roads nobody is waiting on (0.184709ms)
+✔ an ambulance nearby makes the signal jump straight to its road (0.154583ms)
+✔ cars, buses, trucks and ambulances differ in length and acceleration (6.101708ms)
+✔ vehicles keep a gap, never overlap and never tunnel, in a busy two-junction level at every step rate (754.12975ms)
+✔ a vehicle enters only on green and only when its conflict zones are clear (4.149917ms)
+✔ a vehicle that cannot stop in time carries on through yellow (0.69325ms)
+✔ a vehicle waits when the exit lane has no room (3.961041ms)
+✔ X is refused with nobody waiting, then stops the traffic and lets the pedestrians cross (5.91825ms)
+✔ a pedestrian who arrives late in the walk phase waits, so nobody is still on the zebra when the green returns (3.627666ms)
+✔ every strike is explained in both languages and the third one ends the shift (14.896333ms)
+✔ a queue that spills off the map is a strike with its own explanation (10.383ms)
+✔ pedestrians who wait too long cost a strike (3.803541ms)
+✔ an ambulance held up ends the shift at once, and the message says so in both languages (1.665125ms)
+✔ a shift ends when time runs out or when the quota can no longer be reached (16.072625ms)
+✔ a vehicle stuck at a green light for a long time is a gridlock strike, not a silent loss (42.919375ms)
+✔ an idle junction cannot be lost to gridlock while nobody is stuck at a green (53.058083ms)
+✔ strikes are spaced out: a pile of late vehicles costs one strike at a time (5.759ms)
+✔ X returns to the same green and is not a free phase change (6.09375ms)
+✔ no pedestrian is crossing while a conflicting movement has a green, on any level or step rate (3989.075167ms)
+✔ fuzz: vehicles never overlap, on many levels, seeds and step rates, with random keys (20801.674333ms)
+✔ simultaneous heads that conflict never enter on the same tick (40.457916ms)
+✔ the prompt names the next action and its target on the teaching shifts, in both languages, with a matching highlight (650.478666ms)
+✔ from shift 14 the prompt names the problem and its junction, never the key, in both languages (2076.893625ms)
+✔ the prompt never reads arrivals that are not on the map yet (133.078583ms)
+✔ the prompt never asks for an impossible action: a press when it is shown is accepted (39.761416ms)
+✔ select and wait prompts describe real state: the right arrow reaches the target junction (0.094792ms)
+✔ arrow keys select a junction and Space and X act on the selected one (0.138375ms)
+✔ tapping a junction selects it, tapping again advances its signal and tapping the zebra calls pedestrians (4.331291ms)
+✔ the level select opens when levels are unlocked, supports keys and taps, and starts the chosen level (1059.909375ms)
+✔ a broken progress store never stops the game and a cleared level unlocks the next (378.546833ms)
+✔ zero, negative, NaN and infinite dt are inert, and huge dt is capped (1.148875ms)
+✔ simulation is deterministic at 30, 60 and 120 Hz (302.395291ms)
+✔ getState returns copies that cannot change the game (3.821416ms)
+✔ two games with the same seed play identically and different seeds differ (624.428375ms)
+✔ a lost shift ends once, freezes input, matches the HUD and restarts with a fresh instance (23.944125ms)
+✔ the loss message names its cause in both languages (220.793708ms)
+✔ counters are never negative and the HUD matches the real state through a whole shift (1003.001917ms)
+✔ clearing every level plays the whole campaign to one final win (13326.957375ms)
+✔ the controller behind the prompt clears the first levels with no strike at several reaction times (237.512625ms)
+✔ every level draws in both languages without bad numbers or missing text (3126.92575ms)
+✔ the screen shows the prompt, the banner, the wait bars, the alerts and the countdown signs (106.80675ms)
+✔ the level select and the end states draw (614.406959ms)
+✔ wrapText breaks Latin text at spaces and Chinese text by length (0.209083ms)
+✔ long seeded random play stays finite, bounded and error-free on every kind of level (3065.2855ms)
+✔ fuzz: no vehicle ever enters a junction on red, at any step rate (3046.029333ms)
+✔ a queue with an ambulance close behind its head goes before a conflicting head (0.397041ms)
+✔ approaching ambulances are announced well ahead of their arrival (14.144791ms)
+✔ a waiting left-turner on a green is never stalled for anything near the gridlock limit (1274.828125ms)
+✔ the controller and the prompt do not depend on the frame rate (3557.835875ms)
+ℹ tests 74
+ℹ suites 0
+ℹ pass 74
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 303286.344292
+ℹ start of coverage report
+ℹ -----------------------------------------------------------------------
+ℹ file                   | line % | branch % | funcs % | uncovered lines
+ℹ -----------------------------------------------------------------------
+ℹ src                    |        |          |         | 
+ℹ  games                 |        |          |         | 
+ℹ   traffic-conductor.js |  99.76 |    97.23 |   98.37 | 345 2168-2173
+ℹ -----------------------------------------------------------------------
+ℹ all files              |  99.76 |    97.23 |   98.37 | 
+ℹ -----------------------------------------------------------------------
+ℹ end of coverage report

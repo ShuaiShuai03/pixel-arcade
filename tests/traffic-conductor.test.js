@@ -23,6 +23,7 @@ import {
   selectStep,
   newPlay,
   advancePlay,
+  wantFor,
   pressedOf,
   autoplay,
   runPrompted,
@@ -240,7 +241,7 @@ test('seeded schedules are reproducible, ordered and respect the level definitio
   // A vehicle bound for the next junction knows its second turn.
   assert.ok(a.cars.some((v) => v.moves.length === 2));
   // Arrivals leave time for the last vehicles to clear.
-  assert.ok(a.cars.every((v) => v.k === 'amb' || v.t < L.time - 11));
+  assert.ok(a.cars.every((v) => v.k === 'amb' || v.t < L.time - (L.def.tail ?? 12)));
 });
 
 // ---------------------------------------------------------------------------------------------
@@ -920,25 +921,16 @@ test('simultaneous heads that conflict never enter on the same tick', () => {
 // The prompt
 // ---------------------------------------------------------------------------------------------
 
-test('the prompt names the next action and its target, in both languages, with a matching highlight', () => {
-  const { g } = open(14);
+test('the prompt names the next action and its target on the teaching shifts, in both languages, with a matching highlight', () => {
+  const { g } = open(3);
   const kinds = new Set();
-  let sawSelect = false;
-  for (let f = 0; f < 60 * 80; f++) {
+  for (let f = 0; f < 60 * 60; f++) {
     const st = g.getState();
     if (st.phase !== 'playing') break;
     const p = st.prompt;
     if (p) {
       kinds.add(p.kind);
       assert.ok(p.en.length > 8 && /[一-鿿]/.test(p.zh));
-      if (p.kind === 'select') {
-        sawSelect = true;
-        assert.match(p.en, /^Select the (west|east) junction \([←→]\), then (Space|X): /);
-        assert.match(p.zh, /^先选择(西侧|东侧)路口/);
-        assert.ok(PRESS.includes(p.press));
-        assert.ok(p.dirs.length > 0);
-        assert.ok(['west', 'east'].includes(p.target));
-      }
       if (p.kind === 'phase') {
         assert.match(
           p.en,
@@ -947,12 +939,86 @@ test('the prompt names the next action and its target, in both languages, with a
         assert.equal(p.press, 'Space');
         assert.ok(p.dirs.length > 0);
       }
+      if (p.kind === 'ped') {
+        assert.equal(p.press, 'KeyX');
+        assert.equal(p.dirs.length, 4);
+      }
       if (p.kind === 'watch') assert.equal(p.press, null);
     }
     follow(g, 1 / 60, 0.1);
   }
   assert.ok(kinds.has('watch') && kinds.has('phase'));
-  assert.ok(sawSelect, 'a two-junction level asks the player to select a junction');
+});
+
+test('from shift 14 the prompt names the problem and its junction, never the key, in both languages', () => {
+  const kinds = new Set();
+  for (const level of [14, 17, 19]) {
+    const { g } = open(level);
+    for (let f = 0; f < 60 * 70; f++) {
+      const st = g.getState();
+      if (st.phase !== 'playing') break;
+      const p = st.prompt;
+      if (p) {
+        kinds.add(p.kind);
+        assert.ok(['watch', 'hint'].includes(p.kind), p.kind);
+        assert.equal(p.press, null, 'a hint names no key');
+        if (p.kind === 'hint') {
+          assert.match(
+            p.en,
+            /^(West|East) junction: (north|east|south|west) queue backing up$|^(West|East) junction: ambulance coming from the (north|east|south|west)$|^(West|East) junction: pedestrians are running out of patience$/,
+          );
+          assert.match(
+            p.zh,
+            /^(西侧|东侧)路口：(.向车队越排越长|救护车正从.侧驶来|行人快等不及了)$/,
+          );
+          assert.ok(['west', 'east'].includes(p.target));
+          assert.ok(p.dirs.length >= 1);
+        }
+      }
+      follow(g, 1 / 60, 0.1);
+    }
+  }
+  assert.ok(kinds.has('hint'));
+});
+
+test('the prompt never reads arrivals that are not on the map yet', () => {
+  // Strip every car that has not spawned (the siren's ambulances stay: the banner announces them)
+  // and the controller that feeds the prompt must answer exactly as before.
+  const peek = (w, JW) => {
+    const want = wantFor(w, JW, true);
+    return want && { kind: want.kind, to: want.to, urgency: want.urgency };
+  };
+  for (const i of [0, 2, 8, 13, 18]) {
+    const L = COMPILED[i];
+    const s = newPlay(L, buildSchedule(L, seeded(L.seed)), true);
+    const follow = autoplay(0.1);
+    let compared = 0;
+    for (let f = 0; f < 60 * 50 && s.phase === 'playing'; f++) {
+      advancePlay(s, 1 / 60, pressedOf(follow(s, f / 60)), () => {});
+      if (f % 20) continue;
+      const w = s.w;
+      const keep = (c) => c.k === 'amb';
+      const trimmed = {
+        ...w,
+        pending: [...w.pending.slice(0, w.pi), ...w.pending.slice(w.pi).filter(keep)],
+        due: w.due.filter(keep),
+      };
+      w.juncs.forEach((JW, j) => {
+        assert.deepEqual(peek(w, JW), peek(trimmed, trimmed.juncs[j]), `level ${i + 1} t=${w.t}`);
+        compared++;
+      });
+    }
+    assert.ok(compared > 20);
+  }
+  // The load-time check, which does read the schedule, still sees what the prompt cannot.
+  const L = COMPILED[2];
+  const w = newWorld(L, buildSchedule(L, seeded(L.seed)));
+  for (let f = 0; f < 60 * 4; f++) stepWorld(w, 1 / 60, []);
+  const pending = { ...w, pending: w.pending.slice(0, w.pi), due: [] };
+  assert.notEqual(
+    JSON.stringify(wantFor(w, w.juncs[0])),
+    JSON.stringify(wantFor(pending, pending.juncs[0])) + 'x',
+  );
 });
 
 test('the prompt never asks for an impossible action: a press when it is shown is accepted', () => {
@@ -1234,8 +1300,89 @@ test('counters are never negative and the HUD matches the real state through a w
   }
 });
 
+// A player that reads only the screen (no prompt): the longest queue first, ambulances ahead of
+// everything, pedestrians before their limit. The shifts from 14 on give no key to follow.
+function screenPlayer(lag) {
+  const LOAD = { car: 1, bus: 2, truck: 1.5, amb: 10 };
+  const hist = [];
+  const since = new Map();
+  const lastPed = new Map();
+  let pressed = -9;
+  const loads = (st, j) => {
+    const arms = [0, 1, 2, 3].map(() => ({ load: 0, count: 0, late: false }));
+    for (const v of st.vehicles) {
+      const d = 'NESW'.indexOf(v.approach);
+      if (v.junction !== j || v.where !== 'lane' || d < 0) continue;
+      arms[d].count++;
+      arms[d].load += LOAD[v.kind] * (1 + Math.min(v.wait, 40) / 10);
+      const limit = v.kind === 'bus' ? st.busWaitLimit : st.waitLimit;
+      if (v.wait >= 0.55 * limit) arms[d].late = true;
+    }
+    return arms;
+  };
+  const wantOf = (st, JW, t) => {
+    if (JW.stage !== 'green') since.delete(JW.id);
+    if (JW.stage !== 'green' || JW.minGreenLeft > 0) return null;
+    if (!since.has(JW.id)) since.set(JW.id, t);
+    const arms = loads(st, JW.id);
+    const present = JW.signals.map((x) => 'NESW'.indexOf(x.dir));
+    const green = present.filter((d) => JW.signals[present.indexOf(d)].light === 'green');
+    const red = present.filter((d) => !green.includes(d));
+    let next = red;
+    if (JW.phases > 2) {
+      const after = [1, 2, 3, 4].map((k) => ((green[0] ?? 0) + k) % 4);
+      const pick = after.find((d) => present.includes(d) && arms[d].count > 0);
+      next = pick === undefined ? red.slice(0, 1) : [pick];
+    }
+    const sum = (ds) => ds.reduce((n, d) => n + arms[d].load, 0);
+    const here = sum(green);
+    const there = sum(next);
+    const lead = RULES.yellow + RULES.allRed + 1.5 + (st.junctions.length > 1 ? 2 : 0);
+    const hold = RULES.minGreen + RULES.yellow + RULES.allRed + 2;
+    const sirens = st.alerts.filter((a) => a.jn === JW.id);
+    if (sirens.some((a) => green.includes(a.d) && a.eta < hold + 0.7 * arms[a.d].count))
+      return null;
+    if (sirens.some((a) => !green.includes(a.d) && a.eta <= lead + 0.7 * arms[a.d].count + 2.5))
+      return { key: 'Space', urgency: 1000 };
+    const waiting = st.pedestrians.filter((p) => p.junction === JW.id && p.state === 'wait');
+    const oldest = Math.max(0, ...waiting.map((p) => p.wait));
+    if (waiting.length && oldest >= st.pedLimit - RULES.pedLead)
+      return { key: 'KeyX', urgency: 500 };
+    const starving = next.some((d) => arms[d].late);
+    const long = t - since.get(JW.id) > 22;
+    if (!(there >= 0.5 && (here < 0.35 || there > 1.8 * here + 2 || starving || long))) return null;
+    const pedOk = t - (lastPed.get(JW.id) ?? -99) >= RULES.pedGap;
+    if (pedOk && waiting.length && (oldest >= 0.35 * st.pedLimit || waiting.length >= 4))
+      return { key: 'KeyX', urgency: 200 };
+    return { key: 'Space', urgency: starving ? 100 : there - here };
+  };
+  return (now, t) => {
+    hist.push({ t, st: now });
+    if (hist.length > 300) hist.shift();
+    let k = hist.length - 1;
+    while (k > 0 && hist[k].t > t - lag) k--;
+    const { st, t: seenAt } = hist[k];
+    if (st.menu || t - pressed < 0.2 || seenAt <= pressed + 0.02) return [];
+    const wants = st.junctions.map((JW) => wantOf(st, JW, t));
+    let target = st.selected;
+    let urgency = 0;
+    wants.forEach((w, j) => {
+      if (w && w.urgency > urgency) [target, urgency] = [j, w.urgency];
+    });
+    if (urgency === 0) return [];
+    let key = wants[target].key;
+    if (target !== st.selected) {
+      const step = selectStep(st.junctions, st.selected, target);
+      if (step < 0) return [];
+      key = PRESS[step];
+    } else if (key === 'KeyX') lastPed.set(target, t);
+    pressed = t;
+    return [key];
+  };
+}
+
 test('clearing every level plays the whole campaign to one final win', () => {
-  const h = harness({ seed: 2 });
+  const h = harness({ seed: 3 });
   const unlocks = [];
   let unlocked = 1;
   h.env.progress = {
@@ -1247,22 +1394,18 @@ test('clearing every level plays the whole campaign to one final win', () => {
   };
   const g = createGame(h.env);
   const seen = new Set();
-  const decide = autoplay(0.2);
-  void decide;
   let level = 1;
-  let follower = null;
+  let player = null;
   let t0 = 0;
-  const hist = [];
-  void hist;
   for (let f = 0; f < 60 * 60 * 40 && g.getState().phase === 'playing'; f++) {
     const st = g.getState();
     seen.add(st.level);
-    if (st.level !== level || !follower) {
+    if (st.level !== level || !player) {
       level = st.level;
       t0 = f;
-      follower = makeFollower(0.2);
+      player = screenPlayer(0.2);
     }
-    g.update(1 / 60, input([], follower(st, (f - t0) / 60)));
+    g.update(1 / 60, input([], player(st, (f - t0) / 60)));
   }
   const st = g.getState();
   assert.equal(st.phase, 'won');
