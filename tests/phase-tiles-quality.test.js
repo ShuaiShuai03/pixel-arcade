@@ -38,19 +38,21 @@ function open(level, { seed = 1, lang = 'en' } = {}) {
   return { g, h };
 }
 
-// What a person does for the line they read: an arrow, Space, Z, or nothing.
+// What a person does for the line they read: an arrow, Space, Z, H for a hint, or nothing.
 function keyFor(line, lang) {
   if (lang === 'zh') {
     const move = /^光标向(.)移/.exec(line);
     if (move) return ZH_ARROW[move[1]];
     if (/^空格：/.test(line)) return 'Space';
     if (/^Z：/.test(line)) return 'KeyZ';
+    if (line.includes('[H] 提示')) return 'KeyH';
     return null;
   }
   const move = /^Move ([←→↑↓])/.exec(line);
   if (move) return EN_ARROW[move[1]];
   if (/^Space:/.test(line)) return 'Space';
   if (/^Z:/.test(line)) return 'KeyZ';
+  if (line.includes('[H] hint')) return 'KeyH';
   return null;
 }
 
@@ -237,7 +239,12 @@ test('the prompt names its action, and the text, the arrow and the highlighted c
         onFrame: (st) => {
           const h = st.hint;
           const key = keyFor(st.line[lang], lang);
-          assert.equal(key, h.key, `board ${level}: "${st.line[lang]}" vs ${h.key}`);
+          if (h.kind === 'hidden') {
+            assert.equal(key, 'KeyH', `board ${level}: the goal line offers the H key`);
+            assert.deepEqual([h.shown, h.key, h.x, h.y, h.dir], [false, null, null, null, null]);
+            assert.ok(level > RULES.hintFreeBoards, `board ${level} hides its hint`);
+          } else assert.equal(key, h.key, `board ${level}: "${st.line[lang]}" vs ${h.key}`);
+          if (level <= RULES.hintFreeBoards && h.kind !== 'none') assert.equal(h.shown, true);
           kinds.add(h.kind);
           const cells = st.board.join('').replaceAll('#', '').length;
           assert.ok(cells > 0);
@@ -271,17 +278,21 @@ test('the prompt names its action, and the text, the arrow and the highlighted c
   assert.ok(checked > 800);
   assert.ok(kinds.has('act') && kinds.has('move'));
   assert.ok(
-    [...kinds].every((k) => ['act', 'move', 'done', 'none'].includes(k)),
+    [...kinds].every((k) => ['act', 'move', 'done', 'none', 'hidden'].includes(k)),
     [...kinds].join(),
   );
+  assert.ok(kinds.has('hidden'), 'later boards start without the hint');
 });
 
 test('the highlighted tile is the one drawn with a hint frame, and its press really lies on a shortest way home', () => {
   for (const level of [2, 9, 17, 22]) {
     const { g } = open(level);
+    const ask = () => g.update(1 / 60, input([], ['KeyH']));
     const board = BOARDS[level - 1];
     const o = layoutOf(board);
     for (let n = 0; n < 12; n++) {
+      if (g.getState().solved) break;
+      if (g.getState().hint.kind === 'hidden') ask();
       const st = g.getState();
       const h = st.hint;
       if (h.kind === 'done') break;
@@ -719,7 +730,16 @@ test('touch targets stay large on a 390 px wide phone and every action has a tou
   assert.ok(RULES.cell * scale >= 28, `tiles are ${RULES.cell * scale}px on a phone`);
   assert.ok(56 * scale >= 44 && 44 * scale >= 34, 'menu tiles');
   const codes = meta.touchControls.map((c) => c.code);
-  for (const code of ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Space', 'KeyZ', 'KeyQ'])
+  for (const code of [
+    'ArrowLeft',
+    'ArrowRight',
+    'ArrowUp',
+    'ArrowDown',
+    'Space',
+    'KeyZ',
+    'KeyQ',
+    'KeyH',
+  ])
     assert.ok(codes.includes(code), code);
   assert.ok(meta.touchControls.every((c) => c.side === 'left' || c.side === 'right'));
   for (const b of BOARDS) {
@@ -739,7 +759,8 @@ test('a touch-only player (tap to select, tap again to press, the Undo button) c
       const st = g.getState();
       if (st.phase !== 'playing' || st.level !== level) break;
       const hint = st.hint;
-      if (hint.kind === 'undo') g.update(1 / 60, input([], ['KeyZ']));
+      if (hint.kind === 'hidden') g.update(1 / 60, input([], ['KeyH']));
+      else if (hint.kind === 'undo') g.update(1 / 60, input([], ['KeyZ']));
       else if (hint.kind === 'move' || hint.kind === 'act') {
         const tap = {
           x: o.x + hint.x * RULES.cell + 18,

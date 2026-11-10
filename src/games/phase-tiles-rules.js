@@ -15,6 +15,8 @@ export const RULES = Object.freeze({
   msgTime: 1.6,
   clearScore: 100,
   extraPressPenalty: 8,
+  hintFreeBoards: 7, // boards 1 to 7 always show the next move; later boards need the H key
+  hintPenalty: 10, // score taken for each hint asked for on a board
   minBoardScore: 20,
   menuCols: 8,
 });

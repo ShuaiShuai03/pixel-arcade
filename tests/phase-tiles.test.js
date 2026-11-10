@@ -141,10 +141,15 @@ test('meta describes the game in both languages with working touch controls', ()
     'ArrowLeft',
     'ArrowRight',
     'ArrowUp',
+    'KeyH',
     'KeyQ',
     'KeyZ',
     'Space',
   ]);
+  assert.ok(meta.keys.some((k) => k.keys === 'H'));
+  assert.ok(!/glowing hint names/.test(meta.description.en), 'the hint is no longer free');
+  for (const lang of ['en', 'zh'])
+    assert.ok(meta.description[lang].includes(`${RULES.hintPenalty}`), `${lang} names the cost`);
   for (const c of meta.touchControls) assert.ok(c.label.en && CJK.test(c.label.zh));
   for (const k of meta.keys) assert.ok(k.label.en && CJK.test(k.label.zh));
   assert.ok(!codes.includes('KeyP') && !codes.includes('KeyR') && !codes.includes('Escape'));
@@ -170,7 +175,7 @@ test('there are at least 24 bilingual boards within the size limits, each with t
     assert.ok(!isMatched(board, board.start), `board ${i + 1} starts solved`);
     if (board.budget === null) assert.equal(board.slack, null);
     else assert.equal(board.budget, board.optimal + board.slack);
-    assert.ok(board.budget === null || (board.slack >= 1 && board.slack <= 3));
+    assert.ok(board.budget === null || (board.slack >= 0 && board.slack <= 3));
   });
   assert.equal(names.size, BOARD_COUNT);
 });
@@ -819,6 +824,7 @@ test('the hint recovers after an undo and after a restart', () => {
 test('a tile that needs a second press in a row says "again", so the prompt changes after every press', () => {
   const { g } = open(21);
   const board = BOARDS[20];
+  press(g, 'KeyH');
   const sol = solveFrom(board, board.start);
   const double = sol.vector.findIndex((n) => n === 2);
   assert.ok(double >= 0);
@@ -826,6 +832,7 @@ test('a tile that needs a second press in a row says "again", so the prompt chan
   let seenAgain = false;
   const lines = [];
   for (let n = 0; n < 4; n++) {
+    press(g, 'KeyH');
     const st = g.getState();
     if (st.hint.kind !== 'act') break;
     lines.push(st.line.en);
@@ -893,8 +900,8 @@ test('a matched board waits to hold still, banks its score and moves on by itsel
   assert.match(st.line.en, /Board clear/);
   assert.match(st.status.zh, /过关/);
   assert.ok(h.sounds.includes('win'));
-  press(g, 'ArrowRight');
-  assert.equal(g.getState().cursor.x, st.cursor.x, 'input is frozen while the board is clear');
+  press(g, 'KeyZ', 'KeyQ', 'KeyH');
+  assert.equal(g.getState().cleared, true, 'actions are frozen while the board is clear');
   press(g, 'Space');
   st = g.getState();
   assert.equal(st.level, 2);
@@ -1491,4 +1498,250 @@ test('the shape card names the shape under the cursor, and says "no tile" over a
   zh.g.draw(ctx);
   assert.ok(texts.some((t) => t.text === '无方格'));
   assert.ok(!texts.some((t) => t.text === '十字'));
+});
+
+// --- hints: free on the teaching boards, on request and at a cost after them -----------------
+test('boards 1 to 7 always name the next move; from board 8 the prompt states the goal and hides the move', () => {
+  assert.equal(RULES.hintFreeBoards, 7);
+  for (let level = 1; level <= BOARD_COUNT; level++) {
+    const st = open(level).g.getState();
+    if (level <= RULES.hintFreeBoards) {
+      assert.equal(st.hint.shown, true, `board ${level}`);
+      assert.notEqual(st.hint.x, null);
+      assert.notEqual(st.hint.key, null);
+      assert.doesNotMatch(st.line.en, /\[H\]/);
+    } else {
+      assert.deepEqual(
+        st.hint,
+        { kind: 'hidden', x: null, y: null, dir: null, steps: 0, key: null, shown: false },
+        `board ${level}`,
+      );
+      assert.match(st.line.en, /Match every tile to the target card/);
+      assert.match(st.line.en, new RegExp(`\\[H\\] hint -${RULES.hintPenalty}`));
+      assert.match(st.line.zh, new RegExp(`\\[H\\] 提示 -${RULES.hintPenalty}`));
+      assert.doesNotMatch(st.line.en, /Move|row \d/);
+      assert.ok(st.status.en.endsWith(st.line.en));
+    }
+  }
+  const free = open(3);
+  press(free.g, 'KeyH');
+  assert.equal(free.g.getState().hints, 0, 'a free hint costs nothing to ask for');
+  assert.equal(free.g.getState().message, null);
+});
+
+test('H shows the next move for one press at a price; a press, an undo or a reset hides it again', () => {
+  const { g, h } = open(9);
+  const board = BOARDS[8];
+  press(g, 'KeyH');
+  let st = g.getState();
+  assert.equal(st.hints, 1);
+  assert.equal(st.hint.shown, true);
+  assert.ok(['move', 'act'].includes(st.hint.kind));
+  assert.match(st.message.en, new RegExp(`Hint: -${RULES.hintPenalty} points`));
+  assert.match(st.message.zh, new RegExp(`提示：扣 ${RULES.hintPenalty} 分`));
+  assert.ok(h.sounds.includes('coin'));
+  press(g, 'KeyH');
+  assert.equal(g.getState().hints, 1, 'asking while the hint is up costs nothing');
+  walkTo(g, st.hint.x, st.hint.y);
+  assert.equal(g.getState().hint.kind, 'act', 'the hint stays up while the cursor walks');
+  press(g, 'Space');
+  assert.equal(g.getState().hint.kind, 'hidden');
+  assert.equal(g.getState().hint.x, null);
+  press(g, 'KeyH');
+  assert.equal(g.getState().hints, 2);
+  press(g, 'KeyZ');
+  assert.equal(g.getState().hint.kind, 'hidden', 'an undo hides it');
+  press(g, 'KeyH');
+  press(g, 'KeyQ');
+  assert.equal(g.getState().hint.kind, 'hidden', 'a reset hides it');
+  assert.equal(g.getState().hints, 3);
+  assert.ok(pressable(board, st.hint.y * board.w + st.hint.x));
+});
+
+test('H does nothing once the board is matched, and a hint never works on a cleared board', () => {
+  const { g } = open(9);
+  playPlan(g, BOARDS[8]);
+  assert.equal(g.getState().solved, true);
+  press(g, 'KeyH');
+  assert.equal(g.getState().hints, 0);
+  assert.equal(g.getState().hint.kind, 'hidden');
+  idle(g, 0.8);
+  assert.equal(g.getState().cleared, true);
+  press(g, 'KeyH');
+  assert.equal(g.getState().hints, 0);
+});
+
+test('every hint asked for on a board costs points, even across a reset, and a free board costs none', () => {
+  const hinted = open(9);
+  press(hinted.g, 'KeyH');
+  press(hinted.g, 'KeyQ');
+  press(hinted.g, 'KeyH');
+  playPlan(hinted.g, BOARDS[8]);
+  idle(hinted.g, 1);
+  assert.equal(hinted.g.getState().cleared, true);
+  assert.equal(hinted.g.getState().score, 100 - 2 * RULES.hintPenalty);
+  const plain = open(9);
+  playPlan(plain.g, BOARDS[8]);
+  idle(plain.g, 1);
+  assert.equal(plain.g.getState().score, 100);
+  const free = open(2);
+  press(free.g, 'KeyH');
+  playPlan(free.g, BOARDS[1]);
+  idle(free.g, 1);
+  assert.equal(free.g.getState().score, 100);
+  // Many hints cannot push a board below the floor.
+  const floor = open(26);
+  const turns = plan(BOARDS[25]);
+  for (const turn of turns) {
+    press(floor.g, 'KeyH');
+    walkTo(floor.g, turn.x, turn.y);
+    press(floor.g, 'Space');
+  }
+  idle(floor.g, 4);
+  assert.equal(floor.h.ends.at(-1)?.score ?? floor.g.getState().score, RULES.minBoardScore);
+});
+
+test('a hint that is up stays in step with the board: it asks for an undo only when the presses cannot cover the way home', () => {
+  const { g } = open(22);
+  const board = BOARDS[21];
+  assert.equal(board.slack, 0);
+  press(g, 'KeyH');
+  const t = plan(board)[0];
+  walkTo(g, t.x, t.y);
+  const other = board.cells.findIndex(
+    (c, i) => pressable(board, i) && !plan(board).some((p) => p.y * board.w + p.x === i),
+  );
+  assert.ok(other >= 0);
+  walkTo(g, other % board.w, Math.floor(other / board.w));
+  press(g, 'Space');
+  assert.equal(g.getState().hint.kind, 'hidden');
+  press(g, 'KeyH');
+  assert.equal(g.getState().hint.kind, 'undo');
+  assert.equal(g.getState().hint.key, 'KeyZ');
+});
+
+test('the undo hint is marked on the board with a Z on the tile that Z takes back', () => {
+  const marks = (g) => {
+    const { ctx, texts } = recorder();
+    g.draw(ctx);
+    return texts.filter((x) => x.text === 'Z');
+  };
+  const { g } = open(5);
+  const board = BOARDS[4];
+  const t = plan(board)[0];
+  walkTo(g, t.x, t.y);
+  assert.equal(marks(g).length, 0);
+  for (let n = 0; n < board.budget; n++) press(g, 'Space');
+  assert.equal(g.getState().hint.kind, 'undo');
+  const o = layoutOf(board);
+  const [mark] = marks(g);
+  assert.ok(mark, 'a Z marker is drawn');
+  assert.ok(mark.x > o.x + t.x * 36 && mark.x < o.x + (t.x + 1) * 36, 'on the last pressed tile');
+  assert.ok(mark.y >= o.y + t.y * 36 && mark.y < o.y + (t.y + 1) * 36);
+  // Where the hint is not shown, nothing points at the undo.
+  const late = open(10);
+  const lboard = BOARDS[9];
+  const lt = plan(lboard)[0];
+  walkTo(late.g, lt.x, lt.y);
+  for (let n = 0; n < lboard.budget; n++) press(late.g, 'Space');
+  assert.equal(late.g.getState().hint.kind, 'hidden');
+  assert.equal(marks(late.g).length, 0);
+});
+
+test('several mastery boards leave no spare press, and the others keep a small spare', () => {
+  const mastery = BOARDS.slice(18);
+  const exact = mastery.filter((b) => b.slack === 0);
+  assert.ok(exact.length >= 4, `${exact.length} exact mastery boards`);
+  assert.ok(
+    mastery.some((b) => b.slack === 1),
+    'a mix of margins',
+  );
+  for (const board of exact) assert.equal(board.budget, board.optimal);
+  assert.ok(BOARDS.slice(0, 18).every((b) => b.slack !== 0));
+});
+
+test('an exact board is still clearable at its budget, and one wasted press then an undo is forgiven', () => {
+  const { g, h } = open(26);
+  const board = BOARDS[25];
+  assert.equal(board.budget, board.optimal);
+  const turns = plan(board);
+  walkTo(g, turns[0].x, turns[0].y);
+  press(g, 'Space');
+  press(g, 'KeyZ');
+  assert.equal(g.getState().moves, 0, 'the undo refunds the press');
+  for (const turn of turns) {
+    walkTo(g, turn.x, turn.y);
+    press(g, 'Space');
+  }
+  assert.equal(g.getState().movesLeft, 0);
+  assert.equal(g.getState().solved, true);
+  idle(g, 2);
+  assert.equal(h.ends.length, 1);
+  assert.equal(h.ends[0].won, true);
+});
+
+// --- the clear pause ---------------------------------------------------------------------------
+test('arrows, WASD, Space, Enter or a tap skip the pause after a board is cleared', () => {
+  const skips = [
+    ['ArrowRight'],
+    ['KeyA'],
+    ['ArrowUp'],
+    ['KeyS'],
+    ['Space'],
+    ['Enter'],
+    ['KeyW'],
+    ['KeyD'],
+    ['ArrowLeft'],
+    ['ArrowDown'],
+  ];
+  for (const keys of skips) {
+    const { g } = open(1);
+    playPlan(g, BOARDS[0]);
+    idle(g, 0.8);
+    assert.equal(g.getState().cleared, true);
+    g.update(1 / 60, input([], keys));
+    assert.equal(g.getState().level, 2, keys.join());
+    assert.equal(g.getState().cleared, false);
+  }
+  const tap = open(1);
+  playPlan(tap.g, BOARDS[0]);
+  idle(tap.g, 0.8);
+  tap.g.update(1 / 60, input([], [], { x: 5, y: 5, clicked: true }));
+  assert.equal(tap.g.getState().level, 2);
+  // Z, Q and H still do nothing during the pause, and the last board cannot be skipped past.
+  const idleKeys = open(1);
+  playPlan(idleKeys.g, BOARDS[0]);
+  idle(idleKeys.g, 0.8);
+  press(idleKeys.g, 'KeyZ', 'KeyQ', 'KeyH');
+  assert.equal(idleKeys.g.getState().level, 1);
+});
+
+// --- the target phase is more than a colour ------------------------------------------------------
+test('the ghost mark on a tile and the target card show the target phase as a bar count, not only a colour', () => {
+  const barsAt = (g, color) => {
+    const { ctx, rects } = recorder();
+    g.draw(ctx);
+    return rects.filter((r) => r.color === color && r.w === 1 && (r.h === 5 || r.h === 6));
+  };
+  const three = open(21); // every target is phase 2: three bars on each ghost mark and each target swatch
+  const board = BOARDS[20];
+  const tiles = board.cells.filter((c) => !c.hole).length;
+  assert.equal(barsAt(three.g, '#ffffff').length, tiles * 3 * 2);
+  const mixed = open(22); // targets 0, 1 and 2 together
+  const mboard = BOARDS[21];
+  const count = (phase) =>
+    mboard.target.filter((v, i) => !mboard.cells[i].hole && v === phase).length;
+  assert.equal(barsAt(mixed.g, '#ffffff').length, (count(0) + count(2) * 3) * 2);
+  assert.equal(barsAt(mixed.g, '#0b0a1a').length, count(1) * 2 * 2);
+  // Three bars span five pixels inside the 7 px swatch.
+  const { ctx, rects } = recorder();
+  three.g.draw(ctx);
+  const o = layoutOf(board);
+  const ghost = rects.filter(
+    (r) => r.color === '#ffffff' && r.w === 1 && r.h === 5 && r.x < o.x + 36 && r.y < o.y + 36,
+  );
+  assert.deepEqual(
+    ghost.map((r) => r.x - (o.x + 5)).sort((a, b) => a - b),
+    [1, 3, 5],
+  );
 });

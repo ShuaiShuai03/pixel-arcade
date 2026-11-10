@@ -1,0 +1,118 @@
+✔ a literal prompt follower clears every board from the start at 30, 60 and 120 Hz in both languages (819.639708ms)
+✔ followers with fast (0.15-0.35 s) and slow (0.4-0.6 s) reactions clear every board from the start in every run (1004.5935ms)
+✔ a follower clears every board from at least 10 random scrambles, with no livelock and never a lost board (1459.102875ms)
+✔ a follower never loses a budget board, even after wasting presses, because the prompt asks for an undo (487.24725ms)
+✔ the prompt names its action, and the text, the arrow and the highlighted cell always agree (56.769ms)
+✔ the highlighted tile is the one drawn with a hint frame, and its press really lies on a shortest way home (4.968125ms)
+✔ the prompt only changes when the player acts or a board changes, so it never flickers, and it fits the canvas (64.248125ms)
+✔ English and Chinese runs play out identically (47.29575ms)
+✔ idle never wins a board (6.670083ms)
+✔ from board 3 on, mashing, random keys, undo spam and press-everything sweeps each win at most a quarter of runs (8701.562333ms)
+ℹ mashSpaceFast      wins of 30 in boards 3-26: 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+ℹ mashSpaceSlow      wins of 30 in boards 3-26: 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+ℹ randomKeys         wins of 30 in boards 3-26: 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+ℹ quickRandom        wins of 30 in boards 3-26: 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+ℹ undoSpam           wins of 30 in boards 3-26: 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+ℹ pressAllRows       wins of 30 in boards 3-26: 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+ℹ pressAllColumns    wins of 30 in boards 3-26: 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+ℹ pressAllBackwards  wins of 30 in boards 3-26: 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+✔ the blind "press whichever tile lowers the mismatch most" heuristic beats at most half the boards and none of the last third (1870.158041ms)
+ℹ greedy strict wins of 8 per board: 8 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+ℹ greedy forced wins of 8 per board: 8 3 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+✔ the optimal press counts form a rising difficulty curve and every feature appears (0.392417ms)
+ℹ optimal presses per board: 1 2 4 5 5 5 6 6 6 7 7 7 8 8 8 9 9 9 10 10 10 11 12 12 13 14
+ℹ first board of each feature: {"budget":4,"holes":6,"locks":8,"diagonal":10,"ring":12,"line":14,"knight":16,"icons":18,"threePhases":21}
+✔ a batch-literal follower (press the arrow exactly N times, then re-read) clears every board, from the start and from scrambles (68.139458ms)
+✔ the informed random presser (random real tile, walk, press, look) wins at most a quarter of runs on every board from board 5 (2170.075ms)
+ℹ informed random presser, boards 5-26, wins of 30: 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+✔ touch targets stay large on a 390 px wide phone and every action has a touch route (0.166292ms)
+✔ a touch-only player (tap to select, tap again to press, the Undo button) clears every board (25.806333ms)
+✔ the look-ahead bots with free restarts (depth 2 and 3, 120 s) win no board from 18 on, beat at most half the boards and win at most a quarter of runs from board 3 on (45033.551ms)
+ℹ look-ahead depth 2, wins of 20 per board: 20 20 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+ℹ look-ahead depth 3, wins of 10 per board: 10 10 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+✔ the look-ahead bot played through taps and Q key agrees with its model: it beats the first boards and none of the late ones (2065.539375ms)
+✔ meta describes the game in both languages with working touch controls (1.126709ms)
+✔ there are at least 24 bilingual boards within the size limits, each with the recorded optimum and a budget above it (0.182375ms)
+✔ every board is generated from legal moves: the start is the target with its recorded presses taken back out (0.272667ms)
+✔ every board is solvable, its recorded optimum is the true minimum, and a shortest plan really solves it (0.284167ms)
+✔ the optimum is the true minimum: exhaustive search over every press vector agrees wherever it is feasible (3261.222375ms)
+✔ the boards teach the features in order, one at a time, each with its own tip (0.510416ms)
+✔ the boards are deeply frozen records (0.255916ms)
+✔ every influence shape reaches exactly the cells it names, clipped to the grid (0.153375ms)
+✔ holes are never in an influence set, so presses skip them, and locked tiles are reached but cannot be pressed (0.80225ms)
+✔ parseBoard rejects malformed boards (0.464083ms)
+✔ the solver agrees with a breadth-first search on random small boards of every shape and both phase counts (386.616792ms)
+✔ the solver lists exactly the tiles that lie on some shortest way home (0.291083ms)
+✔ the solver memoises per board and survives a flood of distinct states (80.986458ms)
+✔ a board whose answer space is too large is refused (0.284375ms)
+✔ advise names the nearest useful tile, asks for an undo when the presses are too few, and finishes when matched (0.207583ms)
+✔ the prompt number is the length of the first leg along its arrow, from every cell of every board (0.80675ms)
+✔ a press changes exactly the previewed influence set by one phase; holes never change and locked tiles are never pressed (32.420375ms)
+✔ pressing a phase-count number of times on one tile returns the board to where it started (0.179334ms)
+✔ the preview is empty on a locked tile and on a hole, and the press says why it did nothing (0.204708ms)
+✔ arrows and WASD move the cursor one tile, clamp at the edges and ignore ambiguous presses (0.233333ms)
+✔ the cursor starts on the pressable tile nearest the middle, never on a hole or a locked tile (0.330958ms)
+✔ tapping a tile selects it and tapping it again presses it; taps outside the board do nothing (0.26425ms)
+✔ undo restores the exact previous state, refunds the press and an empty history says so (0.2675ms)
+✔ Q restarts the board, keeps the score and counts the restart (0.179834ms)
+✔ the hint recovers after an undo and after a restart (0.101834ms)
+✔ a tile that needs a second press in a row says "again", so the prompt changes after every press (0.175667ms)
+✔ invalid, zero or negative time never reads input and never ends the game (0.100458ms)
+✔ getState returns copies that cannot change the game (0.091416ms)
+✔ a matched board waits to hold still, banks its score and moves on by itself or on Space (0.627458ms)
+✔ a press that breaks a match before it holds cancels the clear (0.230333ms)
+✔ extra presses cost score and the score never goes below the floor (0.725542ms)
+✔ running out of presses on a budget board is a loss, judged after a grace period, and it freezes the game (0.880541ms)
+✔ an undo in the grace period saves a board that ran out of presses (0.881458ms)
+✔ an out-of-presses board shows a visible countdown to the loss, and only then (1.681ms)
+✔ the last press of a budget may still win the board (0.445917ms)
+✔ clearing the last board wins the game once with the full score and then freezes (0.693459ms)
+✔ a full run from board 1 reaches the win with a perfect score (12.364625ms)
+✔ board select opens when progress is saved and starts the chosen board (0.228958ms)
+✔ board select by tap: the first tap selects, the second starts, locked boards and gaps are ignored (0.146208ms)
+✔ progress is read safely: no store, junk values and a throwing store all start at board 1 (0.367833ms)
+✔ clearing a board unlocks the next one but never beyond the last (0.824875ms)
+✔ the same timed key schedule gives the identical result at 30, 60 and 120 Hz (2.997792ms)
+✔ uneven frame times keep the game finite and bounded (7.948875ms)
+✔ the undo history and the press counter stay bounded however long a player mashes (12.094875ms)
+✔ every board draws in both languages and every state without errors (158.819042ms)
+✔ menu, clear, loss and win screens draw in both languages (2.630291ms)
+✔ all text stays inside the 480 px canvas on every board, in both languages, with the longest messages shown (11.708125ms)
+✔ the influence preview is drawn on exactly the tiles a press would change, and on none for a locked tile (0.398333ms)
+✔ sparks appear when a tile reaches its target and stay bounded (1.626375ms)
+✔ random mixed play on every board keeps the state valid and ends at most once (59.270166ms)
+✔ the shared data cannot be changed from outside: board definitions, meta, shape names and prompt lines (0.207041ms)
+✔ the shape card names the shape under the cursor, and says "no tile" over a hole (0.282666ms)
+✔ boards 1 to 7 always name the next move; from board 8 the prompt states the goal and hides the move (0.47725ms)
+✔ H shows the next move for one press at a price; a press, an undo or a reset hides it again (0.169167ms)
+✔ H does nothing once the board is matched, and a hint never works on a cleared board (0.316583ms)
+✔ every hint asked for on a board costs points, even across a reset, and a free board costs none (1.374834ms)
+✔ a hint that is up stays in step with the board: it asks for an undo only when the presses cannot cover the way home (0.133334ms)
+✔ the undo hint is marked on the board with a Z on the tile that Z takes back (0.344791ms)
+✔ several mastery boards leave no spare press, and the others keep a small spare (0.049875ms)
+✔ an exact board is still clearable at its budget, and one wasted press then an undo is forgiven (0.577708ms)
+✔ arrows, WASD, Space, Enter or a tap skip the pause after a board is cleared (0.796084ms)
+✔ the ghost mark on a tile and the target card show the target phase as a bar count, not only a colour (0.321ms)
+ℹ tests 80
+ℹ suites 0
+ℹ pass 80
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 63950.019458
+ℹ start of coverage report
+ℹ ------------------------------------------------------------------------
+ℹ file                    | line % | branch % | funcs % | uncovered lines
+ℹ ------------------------------------------------------------------------
+ℹ src                     |        |          |         | 
+ℹ  games                  |        |          |         | 
+ℹ   phase-tiles-boards.js | 100.00 |   100.00 |  100.00 | 
+ℹ   phase-tiles-draw.js   | 100.00 |    99.30 |  100.00 | 
+ℹ   phase-tiles-rules.js  | 100.00 |    98.77 |  100.00 | 
+ℹ   phase-tiles.js        | 100.00 |    99.48 |  100.00 | 
+ℹ ------------------------------------------------------------------------
+ℹ all files               | 100.00 |    99.20 |  100.00 | 
+ℹ ------------------------------------------------------------------------
+ℹ end of coverage report
+exit 0

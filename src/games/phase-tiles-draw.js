@@ -69,9 +69,22 @@ function drawShape(ctx, shape, x, y, unit, color, centre) {
     rect(ctx, x + 2 * unit, y + 2 * unit, unit, unit, '#3a3566');
 }
 
-function drawBars(ctx, x, y, count, color) {
-  const total = count * 3 + (count - 1) * 2;
-  for (let n = 0; n < count; n++) rect(ctx, x - total / 2 + n * 5, y, 3, 10, color);
+const BARS = Object.freeze({ w: 3, h: 10, gap: 2 });
+const MINI_BARS = Object.freeze({ w: 1, gap: 1 });
+const MINI_INK = ['#ffffff', C.ink, '#ffffff']; // bar colours that stay legible on each phase colour
+
+// phase + 1 bars, centred on x: the same count marks a phase on tiles, swatches and target marks.
+function drawBars(ctx, x, y, count, color, size = BARS) {
+  const total = count * size.w + (count - 1) * size.gap;
+  for (let n = 0; n < count; n++)
+    rect(ctx, x - total / 2 + n * (size.w + size.gap), y, size.w, size.h, color);
+}
+
+// A small swatch of a target phase: its colour plus its bar count, so colour is never the only cue.
+function drawTargetMark(ctx, x, y, size, phase) {
+  rect(ctx, x, y, size, size, C.phase[phase]);
+  const bars = { ...MINI_BARS, h: size - 2 };
+  drawBars(ctx, x + size / 2, y + 1, phase + 1, MINI_INK[phase], bars);
 }
 
 function drawLock(ctx, x, y) {
@@ -112,7 +125,7 @@ function drawTile(ctx, s, i, x, y, matched) {
   drawBars(ctx, x + CELL / 2, y + 13, phase + 1, C.ink);
   // The ghost mark: the phase this tile should end on.
   rect(ctx, x + 4, y + 4, 9, 9, C.ink);
-  rect(ctx, x + 5, y + 5, 7, 7, C.phase[board.target[i]]);
+  drawTargetMark(ctx, x + 5, y + 5, 7, board.target[i]);
   if (matched) drawFrame(ctx, x + 2, y + 2, CELL - 4, 2, C.good);
   if (cell.locked) drawLock(ctx, x + 23, y + 23);
   if (board.mixed) drawShape(ctx, cell.shape, x + 3, y + 23, 2, '#f1edff', '#ffffff');
@@ -127,6 +140,15 @@ function drawArrow(ctx, cx, cy, dir, color) {
       rect(ctx, px - 1, py - 1, 2, 2, color);
     }
   }
+}
+
+// The undo hint points at the tile whose press Z takes back.
+function drawUndoMark(ctx, o, board, i, pulse) {
+  const x = o.x + (i % board.w) * CELL;
+  const y = o.y + Math.floor(i / board.w) * CELL;
+  drawFrame(ctx, x, y, CELL, 3, pulse ? C.bad : '#ffffff');
+  rect(ctx, x + CELL - 14, y + 2, 12, 12, C.ink);
+  text(ctx, 'Z', x + CELL - 8, y + 2, C.hint, 12, 'center');
 }
 
 function drawCursor(ctx, s, o, previewSet) {
@@ -154,6 +176,8 @@ function drawCursor(ctx, s, o, previewSet) {
     rect(ctx, sx > 0 ? x + ax : x + ax - 10, y + ay + (sy > 0 ? 0 : -3), 10, 3, '#fff');
     rect(ctx, x + ax + (sx > 0 ? 0 : -3), sy > 0 ? y + ay : y + ay - 10, 3, 10, '#fff');
   }
+  if (h.kind === 'undo' && s.history.length > 0)
+    drawUndoMark(ctx, o, s.board, s.history.at(-1).i, pulse);
   if (h.kind === 'move')
     drawArrow(ctx, x + CELL / 2 + DX[h.dir] * 24, y + CELL / 2 + DY[h.dir] * 24, h.dir, C.hint);
 }
@@ -168,15 +192,10 @@ function drawTargetCard(ctx, s, lang, o) {
   const gx = cx - (board.w * unit) / 2;
   rect(ctx, gx - 2, 66, board.w * unit + 4, board.h * unit + 4, C.dim);
   for (let i = 0; i < board.cells.length; i++) {
-    const hole = board.cells[i].hole;
-    rect(
-      ctx,
-      gx + (i % board.w) * unit,
-      68 + Math.floor(i / board.w) * unit,
-      unit - 1,
-      unit - 1,
-      hole ? C.hole : C.phase[board.target[i]],
-    );
+    const cx0 = gx + (i % board.w) * unit;
+    const cy0 = 68 + Math.floor(i / board.w) * unit;
+    if (board.cells[i].hole) rect(ctx, cx0, cy0, unit - 1, unit - 1, C.hole);
+    else drawTargetMark(ctx, cx0, cy0, unit - 1, board.target[i]);
   }
   const off = board.cells.filter((c, i) => !c.hole && s.cells[i] !== board.target[i]).length;
   const ok = off === 0;

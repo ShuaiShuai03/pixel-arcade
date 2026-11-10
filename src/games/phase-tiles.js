@@ -41,14 +41,21 @@ export const meta = deepFreeze({
   players: '1',
   touch: true,
   description: {
-    en: `Glowing tiles sit on a woven board, each one showing a phase. Press a tile and every tile in its influence shape, shown as a preview under the cursor, moves one phase on and wraps around at the end. Match the small target card. Later boards bring holes, locked tiles that still change, diagonal, ring, line and knight shapes, tiles with their own icons and three phases. Many boards allow only a limited number of presses; undo refunds one, and a glowing hint names the next move. Clear all ${BOARD_COUNT} boards; progress is saved.`,
-    zh: `发光的方格排在织纹棋盘上，每格显示一个相位。按下一个方格，它影响范围内的所有方格（光标下会预览）都前进一个相位，到头后循环回到开头。让棋盘与右侧的小目标卡一致。后面的棋盘会出现空洞、仍会被带动的锁定方格、斜叉、圆环、整行整列和马步等影响范围、各带图标的方格以及三个相位。许多棋盘限制按压次数；撤销会退还一次，发光提示会告诉你下一步。完成全部 ${BOARD_COUNT} 块棋盘，进度会被保存。`,
+    en: `Glowing tiles sit on a woven board, each one showing a phase. Press a tile and every tile in its influence shape, shown as a preview under the cursor, moves one phase on and wraps around at the end. Match the small target card. Later boards bring holes, locked tiles that still change, diagonal, ring, line and knight shapes, tiles with their own icons and three phases. Many boards allow only a limited number of presses, and undo refunds one. The first ${R.hintFreeBoards} boards glow the next move for you; after that the goal is yours to work out, and the H key buys a hint for ${R.hintPenalty} points. Clear all ${BOARD_COUNT} boards; progress is saved.`,
+    zh: `发光的方格排在织纹棋盘上，每格显示一个相位。按下一个方格，它影响范围内的所有方格（光标下会预览）都前进一个相位，到头后循环回到开头。让棋盘与右侧的小目标卡一致。后面的棋盘会出现空洞、仍会被带动的锁定方格、斜叉、圆环、整行整列和马步等影响范围、各带图标的方格以及三个相位。许多棋盘限制按压次数，撤销会退还一次。前 ${R.hintFreeBoards} 块棋盘会用发光提示告诉你下一步；之后要靠自己思考，按 H 键可花 ${R.hintPenalty} 分换一次提示。完成全部 ${BOARD_COUNT} 块棋盘，进度会被保存。`,
   },
   keys: [
     { label: { en: 'Move the cursor', zh: '移动光标' }, keys: 'Arrows / WASD' },
     { label: { en: 'Press the tile', zh: '按下方格' }, keys: 'Space' },
     { label: { en: 'Undo the last press', zh: '撤销上一次按压' }, keys: 'Z' },
     { label: { en: 'Reset this board', zh: '重置本棋盘' }, keys: 'Q' },
+    {
+      label: {
+        en: `Show the next move (board ${R.hintFreeBoards + 1} on, -${R.hintPenalty} points)`,
+        zh: `显示下一步（第 ${R.hintFreeBoards + 1} 块起，扣 ${R.hintPenalty} 分）`,
+      },
+      keys: 'H',
+    },
     {
       label: {
         en: 'Tap a tile to select it, tap again to press it',
@@ -65,6 +72,7 @@ export const meta = deepFreeze({
     ['Space', 'Press', '按下', 'right'],
     ['KeyZ', 'Undo', '撤销', 'right'],
     ['KeyQ', 'Reset', '重置', 'right'],
+    ['KeyH', 'Hint', '提示', 'right'],
   ]),
 });
 
@@ -81,6 +89,12 @@ const PLAIN = {
   press: ['Space: press this tile', '空格：按下这个方格'],
   again: ['Space: press this tile again', '空格：再按一次这个方格'],
 };
+
+// What the default prompt says on the boards that do not hand out the next move: the goal only.
+export const goalLine = () => [
+  `Match every tile to the target card  [H] hint -${R.hintPenalty}`,
+  `让每个方格与目标卡一致  [H] 提示 -${R.hintPenalty}`,
+];
 
 export function adviceLine(adv, again = false) {
   if (adv.kind === 'undo') return [...PLAIN.undo];
@@ -117,6 +131,7 @@ const say = (s, en, zh) => {
 };
 
 // The influence set under the cursor, or nothing when that tile cannot be pressed.
+const hintShown = (s) => s.index < R.hintFreeBoards || s.hintOn;
 const previewOf = (s) => {
   const i = s.cy * s.board.w + s.cx;
   return pressable(s.board, i) ? s.board.influence[i] : [];
@@ -141,8 +156,13 @@ function refresh(s) {
   else if (s.phase === 'lost') words = PLAIN.lost;
   else if (s.cleared) words = PLAIN.cleared;
   else {
-    adv = advise(s.board, s.cells, { x: s.cx, y: s.cy }, pressesLeftOf(s), s.history.length > 0);
-    words = adviceLine(adv, adv.kind === 'act' && s.history.at(-1)?.i === adv.i);
+    if (hintShown(s)) {
+      adv = advise(s.board, s.cells, { x: s.cx, y: s.cy }, pressesLeftOf(s), s.history.length > 0);
+      words = adviceLine(adv, adv.kind === 'act' && s.history.at(-1)?.i === adv.i);
+    } else {
+      adv = { kind: 'hidden' };
+      words = goalLine();
+    }
   }
   s.line = { en: words[0], zh: words[1] };
   s.hint = {
@@ -152,6 +172,7 @@ function refresh(s) {
     dir: adv.kind === 'move' ? adv.dir : null,
     steps: adv.kind === 'move' ? adv.steps : 0,
     key: { move: DIR_CODES[adv.dir], undo: 'KeyZ', act: 'Space' }[adv.kind] ?? null,
+    shown: adv.kind !== 'hidden' && adv.kind !== 'none',
   };
 }
 
@@ -161,6 +182,8 @@ function loadBoard(s, index) {
   s.cells = [...s.board.start];
   s.moves = 0;
   s.history = [];
+  s.hintOn = false;
+  s.roomHints = 0;
   const cursor = startCursor(s.board);
   s.cx = cursor.x;
   s.cy = cursor.y;
@@ -179,6 +202,7 @@ function newState(env) {
     ended: false,
     restarts: 0,
     undos: 0,
+    hints: 0,
     sparks: [],
     clock: 0,
     acc: 0,
@@ -202,7 +226,8 @@ function finish(s, env, won, message) {
 
 function clearBoard(s, env) {
   const extra = Math.max(0, s.moves - s.board.optimal);
-  s.score += Math.max(R.minBoardScore, R.clearScore - R.extraPressPenalty * extra);
+  const cost = R.extraPressPenalty * extra + R.hintPenalty * s.roomHints;
+  s.score += Math.max(R.minBoardScore, R.clearScore - cost);
   saveUnlocked(s.progress, Math.min(BOARD_COUNT, s.index + 2));
   s.cleared = true;
   env.sound('win');
@@ -286,6 +311,7 @@ function pressUnderCursor(s, env) {
   s.history.push({ i, moves: s.moves });
   if (s.history.length > R.historyMax) s.history.shift();
   s.cells = pressed(s.board, s.cells, i);
+  s.hintOn = false;
   s.moves = Math.min(R.pressesMax, s.moves + 1);
   s.settle = 0;
   for (const j of s.board.influence[i])
@@ -305,15 +331,29 @@ function undoPress(s, env) {
   s.cx = last.i % s.board.w;
   s.cy = Math.floor(last.i / s.board.w);
   s.undos++;
+  s.hintOn = false;
   s.settle = 0;
   env.sound('move');
   refresh(s);
 }
 
+// Asking for the next move costs points; the hint covers one move, and a press, undo or reset hides it.
+function requestHint(s, env) {
+  if (hintShown(s) || isMatched(s.board, s.cells)) return;
+  s.hintOn = true;
+  s.hints++;
+  s.roomHints++;
+  say(s, `Hint: -${R.hintPenalty} points`, `提示：扣 ${R.hintPenalty} 分`);
+  env.sound('coin');
+  refresh(s);
+}
+
 function restartBoard(s, env) {
+  const { roomHints } = s;
   const restarts = s.restarts + 1;
   loadBoard(s, s.index);
   s.restarts = restarts;
+  s.roomHints = roomHints;
   say(s, 'Board reset', '棋盘已重置');
   env.sound('move');
 }
@@ -347,6 +387,7 @@ function playInput(s, env, input) {
   }
   moveCursor(s, env, input);
   if (input.pressed('KeyQ')) return restartBoard(s, env);
+  if (input.pressed('KeyH')) requestHint(s, env);
   if (input.pressed('KeyZ')) undoPress(s, env);
   if (input.pressed('Space')) pressUnderCursor(s, env);
   return undefined;
@@ -378,10 +419,25 @@ function menuInput(s, env, input) {
   }
 }
 
+// Any of these (or a tap) skips the pause after a board is cleared.
+const SKIP_CODES = [
+  'Space',
+  'Enter',
+  'ArrowLeft',
+  'ArrowRight',
+  'ArrowUp',
+  'ArrowDown',
+  'KeyA',
+  'KeyD',
+  'KeyW',
+  'KeyS',
+];
+
 function frameInput(s, env, input) {
   if (s.menu) return menuInput(s, env, input);
   if (s.cleared) {
-    if (input.pressed('Space', 'Enter') && s.phase === 'playing') loadBoard(s, s.index + 1);
+    if (s.phase === 'playing' && (input.pressed(...SKIP_CODES) || input.pointer?.clicked))
+      loadBoard(s, s.index + 1);
     return undefined;
   }
   return playInput(s, env, input);
@@ -454,6 +510,7 @@ export function createGame(env) {
         cleared: s.cleared,
         preview: preview.map((i) => ({ x: i % s.board.w, y: Math.floor(i / s.board.w) })),
         undos: s.undos,
+        hints: s.hints,
         restarts: s.restarts,
         menu: s.menu ? { ...s.menu } : null,
         message: s.msg ? { en: s.msg.en, zh: s.msg.zh } : null,

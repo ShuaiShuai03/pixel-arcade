@@ -276,7 +276,8 @@
       "mirror-lab",
       "traffic-conductor",
       "weightworks",
-      "pixel-parkour"
+      "pixel-parkour",
+      "phase-tiles"
     ],
     "records": [
       "final-review/snowball-siege.json",
@@ -325,7 +326,8 @@
       "final-review/mirror-lab.json",
       "final-review/traffic-conductor.json",
       "final-review/weightworks.json",
-      "final-review/pixel-parkour.json"
+      "final-review/pixel-parkour.json",
+      "final-review/phase-tiles.json"
     ]
   }
 }

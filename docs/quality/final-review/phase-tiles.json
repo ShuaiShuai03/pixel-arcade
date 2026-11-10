@@ -1,0 +1,67 @@
+{
+  "game": "phase-tiles",
+  "date": "2026-11-10",
+  "reviewedRevision": "2c81d920 (accepted build) plus the fixes in this commit",
+  "owner": "owner-phase",
+  "reviewer": "phase-fair, phase-robust and phase-present (parallel split review)",
+  "rounds": 1,
+  "process": "Lean final review at the user's request, with the review split across three parallel reviewers (fairness, robustness, presentation) as the user asked. The game already had 26 boards; robustness passed outright. Three MEDIUM findings and two LOW items were fixed and verified by a separate verification agent re-running the reviewers' probes against the repository files (owner copies changed only to request the now opt-in hint) plus one clean-worktree run, then by the browser check, without a second review round.",
+  "verdict": "pass",
+  "approvedSha256": {
+    "src/games/phase-tiles.js": "55f3df50044588f5d0ef0848cf0d233a7cce9edf79c2e362fe40d35f3d5a232d",
+    "src/games/phase-tiles-boards.js": "442db68acd9dd859a602aa94ceb0bcf2a34e2d33ffa2d025f14cd30dc7a9808d",
+    "src/games/phase-tiles-draw.js": "6bb2d676be0fb3da8a66a0c91d0360f2ce1f78ac5ad8ceff852cb54733733f69",
+    "src/games/phase-tiles-rules.js": "065192c9003d74095e93adf764d75456986267bb30308cb3a0af6662d9a3c16a",
+    "tests/phase-tiles.test.js": "2d8885b9822fcebb4f6e32bdbca60e4b00188663eeb6b1f3fe7a7e1869c8092d",
+    "tests/phase-tiles-quality.test.js": "0505def3791d8ea13e450efcf7af9cc0987838c79adc2fb77e73eaf05c80dbc6"
+  },
+  "tests": {
+    "command": "node --experimental-test-coverage --test-coverage-include='src/games/phase-tiles*.js' --test tests/phase-tiles.test.js tests/phase-tiles-quality.test.js",
+    "passed": 80,
+    "failed": 0,
+    "lineCoverage": 100,
+    "log": "phase-tiles-coverage.txt"
+  },
+  "independentProbes": "On the final files the fairness reviewer's planning bot (public getState only, solving its own linear system) cleared all 26 boards at 0.25 s and 0.35 s with plan cost equal to the optimum; press slack now averages 1.75 on teaching boards, 1.00 on combination boards and 0.38 on mastery boards, with boards 20, 22, 23, 25 and 26 allowing no spare press. A bot that only follows the opt-in hint clears every board but finishes with 1,150 of 2,600 points, where the review had found the always-on hint solving every board for free. Blind policies cleared nothing from board 3, 40 scripted snapshots matched across 30, 60 and 120 Hz, 49 hostile-input cases produced no failures, endings and every broken progress store were safe, no soft-lock was found on any board, and EN and ZH text fits with no Latin in Chinese.",
+  "findings": [
+    {
+      "id": "M1",
+      "severity": "medium",
+      "status": "fixed",
+      "observation": "Fairness finding: the always-on hint named the next move, so following it solved every board at optimal presses. Boards 1-7 keep the step hint; from board 8 the line states the goal ('Match every tile to the target card [H] hint -10') and H or the Hint touch button reveals one move for 10 points; getState exposes the hint only while shown."
+    },
+    {
+      "id": "M2",
+      "severity": "medium",
+      "status": "fixed",
+      "observation": "Fairness finding: every combination and mastery board allowed one spare press, so mastery was no tighter. Mastery boards 20, 22, 23, 25 and 26 now allow none, and every board remains solvable."
+    },
+    {
+      "id": "M3",
+      "severity": "medium",
+      "status": "fixed",
+      "observation": "Presentation finding: the target card and each tile's ghost mark showed the target phase by colour alone. Both now draw the same phase bars as the tiles."
+    },
+    {
+      "id": "L1",
+      "severity": "low",
+      "status": "fixed",
+      "observation": "The undo hint marks the tile Z will undo with a pulsing frame and a Z badge, and arrows, WASD, Space, Enter or a tap skip the clear pause instead of being ignored."
+    }
+  ],
+  "openNotes": [
+    "A player can still buy every hint; the cost is score, not progress.",
+    "Locked boards on the picker are shown dimmed without a padlock; the reviewer did not flag it, and the board number stays readable."
+  ],
+  "browser": {
+    "method": "Official Claude in Chrome extension, local server; real clicks on Start and the language toggle, synthetic in-page keys driven by the status line; only DOM text and the canvas were read.",
+    "servedSha256Prefixes": "55f3df50 442db68a 6bb2d676 065192c9",
+    "observed": [
+      "English: Start opened board 1 of 26 (First Stitch) with the shape preview, the phase legend and the target card, whose swatches now carry phase bars; the description explained that hints are bought with H from board 8.",
+      "Win: following the prompts pressed the right tiles, the board matched ('Board clear! Next board coming') and board 2 opened.",
+      "Chinese 390 px phone frame (388 px inner, no horizontal overflow): the board picker in Chinese with touch buttons 左, 右, 上, 下, 按下, 撤销, 重置 and 提示.",
+      "Not covered in the browser: a bought hint, a zero-slack board and a loss; the probes and quality tests cover them."
+    ],
+    "screenshots": ["screenshots/phase-tiles-en.png", "screenshots/phase-tiles-phone-zh.png"]
+  }
+}

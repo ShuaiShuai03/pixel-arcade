@@ -33,7 +33,10 @@ export const BOARD_DEFS = deepFreeze([
   },
   {
     name: ['Small Loom', '小织机'],
-    tip: ['The corner mark of each tile shows its target.', '每格角上的小方块是它的目标相位。'],
+    tip: [
+      "Corner mark: the tile's target colour and bar count.",
+      '角上的小方块标出目标相位：颜色加条数。',
+    ],
     phases: 2,
     shape: 'p',
     layout: ['....', '....', '....'],
@@ -377,7 +380,7 @@ export const BOARD_DEFS = deepFreeze([
       [5, 2, 1],
       [4, 1, 1],
     ],
-    slack: 1,
+    slack: 0,
   },
   {
     name: ['Triple Dye', '三色染'],
@@ -424,7 +427,7 @@ export const BOARD_DEFS = deepFreeze([
       [3, 1, 1],
       [0, 3, 2],
     ],
-    slack: 1,
+    slack: 0,
   },
   {
     name: ['Twilight Bias', '暮色斜裁'],
@@ -444,7 +447,7 @@ export const BOARD_DEFS = deepFreeze([
       [0, 2, 1],
       [2, 1, 2],
     ],
-    slack: 1,
+    slack: 0,
   },
   {
     name: ['Dyed Patchwork', '染色拼布'],
@@ -485,7 +488,7 @@ export const BOARD_DEFS = deepFreeze([
       [5, 3, 2],
       [2, 0, 1],
     ],
-    slack: 1,
+    slack: 0,
   },
   {
     name: ['Grand Tapestry', '大挂毯'],
@@ -509,6 +512,6 @@ export const BOARD_DEFS = deepFreeze([
       [3, 5, 1],
       [0, 5, 1],
     ],
-    slack: 1,
+    slack: 0,
   },
 ]);
