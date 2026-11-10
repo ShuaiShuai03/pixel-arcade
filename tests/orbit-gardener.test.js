@@ -90,7 +90,11 @@ test('there are 24 authored gardens with consistent data', () => {
     const count = (rows) => rows.reduce((m, r) => ({ ...m, [r[2]]: (m[r[2]] || 0) + 1 }), {});
     assert.deepEqual(count(d.seeds), count(d.beds), `garden ${i + 1} colours`);
     assert.ok(d.beds.length >= 1 && d.cap >= 1);
-    for (const b of d.beds) if (b[3]) assert.ok(b[3][0] >= 4 && b[3][0] > RULES.plantTime + 2);
+    // Timed beds stay open at least 4 s; the mastery gardens (19-24) may open for as little as 3 s,
+    // which still leaves 1.7 s to start planting.
+    const minOpen = i >= 18 ? 3 : 4;
+    for (const b of d.beds)
+      if (b[3]) assert.ok(b[3][0] >= minOpen && b[3][0] >= RULES.plantTime + 1.5);
     // every lane is reachable from the start through the gates, so every bed and seed is
     const seen = new Set([d.start[0]]);
     for (let pass = 0; pass < 4; pass++)
@@ -305,7 +309,7 @@ test('a bed refuses the wrong seed and says what it needs', () => {
   run(s, 2, ['Space']);
   assert.equal(s.beds[0].planted, false);
   assert.equal(s.P.carry.length, 1);
-  assert.match(s.msg.en, /needs a emerald seed/);
+  assert.match(s.msg.en, /needs an emerald seed/);
   assert.match(s.msg.zh, /祖母绿/);
   const none = lab({ lane: 1, a: deg(100), beds: [[1, 100, 0]] });
   run(none, 2, ['Space']);
@@ -825,11 +829,53 @@ test('F6: progress.unlocked() is floored and validated', () => {
     h.env.progress = { unlocked: () => value, unlock() {} };
     return createGame(h.env).getState().menu;
   };
-  for (const bad of [NaN, undefined, null, 0, -5, 0.4, Infinity, 'x', {}])
+  for (const bad of [NaN, undefined, null, 0, -5, 0.4, -Infinity, 'x', {}])
     assert.equal(menu(bad), null, String(bad));
   assert.deepEqual(menu(2.9), { sel: 2, unlocked: 2 });
   assert.deepEqual(menu('4'), { sel: 4, unlocked: 4 });
   assert.deepEqual(menu(99), { sel: 24, unlocked: 24 });
+  assert.deepEqual(menu(1e9), { sel: 24, unlocked: 24 });
+  assert.deepEqual(menu(Infinity), { sel: 24, unlocked: 24 }, 'Infinity clamps like 1e9');
+});
+
+test('a progress store that throws never stops the game', () => {
+  const broken = (progress) => {
+    const h = harness();
+    h.env.progress = progress;
+    return h;
+  };
+  // Reading the unlocked garden throws: the game starts at garden 1 with no menu.
+  const noRead = createGame(
+    broken({
+      unlocked() {
+        throw new Error('storage blocked');
+      },
+      unlock() {},
+    }).env,
+  );
+  assert.equal(noRead.getState().menu, null);
+  assert.equal(noRead.getState().garden, 1);
+  // Saving throws: clearing a garden still loads the next one.
+  const tries = [];
+  const noSave = newState(
+    broken({
+      unlocked: () => 1,
+      unlock(n) {
+        tries.push(n);
+        throw new Error('quota exceeded');
+      },
+    }).env,
+  );
+  noSave.P.a = noSave.beds[0].a;
+  noSave.seeds[0].taken = true;
+  noSave.P.carry = [{ id: 0, color: 0 }];
+  run(noSave, RULES.plantTime + 0.1, ['Space']);
+  assert.ok(noSave.clear > 0, 'the garden is still restored');
+  assert.deepEqual(tries, [2]);
+  run(noSave, 1.6, []);
+  assert.equal(snapshotOf(noSave).garden, 2);
+  // A progress object without functions behaves like none at all.
+  assert.equal(createGame(broken({ unlocked: 5 }).env).getState().menu, null);
 });
 
 test('F6: the controls list names the WASD alternatives and the clear chime is not the win jingle', () => {
@@ -1156,4 +1202,158 @@ test('F1: with a rock coming, the warning for a stopped ship says dodge, away fr
   t.P.inv = 0;
   run(t, 0.1, []);
   assert.equal(snapshotOf(t).prompt.en, 'Rock! Hold Left to dodge');
+});
+
+// ---------------------------------------------------------------- final review: copy, marks, buffer
+
+test('the mastery gardens carry more and faster rocks than the combination gardens', () => {
+  const speeds = (ds) => ds.flatMap((d) => d.debris.map((r) => Math.abs(r[2])));
+  const mean = (xs) => xs.reduce((a, b) => a + b, 0) / xs.length;
+  const combination = speeds(LEVELS.slice(8, 18));
+  const mastery = LEVELS.slice(18);
+  assert.ok(mean(speeds(mastery)) >= mean(combination) + 6, 'mastery rocks are clearly faster');
+  for (const d of mastery)
+    assert.ok(d.debris.length >= 3, `${d.name.en} has ${d.debris.length} rocks`);
+  for (const d of mastery) assert.ok(d.par <= 100, `${d.name.en} par ${d.par}`);
+  for (const d of mastery.filter((x) => x.beds.some((b) => b[3])))
+    for (const b of d.beds.filter((x) => x[3]))
+      assert.ok(b[3][0] <= 3.2, 'timed beds open briefly');
+});
+
+test('the copy discloses dusk, names the arrow keys and explains the bed marks', () => {
+  assert.doesNotMatch(meta.description.zh, /左键|右键|上键|下键/);
+  assert.match(meta.description.zh, /左方向键.*右方向键/);
+  assert.match(meta.description.zh, /日光条.*天黑.*船体每 5 秒衰减一点/);
+  assert.match(meta.description.zh, /对勾.*叉号/);
+  assert.match(meta.description.en, /daylight bar.*dusk.*hull fades by one point every 5 seconds/);
+  assert.match(meta.description.en, /check mark.*cross/);
+  assert.match(LEVELS[0].tip[0], /daylight bar/);
+  assert.match(LEVELS[0].tip[1], /日光条/);
+  for (const d of LEVELS) assert.doesNotMatch(d.tip[1], /左右键|上下键|左键|右键/);
+  const menu = createGame(progressEnv(5).h.env).getState().prompt;
+  assert.match(menu.en, /Arrows/, 'the menu tip covers Up and Down as well as Left and Right');
+  assert.match(menu.zh, /方向键/);
+});
+
+// A canvas that records text, filled boxes, dash patterns and stroked segments.
+function paintLog() {
+  const log = { text: [], boxes: [], dashes: [], segments: [] };
+  const state = {};
+  const ctx = new Proxy(
+    { measureText: (t) => ({ width: String(t).length * 8 }), canvas: { width: 480, height: 320 } },
+    {
+      get: (t, p) => {
+        if (p === 'fillText') return (str, x, y) => log.text.push({ str, x, y });
+        if (p === 'fillRect')
+          return (x, y, w, h) => log.boxes.push({ x, y, w, h, fill: state.fillStyle });
+        if (p === 'setLineDash') return (d) => log.dashes.push([...d]);
+        if (p === 'moveTo') return (x, y) => log.segments.push(['m', x, y]);
+        if (p === 'lineTo') return (x, y) => log.segments.push(['l', x, y]);
+        return p in state ? state[p] : p in t ? t[p] : () => {};
+      },
+      set: (t, p, v) => ((state[p] = v), true),
+    },
+  );
+  return { ctx, log };
+}
+
+test('a timed bed is open or closed by shape as well as colour: check against cross, solid against dashed', () => {
+  const { h } = progressEnv(14);
+  const g = createGame(h.env);
+  g.update(1 / 60, input([], ['Space']));
+  assert.equal(g.getState().garden, 14);
+  const open = paintLog();
+  g.draw(open.ctx);
+  assert.equal(g.getState().beds[0].open, true);
+  const bedDash = (d) => d.join() === '3,3';
+  assert.ok(!open.log.dashes.some(bedDash), 'an open bed ring is solid');
+  const checks = open.log.segments.filter((s) => s[0] === 'm').length;
+  for (let i = 0; i < 60 * 4.5; i++) g.update(1 / 60, input());
+  const closed = paintLog();
+  g.draw(closed.ctx);
+  assert.equal(g.getState().beds[0].open, false);
+  assert.ok(closed.log.dashes.some(bedDash), 'a closed bed ring is dashed');
+  const crosses = closed.log.segments.filter((s) => s[0] === 'm').length;
+  assert.ok(crosses > checks, 'the closed mark (two strokes) differs from the open mark (one)');
+});
+
+test('the daylight bar is labelled, and the label turns to Dusk once the light is gone', () => {
+  for (const [lang, day, dusk] of [
+    ['en', 'Daylight', 'Dusk'],
+    ['zh', '日光', '天黑'],
+  ]) {
+    const g = createGame(harness({ lang }).env);
+    const early = paintLog();
+    g.draw(early.ctx);
+    assert.ok(
+      early.log.text.some((t) => t.str === day && t.y >= RULES.bottom),
+      `${lang} label`,
+    );
+    for (let i = 0; i < 60 * 16; i++) g.update(1 / 60, input());
+    assert.equal(g.getState().dusk, true);
+    const late = paintLog();
+    g.draw(late.ctx);
+    assert.ok(
+      late.log.text.some((t) => t.str === dusk && t.y >= RULES.bottom),
+      `${lang} dusk`,
+    );
+    assert.ok(!late.log.text.some((t) => t.str === day));
+  }
+});
+
+test('locked menu tiles show a padlock, not a dimmed number', () => {
+  const g = createGame(progressEnv(3).h.env);
+  const { ctx, log } = paintLog();
+  g.draw(ctx);
+  const numbers = log.text.map((t) => t.str);
+  for (const open of ['1', '2', '3']) assert.ok(numbers.includes(open), `open tile ${open}`);
+  for (const locked of ['4', '5', '24']) assert.ok(!numbers.includes(locked), `locked ${locked}`);
+  // Tile 4 sits at x 198-230, y 60-92: its padlock is drawn there in the lock colour.
+  const lock = log.boxes.filter(
+    (b) => b.fill === '#8d9ac4' && b.x >= 198 && b.x < 230 && b.y >= 60 && b.y < 92,
+  );
+  assert.ok(lock.length >= 4, 'shackle posts, top bar and body');
+  const noLockOnOpen = log.boxes.filter(
+    (b) => b.fill === '#8d9ac4' && b.x >= 60 && b.x < 92 && b.y >= 60 && b.y < 92,
+  );
+  assert.equal(noLockOnOpen.length, 0, 'tile 1 is open');
+});
+
+test('a transfer pressed in the last moments of the clear screen is kept for the next garden', () => {
+  const { h } = progressEnv(1);
+  const s = newState(h.env);
+  s.P.a = s.beds[0].a;
+  s.seeds[0].taken = true;
+  s.P.carry = [{ id: 0, color: 0 }];
+  run(s, RULES.plantTime + 0.1, ['Space']);
+  assert.ok(s.clear > RULES.pressBuffer);
+  // Too early in the celebration: the press is not kept.
+  advance(s, 1 / 60, input([], ['ArrowUp']));
+  assert.equal(s.queued, 0);
+  // Within the buffer window it is kept, and the newest press wins.
+  s.clear = 0.2;
+  advance(s, 1 / 60, input([], ['ArrowUp']));
+  assert.equal(s.queued, 1);
+  advance(s, 1 / 60, input([], ['ArrowDown']));
+  assert.equal(s.queued, -1);
+  advance(s, 1 / 60, input([], ['ArrowUp', 'ArrowDown']));
+  assert.equal(s.queued, -1, 'Up and Down together change nothing');
+  for (let i = 0; i < 60 && s.level === 0; i++) advance(s, 1 / 60, input());
+  assert.equal(s.level, 1);
+  assert.equal(s.queued, -1, 'it survives the load');
+  // No gate under the ship: dropped silently, no refusal counted, no complaint shown.
+  const refused = s.stats.refused;
+  advance(s, 1 / 60, input());
+  assert.equal(s.queued, 0);
+  assert.equal(s.stats.refused, refused);
+  assert.doesNotMatch(s.msg?.en ?? '', /No gate/);
+  // With a gate under the ship it is a transfer, tried once.
+  s.P.lane = 0;
+  s.gates = [{ lanes: [0, 1], a: s.P.a, spin: 0 }];
+  s.queued = 1;
+  advance(s, 1 / 60, input());
+  assert.equal(s.P.lane, 1);
+  assert.equal(s.queued, 0);
+  advance(s, 1 / 60, input());
+  assert.equal(s.P.lane, 1, 'the press is not repeated');
 });

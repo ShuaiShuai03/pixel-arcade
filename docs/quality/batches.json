@@ -265,7 +265,8 @@
       "magnet-marauder",
       "frost-forge",
       "mimic-vault",
-      "comet-catcher"
+      "comet-catcher",
+      "orbit-gardener"
     ],
     "records": [
       "final-review/snowball-siege.json",
@@ -303,7 +304,8 @@
       "final-review/magnet-marauder.json",
       "final-review/frost-forge.json",
       "final-review/mimic-vault.json",
-      "final-review/comet-catcher.json"
+      "final-review/comet-catcher.json",
+      "final-review/orbit-gardener.json"
     ]
   }
 }

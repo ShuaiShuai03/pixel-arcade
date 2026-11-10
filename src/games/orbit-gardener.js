@@ -9,8 +9,8 @@ export const meta = {
   players: '1',
   touch: true,
   description: {
-    en: 'Your little ship rides concentric orbital lanes around a jewel planet. Hold Left or Right to orbit counter-clockwise or clockwise (you only move while a key is held). Gaps in the rings are transfer gates: press Up at a gate to move to the next lane out, Down to move in; anywhere else the ship cannot change lane. Fly over seeds to gather them, then stop at a bed of the same colour and shape and hold Space to plant. Beds accept only matching seeds, and some bloom open and closed. Drifting debris costs one of your three hull points and drops your seeds; run out of hull and the garden withers. Restore all 24 orbital gardens; your progress is saved.',
-    zh: '你的小飞船在宝石行星外的同心轨道上航行。按住左键或右键逆时针或顺时针绕行（只有按住时才会移动）。环上的缺口是换轨门：在门处按上方向键移到外一圈，按下方向键移到内一圈，其他地方无法换轨。飞过种子即可收集，然后停在颜色和形状相同的花床上，按住空格种植。花床只接受匹配的种子，有些花床会开合。漂移的碎片会扣掉三点船体中的一点并让你丢下种子；船体耗尽花园就会枯萎。修复全部 24 座轨道花园，进度会被保存。',
+    en: 'Your little ship rides concentric orbital lanes around a jewel planet. Hold Left or Right to orbit counter-clockwise or clockwise (you only move while a key is held). Gaps in the rings are transfer gates: press Up at a gate to move to the next lane out, Down to move in; anywhere else the ship cannot change lane. Fly over seeds to gather them, then stop at a bed of the same colour and shape and hold Space to plant. Beds accept only matching seeds, and some bloom open and closed (a check mark means open, a cross means closed). Drifting debris costs one of your three hull points and drops your seeds. Each garden also has a daylight bar: when it runs out it is dusk, and the hull fades by one point every 5 seconds. Run out of hull and the garden withers. Restore all 24 orbital gardens; your progress is saved.',
+    zh: '你的小飞船在宝石行星外的同心轨道上航行。按住左方向键逆时针绕行，按住右方向键顺时针绕行（只有按住时才会移动）。环上的缺口是换轨门：在门处按上方向键移到外一圈，按下方向键移到内一圈，其他地方无法换轨。飞过种子即可收集，然后停在颜色和形状相同的花床上，按住空格种植。花床只接受匹配的种子，有些花床会开合（对勾表示开，叉号表示关）。漂移的碎片会扣掉三点船体中的一点并让你丢下种子。每座花园还有一条日光条：耗尽后天黑，船体每 5 秒衰减一点。船体耗尽花园就会枯萎。修复全部 24 座轨道花园，进度会被保存。',
   },
   keys: [
     { label: { en: 'Orbit left / right', zh: '向左 / 向右绕行' }, keys: 'Left / Right, A / D' },
@@ -49,6 +49,7 @@ export const RULES = Object.freeze({
   promptHold: 0.5,
   introTime: 5,
   clearTime: 1.4,
+  pressBuffer: 0.3,
   msgTime: 2.2,
   danger: 2,
   dangerPad: 10,
@@ -66,6 +67,8 @@ const TAU = Math.PI * 2;
 const MENU_COLS = 8;
 export const MESSAGE_CENTRE = 252;
 export const MESSAGE_WIDTH = 340;
+const DAYLIGHT_Y = 305;
+const DAYLIGHT_BAR_X = 80;
 
 const COLOR_NAMES = [
   ['ruby', '红宝石'],
@@ -103,13 +106,18 @@ const G = (en, zh, tip, o) => ({
   ...o,
 });
 const GARDEN_DEFS = [
-  G('First Orbit', '初次绕行', ['Orbit with Left/Right, gather the seed', '左右键绕行，收集种子'], {
-    par: 15,
-    lanes: 1,
-    start: [0, 0],
-    seeds: [[0, 180, 0]],
-    beds: [[0, 300, 0]],
-  }),
+  G(
+    'First Orbit',
+    '初次绕行',
+    ['Beat the daylight bar or the hull fades', '赶在日光条耗尽前完成，否则船体衰减'],
+    {
+      par: 15,
+      lanes: 1,
+      start: [0, 0],
+      seeds: [[0, 180, 0]],
+      beds: [[0, 300, 0]],
+    },
+  ),
   G(
     'Two Seeds',
     '两粒种子',
@@ -416,7 +424,7 @@ const GARDEN_DEFS = [
     '四条轨道',
     ['Four lanes: plan the route through gates', '四条轨道：规划穿门路线'],
     {
-      par: 65,
+      par: 58,
       lanes: 4,
       start: [0, 90],
       gates: [
@@ -425,8 +433,10 @@ const GARDEN_DEFS = [
         [2, 90],
       ],
       debris: [
-        [1, 90, -30],
-        [3, 0, 26],
+        [1, 270, -42],
+        [2, 120, 38],
+        [3, 315, -36],
+        [3, 255, -32],
       ],
       seeds: [
         [3, 270, 0],
@@ -443,7 +453,7 @@ const GARDEN_DEFS = [
     '四轨碎石',
     ['Outer lanes are long: use rock gaps', '外圈很长：利用碎片间的空档'],
     {
-      par: 100,
+      par: 56,
       lanes: 4,
       start: [0, 180],
       gates: [
@@ -452,8 +462,10 @@ const GARDEN_DEFS = [
         [2, 0],
       ],
       debris: [
-        [1, 60, -30],
-        [2, 250, 30],
+        [0, 345, 37],
+        [1, 60, -47],
+        [2, 185, 42],
+        [3, 40, 33],
       ],
       seeds: [
         [3, 270, 0],
@@ -472,7 +484,7 @@ const GARDEN_DEFS = [
     '压力下的花期',
     ['Plant before the bed closes, mind rocks', '趁花床开着种下，留意碎片'],
     {
-      par: 90,
+      par: 65,
       lanes: 3,
       start: [0, 90],
       gates: [
@@ -480,38 +492,41 @@ const GARDEN_DEFS = [
         [1, 270],
       ],
       debris: [
-        [1, 0, -26],
-        [2, 200, 28],
+        [1, 275, -42],
+        [2, 45, -38],
+        [2, 5, -37],
+        [0, 350, -38],
       ],
       seeds: [
         [0, 200, 0],
         [1, 100, 1],
       ],
       beds: [
-        [2, 0, 0, [4.5, 3, 0]],
-        [2, 180, 1, [4.5, 3, 2.5]],
+        [2, 0, 0, [3.2, 3, 0]],
+        [2, 180, 1, [3.2, 3, 2.4]],
       ],
     },
   ),
   G('Spinning Blooms', '旋转花期', ['Drifting gates, blooming beds', '漂移的门，开合的花床'], {
-    par: 50,
+    par: 42,
     lanes: 3,
     start: [0, 0],
     gates: [
-      [0, 45, 15],
-      [1, 225, -15],
+      [0, 45, 20],
+      [1, 225, -20],
     ],
     debris: [
-      [0, 180, -34],
-      [1, 135, 30],
+      [0, 180, -44],
+      [1, 345, -39],
+      [1, 285, -38],
     ],
     seeds: [
       [1, 0, 0],
       [0, 270, 1],
     ],
     beds: [
-      [2, 90, 0, [4, 3, 0]],
-      [1, 270, 1, [4, 3, 2]],
+      [2, 90, 0, [3, 3, 0]],
+      [1, 270, 1, [3, 3, 2]],
     ],
   }),
   G(
@@ -519,18 +534,20 @@ const GARDEN_DEFS = [
     '满载货舱',
     ['Fill the hold, then plant in any order', '装满货舱，再按任意顺序种植'],
     {
-      par: 130,
+      par: 68,
       lanes: 4,
       cap: 2,
       start: [0, 90],
       gates: [
-        [0, 0, 10],
-        [1, 180, -10],
-        [2, 90, 10],
+        [0, 0, 14],
+        [1, 180, -14],
+        [2, 90, 14],
       ],
       debris: [
-        [2, 300, -28],
-        [3, 40, 26],
+        [2, 100, 44],
+        [3, 355, 35],
+        [1, 320, -45],
+        [3, 85, 38],
       ],
       seeds: [
         [1, 90, 0],
@@ -539,7 +556,7 @@ const GARDEN_DEFS = [
         [3, 300, 0],
       ],
       beds: [
-        [3, 90, 1, [4, 3, 0]],
+        [3, 90, 1, [3.2, 3, 0]],
         [2, 200, 2],
         [1, 300, 0],
         [0, 300, 0],
@@ -551,19 +568,20 @@ const GARDEN_DEFS = [
     '轨道大花园',
     ['Everything at once: the grand garden', '一切齐上：修复大花园'],
     {
-      par: 140,
+      par: 95,
       lanes: 4,
       cap: 2,
       start: [1, 0],
       gates: [
-        [0, 0, 12],
-        [1, 180, -12],
-        [2, 60, 10],
+        [0, 0, 16],
+        [1, 180, -16],
+        [2, 60, 14],
       ],
       debris: [
-        [0, 200, -34],
-        [2, 300, -28],
-        [3, 30, 24],
+        [0, 25, 43],
+        [2, 55, -41],
+        [3, 5, -36],
+        [1, 120, 41],
       ],
       seeds: [
         [0, 100, 0],
@@ -573,8 +591,8 @@ const GARDEN_DEFS = [
         [3, 330, 1],
       ],
       beds: [
-        [3, 90, 3, [4.5, 3, 0]],
-        [2, 180, 1, [4.5, 3, 1.5]],
+        [3, 90, 3, [3.2, 3, 0]],
+        [2, 180, 1, [3.2, 3, 1.5]],
         [1, 60, 0],
         [0, 300, 2],
         [3, 270, 1],
@@ -615,8 +633,8 @@ export const LEVELS = GARDEN_DEFS.map((d) => JSON.parse(JSON.stringify(d)));
 
 const dirWord = (dir) => (dir > 0 ? ['Right', '右'] : ['Left', '左']);
 const TXT = {
-  menu: ['Pick a garden: Left / Right, then Space', '选择花园：左 / 右，然后按空格'],
-  hold: ['Rock ahead! Hold still (Arrows)', '前方有碎片！别动（方向键）'],
+  menu: ['Pick a garden: Arrows, then Space', '选择花园：方向键，然后按空格'],
+  hold: ['Rock ahead! Release Left/Right', '前方有碎片！松开左 / 右方向键'],
   clear: ['Restored! Next garden: Arrows', '修复完成！下一园：方向键'],
   wait: ['Wait: the bed is closed (Space)', '等待：花床已关闭（空格）'],
   plant: ['Stop, then hold Space to plant', '停下，然后按住空格种植'],
@@ -749,6 +767,24 @@ function loadGarden(s, index) {
   updateLine(s, true);
 }
 
+// Progress is a convenience: a missing or broken store must never stop the game.
+function readUnlocked(progress) {
+  try {
+    const n = Math.floor(Number(progress?.unlocked?.()));
+    return Number.isNaN(n) ? 1 : Math.min(GARDEN_COUNT, Math.max(1, n));
+  } catch {
+    return 1;
+  }
+}
+
+function saveUnlocked(progress, garden) {
+  try {
+    progress?.unlock?.(garden);
+  } catch {
+    // The next garden still loads; only the saved progress is lost.
+  }
+}
+
 export function newState(env = {}) {
   const s = {
     phase: 'playing',
@@ -756,11 +792,11 @@ export function newState(env = {}) {
     mode: env.mode || 1,
     acc: 0,
     ticks: 0,
+    queued: 0,
     progress: env.progress || null,
     stats: { gathered: 0, planted: 0, transfers: 0, refused: 0, hits: 0, dusk: 0 },
   };
-  const raw = Math.floor(Number(s.progress?.unlocked?.()));
-  const unlocked = Number.isFinite(raw) ? Math.min(GARDEN_COUNT, Math.max(1, raw)) : 1;
+  const unlocked = readUnlocked(s.progress);
   loadGarden(s, 0);
   if (unlocked > 1) {
     s.menu = { sel: unlocked, unlocked };
@@ -914,10 +950,11 @@ function hurt(s, emit) {
   );
 }
 
-function transfer(s, up, emit) {
+function transfer(s, up, emit, quiet = false) {
   const P = s.P;
   const gate = gateAt(s, P.a, P.lane, up);
   if (!gate) {
+    if (quiet) return;
     s.stats.refused++;
     say(s, 'No gate here: transfer only at a gap', '这里没有门：只能在缺口处换轨');
     return;
@@ -933,10 +970,24 @@ function transfer(s, up, emit) {
   think(s);
 }
 
+const pressedUpDown = (input) => ({
+  up: input.pressed('ArrowUp', 'KeyW'),
+  down: input.pressed('ArrowDown', 'KeyS'),
+});
+
+// A transfer pressed in the last moments of the clear screen waits for the next garden, where it is
+// tried once; with no gate under the ship it is dropped without a complaint.
+function queuePress(s, input) {
+  const { up, down } = pressedUpDown(input);
+  if (up !== down && s.clear <= RULES.pressBuffer) s.queued = up ? 1 : -1;
+}
+
 function act(s, input, emit) {
-  const up = input.pressed('ArrowUp', 'KeyW');
-  const down = input.pressed('ArrowDown', 'KeyS');
+  const { up, down } = pressedUpDown(input);
+  const queued = s.queued;
+  s.queued = 0;
   if (up !== down) transfer(s, up, emit);
+  else if (queued) transfer(s, queued > 0, emit, true);
 }
 
 function plantStep(s, space, dir, emit) {
@@ -956,7 +1007,11 @@ function plantStep(s, space, dir, emit) {
     if (s.nag <= 0) {
       s.nag = 2;
       const [en, zh] = COLOR_NAMES[bed.color];
-      say(s, `This bed needs a ${en} seed`, `这个花床需要${zh}种子`);
+      say(
+        s,
+        `This bed needs ${/^[aeiou]/.test(en) ? 'an' : 'a'} ${en} seed`,
+        `这个花床需要${zh}种子`,
+      );
     }
     return;
   }
@@ -981,7 +1036,7 @@ function finishGarden(s, emit) {
   s.P.inv = RULES.clearTime + 1;
   s.P.dir = 0;
   const n = s.level + 1;
-  s.progress?.unlock?.(Math.min(GARDEN_COUNT, n + 1));
+  saveUnlocked(s.progress, Math.min(GARDEN_COUNT, n + 1));
   say(s, 'Garden restored!', '花园已修复！', RULES.clearTime);
   emit('coin');
   s.cue = cueFor(s);
@@ -1092,7 +1147,8 @@ export function advance(s, dt, input, emit = () => {}) {
     menuInput(s, input, emit);
     return true;
   }
-  if (s.clear <= 0) act(s, input, emit);
+  if (s.clear > 0) queuePress(s, input);
+  else act(s, input, emit);
   const dir =
     (input.held('ArrowRight', 'KeyD') ? 1 : 0) - (input.held('ArrowLeft', 'KeyA') ? 1 : 0);
   const space = input.held('Space');
@@ -1359,6 +1415,25 @@ function drawGates(ctx, s) {
   }
 }
 
+// A check (open) or a cross (closed) on a dark chip, so the bed state never rests on colour alone.
+function bedMark(ctx, x, y, open) {
+  box(ctx, '#0b0e17', x - 6, y - 6, 12, 12);
+  ctx.strokeStyle = open ? '#9dff9d' : '#ff8a6a';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  if (open) {
+    ctx.moveTo(x - 4, y);
+    ctx.lineTo(x - 1, y + 3);
+    ctx.lineTo(x + 4, y - 3);
+  } else {
+    ctx.moveTo(x - 3, y - 3);
+    ctx.lineTo(x + 3, y + 3);
+    ctx.moveTo(x + 3, y - 3);
+    ctx.lineTo(x - 3, y + 3);
+  }
+  ctx.stroke();
+}
+
 function drawBeds(ctx, s) {
   for (const b of s.beds) {
     const p = posOf(b.lane, b.a);
@@ -1366,13 +1441,17 @@ function drawBeds(ctx, s) {
     disc(ctx, p.x, p.y, 12, '#2a1a14');
     disc(ctx, p.x, p.y, 10, open ? '#6b4326' : '#3a2c26');
     if (b.cycle) {
-      // The ring is a clock: it shrinks as the bed's current open (green) or closed (orange) spell runs out.
+      // The ring is a clock: it shrinks as the bed's current open or closed spell runs out. Open is a
+      // solid green ring with a check mark; closed is a dashed orange ring with a cross.
       const phaseLen = b.cycle[open ? 0 : 1];
       ctx.strokeStyle = open ? '#9dff9d' : '#ff8a6a';
       ctx.lineWidth = 3;
+      ctx.setLineDash(open ? [] : [3, 3]);
       ctx.beginPath();
       ctx.arc(p.x, p.y, 14, -Math.PI / 2, -Math.PI / 2 + TAU * (bedChange(s, b) / phaseLen));
       ctx.stroke();
+      ctx.setLineDash([]);
+      bedMark(ctx, p.x + 13, p.y - 13, open);
     }
     if (b.planted) {
       box(ctx, '#2e9b4d', p.x - 1, p.y - 2, 3, 10);
@@ -1473,17 +1552,36 @@ function drawHud(ctx, s, env) {
   // Bottom messages are kept to MESSAGE_WIDTH so they never reach the bed count or the score.
   if (s.msg) text(ctx, env.t(s.msg.en, s.msg.zh), MESSAGE_CENTRE, 292, '#ffe066', 14, 'center');
   text(ctx, String(s.score), 474, 292, '#8d9ac4', 14, 'right');
-  // Daylight: the time left before dusk starts to drain the hull.
+  // Daylight: the time left before dusk starts to drain the hull. At dusk the bar becomes the next
+  // hull point's countdown.
   const left = Math.max(0, s.par - s.t);
-  box(ctx, '#1b2133', 6, 311, 468, 5);
+  const dusk = left <= 0;
+  text(
+    ctx,
+    dusk ? env.t('Dusk', '天黑') : env.t('Daylight', '日光'),
+    6,
+    DAYLIGHT_Y,
+    dusk ? '#ff8a6a' : '#ffd24a',
+    14,
+  );
+  box(ctx, '#1b2133', DAYLIGHT_BAR_X, 310, 474 - DAYLIGHT_BAR_X, 6);
   box(
     ctx,
-    left > 0 ? '#ffd24a' : '#ff6a4a',
+    dusk ? '#ff6a4a' : '#ffd24a',
+    DAYLIGHT_BAR_X,
+    310,
+    Math.round((474 - DAYLIGHT_BAR_X) * (dusk ? 1 - s.dusk / RULES.duskDrain : left / s.par)),
     6,
-    311,
-    Math.round(468 * (left > 0 ? left / s.par : 1 - s.dusk / RULES.duskDrain)),
-    5,
   );
+}
+
+// A locked garden shows a padlock instead of its number, so it never reads as dim-but-open.
+function padlock(ctx, x, y) {
+  box(ctx, '#8d9ac4', x + 11, y + 6, 10, 2);
+  box(ctx, '#8d9ac4', x + 11, y + 6, 2, 8);
+  box(ctx, '#8d9ac4', x + 19, y + 6, 2, 8);
+  box(ctx, '#8d9ac4', x + 9, y + 14, 14, 11);
+  box(ctx, '#14171f', x + 15, y + 17, 2, 5);
 }
 
 function drawMenu(ctx, s, env) {
@@ -1496,7 +1594,8 @@ function drawMenu(ctx, s, env) {
     const open = i <= unlocked;
     box(ctx, i === sel ? '#ffe066' : '#3a4258', x - 2, y - 2, 36, 36);
     box(ctx, open ? '#262c3e' : '#14171f', x, y, 32, 32);
-    text(ctx, String(i), x + 16, y + 9, open ? '#ffffff' : '#555d75', 14, 'center');
+    if (open) text(ctx, String(i), x + 16, y + 9, '#ffffff', 14, 'center');
+    else padlock(ctx, x, y);
   }
   const g = GARDENS[sel - 1];
   text(

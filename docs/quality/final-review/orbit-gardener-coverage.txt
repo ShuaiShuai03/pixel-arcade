@@ -1,0 +1,101 @@
+per-garden wins, fast: 1:30 2:30 3:30 4:30 5:30 6:30 7:30 8:30 9:30 10:30 11:30 12:30 13:30 14:30 15:30 16:30 17:30 18:30 19:30 20:30 21:30 22:30 23:30 24:30
+per-garden wins, slow: 1:30 2:30 3:30 4:30 5:30 6:30 7:30 8:30 9:30 10:30 11:30 12:30 13:30 14:30 15:30 16:30 17:30 18:30 19:30 20:30 21:30 22:30 23:30 24:30
+campaign wins at 30 Hz: 30/30
+campaign wins at 60 Hz: 30/30
+campaign wins at 120 Hz: 30/30
+slow campaign wins at 60 Hz: 30/30
+crude wins/10 in 90 s:
+random     0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+mash       0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+holdRight  0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+spaceOnly  0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+pulse      0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+pulseLong  4 2 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0
+pulseShort 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+marker follower: 11/24 clean clears; hurt in 9 10 11 15 16 17 18 19 20 21 22 23 24
+✔ a delayed player (0.15-0.35 s) using only the drawn state clears every garden in at least 27 of 30 runs at 30, 60 and 120 Hz (6143.729834ms)
+✔ a slow player (0.4-0.6 s with jitter) clears every garden in at least 24 of 30 runs at 30, 60 and 120 Hz (6659.691375ms)
+✔ the whole 24-garden campaign is won in at least 27 of 30 runs at each frame rate (18475.377791ms)
+✔ the slow player also finishes the campaign in at least 24 of 30 runs at 60 Hz (6507.020458ms)
+✔ every garden has a scripted legal solution: a zero-delay planner replays it through public keys (268.131417ms)
+✔ perturbed input (dropped keys, irregular frame times) still clears representative gardens (4604.554208ms)
+✔ prompts name keys, are held at least half a second and rarely flip straight back (228.739083ms)
+✔ crude policies win at most half the runs in every garden: random keys, mashing, spam, holding one way and the pulse policy (9844.981042ms)
+✔ the same crude policies stay at or under half with a 300 s budget (the daylight, then the hull, runs out) (5765.429541ms)
+✔ a zero-skill marker follower is hurt in the gardens that have rocks: at most half the campaign clears with no hits (114.803ms)
+✔ F2: a literal prompt follower that never looks at a rock is never led into a hit, in any garden or frame rate (546.027875ms)
+✔ the drawn top line names a key, holds half a second without input and fits beside the counters (993.619625ms)
+✔ metadata is complete, bilingual and the touch layout covers every action (1.059541ms)
+✔ there are 24 authored gardens with consistent data (0.376833ms)
+✔ the first gardens teach one idea at a time, then combine, then master (0.149917ms)
+✔ invalid frame times are inert and never consume a press (1.269584ms)
+✔ the same aligned input gives identical full state at 30, 60 and 120 Hz (15.329875ms)
+✔ orbiting: Left and Right choose the direction at a finite speed, and only while held (0.583292ms)
+✔ transfers happen only inside a drawn gate, outward with Up and inward with Down (0.1405ms)
+✔ a gate spans exactly its drawn width and drifting gates carry it past the ship (0.264042ms)
+✔ a transfer onto a rock costs hull; a transfer the other way is safe (0.083417ms)
+✔ seeds are gathered by flying over them, once, and only up to the hold size (0.925833ms)
+✔ seeds are never skipped, whatever the frame length (0.988042ms)
+✔ planting needs a matching seed, a held Space, standing still and a full second (0.754208ms)
+✔ a bed refuses the wrong seed and says what it needs (0.701542ms)
+✔ a hold of two plants each seed in its own bed (0.55625ms)
+✔ timed beds only take seeds while open, and closing resets the planting (1.571166ms)
+✔ clearing a garden scores once, unlocks the next and loads it after a pause (0.551333ms)
+✔ debris costs one hull, drops the seeds back, then grants brief invulnerability (0.77675ms)
+✔ rocks never tunnel: a fast rock hits at every frame length, from both sides (0.735458ms)
+✔ a moving ship meeting a rock head-on is swept too (0.40975ms)
+✔ losing all hull loses the garden once, and a new instance starts fresh (0.170167ms)
+✔ terminal: a lost garden ends the game once, frozen; a restart is a fresh game (5.045833ms)
+✔ winning the campaign: the last garden finishes the game (21.723875ms)
+✔ with only garden 1 open (or no progress API) the game starts at once (0.094959ms)
+✔ a later start offers continue and a select menu; the world waits behind it (0.699417ms)
+✔ progress: clearing a garden unlocks the next and never lowers or exceeds the range (0.437959ms)
+✔ the marker points at the seed, then the gate, then the bed, along the cheapest route (0.383208ms)
+✔ inward gates are named in the prompt, closed beds say wait, and nothing is held for ever (0.227458ms)
+✔ a rock on the way raises a warning that says what to hold, and only then (0.4015ms)
+✔ F2: the prompt leads with the ship's own motion, looks 2 s ahead and bypasses the half-second hold (0.266166ms)
+✔ F2: a transfer prompt becomes a wait prompt while a rock is near the arrival point (0.136458ms)
+✔ F3: the wait at a closed bed warns when a rock is closing in on the waiting ship (0.100208ms)
+✔ F1: after the par time the light fades and the hull drains; the garden can wither at dusk (5.153542ms)
+✔ F1: finishing before the par time keeps the hull; the hull score rewards it (0.475041ms)
+✔ F6: a dropped seed cannot be re-gathered at once, then it can (0.579417ms)
+✔ F6: a timed bed shows its remaining open or closed time (0.629416ms)
+✔ F6: progress.unlocked() is floored and validated (0.184125ms)
+✔ a progress store that throws never stops the game (0.58925ms)
+✔ F6: the controls list names the WASD alternatives and the clear chime is not the win jingle (0.342792ms)
+✔ A and D, W and S work like the arrows (0.062542ms)
+✔ the status is bilingual and names the garden, the key prompt and the hull (0.116959ms)
+✔ getState is JSON-safe, detached and offers no cheat API (0.389708ms)
+✔ long seeded chaos stays finite and bounded (45.064209ms)
+✔ drawing: every phase renders, text is 14-16 px, fits the canvas and stays in the HUD bands (27.761209ms)
+✔ drawing: HUD text stays out of the play area and the ring field fits between the bands (1.437834ms)
+✔ drawing: a full garden-1 clear renders the planted flower and the celebration (7.336375ms)
+✔ F5: the bottom message has its own width and centre, clear of the bed count and the score (168.928458ms)
+✔ F4: drifting gates and rocks show their drift: arrowheads point the way and fast gates carry two (0.350667ms)
+✔ F1: a rock closing head-on on a stopped ship is never answered with "hold still" (42.121958ms)
+✔ F1: with a rock coming, the warning for a stopped ship says dodge, away from the rock (0.4975ms)
+✔ the mastery gardens carry more and faster rocks than the combination gardens (0.154958ms)
+✔ the copy discloses dusk, names the arrow keys and explains the bed marks (0.203709ms)
+✔ a timed bed is open or closed by shape as well as colour: check against cross, solid against dashed (1.297583ms)
+✔ the daylight bar is labelled, and the label turns to Dusk once the light is gone (3.908959ms)
+✔ locked menu tiles show a padlock, not a dimmed number (0.127125ms)
+✔ a transfer pressed in the last moments of the clear screen is kept for the next garden (0.299083ms)
+ℹ tests 67
+ℹ suites 0
+ℹ pass 67
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 60203.852333
+ℹ start of coverage report
+ℹ --------------------------------------------------------------------
+ℹ file                | line % | branch % | funcs % | uncovered lines
+ℹ --------------------------------------------------------------------
+ℹ src                 |        |          |         | 
+ℹ  games              |        |          |         | 
+ℹ   orbit-gardener.js | 100.00 |    99.13 |   99.08 | 
+ℹ --------------------------------------------------------------------
+ℹ all files           | 100.00 |    99.13 |   99.08 | 
+ℹ --------------------------------------------------------------------
+ℹ end of coverage report

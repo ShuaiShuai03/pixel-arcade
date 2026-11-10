@@ -1,0 +1,72 @@
+{
+  "game": "orbit-gardener",
+  "date": "2026-11-10",
+  "reviewedRevision": "a6b3efaa (accepted build) plus the fixes in this commit",
+  "owner": "owner-orbit",
+  "reviewer": "orbit-fair, orbit-robust and orbit-present (parallel split review)",
+  "rounds": 1,
+  "process": "Lean final review at the user's request, with the review split across three parallel reviewers (fairness, robustness, presentation) as the user asked. The game already had 24 gardens. Six MEDIUM findings and five LOW items were fixed and verified by a separate verification agent re-running the reviewers' own probes and one clean-worktree run, then by the browser check, without a second review round.",
+  "verdict": "pass",
+  "approvedSha256": {
+    "src/games/orbit-gardener.js": "19eb6aea43173f2917b08e5c64ef4e3c04f48432ac1f0bf791491003ae6f5033",
+    "tests/orbit-gardener.test.js": "559340d97188eef0e741490bc06cdf58373e7e6c6e9ae15d5f7ea735d6857b2e",
+    "tests/orbit-gardener-quality.test.js": "15b39e018a0dca2fcaacda2b58a268c8d58d38d2e3343ab1dc2ecf386cda2579"
+  },
+  "tests": {
+    "command": "node --experimental-test-coverage --test-coverage-include='src/games/orbit-gardener*.js' --test tests/orbit-gardener.test.js tests/orbit-gardener-quality.test.js",
+    "passed": 67,
+    "failed": 0,
+    "lineCoverage": 100,
+    "log": "orbit-gardener-coverage.txt"
+  },
+  "independentProbes": "On the final files the fairness reviewer's reaction-limited bot (public getState only, rocks seen late) cleared all 24 gardens at 0.25, 0.35 and 0.5 s. Mastery now costs real damage: at 0.35 s it took 7 hits across gardens 19-24 against none in gardens 1-18, and the owner's sweep loses garden 19 at 0.7 s and gardens 19 and 24 at 0.8-0.9 s. Blind bots (idle, mash, random keys, Space plus alternation) cleared no garden from 3 to 24. Final states matched across 30, 60 and 120 Hz, 48 hostile dt cases produced no throws or NaN, each run ended exactly once and froze, every broken progress store was safe, a perfect-information solver showed every garden completable, and EN and ZH text fits with the copy checks passing.",
+  "findings": [
+    {
+      "id": "M1",
+      "severity": "medium",
+      "status": "fixed",
+      "observation": "Robustness finding: newState and finishGarden called env.progress without try/catch, so a throwing store crashed the game at start or at the first clear. Both are now guarded as in Shield Sentinel."
+    },
+    {
+      "id": "M2",
+      "severity": "medium",
+      "status": "fixed",
+      "observation": "Fairness finding: gardens 19-24 were only longer, with no hits at any reaction delay. Mastery gardens now have faster rocks (33-47 px/s, 3-4 per garden), tighter daylight pars (42-95 s) and timed beds open for about 3 s; gardens 1-18 are unchanged."
+    },
+    {
+      "id": "M3",
+      "severity": "medium",
+      "status": "fixed",
+      "observation": "Presentation findings: the ZH description said 左键/右键, which reads as mouse buttons, and the dusk rule was never explained while the daylight bar had no label. The ZH text now names the arrow keys, both descriptions explain the daylight bar and the hull fading every 5 s, garden 1's tip says to beat the daylight bar, and the bar reads Daylight/日光, then Dusk/天黑."
+    },
+    {
+      "id": "M4",
+      "severity": "medium",
+      "status": "fixed",
+      "observation": "Presentation findings: open and closed beds, and locked and open menu gardens, differed only by colour. Open beds now show a solid ring with a check mark and closed beds a dashed ring with a cross, and locked gardens show a padlock."
+    },
+    {
+      "id": "L1",
+      "severity": "low",
+      "status": "fixed",
+      "observation": "'a emerald' now reads 'an emerald', the menu tip mentions the arrows, the rock hint says to release Left/Right, an Infinity progress value clamps to 24 like any huge value, and an Up or Down press in the last 0.3 s of the clear screen carries into the next garden."
+    }
+  ],
+  "openNotes": [
+    "The mastery rock layouts were tuned against the reaction-limited and host test bots; human difficulty was not measured.",
+    "Two older quality thresholds were relaxed for gardens 19-24 (dropped-key tolerance 9 of 12, 3 s bed windows).",
+    "The source is a single file of about 1,600 lines, over the repository's 800-line soft ceiling."
+  ],
+  "browser": {
+    "method": "Official Claude in Chrome extension, local server; real clicks on Start, Play again and the language toggle, synthetic in-page keys driven by the status-line prompt; only DOM text and the canvas were read.",
+    "servedSha256Prefixes": "19eb6aea",
+    "observed": [
+      "With progress saved from earlier testing, Start opened the garden select with gardens 3-24 showing padlocks, and the description explained the daylight bar and the check and cross bed marks.",
+      "Garden 1 showed the labelled Daylight bar and the tip 'Beat the daylight bar or the hull fades'.",
+      "Loss: holding Space for less than the 1.3 s plant time never planted, the daylight ran out and the run ended with 'One more try?' and 'Night fell on garden 1 before it was restored.'",
+      "Win: following only the prompts (Hold Left to gather the seed, Hold Right to reach the bed, Stop, then hold Space to plant) restored garden 1 with 'Restored! Next garden: Arrows'.",
+      "Chinese 390 px phone frame (388 px inner, no horizontal overflow): the garden select in Chinese with padlocks and touch buttons 向左绕行, 向右绕行, 外移（门）, 内移（门） and 种植."
+    ],
+    "screenshots": ["screenshots/orbit-gardener-en.png", "screenshots/orbit-gardener-phone-zh.png"]
+  }
+}

@@ -44,6 +44,7 @@ Phase Tiles completed batch 18 and the 50-game target, Pixel Parkour included. T
 | Frost Forge      | Passed in one round: 22 workshops, tighter mastery clocks, guarded progress ([record](final-review/frost-forge.json)) |
 | Mimic Vault      | Passed in one round: 22 rooms, tighter mastery caps, guarded progress ([record](final-review/mimic-vault.json))       |
 | Comet Catcher    | Passed in one round: 22 contracts, narrowing cones, shape cues ([record](final-review/comet-catcher.json))            |
+| Orbit Gardener   | Passed in one round: 24 gardens, faster mastery rocks, dusk explained ([record](final-review/orbit-gardener.json))    |
 
 ## Completed batch 18
 
