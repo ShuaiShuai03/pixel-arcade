@@ -102,7 +102,7 @@ function driver(g) {
 }
 
 // The authored solution of one leg, played with public inputs only.
-function solveLeg(d, level, legIndex) {
+function solveLeg(d, level, legIndex, takes = []) {
   const leg = LEVELS[level - 1].legs[legIndex];
   d.press('Space');
   for (const stop of leg.route) d.walkTo(stop);
@@ -110,6 +110,7 @@ function solveLeg(d, level, legIndex) {
   d.press('Space');
   assert.ok(d.st().saved.ok, 'the recording ends on the echo perch');
   assert.ok(d.st().saved.seconds >= 1, 'recordings are comfortably longer than the minimum');
+  takes.push(d.st().saved.seconds);
   d.press('KeyX');
   leg.after.forEach((item, i) => {
     d.walkTo(item.at);
@@ -139,8 +140,8 @@ function solveLeg(d, level, legIndex) {
   });
 }
 
-function solveLevel(level, d = driver(start(level).g)) {
-  LEVELS[level - 1].legs.forEach((_, i) => solveLeg(d, level, i));
+function solveLevel(level, d = driver(start(level).g), takes = []) {
+  LEVELS[level - 1].legs.forEach((_, i) => solveLeg(d, level, i, takes));
   return d;
 }
 
@@ -369,7 +370,9 @@ test('an echo is blocked by walls and closed doors exactly like the player', () 
   assert.equal(s.echo.playing, false);
   assert.ok(s.echo.x + 8 <= door.x + 1e-6, 'the echo never passes the door');
   assert.ok(s.stats.blocked > 0 && s.echo.x > 0);
-  assert.ok(Math.abs(s.echo.x - pushed) < 0.8, 'it repeats the same bump');
+  // It repeats the same bump, then settles in the middle of the tile it stopped in.
+  assert.ok(Math.abs(s.echo.x - pushed) < 5, 'it repeats the same bump');
+  assert.ok(Math.abs(s.echo.x - px(Math.floor(pushed / T))) < 1e-6, 'and parks in the tile middle');
 });
 
 test('a recording made through an open door cannot bypass it once the door closes', () => {
@@ -856,4 +859,251 @@ test('F1: the marker routes around the parked echo instead of through it (room 5
     d.step(held);
   }
   assert.ok(d.st().player.y >= py(6), 'the player got past the solid echo');
+});
+
+// --- Final-review fixes ---
+
+const MASTERY_FIRST = 15;
+const COMBINATION = [8, 14];
+const mean = (list) => list.reduce((a, b) => a + b, 0) / list.length;
+
+// Seconds to walk between two tiles over walls alone (doors count as open).
+function walkSeconds(s, from, to) {
+  const wall = new Set(s.walls.map((w) => `${w.x / T},${(w.y - TOP) / T}`));
+  const seen = new Set([from.join()]);
+  let frontier = [from];
+  for (let steps = 0; frontier.length; steps++) {
+    if (frontier.some(([c, r]) => c === to[0] && r === to[1])) return (steps * T) / RULES.speed;
+    const next = [];
+    for (const [c, r] of frontier)
+      for (const [dc, dr] of [
+        [1, 0],
+        [-1, 0],
+        [0, 1],
+        [0, -1],
+      ]) {
+        const key = `${c + dc},${r + dr}`;
+        if (c + dc < 0 || r + dr < 0 || c + dc > 19 || r + dr > 10) continue;
+        if (wall.has(key) || seen.has(key)) continue;
+        seen.add(key);
+        next.push([c + dc, r + dr]);
+      }
+    frontier = next;
+  }
+  return Infinity;
+}
+
+// Slack of every timed or pair door: how long it stays open after the nearest of its plates is
+// released, minus the walk from that plate to the door.
+function windowSlacks(level) {
+  const s = start(level).g.getState();
+  return s.doors
+    .filter((door) => door.hold > 0)
+    .map((door) => {
+      const cell = [door.cells[0].x / T, (door.cells[0].y - TOP) / T];
+      const walks = door.needs.map((id) => {
+        const plate = find(s, id);
+        return walkSeconds(s, [plate.x / T, (plate.y - TOP) / T], cell);
+      });
+      return door.hold - Math.min(...walks);
+    });
+}
+
+const roomsIn = (first, last) => Array.from({ length: last - first + 1 }, (_, i) => first + i);
+
+test('mastery rooms 15-22 cap the recording and keep door windows tight, rooms 1-14 stay generous', () => {
+  const caps = LEVELS.map((l) => l.cap);
+  for (const level of roomsIn(1, 14)) assert.equal(caps[level - 1], RULES.maxRec);
+  // Longest scripted take per room, as a share of that room's cap.
+  const fill = (levels) =>
+    levels.map((level) => {
+      const takes = [];
+      solveLevel(level, driver(start(level).g), takes);
+      return Math.max(...takes) / LEVELS[level - 1].cap;
+    });
+  const mastery = roomsIn(MASTERY_FIRST, ROOM_COUNT);
+  const masteryFill = fill(mastery);
+  const comboFill = fill(roomsIn(...COMBINATION));
+  assert.ok(Math.max(...masteryFill) < 1, 'the authored solutions fit the caps');
+  assert.ok(mean(masteryFill) > mean(comboFill) * 1.5, 'mastery takes use far more of the cap');
+  for (const level of mastery) assert.ok(caps[level - 1] <= 8, `room ${level}`);
+  const windows = (levels) => levels.flatMap(windowSlacks);
+  const masteryWindows = windows(mastery);
+  assert.ok(Math.min(...masteryWindows) >= 0.9, 'still crossable at a 0.35 s reaction');
+  assert.ok(mean(masteryWindows) < mean(windows(roomsIn(...COMBINATION))) / 2);
+});
+
+test('the visible cap is the real cap: the timeline, the label and the auto-stop agree (room 18)', () => {
+  const { g } = start(18);
+  const cap = LEVELS[17].cap;
+  const d = driver(g);
+  assert.equal(d.st().timeline.max, cap);
+  assert.equal(d.st().recording.max, cap);
+  const { calls, ctx } = fontCapture();
+  g.draw(ctx);
+  assert.ok(calls.some((c) => c.str === `NO REC ${cap}s`));
+  d.press('Space');
+  d.step(['ArrowUp'], [], Math.round(60 * (cap - 0.5)));
+  assert.ok(d.st().recording.active);
+  d.step(['ArrowUp'], [], 60);
+  assert.ok(!d.st().recording.active);
+  assert.ok(Math.abs(d.st().saved.seconds - cap) < 1e-6);
+  const zh = fontCapture();
+  start(18, { lang: 'zh' }).g.draw(zh.ctx);
+  assert.ok(zh.calls.some((c) => c.str === `无录制 ${cap}秒`));
+});
+
+test('the tips that quote a recording length are true', () => {
+  assert.match(LEVELS[2].name.en, /Winding/);
+  assert.equal(LEVELS[2].cap, 12);
+  assert.equal(LEVELS[13].cap, 12);
+  assert.equal(start(3).g.getState().message.en, 'Recordings last 12 seconds at most');
+  assert.match(start(14).g.getState().message.en, /12 seconds/);
+});
+
+test('a throwing or broken progress store never crashes the game', () => {
+  const boom = () => {
+    throw new Error('store is gone');
+  };
+  for (const progress of [
+    { unlocked: boom, unlock: boom },
+    { unlocked: () => 'nonsense', unlock: boom },
+    { unlocked: () => 1 },
+    {},
+  ]) {
+    const h = harness();
+    h.env.progress = progress;
+    const g = createGame(h.env);
+    const d = driver(g);
+    assert.equal(d.st().phase, 'playing');
+    // Clearing room 1 works although saving fails.
+    d.press('Space');
+    d.walkTo(LEVELS[0].legs[0].route[0]);
+    d.step([], [], 12);
+    d.press('Space');
+    d.press('KeyX');
+    d.until((s) => s.echo && !s.echo.playing);
+    d.walkTo(LEVELS[0].exit);
+    d.step([], [], 5);
+    assert.equal(d.st().room, 2, 'the room is cleared even though the save threw');
+    d.step([], [], 60);
+    d.press('KeyZ');
+    d.press('KeyZ');
+    assert.equal(d.st().phase, 'playing');
+  }
+});
+
+test('presses during the "Room cleared!" pause are kept and applied when it ends', () => {
+  for (const [key, check] of [
+    ['Space', (s) => s.recording.active],
+    ['KeyZ', (s) => s.menu && s.menu.sel === 2],
+  ]) {
+    const { g } = start(1);
+    const d = driver(g);
+    d.press('Space');
+    d.walkTo(LEVELS[0].legs[0].route[0]);
+    d.step([], [], 12);
+    d.press('Space');
+    d.press('KeyX');
+    d.until((s) => s.echo && !s.echo.playing);
+    d.walkTo(LEVELS[0].exit);
+    d.step([], [], 3);
+    assert.equal(d.st().room, 2);
+    assert.match(d.st().message.en, /Room cleared/);
+    d.step([], [], 15);
+    d.press(key); // in the middle of the pause
+    assert.ok(!d.st().recording.active && !d.st().menu, 'nothing happens during the pause');
+    d.step([], [], 60);
+    assert.ok(check(d.st()), `${key} pressed in the pause is applied afterwards`);
+  }
+});
+
+test('a parked echo settles in the middle of its tile, so the marker never leads through its body (room 14)', () => {
+  const { g } = start(14);
+  const d = driver(g);
+  const leg = LEVELS[13].legs[0];
+  d.press('Space');
+  d.walkTo(leg.route[0]);
+  d.step([], [], 6);
+  d.press('Space');
+  d.press('KeyX');
+  d.until((s) => s.echo && !s.echo.playing);
+  d.step([], [], 30);
+  const echo = d.st().echo;
+  assert.ok(
+    Math.abs(echo.x - px(leg.route[0][0])) < 1e-6 && Math.abs(echo.y - py(leg.route[0][1])) < 1e-6,
+  );
+  // Neighbouring tiles are clear of the echo's 16 px body.
+  for (const [dc, dr] of [
+    [1, 0],
+    [-1, 0],
+    [0, 1],
+    [0, -1],
+  ]) {
+    const near = { x: px(leg.route[0][0] + dc), y: py(leg.route[0][1] + dr) };
+    assert.ok(Math.abs(near.x - echo.x) >= 16 || Math.abs(near.y - echo.y) >= 16);
+  }
+  for (const item of leg.after) {
+    d.walkTo(item.at);
+    if (item.wait === 'open') d.until(() => d.path(leg.after.at(-1).at));
+  }
+  assert.equal(d.st().room, 15);
+});
+
+test('the idle timeline segment, the replaying playhead and the locked rooms differ by shape, not colour alone', () => {
+  const draw = (g) => {
+    const rects = [];
+    const state = {};
+    const ctx = new Proxy(
+      { measureText: () => ({ width: 10 }), canvas: { width: 480, height: 320 } },
+      {
+        get: (t, p) =>
+          p === 'fillRect'
+            ? (x, y, w, h) => rects.push({ x, y, w, h, c: state.fillStyle })
+            : p in state
+              ? state[p]
+              : p in t
+                ? t[p]
+                : () => {},
+        set: (t, p, v) => ((state[p] = v), true),
+      },
+    );
+    g.draw(ctx);
+    return rects;
+  };
+  const { g } = start(1);
+  const d = driver(g);
+  d.press('Space');
+  d.step([], [], 30); // idle half second
+  d.step(['ArrowDown'], [], 30); // moving half second
+  d.press('Space');
+  const rects = draw(g);
+  const idle = rects.find((r) => r.c === '#2d7a58');
+  const moving = rects.find((r) => r.c === '#4ad991');
+  assert.ok(idle.h <= 2 && moving.h >= 8, 'idle is a thin line, moving a full block');
+  d.press('KeyX');
+  d.step([], [], 10);
+  const playing = draw(g).filter((r) => r.c === '#ffffff' && r.y < 296 && r.y >= 290);
+  assert.ok(playing.length >= 2, 'a replaying head wears an arrow');
+  d.until((s) => s.echo && !s.echo.playing);
+  const parked = draw(g).filter((r) => r.c === '#ffffff' && r.y < 296 && r.y >= 290);
+  assert.equal(parked.length, 0, 'a parked head has no arrow');
+  const menuFor = (unlocked) => {
+    const h = harness();
+    h.env.progress = { unlocked: () => unlocked, unlock() {} };
+    return createGame(h.env);
+  };
+  // The padlock shackle is eight 2 px pixels per locked room.
+  const shackles = (rects) => rects.filter((r) => r.c === '#8d9ac4' && r.w === 2 && r.h === 2);
+  assert.equal(
+    shackles(draw(menuFor(3))).length,
+    8 * (ROOM_COUNT - 3),
+    'every locked room has a padlock',
+  );
+  assert.equal(shackles(draw(menuFor(ROOM_COUNT))).length, 0);
+});
+
+test('the description is accurate about Z with a single room unlocked', () => {
+  assert.match(meta.description.en, /until then it restarts the room/);
+  assert.match(meta.description.zh, /在此之前则重新开始本间/);
 });

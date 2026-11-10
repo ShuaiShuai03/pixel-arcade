@@ -9,8 +9,8 @@ export const meta = {
   players: '1',
   touch: true,
   description: {
-    en: 'Press Space to record a short walk, press Space again to stop, then press X to send your translucent echo to repeat exactly those key presses. The echo is solid, obeys the same walls and closed doors as you, and can hold pressure plates while you slip past. Hold doors stay open only while a plate is pressed, timed doors stay open for a while after it, and some doors need two plates at once. Z clears the recording, then returns you to your checkpoint, then (once more than one room is unlocked) opens the vault list. Reach the exit of all 22 vault rooms; your progress is saved.',
-    zh: '按空格键录下一小段行走，再按空格键停止，然后按 X 让半透明的幻影重复完全相同的按键。幻影是实体，和你一样会被墙壁和关闭的门挡住，还能替你压住踏板。常开门只在踏板被压住时开启，限时门在松开后会再开一阵，有些门需要两块踏板同时被压住。Z 先清除录制，再回到检查点，（解锁多于一间后）再打开宝库列表。走到全部 22 间宝库的出口，进度会被保存。',
+    en: 'Press Space to record a short walk, press Space again to stop, then press X to send your translucent echo to repeat exactly those key presses. The echo is solid, obeys the same walls and closed doors as you, and can hold pressure plates while you slip past. Hold doors stay open only while a plate is pressed, timed doors stay open for a while after it, and some doors need two plates at once. Z clears the recording, then returns you to your checkpoint, then (once more than one room is unlocked) opens the vault list; until then it restarts the room. Reach the exit of all 22 vault rooms; your progress is saved.',
+    zh: '按空格键录下一小段行走，再按空格键停止，然后按 X 让半透明的幻影重复完全相同的按键。幻影是实体，和你一样会被墙壁和关闭的门挡住，还能替你压住踏板。常开门只在踏板被压住时开启，限时门在松开后会再开一阵，有些门需要两块踏板同时被压住。Z 先清除录制，再回到检查点，（解锁多于一间后）再打开宝库列表；在此之前则重新开始本间。走到全部 22 间宝库的出口，进度会被保存。',
   },
   keys: [
     { label: { en: 'Move', zh: '移动' }, keys: 'WASD / Arrows' },
@@ -55,7 +55,6 @@ export const RULES = Object.freeze({
 });
 const { tile: T, cols: COLS, rows: ROWS, top: TOP, step: STEP } = RULES;
 const HALF = RULES.actor / 2;
-const MAX_TICKS = Math.round(RULES.maxRec / STEP);
 const MIN_TICKS = Math.round(RULES.minRec / STEP);
 const DIAG = Math.SQRT1_2;
 const MENU_COLS = 11;
@@ -69,6 +68,22 @@ const DIRS = [
   [-1, 0],
   [0, -1],
 ];
+// Progress is a convenience: a missing or throwing store must never stop the game.
+function readUnlocked(progress) {
+  try {
+    const n = Math.floor(Number(progress?.unlocked?.()));
+    return Number.isFinite(n) ? Math.min(ROOM_COUNT, Math.max(1, n)) : 1;
+  } catch {
+    return 1;
+  }
+}
+function saveUnlocked(progress, room) {
+  try {
+    progress?.unlock?.(room);
+  } catch {
+    // Ignored on purpose: the room is cleared whether or not it could be saved.
+  }
+}
 const px = (c) => c * T + T / 2;
 const py = (r) => TOP + r * T + T / 2;
 const tileOf = (a) => [Math.floor(a.x / T), Math.floor((a.y - TOP) / T)];
@@ -112,8 +127,29 @@ const TXT = {
 const TIMED_HOLD = 6;
 const PATROL_HOLD = 7;
 const PAIR_HOLD = 10;
+// Mastery rooms (15-22) cap the recording length and size every door window to the walk that has to
+// beat it: the shortest tile route from the plate to the door, plus MASTERY_SLACK seconds.
+const MASTERY_SLACK = 1;
 
-function compose({ start, stages }) {
+function walkSeconds(g, from, to) {
+  const seen = new Set([from.join()]);
+  let frontier = [from];
+  for (let steps = 0; frontier.length; steps++) {
+    if (frontier.some(([c, r]) => c === to[0] && r === to[1])) return (steps * T) / RULES.speed;
+    frontier = frontier.flatMap(([c, r]) =>
+      DIRS.map(([dc, dr]) => [c + dc, r + dr]).filter(([nc, nr]) => {
+        const free = g[nr]?.[nc] !== undefined && g[nr][nc] !== '#' && !seen.has(`${nc},${nr}`);
+        if (free) seen.add(`${nc},${nr}`);
+        return free;
+      }),
+    );
+  }
+  return 0;
+}
+const tightHold = (g, from, to) => Math.ceil((walkSeconds(g, from, to) + MASTERY_SLACK) * 2) / 2;
+
+function compose({ start, stages, tight }) {
+  const hold = (kind, from, to) => (tight ? tightHold(g, from, to) : kind);
   const g = Array.from({ length: ROWS }, (_, r) =>
     Array.from({ length: COLS }, (_, c) =>
       r === 0 || r === ROWS - 1 || c === 0 || c === COLS - 1 ? '#' : '.',
@@ -144,7 +180,12 @@ function compose({ start, stages }) {
         const at = [x + z.p[0], z.p[1]];
         const id = putPlate(...at);
         route.push(at);
-        putDoor(x + z.w, z.d, [id], i < st.zones.length - 1 ? TIMED_HOLD : 0);
+        putDoor(
+          x + z.w,
+          z.d,
+          [id],
+          i < st.zones.length - 1 ? hold(TIMED_HOLD, at, [x + z.w, z.d]) : 0,
+        );
         x += z.w + 1;
         tail = [x, z.d];
       });
@@ -153,7 +194,7 @@ function compose({ start, stages }) {
       const b = [x + st.b[0], st.b[1]];
       const a = [x + st.a[0], st.a[1]];
       const ids = [putPlate(...a), putPlate(...b)];
-      putDoor(x + st.w, st.d, ids, PAIR_HOLD);
+      putDoor(x + st.w, st.d, ids, hold(PAIR_HOLD, a, [x + st.w, st.d]));
       x += st.w + 1;
       tail = [x, st.d];
       legs.push({ route: [b], after: [{ at: a, wait: 'open' }, { at: tail }] });
@@ -163,7 +204,7 @@ function compose({ start, stages }) {
       const ids = [putPlate(...p), putPlate(...q)];
       const wa = x + st.w;
       const wb = wa + 1 + st.tw;
-      putDoor(wa, st.dA, [ids[0]], PATROL_HOLD);
+      putDoor(wa, st.dA, [ids[0]], hold(PATROL_HOLD, p, [wa, st.dA]));
       putDoor(wb, st.dB, [ids[1]], 0);
       x = wb + 1;
       tail = [x, st.dB];
@@ -297,36 +338,48 @@ const ROOM_DEFS = [
   },
   {
     name: ['Patrol and Pair', '巡逻与配对'],
+    cap: 5,
+    tight: true,
     tip: ['Timed doors first, then a pair', '先过限时门，再踩双踏板'],
     start: [2, 5],
     stages: [P2(5, [1, 2], [1, 8], 3, 3, 7), T2(5, [1, 2], [1, 8], 5)],
   },
   {
     name: ['Pair and Patrol', '配对与巡逻'],
+    cap: 5.5,
+    tight: true,
     tip: ['A pair first, then timed doors', '先踩双踏板，再过限时门'],
     start: [2, 5],
     stages: [T2(5, [1, 2], [1, 8], 5), P2(5, [1, 2], [1, 8], 3, 3, 7)],
   },
   {
     name: ['Hall of Doors', '门厅'],
+    cap: 8,
+    tight: true,
     tip: ['One recording per door chain', '每条门链录制一次'],
     start: [2, 5],
     stages: [L(z(4, [1, 2], 8), z(4, [2, 8], 3)), L(z(4, [2, 2], 5))],
   },
   {
     name: ['Twin Twice', '双重配对'],
+    cap: 3,
+    tight: true,
     tip: ['Two pairs, two recordings', '两组双踏板，两次录制'],
     start: [2, 5],
     stages: [T2(6, [1, 2], [4, 8], 5), T2(6, [1, 8], [4, 2], 5)],
   },
   {
     name: ['Gauntlet', '考验'],
+    cap: 5.5,
+    tight: true,
     tip: ['Hold first, then race the clock', '先撑门，再和时间赛跑'],
     start: [2, 5],
     stages: [L(z(3, [1, 2], 5)), P2(5, [1, 2], [1, 8], 4, 3, 6)],
   },
   {
     name: ['Echo Maze', '回声迷宫'],
+    cap: 7.5,
+    tight: true,
     tip: ['The echo repeats every bump', '幻影会重复每次碰撞'],
     start: [2, 5],
     stages: [
@@ -339,6 +392,7 @@ const ROOM_DEFS = [
   },
   {
     name: ['Vault Heart', '宝库之心'],
+    cap: 6,
     tip: ['Hold, pair and time: use all three', '撑住、配对、限时：三招合用'],
     map: [
       '####################',
@@ -355,8 +409,8 @@ const ROOM_DEFS = [
     ],
     doors: {
       A: { needs: ['a'], hold: 0 },
-      C: { needs: ['b', 'c'], hold: 8 },
-      D: { needs: ['d'], hold: 7 },
+      C: { needs: ['b', 'c'], hold: 3.5 },
+      D: { needs: ['d'], hold: 3.5 },
       E: { needs: ['e'], hold: 0 },
     },
     legs: [
@@ -373,6 +427,8 @@ const ROOM_DEFS = [
   },
   {
     name: ['The Grand Vault', '终极宝库'],
+    cap: 7.5,
+    tight: true,
     tip: ['Use everything you have learned', '把学到的一切用上'],
     start: [2, 5],
     stages: [L(z(3, [1, 2], 7), z(3, [1, 8], 3)), T2(4, [1, 1], [2, 9], 5), L(z(3, [1, 8], 5))],
@@ -386,6 +442,7 @@ function buildRoom(def) {
   const room = {
     ...base,
     name: { en: def.name[0], zh: def.name[1] },
+    cap: def.cap ?? RULES.maxRec,
     grid: [],
     plates: [],
     cells: {},
@@ -412,6 +469,7 @@ const ROOMS = ROOM_DEFS.map(buildRoom);
 export const ROOM_COUNT = ROOMS.length;
 export const LEVELS = ROOMS.map((r) => ({
   name: r.name,
+  cap: r.cap,
   start: [...r.start],
   exit: [...r.exit],
   legs: r.legs.map((l) => ({
@@ -463,11 +521,12 @@ export function newState(env = {}) {
     ticks: 0,
     recSeq: 0,
     reached: 1,
+    queued: {},
     progress: env.progress || null,
     roomBest: Array(ROOM_COUNT).fill(0),
     stats: { recordings: 0, replays: 0, clears: 0, resets: 0, blocked: 0 },
   };
-  const unlocked = Math.min(ROOM_COUNT, s.progress?.unlocked?.() || 1);
+  const unlocked = readUnlocked(s.progress);
   loadRoom(s, 0);
   if (unlocked > 1) {
     s.menu = { sel: unlocked, unlocked };
@@ -556,6 +615,15 @@ function moveActor(s, a, mask, blocker) {
     } else a.y += a.vy * STEP;
   }
   return hitDoor;
+}
+
+// A parked echo glides to the middle of its tile, so its solid body never overhangs a neighbouring tile
+// and the markers, which treat the echo as one tile, always match what the player bumps into.
+function settleEcho(H) {
+  const [c, r] = tileOf(H);
+  const reach = RULES.speed * STEP;
+  H.x += Math.max(-reach, Math.min(reach, px(c) - H.x));
+  H.y += Math.max(-reach, Math.min(reach, py(r) - H.y));
 }
 
 function updateDoors(s, emit) {
@@ -843,8 +911,7 @@ function act(s, input, emit) {
   }
 }
 
-const unlockedCount = (s) =>
-  Math.min(ROOM_COUNT, Math.max(s.reached, s.progress?.unlocked?.() || 1));
+const unlockedCount = (s) => Math.min(ROOM_COUNT, Math.max(s.reached, readUnlocked(s.progress)));
 
 function menuInput(s, input, emit) {
   const m = s.menu;
@@ -868,7 +935,7 @@ function clearRoom(s, emit) {
   s.roomBest[s.room] = Math.max(s.roomBest[s.room], gain);
   s.score = s.roomBest.reduce((a, b) => a + b, 0);
   s.reached = Math.max(s.reached, s.room + 2);
-  s.progress?.unlock?.(Math.min(ROOM_COUNT, s.room + 2));
+  saveUnlocked(s.progress, Math.min(ROOM_COUNT, s.room + 2));
   if (s.room === ROOM_COUNT - 1) {
     s.phase = 'won';
     return;
@@ -888,7 +955,7 @@ function tick(s, mask, emit) {
   moveActor(s, s.P, mask, s.H);
   if (s.cur) {
     s.cur.inputs.push(mask);
-    if (s.cur.inputs.length >= MAX_TICKS) stopRecording(s, emit, true);
+    if (s.cur.inputs.length >= Math.round(ROOMS[s.room].cap / STEP)) stopRecording(s, emit, true);
   }
   const H = s.H;
   if (H?.playing) {
@@ -909,7 +976,7 @@ function tick(s, mask, emit) {
       H.playing = false;
       H.vx = H.vy = 0;
     }
-  }
+  } else if (H) settleEcho(H);
   updateDoors(s, emit);
   s.ticks++;
   s.shownAge += STEP;
@@ -923,13 +990,22 @@ function tick(s, mask, emit) {
   if (s.ticks % RULES.think === 0) think(s);
 }
 
+const QUEUED_KEYS = ['KeyZ', 'Space', 'KeyX'];
+
 export function advance(s, dt, input, emit = () => {}) {
   if (s.phase !== 'playing' || !Number.isFinite(dt) || dt <= 0 || dt > RULES.maxDt) return false;
   if (s.menu) {
     menuInput(s, input, emit);
     return true;
   }
-  if (s.freeze <= 0) act(s, input, emit);
+  if (s.freeze > 0) {
+    // A press during the "Room cleared!" pause is kept and applied the moment it ends.
+    for (const code of QUEUED_KEYS) if (input.pressed(code)) s.queued[code] = true;
+  } else {
+    const queued = s.queued;
+    s.queued = {};
+    act(s, { pressed: (...codes) => codes.some((c) => queued[c] || input.pressed(c)) }, emit);
+  }
   if (s.lineForce) updateLine(s);
   const mask = maskOf(input);
   s.acc += dt;
@@ -1026,7 +1102,7 @@ export function snapshotOf(s) {
       active: !!s.cur,
       ticks: s.cur ? s.cur.inputs.length : 0,
       seconds: s.cur ? s.cur.inputs.length * STEP : 0,
-      max: RULES.maxRec,
+      max: room.cap,
     },
     saved: s.rec
       ? {
@@ -1036,7 +1112,7 @@ export function snapshotOf(s) {
           ok: s.rec.ok,
         }
       : null,
-    timeline: { max: RULES.maxRec, segments: rle(recording || []), playhead: s.H?.i ?? null },
+    timeline: { max: room.cap, segments: rle(recording || []), playhead: s.H?.i ?? null },
     plates: room.plates.map((p) => ({
       id: p.id,
       ...cellRect(p),
@@ -1190,36 +1266,48 @@ function drawMarkers(ctx, s, room) {
   box(ctx, '#ffe066', m.x - 1, m.y - 10 + bob, 2, 3);
 }
 
+const PADLOCK = [
+  '..mmmm..',
+  '.m....m.',
+  '.m....m.',
+  'bbbbbbbb',
+  'bbbkkbbb',
+  'bbbkkbbb',
+  'bbbbbbbb',
+];
+const PADLOCK_COLORS = { m: '#8d9ac4', b: '#6c7898', k: '#14171f' };
 const TL = { x: 138, y: 296, w: 336, h: 14 };
 function drawTimeline(ctx, s, env) {
   box(ctx, '#0b0e17', 0, RULES.bottom, 480, 320 - RULES.bottom);
-  const perSec = TL.w / RULES.maxRec;
+  const cap = ROOMS[s.room].cap;
+  const perSec = TL.w / cap;
   const live = s.cur ? s.cur.inputs : s.rec?.inputs;
   const secs = live ? (live.length * STEP).toFixed(1) : '0.0';
-  let label = env.t('NO REC', '无录制');
-  if (s.cur) label = env.t(`REC ${secs}/${RULES.maxRec}s`, `录制 ${secs}/${RULES.maxRec}秒`);
+  let label = env.t(`NO REC ${cap}s`, `无录制 ${cap}秒`);
+  if (s.cur) label = env.t(`REC ${secs}/${cap}s`, `录制 ${secs}/${cap}秒`);
   else if (live) label = env.t(`SAVED ${secs}s`, `已存 ${secs}秒`);
   text(ctx, label, 6, 294, s.cur ? '#ff6a6a' : '#cfd6ea', 14);
   box(ctx, '#1b2133', TL.x, TL.y, TL.w, TL.h);
   let at = 0;
   for (const seg of rle(live || [])) {
     const w = Math.max(1, Math.round(seg.ticks * STEP * perSec));
-    box(
-      ctx,
-      seg.mask ? '#4ad991' : '#2d7a58',
-      TL.x + Math.round(at * perSec),
-      TL.y + 2,
-      w,
-      TL.h - 4,
-    );
+    // Moving takes are full-height blocks; idle takes are a thin dim line, so the two differ in shape.
+    const x = TL.x + Math.round(at * perSec);
+    if (seg.mask) box(ctx, '#4ad991', x, TL.y + 2, w, TL.h - 4);
+    else box(ctx, '#2d7a58', x, TL.y + TL.h / 2 - 1, w, 2);
     at += seg.ticks * STEP;
   }
-  for (let k = 0; k <= RULES.maxRec; k++)
+  for (let k = 0; k <= cap; k++)
     box(ctx, '#8d9ac4', TL.x + Math.round(k * perSec) - (k ? 1 : 0), TL.y + TL.h, 1, 4);
   box(ctx, '#cfd6ea', TL.x, TL.y - 1, TL.w, 1);
   if (s.H && s.rec) {
     const x = TL.x + Math.round(s.H.i * STEP * perSec);
     box(ctx, s.H.playing ? '#ffffff' : '#7be8ff', x, TL.y - 3, 2, TL.h + 6);
+    // Only a replaying head wears an arrow, so playing and parked differ by shape as well as colour.
+    if (s.H.playing) {
+      box(ctx, '#ffffff', x - 2, TL.y - 6, 6, 1);
+      box(ctx, '#ffffff', x - 1, TL.y - 5, 4, 1);
+    }
   }
 }
 
@@ -1233,8 +1321,11 @@ function drawMenu(ctx, s, env) {
     const open = i <= unlocked;
     box(ctx, i === sel ? '#ffe066' : '#3a4258', x - 2, y - 2, 36, 36);
     box(ctx, open ? '#262c3e' : '#14171f', x, y, 32, 32);
-    text(ctx, String(i), x + 16, y + 9, open ? '#ffffff' : '#555d75', 14, 'center');
+    if (open) text(ctx, String(i), x + 16, y + 9, '#ffffff', 14, 'center');
+    else pixelSprite(ctx, PADLOCK, x + 8, y + 7, 2, PADLOCK_COLORS);
   }
+  if (unlocked < ROOM_COUNT)
+    text(ctx, env.t('Padlock = locked', '锁 = 未解锁'), 240, 240, '#8d9ac4', 14, 'center');
   const name = ROOMS[sel - 1].name;
   text(ctx, `${sel}/${ROOM_COUNT}  ${env.t(name.en, name.zh)}`, 240, 170, '#ffffff', 16, 'center');
   text(ctx, env.t(...ROOMS[sel - 1].tip), 240, 200, '#8d9ac4', 14, 'center');

@@ -263,7 +263,8 @@
       "vine-warden",
       "tether-twins",
       "magnet-marauder",
-      "frost-forge"
+      "frost-forge",
+      "mimic-vault"
     ],
     "records": [
       "final-review/snowball-siege.json",
@@ -299,7 +300,8 @@
       "final-review/vine-warden.json",
       "final-review/tether-twins.json",
       "final-review/magnet-marauder.json",
-      "final-review/frost-forge.json"
+      "final-review/frost-forge.json",
+      "final-review/mimic-vault.json"
     ]
   }
 }

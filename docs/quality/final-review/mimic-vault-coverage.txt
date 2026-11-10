@@ -1,0 +1,72 @@
+per-room wins, fast reactions: 1:30 2:30 3:30 4:30 5:30 6:30 7:30 8:30 9:30 10:30 11:30 12:30 13:30 14:30 15:30 16:30 17:30 18:30 19:30 20:30 21:30 22:30
+per-room wins, slow reactions: 1:30 2:30 3:30 4:30 5:30 6:30 7:30 8:30 9:30 10:30 11:30 12:30 13:30 14:30 15:30 16:28 17:30 18:30 19:30 20:30 21:30 22:30
+campaign wins at 30 Hz: 30/30
+campaign wins at 60 Hz: 30/30
+campaign wins at 120 Hz: 30/30
+slow campaign wins at 60 Hz: 30/30
+✔ a delayed player (0.15-0.35 s) using only the screen clears every room in at least 27 of 30 runs at 30, 60 and 120 Hz (8505.969ms)
+✔ a slow player (0.4-0.6 s with jitter) clears every room in at least 24 of 30 runs at 30, 60 and 120 Hz (12024.621208ms)
+✔ the whole 22-room campaign is won in at least 27 of 30 runs at each frame rate (22943.605417ms)
+✔ the slow player also finishes the campaign in at least 24 of 30 runs at 60 Hz (10017.84375ms)
+✔ perturbed input (dropped keys, slips, irregular frame times) still clears representative rooms (4655.407583ms)
+✔ prompts name keys, are held at least half a second, rarely flip back and never lead into a dead state (310.453416ms)
+✔ the marker never points into a wall or a closed door (82.734583ms)
+✔ crude policies never win: random input, mashing the action keys, never recording, only recording (936.077166ms)
+✔ timed doors give humane windows and pair doors stay open long enough to cross (0.247417ms)
+✔ F1: a player who steps off the plate after recording still clears every room (3306.356375ms)
+✔ F2: the drawn top line names a key, holds at least half a second without input and never overflows (5021.984375ms)
+✔ metadata is complete, bilingual and the touch layout covers every action (1.093041ms)
+✔ every one of the 22 vault rooms has a legal scripted solution played through public inputs (544.868583ms)
+✔ the first rooms teach one idea at a time and the campaign has teach, combine and master stages (0.231917ms)
+✔ invalid frame times are inert and never consume a press (0.340542ms)
+✔ the same aligned input gives identical full state at 30, 60 and 120 Hz (55.064084ms)
+✔ movement is wall-blocked, speed-limited and uses a 16 px actor (0.94025ms)
+✔ recording: Space starts and stops, timeline is visible, short takes are discarded (0.251042ms)
+✔ a recording stops by itself at the visible maximum length (1.242666ms)
+✔ the echo repeats the recorded inputs through the same physics, step for step (1.756292ms)
+✔ an echo is blocked by walls and closed doors exactly like the player (5.608083ms)
+✔ a recording made through an open door cannot bypass it once the door closes (10.770167ms)
+✔ the echo is solid to the player and can hold a plate while the player passes (5.854ms)
+✔ timed doors stay open for their hold time and never close on an actor (5.036708ms)
+✔ a two-plate door needs both plates and keeps humane timing (3.436167ms)
+✔ Z clears the recording, then returns to the checkpoint, then opens the vault list (2.2695ms)
+✔ a first-time player has no menu, and Z at the checkpoint just restarts the room (0.149708ms)
+✔ progress: continue lands on the unlocked room, select is clamped, the best score is not farmed (72.400208ms)
+✔ a player can always get out: after any wandering, Z returns to a clean checkpoint (577.034833ms)
+✔ crude play does not win: idling, random keys and never recording leave every room unsolved (206.482209ms)
+✔ terminal: the end callback fires once, the game freezes, a new instance starts fresh (24.203375ms)
+✔ the status is bilingual, names the room and the keys, and events reach it (0.478917ms)
+✔ long seeded chaos stays finite and bounded (39.791666ms)
+✔ drawing: every phase renders, text is 14-16 px, fits the canvas and stays out of the play area (64.44675ms)
+✔ layout: HUD bands do not cover play, actors are at least 16 px and the echo looks different (1.656833ms)
+✔ F1: stepping off the plate before the echo parks never stalls the leg (rooms 1 and 6) (15.502458ms)
+✔ F3: the walls in the snapshot cannot be mutated (0.368792ms)
+✔ F4: the copy matches the behaviour and the touch label says Record/Stop (0.074834ms)
+✔ F1: the marker routes around the parked echo instead of through it (room 5) (4.638083ms)
+✔ mastery rooms 15-22 cap the recording and keep door windows tight, rooms 1-14 stay generous (312.495041ms)
+✔ the visible cap is the real cap: the timeline, the label and the auto-stop agree (room 18) (0.617583ms)
+✔ the tips that quote a recording length are true (0.05475ms)
+✔ a throwing or broken progress store never crashes the game (38.699959ms)
+✔ presses during the "Room cleared!" pause are kept and applied when it ends (19.544125ms)
+✔ a parked echo settles in the middle of its tile, so the marker never leads through its body (room 14) (45.470792ms)
+✔ the idle timeline segment, the replaying playhead and the locked rooms differ by shape, not colour alone (1.143167ms)
+✔ the description is accurate about Z with a single room unlocked (0.048792ms)
+ℹ tests 47
+ℹ suites 0
+ℹ pass 47
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 67872.974959
+ℹ start of coverage report
+ℹ -----------------------------------------------------------------
+ℹ file             | line % | branch % | funcs % | uncovered lines
+ℹ -----------------------------------------------------------------
+ℹ src              |        |          |         | 
+ℹ  games           |        |          |         | 
+ℹ   mimic-vault.js |  99.70 |    98.09 |   99.07 | 
+ℹ -----------------------------------------------------------------
+ℹ all files        |  99.70 |    98.09 |   99.07 | 
+ℹ -----------------------------------------------------------------
+ℹ end of coverage report

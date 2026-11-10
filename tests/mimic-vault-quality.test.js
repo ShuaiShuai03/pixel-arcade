@@ -289,6 +289,8 @@ test('timed doors give humane windows and pair doors stay open long enough to cr
   for (let level = 1; level <= ROOM_COUNT; level++) {
     const { g } = begin(level, 1);
     for (const d of g.getState().doors) {
+      // Rooms 15-22 size their windows to the walk (see the mastery test); the rest are generous.
+      if (level >= 15) continue;
       if (d.needs.length > 1) assert.ok(d.hold >= 8, `pair door ${d.id} in room ${level}`);
       if (d.hold) assert.ok(d.hold >= 6, `timed door ${d.id} in room ${level}`);
     }
