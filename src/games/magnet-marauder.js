@@ -282,7 +282,9 @@ export const CHAMBERS = [
   },
   {
     name: { en: 'Reactor Forge', zh: '反应炉锻房' },
-    tip: ['Mix of foes: clear the most urgent one first', '敌人混合出现：先处理最紧迫的'],
+    tempo: 0.6,
+    plating: 1,
+    tip: ['Mastery: foes are faster and tougher now', '精通之路：敌人更快、更硬了'],
     start: { x: 436, y: 262 },
     pillars: [box(224, 138, 256, 186)],
     machines: [
@@ -294,6 +296,8 @@ export const CHAMBERS = [
   },
   {
     name: { en: 'Long Shift', zh: '漫长轮班' },
+    tempo: 0.6,
+    plating: 1,
     tip: ['Five foes in turn: keep metal in orbit', '五个敌人轮番登场：保持轨道上有金属'],
     flip: true,
     start: { x: 436, y: 62 },
@@ -312,16 +316,25 @@ export const CHAMBERS = [
     ],
   },
   {
-    name: { en: 'Ricochet Hall', zh: '回弹长厅' },
-    tip: ['Walls block throws: find the open lane', '墙会挡住射线：找到开阔的位置'],
+    name: { en: 'Gap Hall', zh: '缺口长厅' },
+    tempo: 0.6,
+    plating: 2,
+    tip: ['Walls block throws: aim through the gaps', '墙会挡住射线：从缺口处瞄准'],
     start: { x: 436, y: 262 },
-    pillars: [box(180, 100, 330, 112), box(180, 212, 330, 224)],
+    pillars: [
+      box(180, 100, 240, 112),
+      box(270, 100, 330, 112),
+      box(180, 212, 240, 224),
+      box(270, 212, 330, 224),
+    ],
     machines: [[56, 162]],
     metals: [plate(100, 110), plate(100, 214), plate(135, 162), plate(110, 60)],
     foes: [brute(370, 100), charger(370, 70, 1), brute(370, 130, 2)],
   },
   {
     name: { en: 'Cross Pillars', zh: '十字立柱' },
+    tempo: 0.6,
+    plating: 1,
     tip: ['Pillars hide foes and machines from your aim', '立柱会遮住敌人，也会挡住瞄准'],
     start: { x: 436, y: 62 },
     pillars: [pillar(150, 150), pillar(306, 150), pillar(228, 110), pillar(228, 190)],
@@ -334,6 +347,8 @@ export const CHAMBERS = [
   },
   {
     name: { en: 'Twin Gallery', zh: '双子长廊' },
+    tempo: 0.65,
+    plating: 1,
     tip: ['Mastery: two machines, steady hands', '精通之路：两台机器，沉着应对'],
     flip: true,
     start: { x: 436, y: 262 },
@@ -353,6 +368,8 @@ export const CHAMBERS = [
   },
   {
     name: { en: 'Triple Charge', zh: '三重冲锋' },
+    tempo: 0.5,
+    plating: 2,
     tip: ['Mastery: three chargers, three lanes', '精通之路：三个冲锋者，三条通道'],
     start: { x: 436, y: 262 },
     pillars: [box(250, 110, 274, 134), box(250, 190, 274, 214)],
@@ -366,6 +383,8 @@ export const CHAMBERS = [
   },
   {
     name: { en: 'Pressure', zh: '步步紧逼' },
+    tempo: 0.6,
+    plating: 1,
     tip: ['Mastery: waves of foes keep coming', '精通之路：敌人一波接一波'],
     flip: true,
     start: { x: 436, y: 62 },
@@ -386,6 +405,8 @@ export const CHAMBERS = [
   },
   {
     name: { en: 'Heavy Duty', zh: '重型作业' },
+    tempo: 0.55,
+    plating: 1,
     tip: ['Mastery: slabs hit hard, so plan every throw', '精通之路：铁块威力大，谋定而后射'],
     start: { x: 436, y: 262 },
     pillars: [box(250, 100, 274, 124), box(250, 200, 274, 224)],
@@ -404,6 +425,8 @@ export const CHAMBERS = [
   },
   {
     name: { en: 'Final Foundry', zh: '终极铸造厂' },
+    tempo: 0.55,
+    plating: 1,
     tip: ['Final chamber: use everything you have learned', '最终车间：运用你学到的一切'],
     start: { x: 436, y: 262 },
     pillars: [pillar(250, 100, 24, 40), pillar(250, 190, 24, 40)],
@@ -503,6 +526,7 @@ export function createWorld(random = Math.random, first = 0) {
     nextId: 1,
     sounds: [],
     cleared: 0,
+    repelQueued: false,
   };
   loadChamber(w, first);
   return w;
@@ -515,6 +539,8 @@ export function loadChamber(w, index) {
   const mirrorBox = (b) =>
     box(Math.min(mx(b.x0), mx(b.x1)), b.y0, Math.max(mx(b.x0), mx(b.x1)), b.y1);
   w.chamber = index;
+  w.tempo = c.tempo ?? 1;
+  w.plating = c.plating ?? 0;
   w.walls = [...FRAME, ...c.pillars.map(mirrorBox)];
   w.p = {
     x: mx(c.start.x),
@@ -605,8 +631,11 @@ export function spawnPending(w) {
       y: doorSpot(w, spec),
       hw: base.hw,
       hh: base.hh,
-      hp: base.hp,
-      maxHp: base.hp,
+      hp: base.hp + w.plating,
+      maxHp: base.hp + w.plating,
+      walkSpeed: base.speed / w.tempo,
+      windTime: base.wind * w.tempo,
+      restTime: base.rest * w.tempo,
       vx: 0,
       vy: 0,
       state: 'walk',
@@ -1003,9 +1032,12 @@ const nearestMachine = (w, f) =>
     null,
   );
 
+// A chamber's `tempo` (below 1 = faster) scales how long its foes telegraph and rest.
+const windOf = (f) => f.windTime ?? FOES[f.type].wind;
+const restOf = (f) => f.restTime ?? FOES[f.type].rest;
 function enterWind(f, k) {
   f.state = 'wind';
-  f.t = FOES[f.type].wind;
+  f.t = windOf(f);
   [f.dirx, f.diry] = unit(k.x - f.x, k.y - f.y);
 }
 
@@ -1018,7 +1050,7 @@ function stepFoe(w, f) {
   }
   if (f.stun > 0) {
     f.stun = Math.max(0, f.stun - STEP);
-    if (f.stun === 0 && f.state === 'wind') f.t = FOES[f.type].wind;
+    if (f.stun === 0 && f.state === 'wind') f.t = windOf(f);
     return;
   }
   const base = FOES[f.type];
@@ -1041,7 +1073,7 @@ function stepFoe(w, f) {
     const [ux, uy] = unit(k.x - f.x, k.y - f.y);
     const dist = Math.hypot(k.x - f.x, k.y - f.y);
     if (f.type === 'brute' ? gapBetween(f, k) <= 3 : dist <= CHARGE_RANGE) enterWind(f, k);
-    else walk(ux, uy, base.speed);
+    else walk(ux, uy, f.walkSpeed ?? base.speed);
   } else if (f.state === 'wind') {
     if (f.t > 0) return;
     if (f.type === 'charger') {
@@ -1050,7 +1082,7 @@ function stepFoe(w, f) {
     } else {
       damageMachine(w, k, base.dmg, false);
       f.state = 'rest';
-      f.t = base.rest;
+      f.t = restOf(f);
     }
   } else if (f.state === 'dash') {
     const { bx, by } = moveBody(
@@ -1065,7 +1097,7 @@ function stepFoe(w, f) {
     if (rammed) damageMachine(w, rammed, base.dmg, false);
     if (rammed || bx || by || f.t === 0) {
       f.state = 'dizzy';
-      f.t = base.rest;
+      f.t = restOf(f);
     }
   } else if (f.state === 'dizzy') {
     if (f.t === 0) {
@@ -1198,24 +1230,25 @@ function tick(w, inp) {
   promoteMessage(w);
 }
 
-const readInput = (input, first) => ({
+const readInput = (input, repel) => ({
   left: input.held('ArrowLeft', 'KeyA'),
   right: input.held('ArrowRight', 'KeyD'),
   up: input.held('ArrowUp', 'KeyW'),
   down: input.held('ArrowDown', 'KeyS'),
   space: input.held('Space'),
-  repel: first && input.pressed('KeyX'),
+  repel,
 });
 
 export function stepWorld(w, dt, input) {
   if (w.phase !== 'playing' || !Number.isFinite(dt) || dt <= 0 || dt > MAX_ACCEPTED_DT) return;
   w.acc += Math.min(dt, MAX_FRAME);
   w.sounds = [];
-  let first = true;
+  // A press made in a frame that runs no tick (a very fast display) waits for the next tick.
+  if (input.pressed('KeyX')) w.repelQueued = true;
   while (w.acc + 1e-9 >= STEP && w.phase === 'playing') {
     w.acc -= STEP;
-    tick(w, readInput(input, first));
-    first = false;
+    tick(w, readInput(input, Boolean(w.repelQueued)));
+    w.repelQueued = false;
   }
   if (Math.abs(w.acc) < 1e-9) w.acc = 0;
 }
@@ -1325,8 +1358,25 @@ export function menuStep(menu, input) {
   return { ...menu, sel: clamp(menu.sel + move, 0, menu.unlocked - 1) };
 }
 
+// Progress is a convenience: a broken store must not stop the game.
+function readUnlocked(progress) {
+  try {
+    const n = Math.floor(Number(progress?.unlocked?.() ?? 1));
+    return Number.isFinite(n) ? clamp(n, 1, CHAMBER_COUNT) : 1;
+  } catch {
+    return 1;
+  }
+}
+function saveUnlocked(progress, chamber) {
+  try {
+    progress?.unlock?.(chamber);
+  } catch {
+    // Ignored on purpose: see readUnlocked.
+  }
+}
+
 export function createGame(env) {
-  const unlocked = clamp(Math.floor(env.progress?.unlocked?.() ?? 1) || 1, 1, CHAMBER_COUNT);
+  const unlocked = readUnlocked(env.progress);
   const w = createWorld(env.random);
   // Only offer a choice when there is something to choose.
   let menu = { open: unlocked > 1, sel: unlocked - 1, unlocked };
@@ -1347,7 +1397,7 @@ export function createGame(env) {
       for (const s of w.sounds) env.sound(s);
       if (w.cleared > reported) {
         reported = w.cleared;
-        env.progress?.unlock?.(Math.min(CHAMBER_COUNT, reported + 1));
+        saveUnlocked(env.progress, Math.min(CHAMBER_COUNT, reported + 1));
       }
       if (w.phase === 'playing') return;
       ended = true;
@@ -1595,8 +1645,12 @@ function drawMenu(ctx, menu, env) {
       chosen = i === menu.sel;
     rect(ctx, chosen ? '#ffe066' : '#444a55', c.x, c.y, MENU.cellW, MENU.cellH);
     rect(ctx, open ? '#2e3a4a' : '#1d2026', c.x + 2, c.y + 2, MENU.cellW - 4, MENU.cellH - 4);
-    const color = !open ? '#6b717c' : i < menu.unlocked - 1 ? '#9cffb5' : '#fff';
+    const cleared = i < menu.unlocked - 1;
+    const color = !open ? '#6b717c' : cleared ? '#9cffb5' : '#fff';
     text(ctx, String(i + 1), c.x + MENU.cellW / 2, c.y + 10, color, 16, 'center');
+    // Shape as well as colour: a cleared chamber has a long green bar, the current one a short white bar.
+    if (cleared) rect(ctx, '#9cffb5', c.x + 6, c.y + MENU.cellH - 9, MENU.cellW - 12, 3);
+    else if (open) rect(ctx, '#fff', c.x + MENU.cellW / 2 - 7, c.y + MENU.cellH - 9, 14, 3);
   }
   text(
     ctx,

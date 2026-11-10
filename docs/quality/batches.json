@@ -261,7 +261,8 @@
       "burrow-rescue",
       "dash-duelist",
       "vine-warden",
-      "tether-twins"
+      "tether-twins",
+      "magnet-marauder"
     ],
     "records": [
       "final-review/snowball-siege.json",
@@ -295,7 +296,8 @@
       "final-review/burrow-rescue.json",
       "final-review/dash-duelist.json",
       "final-review/vine-warden.json",
-      "final-review/tether-twins.json"
+      "final-review/tether-twins.json",
+      "final-review/magnet-marauder.json"
     ]
   }
 }

@@ -1,0 +1,62 @@
+{
+  "game": "magnet-marauder",
+  "date": "2026-11-10",
+  "reviewedRevision": "e7d7d365 (accepted build) plus the fixes in this commit",
+  "owner": "owner-magnet",
+  "reviewer": "final-magnet",
+  "rounds": 1,
+  "process": "Lean final review at the user's request. The game already had 25 chambers, so it went straight to one independent review round. Its MEDIUM progress-store finding, a flat mastery tier and three cheap LOW items were fixed and verified by re-running the reviewer's own pilot, blind and correctness scripts, one clean-worktree run and the browser check, without a second review round.",
+  "verdict": "pass",
+  "approvedSha256": {
+    "src/games/magnet-marauder.js": "e8939c6e4b1421cfcf6b9525110bcca9f30f45b0b2d4010f35667d1d5ceb921b",
+    "tests/magnet-marauder.test.js": "c16b47b698400e936ece462caed8a5023a0d412643a9a9bd1900e274b3e36198",
+    "tests/magnet-marauder-quality.test.js": "f53ce6a13df05e85b6b87e8a9283194c3ede2c08a8e203ae68990533597fa45d"
+  },
+  "tests": {
+    "command": "node --experimental-test-coverage --test-coverage-include='src/games/magnet-marauder*.js' --test tests/magnet-marauder.test.js tests/magnet-marauder-quality.test.js",
+    "passed": 102,
+    "failed": 0,
+    "lineCoverage": 100,
+    "log": "magnet-marauder-coverage.txt"
+  },
+  "independentProbes": "On the final files the reviewer's reaction-limited bot (public getState only, 60 Hz, 20 seeds per chamber) cleared 496 of 500 chamber runs at 0.35 s and 150 of 150 at 0.25 s. The worst chamber was 21 at 17 of 20, and the mastery chambers 17-25 now leave the machines at about 7-12 of 14 health against about 13 in the combination tier. The owner's 100-seed sweep found mastery at 98.2% at 0.35 s and 91.8% at 0.6 s, where it had been 249 of 250. Blind play (316 patterns per chamber: idle, mash, random keys, hold-and-alternate at 0.1-2 s) cleared 0.34% overall and at most 1.3% of any chamber from 3. Hostile dt and pointer fuzz found no problems, every broken progress store was safe, an X press was never lost at 30-240 Hz, and in the review round final states matched across 30, 60 and 120 Hz, each run ended exactly once and froze, and EN and ZH text fit.",
+  "findings": [
+    {
+      "id": "M1",
+      "severity": "medium",
+      "status": "fixed",
+      "observation": "Review finding: createGame and the chamber-clear unlock called env.progress without try/catch, so a throwing store crashed the game at start or at the first clear. Both calls are now guarded as in Shield Sentinel, with quality tests."
+    },
+    {
+      "id": "M2",
+      "severity": "medium",
+      "status": "fixed",
+      "observation": "Review observation: mastery chambers 17-25 were longer but not harder; the reviewer's bot cleared every chamber with almost no damage, even at 0.6 s reaction. Mastery chambers now set a per-chamber tempo (0.5-0.65, faster wind-ups and walks) and plating (1-2 extra hit points per foe), and chamber 17's tip announces it."
+    },
+    {
+      "id": "L1",
+      "severity": "low",
+      "status": "fixed",
+      "observation": "Review findings: 'Ricochet Hall' had a tip about blocked throws and a corridor the bot could not aim in, the select screen marked cleared and current chambers by colour alone, and an X press could be lost on a frame with no simulation tick. The chamber is now 'Gap Hall' (缺口长厅) with split walls and a matching tip, cleared and current cells carry long and short bars, and X presses are queued until the next tick."
+    }
+  ],
+  "openNotes": [
+    "The source is a single 1,600-line file, over the repository's 800-line soft ceiling; the review found no defect hidden by it.",
+    "Mastery is harder through faster, tougher foes and machine damage; the player's own HP is rarely threatened.",
+    "Several older quality gates that encoded the previous flat balance were relaxed, for example a casual bot now needs to reach chamber 17 rather than win all 25."
+  ],
+  "browser": {
+    "method": "Official Claude in Chrome extension, local server; real clicks on Start and the language toggle; only DOM text and the canvas were read.",
+    "servedSha256Prefixes": "e8939c6e",
+    "observed": [
+      "English: Start opened chamber 1 of 25 with HP, the weakest machine and the prompt 'Hold Space: pull · face foe, X: throw · dodge red' in the status line.",
+      "Loss: left idle, enemies wound up on the machine until 'Machine 1 hit! 0/14', and the run ended with 'One more try?' and 'Enemies wrecked the machinery. Hit them before their wind-up ends.'",
+      "Chinese 390 px phone frame (388 px inner, no horizontal overflow): chamber 1 in Chinese with touch buttons 左, 上, 下, 右, 吸引（按住） and 排斥.",
+      "Not covered in the browser: a chamber win and the mastery chambers; the reviewer's pilot and the quality tests cover them."
+    ],
+    "screenshots": [
+      "screenshots/magnet-marauder-loss-en.png",
+      "screenshots/magnet-marauder-phone-zh.png"
+    ]
+  }
+}

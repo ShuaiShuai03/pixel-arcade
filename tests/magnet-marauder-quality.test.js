@@ -14,7 +14,11 @@ import {
   REPEL_V,
   FIELD_R,
   MACHINE_HP,
+  MACHINE_V,
+  CLEAR_TIME,
+  FOES,
   CHAMBER_COUNT,
+  CHAMBERS,
   inLane,
 } from '../src/games/magnet-marauder.js';
 import { harness, input, mockContext, seeded } from './harness.js';
@@ -267,6 +271,10 @@ const seedsOf = (n) => Array.from({ length: n }, (_, i) => i + 1);
 const ALL = Array.from({ length: CHAMBER_COUNT }, (_, i) => i);
 // five rooms that differ in what they teach: orbit, a charger lane, two machines, a slab gate, the finale
 const FIVE = [0, 5, 8, 15, CHAMBER_COUNT - 1];
+// Chambers 17-25 (zero-based 16 and up) are the mastery tier: faster, tougher foes. They are meant
+// to cost a slow or casual player the odd run, so their gates are lower than the earlier chambers'.
+const MASTERY_FROM = 16;
+const gate = (chamber, normal, mastery) => (chamber >= MASTERY_FROM ? mastery : normal);
 // a spread used by the long invariant checks that would be too slow on all 25
 const SAMPLE = [0, 3, 6, 12, 17, 22];
 
@@ -289,14 +297,14 @@ test('quality: every chamber is cleared by a 0.15-0.35 s visible-information pol
 test('quality: every chamber is cleared by a slow, jittery 0.4-0.6 s policy (60 Hz)', () => {
   for (const chamber of ALL) {
     const wins = clears(chamber, 60, 0.4, 0.2);
-    assert.ok(wins >= 24, `chamber ${chamber + 1}: ${wins}/30`);
+    assert.ok(wins >= gate(chamber, 24, 20), `chamber ${chamber + 1}: ${wins}/30`);
   }
 });
 
 test('quality: every chamber is cleared by a casual player (nearest foe, straight lines, no triage)', () => {
   for (const chamber of ALL) {
     const wins = clears(chamber, 60, 0.4, 0.2, makeCasualPolicy);
-    assert.ok(wins >= 24, `chamber ${chamber + 1}: ${wins}/30`);
+    assert.ok(wins >= gate(chamber, 24, 16), `chamber ${chamber + 1}: ${wins}/30`);
   }
 });
 
@@ -307,8 +315,11 @@ test('quality: five different chambers hold all three gates at 30 and 120 Hz', (
       const slow = clears(chamber, hz, 0.4, 0.2);
       const casual = clears(chamber, hz, 0.4, 0.2, makeCasualPolicy);
       assert.ok(fast >= 27, `chamber ${chamber + 1} ${hz} Hz fast: ${fast}/30`);
-      assert.ok(slow >= 24, `chamber ${chamber + 1} ${hz} Hz slow: ${slow}/30`);
-      assert.ok(casual >= 24, `chamber ${chamber + 1} ${hz} Hz casual: ${casual}/30`);
+      assert.ok(slow >= gate(chamber, 24, 18), `chamber ${chamber + 1} ${hz} Hz slow: ${slow}/30`);
+      assert.ok(
+        casual >= gate(chamber, 24, 14),
+        `chamber ${chamber + 1} ${hz} Hz casual: ${casual}/30`,
+      );
     }
   }
 });
@@ -377,8 +388,10 @@ function wonCampaign() {
   assert.fail('no campaign was won in six tries');
 }
 
-test('quality: a casual player can play the whole campaign through to the end', () => {
-  let wins = 0;
+// The mastery tier (chambers 17-25) asks for real execution: a casual player is expected to get
+// through the teaching and combination chambers and into mastery, and may fall there.
+test('quality: a casual player plays through the teaching and combination chambers into mastery', () => {
+  let reached = 0;
   const seeds = seedsOf(8);
   for (const seed of seeds) {
     const r = playPolicy({
@@ -390,9 +403,10 @@ test('quality: a casual player can play the whole campaign through to the end', 
       campaign: true,
     });
     assert.equal(r.h.ends.length, 1, 'every campaign ends exactly once');
-    if (r.g.getState().phase === 'won') wins++;
+    const s = r.g.getState();
+    if (s.phase === 'won' || s.chamber > MASTERY_FROM) reached++;
   }
-  assert.ok(wins >= 3, `${wins}/${seeds.length} casual campaigns won`);
+  assert.ok(reached >= 4, `${reached}/${seeds.length} casual campaigns reached chamber 17`);
 });
 
 test('quality: clearing a chamber unlocks the next, in order, and the last win keeps the last', () => {
@@ -667,7 +681,9 @@ test('quality: every hit on the player or machinery was telegraphed and nothing 
             const hit = prev.machines.filter((m, i) => s.machines[i].hp < m.hp);
             // damage from the player's own fast metal needs no wind-up; everything else does
             const ownMetal = hit.some((m) =>
-              prev.metals.some((q) => q.fast && Math.hypot(q.x - m.x, q.y - m.y) < 40),
+              prev.metals.some(
+                (q) => q.speed >= MACHINE_V && Math.hypot(q.x - m.x, q.y - m.y) < 40,
+              ),
             );
             if (hit.length && !ownMetal) {
               assert.ok(
@@ -855,4 +871,166 @@ test('quality: no event message ever flashes for a tick or two (a replaced event
     }
   }
   assert.ok(runs > 50);
+});
+
+// ------------------------------------------------------------ broken progress stores
+
+test('quality: a progress store whose unlocked() throws or misbehaves never stops the game starting', () => {
+  const stores = [
+    {
+      unlocked: () => {
+        throw new Error('storage blocked');
+      },
+      unlock: () => {},
+    },
+    { unlocked: () => Number.NaN, unlock: () => {} },
+    { unlocked: () => ({}), unlock: () => {} },
+    { unlocked: () => 'seven', unlock: () => {} },
+    { unlocked: () => -5, unlock: () => {} },
+    { unlocked: undefined, unlock: undefined },
+  ];
+  for (const progress of stores) {
+    const h = harness({ seed: 1 });
+    h.env.progress = progress;
+    const g = createGame(h.env);
+    g.update(1 / 60, input([], []));
+    const s = g.getState();
+    assert.equal(s.phase, 'playing', 'no chamber select, the run starts');
+    assert.equal(s.chamber, 1);
+  }
+  const h = harness({ seed: 1 });
+  h.env.progress = { unlocked: () => 999, unlock: () => {} };
+  assert.equal(createGame(h.env).getState().menu.unlocked, CHAMBER_COUNT);
+});
+
+test('quality: a progress store whose unlock() throws never kills the run on a chamber clear', () => {
+  const h = harness({ seed: 1 });
+  let attempts = 0;
+  h.env.progress = {
+    unlocked: () => 1,
+    unlock: () => {
+      attempts++;
+      throw new Error('storage full');
+    },
+  };
+  const g = createGame(h.env);
+  const policy = makePolicy();
+  for (let t = 0; t < 60 && attempts === 0 && h.ends.length === 0; t += 1 / 60) {
+    const a = policy(g.getState());
+    assert.doesNotThrow(() => g.update(1 / 60, input(a.held, a.pressed)));
+  }
+  assert.equal(attempts, 1, 'the clear tried to save once');
+  assert.equal(h.ends.length, 0, 'the run is still going');
+  for (let t = 0; t < CLEAR_TIME + 0.5; t += 1 / 60) g.update(1 / 60, input([], []));
+  assert.equal(g.getState().chamber, 2, 'the next chamber still loads');
+});
+
+// ------------------------------------------------------------ the mastery tier
+
+test('quality: chambers 17-25 have faster, tougher foes, and chambers 1-16 keep the base foes', () => {
+  for (const chamber of ALL) {
+    const foes = snapshot(createWorld(seeded(1), chamber)).foes;
+    assert.ok(foes.length > 0, `chamber ${chamber + 1} starts with a foe`);
+    for (const f of foes) {
+      const base = FOES[f.type];
+      if (chamber < MASTERY_FROM) {
+        assert.deepEqual(
+          [f.maxHp, f.windTime, f.restTime, f.walkSpeed],
+          [base.hp, base.wind, base.rest, base.speed],
+          `chamber ${chamber + 1} is a plain chamber`,
+        );
+      } else {
+        const faster = f.windTime < base.wind && f.restTime < base.rest && f.walkSpeed > base.speed;
+        assert.ok(faster && f.maxHp > base.hp, `chamber ${chamber + 1} is a mastery chamber`);
+      }
+    }
+  }
+});
+
+test('quality: a mastery foe spawns with its plating added to the base hit points', () => {
+  const w = createWorld(seeded(1), MASTERY_FROM);
+  const [foe] = w.foes;
+  const base = FOES[foe.type];
+  assert.ok(foe.windTime < base.wind);
+  assert.equal(foe.hp, base.hp + w.plating, 'plating adds to the base hit points');
+  assert.equal(foe.hp, foe.maxHp);
+});
+
+// ------------------------------------------------------------ input latch and select screen
+
+test('quality: an X press is never lost, at any frame rate or tick phase', () => {
+  for (const hz of [30, 60, 120, 144, 165, 240, 500]) {
+    for (let phase = 0; phase < 12; phase++) {
+      const w = createWorld(seeded(3), 0);
+      w.pending = [];
+      Object.assign(w.p, { x: 300, y: 200, fx: -1, fy: 0 });
+      w.foes = [
+        {
+          id: 'fT',
+          type: 'brute',
+          x: 220,
+          y: 200,
+          hw: 12,
+          hh: 12,
+          hp: 2,
+          maxHp: 2,
+          vx: 0,
+          vy: 0,
+          state: 'rest',
+          t: 99,
+          dirx: -1,
+          diry: 0,
+          target: null,
+          spawnT: 0,
+          stun: 0,
+          flash: 0,
+          detour: 0,
+        },
+      ];
+      const piece = w.metals[0];
+      Object.assign(piece, { held: true, x: 300, y: 166, ang: -Math.PI / 2, r: 34 });
+      const dt = 1 / hz;
+      w.acc = (phase / 12) * STEP;
+      for (let i = 0; i < 80; i++) stepWorld(w, dt, input(['Space'], []));
+      assert.equal(w.aim, 'fT', `${hz} Hz phase ${phase}: the foe is locked`);
+      stepWorld(w, dt, input(['Space'], ['KeyX']));
+      for (let i = 0; i < 6; i++) stepWorld(w, dt, input(['Space'], []));
+      assert.ok(!piece.held, `${hz} Hz phase ${phase}: the press was used`);
+    }
+  }
+});
+
+test('quality: one X press throws once, not again on later frames', () => {
+  const w = createWorld(seeded(3), 0);
+  stepWorld(w, 1 / 500, input([], ['KeyX']));
+  assert.equal(w.repelQueued, true, 'a frame with no tick keeps the press');
+  stepWorld(w, 1 / 60, input([], []));
+  assert.equal(w.repelQueued, false, 'the next tick spends it');
+  assert.ok(!w.events.some((e) => e.name === 'repel'), 'nothing was held, so nothing was thrown');
+});
+
+test('quality: on the select screen a cleared chamber and the current one differ by shape', () => {
+  const h = harness({ seed: 1 });
+  h.env.progress = { unlocked: () => 3, unlock: () => {} };
+  const g = createGame(h.env);
+  const ctx = mockContext();
+  const bars = [];
+  ctx.fillRect = (x, y, w, hgt) => {
+    if (hgt === 3) bars.push({ x, w, color: ctx.fillStyle });
+  };
+  g.draw(ctx);
+  assert.equal(bars.length, 3, 'two cleared chambers and the current one');
+  const [first, second, current] = bars;
+  assert.equal(first.w, second.w);
+  assert.ok(current.w < first.w, 'the current chamber has a shorter bar');
+  assert.notEqual(current.color, first.color);
+});
+
+test('quality: chamber 19 is named for what it is, with a matching tip', () => {
+  const c = CHAMBERS[18];
+  assert.equal(c.name.en, 'Gap Hall');
+  assert.match(c.tip[0], /gaps/);
+  assert.ok(c.tip[1].includes('缺口') && c.name.zh.includes('缺口'));
+  const wallsAcross = c.pillars.filter((b) => b.x1 - b.x0 > 40 && b.y1 - b.y0 < 20);
+  assert.equal(wallsAcross.length, 4, 'each wall is split in two, leaving gaps to throw through');
 });

@@ -40,6 +40,7 @@ Phase Tiles completed batch 18 and the 50-game target, Pixel Parkour included. T
 | Dash Duelist     | Passed in one round: 20 duels, timed dash prompt ([record](final-review/dash-duelist.json))                       |
 | Vine Warden      | Passed in one round: 20 greenhouses, tighter early levels ([record](final-review/vine-warden.json))               |
 | Tether Twins     | Passed in one round: 20 rooms, relay guide fixed ([record](final-review/tether-twins.json))                       |
+| Magnet Marauder  | Passed in one round: 25 chambers, harder mastery, guarded progress ([record](final-review/magnet-marauder.json))  |
 
 ## Completed batch 18
 
