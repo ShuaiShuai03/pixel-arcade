@@ -249,7 +249,7 @@ test('verdicts: raw, burnt, unchopped and wrong dishes are rejected with a reaso
 });
 
 test('time: invalid dt is inert and a press during it is not kept for later', () => {
-  for (const bad of [NaN, 0, -0.01, Infinity, undefined, 0.5, RULES.maxDt + 0.001]) {
+  for (const bad of [NaN, 0, -0.01, Infinity, undefined]) {
     const s = shift(1);
     open(s, 1);
     stand(s, 4, 3);
@@ -262,6 +262,40 @@ test('time: invalid dt is inert and a press during it is not kept for later', ()
   const s = shift(1);
   assert.equal(advance(s, 1 / 30, input([])), true);
   assert.equal(advance(s, RULES.maxDt, input([])), true);
+});
+
+test('time: a hitch frame is not simulated, but the key pressed in it is kept for the next frame', () => {
+  for (const hitch of [0.5, RULES.maxDt + 0.001]) {
+    const s = shift(1);
+    open(s, 1);
+    stand(s, 4, 3);
+    const before = JSON.stringify(snapshot(s));
+    assert.equal(advance(s, hitch, input([], ['Space'])), false);
+    assert.equal(JSON.stringify(snapshot(s)), before, `dt ${hitch} changes nothing`);
+    run(s, 0.1);
+    assert.equal(s.stats.drops, 1, `the Space pressed during dt ${hitch} still drops one item`);
+  }
+  const menu = newState(1);
+  openMenu(menu, 3);
+  assert.equal(advance(menu, 0.5, input([], ['Space'])), false);
+  assert.ok(menu.menu, 'a hitch frame never confirms the shift chooser');
+  assert.equal(menu.pend[0].act, false, 'and keeps nothing for the kitchen');
+});
+
+test('time: the frame that confirms a shift is also its first frame of play, at any frame rate', () => {
+  for (const hz of [30, 60, 120]) {
+    const s = newState(1);
+    openMenu(s, 3);
+    const dt = 1 / hz;
+    advance(s, dt, input([], ['Space']));
+    assert.equal(s.menu, null);
+    assert.equal(s.shiftIndex, 2);
+    assert.equal(s.stats.acts, 0, 'the confirming Space is not also an action in the kitchen');
+    assert.equal(s.pend[0].act, false);
+    // one 1/30 s cell in total: the confirm frame plus idle frames
+    for (let j = 1; j < hz / 30; j++) advance(s, dt, input([]));
+    assert.equal(s.ticks, 4, `${hz} Hz: the first cell is 4 ticks, none lost`);
+  }
 });
 
 test('interact: Space drops one item per press; holding it cannot duplicate', () => {
@@ -900,7 +934,7 @@ test('prompts: the marker names its key per mode, in both languages, for every k
   open(s, 1);
   s.prompt = { id: 'x', key: 'drop', c: 3, r: 3, i: 'bread', w: null, born: -999 };
   assert.equal(promptText(s).en, 'Go to the bread crate: Space puts one on the belt');
-  assert.equal(promptText(s).zh, '去面包箱旁：按Space放一份到传送带');
+  assert.equal(promptText(s).zh, '去面包箱旁：按空格放一份到传送带');
   assert.deepEqual(promptText(s).target, { c: 3, r: 3 });
   const duo = shift(1, 2);
   duo.prompt = { id: 'x', key: 'preset', c: 9, r: 4, i: 'meat', w: 'stove', born: -999 };
@@ -910,6 +944,12 @@ test('prompts: the marker names its key per mode, in both languages, for every k
     duo.prompt = { id: key, key, c: -1, r: -1, i: 'fish', w: 'bin', born: -999 };
     for (const lang of ['en', 'zh'])
       assert.ok(promptText(duo)[lang].length > 4 && !promptText(duo)[lang].includes('{'));
+  }
+  // Chinese text names the key in Chinese, in both menu and kitchen prompts.
+  for (const key of Object.keys(PROMPTS)) {
+    s.prompt = { id: key, key, c: -1, r: -1, i: 'fish', w: 'bin', born: -999 };
+    assert.ok(!/Space/.test(promptText(s).zh), `${key}: no Latin Space in Chinese`);
+    assert.ok(!/空格/.test(promptText(s).en), `${key}: no Chinese in English`);
   }
 });
 
@@ -1144,18 +1184,18 @@ test('stock-out counts the best set of tickets, not the first ones in order', ()
   s.orders.forEach((o) => (o.state = 'open'));
   s.orders[0].state = 'served';
   s.orders[4].state = 'expired';
-  s.points = 90;
+  s.points = 140;
   const stock = { tomato: 1, fish: 2, egg: 1 };
   for (const q of s.lv.stations) if (q.kind === 'crate') s.stn[q.id].stock = stock[q.item] ?? 0;
   run(s, 0.05);
-  assert.notEqual(s.cause, 'stock', 'two tickets (58%) still reach the 55% target');
+  assert.notEqual(s.cause, 'stock', 'two tickets (68%) still reach the 68% target');
   assert.equal(s.phase, 'playing');
-  // One egg fewer and only one ticket can be made (38%): now the stock loss is real.
+  // One egg fewer and only one ticket can be made (48%): now the stock loss is real.
   const t = shift(22);
   t.orders.forEach((o) => (o.state = 'open'));
   t.orders[0].state = 'served';
   t.orders[4].state = 'expired';
-  t.points = 90;
+  t.points = 140;
   for (const q of t.lv.stations)
     if (q.kind === 'crate') t.stn[q.id].stock = { ...stock, egg: 0 }[q.item] ?? 0;
   run(t, 0.05);
@@ -1169,7 +1209,7 @@ test('stock-out: a ticket that can no longer be supplied ends the shift at once 
       if (st.kind === 'crate' && (!kind || st.item === kind)) s.stn[st.id].stock = 0;
     });
   };
-  // Breakfast needs 3 eggs and 3 patties. Without eggs anywhere the target slips away.
+  // Breakfast needs 4 eggs and 4 patties. Without eggs anywhere the target slips away.
   const s = shift(16);
   assert.equal(s.phase, 'playing');
   emptyCrates(s, 'egg');
@@ -1186,7 +1226,7 @@ test('stock-out: a ticket that can no longer be supplied ends the shift at once 
   place(t, 'egg', 6, 4);
   place(t, 'meat', 7, 4);
   run(t, 0.05);
-  assert.equal(t.phase, 'lost', 'one patty on the way for three tickets: only one can be made');
+  assert.equal(t.phase, 'lost', 'one patty on the way for four tickets: only one can be made');
   assert.equal(t.lacking, 'meat');
   const u = shift(16);
   emptyCrates(u);
@@ -1200,20 +1240,20 @@ test('stock-out: a ticket that can no longer be supplied ends the shift at once 
   ])
     place(u, kind, c, 4);
   run(u, 0.05);
-  assert.equal(u.phase, 'playing', 'six dishes on the belt cover every part');
+  assert.equal(u.phase, 'playing', 'six dishes on the belt cover three of four tickets (75%)');
   u.items.forEach((it) => (it.heat = 2));
   run(u, 0.05);
   assert.equal(u.phase, 'lost', 'burnt dishes cannot be served');
-  // Tickets are served in order: two tickets out of three (67%) still reach the 65% target, one does not.
+  // Three tickets out of four (75%) still reach the 70% target, two do not.
   const keep = shift(16);
   emptyCrates(keep);
-  keep.stn[keep.lv.stations.find((q) => q.item === 'egg').id].stock = 2;
+  keep.stn[keep.lv.stations.find((q) => q.item === 'egg').id].stock = 3;
   keep.stn[keep.lv.stations.find((q) => q.item === 'meat').id].stock = 3;
   run(keep, 0.05);
   assert.equal(keep.phase, 'playing');
   const v = shift(16);
   emptyCrates(v);
-  v.stn[v.lv.stations.find((q) => q.item === 'egg').id].stock = 1;
+  v.stn[v.lv.stations.find((q) => q.item === 'egg').id].stock = 2;
   v.stn[v.lv.stations.find((q) => q.item === 'meat').id].stock = 3;
   run(v, 0.05);
   assert.equal(v.phase, 'lost');
@@ -1231,4 +1271,141 @@ test('stock-out: a ticket that can no longer be supplied ends the shift at once 
     for (const st of x.lv.stations.filter((q) => q.kind === 'crate' && need[q.item]))
       assert.ok(x.stn[st.id].stock >= need[st.item] + 1, `shift ${n}: ${st.item} has a spare unit`);
   }
+});
+
+// A recording canvas: every filled rectangle with its colour, every text with its position.
+function recording() {
+  const rects = [];
+  const texts = [];
+  let fill = '';
+  const ctx = new Proxy(mockContext(), {
+    get: (t, p) =>
+      p === 'fillRect'
+        ? (x, y, w, h) => rects.push({ x, y, w, h, fill })
+        : p === 'fillText'
+          ? (text, x, y) => texts.push({ text: String(text), x, y })
+          : p in t
+            ? t[p]
+            : () => {},
+    set: (t, p, v) => {
+      if (p === 'fillStyle') fill = v;
+      t[p] = v;
+      return true;
+    },
+  });
+  return { ctx, rects, texts };
+}
+const ENV_EN = { lang: 'en', t: (en) => en };
+
+test('draw: the open junction exit is a filled triangle and the closed one a dotted stub, not only a colour', () => {
+  for (const state of [0, 1]) {
+    const s = shift(6);
+    s.jn[0] = state;
+    const { ctx, rects } = recording();
+    render(ctx, s, ENV_EN);
+    const junction = s.lv.junctions[0];
+    const near = (q) =>
+      Math.abs(q.x - cx(junction.c)) <= 14 && Math.abs(q.y - cy(junction.r)) <= 14;
+    const open = rects.filter((q) => q.fill === '#ffd23f' && near(q));
+    assert.equal(open.length, 5, 'five rows build the head');
+    assert.deepEqual(
+      open.map((q) => Math.max(q.w, q.h)).sort(),
+      [1, 3, 5, 7, 9].map((n) => Math.max(n, 2)).sort(),
+    );
+    const stubs = rects.filter((q) => q.fill === '#6b7280' && near(q) && q.w === 2 && q.h === 2);
+    assert.equal(stubs.length, 2, 'the closed exit is two dots');
+    // the head sits along the exit that is open, not along the other one
+    const [dx, dy] = junction.exits[state];
+    const widest = open.reduce((a, q) => (Math.max(q.w, q.h) > Math.max(a.w, a.h) ? q : a));
+    const offX = widest.x + widest.w / 2 - cx(junction.c);
+    const offY = widest.y + widest.h / 2 - cy(junction.r);
+    assert.ok(offX * dx + offY * dy > 1, `exit ${state}: the triangle lies out along its exit`);
+    assert.ok(
+      Math.abs(offX * dy) + Math.abs(offY * dx) < 1,
+      `exit ${state}: and not off to the side`,
+    );
+  }
+});
+
+test('draw: the shift select marks cleared shifts with a tick and leaves the next shift to its pulsing strip', () => {
+  const green = (unlocked) => {
+    const s = shift(1);
+    openMenu(s, unlocked);
+    const { ctx, rects } = recording();
+    render(ctx, s, ENV_EN);
+    return rects.filter((q) => q.fill === '#3fbf5f');
+  };
+  assert.equal(green(1).length, 0, 'nothing cleared yet');
+  assert.equal(
+    green(3).length,
+    2 * (1 + 9),
+    'two cleared cells: a strip and nine tick pixels each',
+  );
+  const cell = menuCell(1);
+  const tick = green(3).filter((q) => q.w === 2 && q.x > cell.x && q.x < cell.x + cell.w);
+  assert.equal(tick.length, 9);
+});
+
+test('draw: a locked tap in the shift select shows its message once, below the shift name', () => {
+  const s = shift(1);
+  openMenu(s, 3);
+  s.msg = { en: 'Clear shift 3 first.', zh: '请先通关第3班。', left: 100 };
+  const { ctx, texts } = recording();
+  render(ctx, s, ENV_EN);
+  const at = (y) => texts.filter((q) => q.y === y).map((q) => q.text);
+  assert.deepEqual(
+    at(RULES.bottom + 16),
+    ['3. Chop Chop'],
+    'only the shift name on the second line',
+  );
+  assert.deepEqual(at(RULES.bottom + 30), ['Clear shift 3 first.']);
+});
+
+test('clear banner: a press in its last moments starts the next shift, an early one is forgotten', () => {
+  const banner = (clear, pressAt) => {
+    const s = shift(1);
+    s.clear = clear;
+    s.unlockTo = 2;
+    for (let n = 0; n < clear + 2; n++) advance(s, STEP, input([], n === pressAt ? ['Space'] : []));
+    return s;
+  };
+  const late = banner(20, 15);
+  assert.equal(late.shiftIndex, 1, 'the next shift has begun');
+  assert.match(late.msg.en, /Nothing in reach/, 'the late press was read in the new kitchen');
+  const early = banner(100, 2);
+  assert.equal(early.shiftIndex, 1);
+  assert.equal(early.msg, null, 'a press 0.8 s before the end is dropped');
+  const held = newState(1);
+  held.clear = RULES.clearTicks;
+  advance(held, STEP, input([], ['KeyX']));
+  assert.equal(held.pend[0].route, true, 'it is kept while the banner is up');
+  const duo = newState(2);
+  duo.clear = RULES.clearTicks;
+  advance(duo, STEP, input([], ['KeyF', 'Period']));
+  assert.deepEqual([duo.pend[0].act, duo.pend[1].route], [true, true]);
+});
+
+test('prompts: a board far from a ready dish waits; the dish comes first', () => {
+  const stage = (prog, onStove) => {
+    const s = shift(21);
+    open(s, 1);
+    const stove = s.lv.stations.find((q) => q.kind === 'stove');
+    const board = s.lv.stations.find((q) => q.kind === 'chopper');
+    if (onStove)
+      Object.assign(s.stn[stove.id], {
+        slot: { kind: 'fish', chopped: true, heat: prog >= 3 ? 1 : 0 },
+        mode: 'cook',
+        prog,
+      });
+    Object.assign(s.stn[board.id], {
+      slot: { kind: 'fish', chopped: false, heat: 0 },
+      mode: 'idle',
+    });
+    stand(s, stove.c, stove.r - 1);
+    s.prompt = { id: '', key: 'wait', c: -1, r: -1, i: null, w: null, born: -999 };
+    run(s, 0.1);
+    return snapshot(s).prompt.key;
+  };
+  assert.equal(stage(0, false), 'chop', 'an empty stove: go and chop');
+  assert.equal(stage(3.2, true), 'pull', 'a ready dish about to burn: take it out first');
 });

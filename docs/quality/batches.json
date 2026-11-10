@@ -266,7 +266,8 @@
       "frost-forge",
       "mimic-vault",
       "comet-catcher",
-      "orbit-gardener"
+      "orbit-gardener",
+      "conveyor-chef"
     ],
     "records": [
       "final-review/snowball-siege.json",
@@ -305,7 +306,8 @@
       "final-review/frost-forge.json",
       "final-review/mimic-vault.json",
       "final-review/comet-catcher.json",
-      "final-review/orbit-gardener.json"
+      "final-review/orbit-gardener.json",
+      "final-review/conveyor-chef.json"
     ]
   }
 }

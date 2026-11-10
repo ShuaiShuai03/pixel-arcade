@@ -45,6 +45,7 @@ Phase Tiles completed batch 18 and the 50-game target, Pixel Parkour included. T
 | Mimic Vault      | Passed in one round: 22 rooms, tighter mastery caps, guarded progress ([record](final-review/mimic-vault.json))       |
 | Comet Catcher    | Passed in one round: 22 contracts, narrowing cones, shape cues ([record](final-review/comet-catcher.json))            |
 | Orbit Gardener   | Passed in one round: 24 gardens, faster mastery rocks, dusk explained ([record](final-review/orbit-gardener.json))    |
+| Conveyor Chef    | Passed in one round: 22 shifts, tighter mastery, 空格 prompts ([record](final-review/conveyor-chef.json))             |
 
 ## Completed batch 18
 

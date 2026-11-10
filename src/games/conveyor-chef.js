@@ -85,6 +85,7 @@ export const RULES = Object.freeze({
   msgTicks: 300,
   clearTicks: 300,
   clearScore: 200,
+  pressBuffer: 30, // ticks: a press this close to the end of the clear banner starts the next shift
 });
 const {
   tile: TILE,
@@ -580,13 +581,14 @@ export const SHIFTS = freeze([
         '#..................#',
         '####################',
       ],
-      stock: { e: 4, m: 4, b: 3 },
-      need: 65,
+      stock: { e: 5, m: 5, b: 3 },
+      window: 3.5,
+      need: 70,
       chefs: [
         [12, 7],
         [14, 7],
       ],
-      tickets: ['3 65 e:k m:k', '28 65 e:k m:k', '52 65 e:k m:k'],
+      tickets: ['3 45 e:k m:k', '14 45 e:k m:k', '25 45 e:k m:k', '36 45 e:k m:k'],
     },
   ),
   shift(
@@ -607,14 +609,14 @@ export const SHIFTS = freeze([
         '####################',
       ],
       junctions: ['>v'],
-      stock: { b: 3, m: 4 },
+      stock: { b: 3, m: 5 },
       speed: 2.5,
-      need: 65,
+      need: 70,
       chefs: [
         [10, 7],
         [12, 7],
       ],
-      tickets: ['3 60 m:k', '16 60 b', '28 60 m:k', '40 60 b', '52 60 m:k'],
+      tickets: ['3 40 m:k', '10 40 b', '16 40 m:k', '22 40 b', '28 40 m:k', '34 40 m:k'],
     },
   ),
   shift(
@@ -635,13 +637,13 @@ export const SHIFTS = freeze([
         '####################',
       ],
       junctions: ['>^', '>v'],
-      stock: { b: 3, t: 4, m: 4 },
-      need: 60,
+      stock: { b: 4, t: 4, m: 4 },
+      need: 65,
       chefs: [
         [12, 7],
         [14, 7],
       ],
-      tickets: ['3 80 b', '5 80 t:c', '7 80 m:k', '9 80 t:c', '11 80 m:k'],
+      tickets: ['3 53 b', '4 53 t:c', '5 53 m:k', '6 53 t:c', '7 53 m:k', '8 53 b'],
     },
   ),
   shift(
@@ -668,7 +670,7 @@ export const SHIFTS = freeze([
         [13, 2],
         [15, 2],
       ],
-      tickets: ['3 50 m:k', '10 50 t:c', '17 50 m:k', '24 50 t:c', '31 50 m:k', '38 50 t:c'],
+      tickets: ['3 42 m:k', '9 42 t:c', '15 42 m:k', '21 42 t:c', '27 42 m:k', '33 42 t:c'],
     },
   ),
   shift(
@@ -689,13 +691,14 @@ export const SHIFTS = freeze([
         '####################',
       ],
       junctions: ['>^', '>v'],
-      stock: { b: 4, t: 4, m: 4 },
+      stock: { b: 5, t: 5, m: 5 },
+      speed: 3,
       need: 65,
       chefs: [
         [12, 7],
         [14, 7],
       ],
-      tickets: ['3 80 b t:c m:k', '30 80 b t:c m:k', '57 80 b t:c m:k'],
+      tickets: ['3 60 b t:c m:k', '17 60 b t:c m:k', '31 60 b t:c m:k', '45 60 b t:c m:k'],
     },
   ),
   shift(
@@ -716,13 +719,14 @@ export const SHIFTS = freeze([
         '####################',
       ],
       junctions: ['>^', '>v'],
-      stock: { b: 3, f: 5, m: 3 },
-      need: 55,
+      stock: { b: 4, f: 6, m: 4 },
+      speed: 3,
+      need: 62,
       chefs: [
         [12, 7],
         [14, 7],
       ],
-      tickets: ['3 90 f:ck', '22 90 f:ck b', '42 90 m:k f:ck', '64 90 f:ck b'],
+      tickets: ['3 50 f:ck', '16 50 f:ck b', '29 50 m:k f:ck', '42 50 f:ck b'],
     },
   ),
   shift(
@@ -743,19 +747,14 @@ export const SHIFTS = freeze([
         '####################',
       ],
       junctions: ['>^', '>v'],
-      stock: { t: 4, f: 5, e: 4 },
-      need: 55,
+      stock: { t: 5, f: 6, e: 5 },
+      speed: 3,
+      need: 68,
       chefs: [
         [12, 7],
         [14, 7],
       ],
-      tickets: [
-        '3 120 f:ck',
-        '16 120 t:c e:k',
-        '34 120 e:k f:ck',
-        '52 120 f:ck t:c',
-        '70 120 t:c e:k',
-      ],
+      tickets: ['3 66 f:ck', '16 66 t:c e:k', '29 66 e:k f:ck', '42 66 f:ck t:c', '55 66 t:c e:k'],
     },
   ),
 ]);
@@ -912,8 +911,8 @@ export function newState(mode = 1) {
     clear: 0,
     unlockTo: 0,
     pend: [
-      { act: false, route: false },
-      { act: false, route: false },
+      { act: false, route: false, age: 0 },
+      { act: false, route: false, age: 0 },
     ],
     msg: null,
     refresh: false,
@@ -1430,7 +1429,12 @@ function tick(s, dirs, emit) {
       if (s.shiftIndex === SHIFTS.length - 1) finish(s, 'won', null);
       else loadShift(s, s.shiftIndex + 1);
     }
-    s.pend.forEach((p) => (p.act = p.route = false));
+    // Presses made during the banner wait for the next shift; only the last moments of it carry
+    // over, so a stray early tap cannot answer for a kitchen it never saw.
+    s.pend.forEach((p) => {
+      p.age++;
+      if (s.clear === 0 && p.age > RULES.pressBuffer) p.act = p.route = false;
+    });
     return;
   }
   const first = s.ticks % 2 ? 0 : 1;
@@ -1465,21 +1469,36 @@ function readDirs(s, input) {
   ];
 }
 
+const PRESS_KEYS = [
+  { mode: 1, key: 'Space', chef: 0, want: 'act' },
+  { mode: 1, key: 'KeyX', chef: 0, want: 'route' },
+  { mode: 2, key: 'KeyF', chef: 0, want: 'act' },
+  { mode: 2, key: 'KeyG', chef: 0, want: 'route' },
+  { mode: 2, key: 'Comma', chef: 1, want: 'act' },
+  { mode: 2, key: 'Period', chef: 1, want: 'route' },
+];
+
+// A press is remembered until the next tick reads it, so no frame can swallow one.
+function storePresses(s, input) {
+  for (const { mode, key, chef, want } of PRESS_KEYS) {
+    if (mode !== s.mode || !input.pressed(key)) continue;
+    s.pend[chef][want] = true;
+    s.pend[chef].age = 0;
+  }
+}
+
 export function advance(s, dt, input, emit = () => {}) {
-  if (s.phase !== 'playing' || !Number.isFinite(dt) || dt <= 0 || dt > RULES.maxDt) return false;
+  if (s.phase !== 'playing' || !Number.isFinite(dt) || dt <= 0) return false;
+  if (dt > RULES.maxDt) {
+    // A hitch is not simulated, but a key pressed in it is still the player's.
+    if (!s.menu) storePresses(s, input);
+    return false;
+  }
   if (s.menu) {
     menuStep(s, dt, input, emit);
-    return true;
-  }
-  if (s.mode === 1) {
-    if (input.pressed('Space')) s.pend[0].act = true;
-    if (input.pressed('KeyX')) s.pend[0].route = true;
-  } else {
-    if (input.pressed('KeyF')) s.pend[0].act = true;
-    if (input.pressed('KeyG')) s.pend[0].route = true;
-    if (input.pressed('Comma')) s.pend[1].act = true;
-    if (input.pressed('Period')) s.pend[1].route = true;
-  }
+    // The frame that starts a shift is also its first frame of play: keep its time.
+    if (s.menu) return true;
+  } else storePresses(s, input);
   const dirs = readDirs(s, input);
   s.acc += dt;
   const steps = Math.floor(s.acc / STEP + 1e-6);
@@ -1497,7 +1516,7 @@ export const PROMPTS = freeze({
   drop: ['Go to the {i} crate: {A} puts one on the belt', '去{i}箱旁：按{A}放一份到传送带'],
   chop: ['At the board: {A} starts chopping the {i}', '在砧板旁：按{A}开始切{i}'],
   stay: ['Arrows: stay by the board while the {i} is chopped', '方向键：留在砧板旁，等{i}切好'],
-  cook: ['Wait by the stove: {A} takes the {i} out when green', '守在炉灶旁：变绿时按{A}取出{i}'],
+  cook: ['At the stove: {A} takes the {i} out when green', '守在炉灶旁：变绿时按{A}取出{i}'],
   clear: ['{A}: clear the stray {i} off the board', '按{A}：把多余的{i}从砧板上清走'],
   pull: ['{A} now: take the {i} off the stove!', '现在按{A}：把{i}从炉灶取出！'],
   preset: [
@@ -1599,9 +1618,10 @@ function wantsOf(s) {
     if (src.station) {
       const st = src.station;
       const d = s.stn[st.id];
-      if (st.kind === 'chopper' && d.mode === 'idle')
-        wants.push({ urg: 2, key: 'chop', c: st.c, r: st.r, i: kindOfItem });
-      else if (st.kind === 'chopper' && d.mode === 'chopping')
+      if (st.kind === 'chopper' && d.mode === 'idle') {
+        // Like a crate or a junction, the board is not worth a dish burning at the stove.
+        if (tripIsSafe(s, st)) wants.push({ urg: 2, key: 'chop', c: st.c, r: st.r, i: kindOfItem });
+      } else if (st.kind === 'chopper' && d.mode === 'chopping')
         wants.push({ urg: 2.5, key: 'stay', c: st.c, r: st.r, i: kindOfItem });
       else if (st.kind === 'stove' && d.mode === 'cook') {
         const left = RULES.cookTime + cookWindow(s) - d.prog;
@@ -1731,13 +1751,14 @@ function setPrompt(s, force = false) {
   s.prompt = { id, key: w.key, c: w.c, r: w.r, i: w.i ?? null, w: w.w ?? null, born: s.ticks };
 }
 
+const actKey = (s, lang) => (s.mode === 2 ? 'F/,' : lang === 'en' ? 'Space' : '空格');
+
 export function promptText(s) {
   const { key, i, w, c, r } = s.prompt;
-  const keys = s.mode === 2 ? { A: 'F/,', R: 'G/.' } : { A: 'Space', R: 'X' };
   const fill = (lang) =>
     PROMPTS[key][lang === 'en' ? 0 : 1]
-      .replace('{A}', keys.A)
-      .replace('{R}', keys.R)
+      .replace('{A}', actKey(s, lang))
+      .replace('{R}', s.mode === 2 ? 'G/.' : 'X')
       .replace('{i}', i ? KINDS[i][lang] : '')
       .replace('{w}', w ? WHERE[w][lang === 'en' ? 0 : 1] : '');
   return { key, en: fill('en'), zh: fill('zh'), target: c >= 0 ? { c, r } : null };
@@ -2025,13 +2046,24 @@ function drawJunction(ctx, s, j) {
   const y = cy(j.r);
   rect(ctx, '#5a5f6a', x - 11, y - 11, 22, 22);
   j.exits.forEach(([dx, dy], k) => {
-    const on = s.jn[j.id] === k;
-    const color = on ? '#ffd23f' : '#6b7280';
-    for (let n = 3; n <= 10; n += 2)
-      rect(ctx, color, x + dx * n - 1, y + dy * n - 1, on ? 3 : 2, on ? 3 : 2);
-    const hx = x + dx * 10;
-    const hy = y + dy * 10;
-    rect(ctx, color, hx - (dy ? 4 : 1), hy - (dx ? 4 : 1), dy ? 9 : 3, dx ? 9 : 3);
+    if (s.jn[j.id] !== k) {
+      // A closed exit is only a dotted stub, so the open one differs in shape, not just colour.
+      for (let n = 4; n <= 8; n += 4) rect(ctx, '#6b7280', x + dx * n - 1, y + dy * n - 1, 2, 2);
+      return;
+    }
+    // The open exit is a filled triangle pointing out of the junction.
+    for (let k = 0; k < 5; k++) {
+      const hx = x + dx * (11 - 2 * k);
+      const hy = y + dy * (11 - 2 * k);
+      rect(
+        ctx,
+        '#ffd23f',
+        dx ? hx - 1 : hx - k,
+        dy ? hy - 1 : hy - k,
+        dx ? 2 : 2 * k + 1,
+        dy ? 2 : 2 * k + 1,
+      );
+    }
   });
   rect(ctx, '#2b2f36', x - 2, y - 2, 4, 4);
 }
@@ -2217,7 +2249,7 @@ function drawBottom(ctx, s, env, snap) {
   const t = env.t;
   text(ctx, snap.prompt[env.lang], 6, BOTTOM + 2, '#ffe9a8', 14);
   const tip = s.ticks < 1200 && !s.menu ? s.def.tip : null;
-  const line = s.msg ? s.msg : tip;
+  const line = s.menu ? null : s.msg ? s.msg : tip;
   if (line) text(ctx, line[env.lang], 6, BOTTOM + 16, s.msg ? '#ff9a8a' : '#bfe9ff', 14);
   if (!s.menu) {
     const w = cookWindow(s);
@@ -2235,6 +2267,21 @@ function drawBottom(ctx, s, env, snap) {
   }
 }
 
+// A small tick for a shift already cleared; the shift to play next has none.
+function drawCheck(ctx, x, y) {
+  [
+    [0, 4],
+    [1, 5],
+    [2, 6],
+    [3, 5],
+    [4, 4],
+    [5, 3],
+    [6, 2],
+    [7, 1],
+    [8, 0],
+  ].forEach(([dx, dy]) => rect(ctx, '#3fbf5f', x + dx, y + dy, 2, 2));
+}
+
 function drawMenu(ctx, s, env) {
   const { cursor, unlocked } = s.menu;
   const f = Math.floor(s.menuClock * 60);
@@ -2249,6 +2296,7 @@ function drawMenu(ctx, s, env) {
     rect(ctx, n === cursor ? '#ffe9a8' : '#4a3a2a', q.x, q.y, q.w, q.h);
     rect(ctx, open ? '#3a2d20' : '#211a12', q.x + 2, q.y + 2, q.w - 4, q.h - 4);
     if (open && n < unlocked) rect(ctx, '#3fbf5f', q.x + 2, q.y + 2, q.w - 4, 4);
+    if (open && n < unlocked) drawCheck(ctx, q.x + q.w - 16, q.y + 10);
     if (n === unlocked && f % 60 < 40) rect(ctx, '#ffb347', q.x + 2, q.y + 2, q.w - 4, 4);
     text(ctx, `${n}`, q.x + q.w / 2, q.y + 8, open ? '#ffffff' : '#6b5a48', 16, 'center');
     const kinds = [...new Set(def.tickets.flatMap((tk) => tk.parts.map((p) => p.kind)))].slice(
@@ -2306,9 +2354,22 @@ export function render(ctx, s, env) {
 // Public game
 // ---------------------------------------------------------------------------
 
+// Progress is a convenience: a missing or broken store must never stop the kitchen.
 const unlockedOf = (env) => {
-  const n = Math.floor(Number(env.progress?.unlocked?.()));
-  return Number.isFinite(n) ? Math.max(1, Math.min(SHIFTS.length, n)) : 1;
+  try {
+    const n = Math.floor(Number(env.progress?.unlocked?.()));
+    return Number.isFinite(n) ? Math.max(1, Math.min(SHIFTS.length, n)) : 1;
+  } catch {
+    return 1;
+  }
+};
+
+const saveUnlocked = (env, n) => {
+  try {
+    env.progress?.unlock?.(n);
+  } catch {
+    // Not saving the unlock only means the next visit starts from the old frontier.
+  }
 };
 
 const LOSS_MESSAGE = {
@@ -2335,7 +2396,7 @@ export function createGame(env) {
         const n = Math.min(SHIFTS.length, s.unlockTo);
         s.unlockTo = 0;
         unlocked = Math.max(unlocked, n);
-        env.progress?.unlock?.(n);
+        saveUnlocked(env, n);
       }
       if (s.phase === 'playing' || ended) return;
       ended = true;

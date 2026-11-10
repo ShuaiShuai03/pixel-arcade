@@ -1,0 +1,87 @@
+✔ quality: every shift has a scripted legal solution that clears it cleanly through public input (1022.47475ms)
+✔ quality: a progress store that throws never stops the kitchen, on opening or after a clear (58.374042ms)
+✔ quality: scripted solutions hold at 30 and 120 Hz too (561.126833ms)
+✔ quality: solo station reach times are feasible: every station is a short walk from the others (6.257042ms)
+✔ quality: a prompt-and-drawn-state policy at 0.15-0.35 s wins at least 27 of 30 on every shift at 60 Hz (16344.889792ms)
+✔ quality: the same policy wins at least 27 of 30 at 30 and 120 Hz on five shifts (9704.365791ms)
+✔ quality: a slower 0.4-0.6 s policy with jitter wins at least 24 of 30 before the mastery tier and 12 of 30 within it, at 60 Hz (17294.153958ms)
+✔ quality: the slower policy also keeps those floors at 30 and 120 Hz on five shifts (9869.567959ms)
+✔ quality: a casual player (0.5-0.8 s, now and then distracted) wins at least 24 of 30 before the mastery tier and keeps a chance on its first three shifts (12987.610167ms)
+✔ quality: random keys, mashing, hold-and-spam, a blind pulse and blind station tours each win at most half the runs on every shift (116663.027084ms)
+✔ quality: following the prompts never costs a refusal, a burnt dish or a lost customer, even for slow readers (15590.363083ms)
+✔ quality: X is central: a follower that never presses it fails every shift that has a junction (1326.346042ms)
+✔ quality: the drawn prompt line names keys, holds for 0.5 s, rarely flips back and teaches each idea (6735.082333ms)
+✔ quality: each shift opens with its tip in the status line, in both languages (0.927833ms)
+✔ quality: the shift select shows no text over a cell or another text, in English and Chinese (3.393ms)
+✔ quality: HUD bands do not overlap, text is 14-16 px, and chefs, stations and dishes are 16 px or more (362.305667ms)
+✔ quality: touch controls are complete and bilingual, solo and co-op (0.153416ms)
+✔ quality: the whole campaign played in order unlocks each shift once and ends in one win (535.584791ms)
+✔ quality: coming back later offers the select screen and continues from the unlocked shift (40.856375ms)
+✔ quality: wasting ingredients ends the shift at once with an explicit out-of-stock reason (28.673542ms)
+✔ quality: a player who never acts loses fairly at every frame rate, once, and the end stays frozen (51.504167ms)
+✔ quality: the state is identical at 30, 60 and 120 Hz when input is aligned to 1/30 s (109.193709ms)
+✔ quality: co-op: each chef can clear a shift alone with their own keys, and two chefs together do too (159.5395ms)
+✔ quality: the final-shift win and the failure message are explicit and bilingual (54.232958ms)
+✔ quality: every kind of ingredient is used and the campaign introduces each station in turn (0.216584ms)
+✔ meta: a bilingual 1-2 player arcade entry with complete controls (1.536834ms)
+✔ data: 22 authored shifts with consistent kitchens (2.501792ms)
+✔ routes: the board and stove are only on a route when the dish needs them (0.206125ms)
+✔ verdicts: raw, burnt, unchopped and wrong dishes are rejected with a reason; matches score (0.16775ms)
+✔ time: invalid dt is inert and a press during it is not kept for later (2.928375ms)
+✔ time: a hitch frame is not simulated, but the key pressed in it is kept for the next frame (0.592041ms)
+✔ time: the frame that confirms a shift is also its first frame of play, at any frame rate (0.245459ms)
+✔ interact: Space drops one item per press; holding it cannot duplicate (5.213125ms)
+✔ interact: crates explain why nothing came out (1.453416ms)
+✔ belts: dishes ride at the stated speed, one per tile, and wait in a queue (3.09125ms)
+✔ junctions: X flips the nearest one; a dish commits to an exit when it reaches the centre (1.166ms)
+✔ board: Space starts chopping, which only advances while a chef is close (4.257792ms)
+✔ board: dishes that need no chopping pass through; strays can be cleared with Space (1.255083ms)
+✔ stove: cooks alone, turns green, warns, then burns and spits the dish out (13.504959ms)
+✔ stove: Space takes the dish out in the green window and it is served (2.720792ms)
+✔ stove: taking a dish out early sends it raw and the window refuses it with a reason (2.82575ms)
+✔ stove: cooked and burnt dishes pass a second stove untouched (0.384584ms)
+✔ tickets: each scores once, by speed; expiry and rejects cost satisfaction (0.898167ms)
+✔ tickets: multi-part tickets fill part by part and score only when complete (0.657792ms)
+✔ shifts end explicitly: an unreachable target loses at once, a reachable one clears (1.110417ms)
+✔ the last shift ends the run with one win and no extra fanfare from the game (0.176833ms)
+✔ select: shows only when more than shift 1 is open, validates progress and never starts a locked shift (0.547459ms)
+✔ clearing a shift unlocks the next with unlock(n+1) and replays never lower it (0.071834ms)
+✔ co-op: two chefs with separate keys share one kitchen; Space and X are for the solo chef only (1.204083ms)
+✔ co-op: simultaneous presses alternate which chef goes first (0.197834ms)
+✔ chefs: walls, stations and the screen edge are solid; diagonals are not faster (2.715583ms)
+✔ random play never breaks the world: finite numbers, bounded lists, no overlapping dishes (434.41375ms)
+✔ terminals: the end fires once, the game stays frozen, and a new instance starts fresh (9.230625ms)
+✔ state: getState returns copies, is JSON-safe and offers no cheat API (0.251083ms)
+✔ sounds: ingredients, serving, refusals and shift clears are announced once (1.606375ms)
+✔ prompts: the marker names its key per mode, in both languages, for every kind (0.20775ms)
+✔ planner: the prompt follows the kitchen: feed, preset, chop, cook, pull, clear (3.547083ms)
+✔ bin: the belt ends in the bin until X sends it to the window; a burnt dish thrown away costs nothing (2.797459ms)
+✔ prompts move on at once when the action they asked for is done (1.664916ms)
+✔ prompts do not send the chef away from a dish that is about to burn (0.317708ms)
+✔ draw: every shift renders in both languages and modes with finite coordinates and no exceptions (97.123291ms)
+✔ stock-out counts the best set of tickets, not the first ones in order (0.202958ms)
+✔ stock-out: a ticket that can no longer be supplied ends the shift at once with the missing ingredient (0.35275ms)
+✔ draw: the open junction exit is a filled triangle and the closed one a dotted stub, not only a colour (0.685667ms)
+✔ draw: the shift select marks cleared shifts with a tick and leaves the next shift to its pulsing strip (0.256833ms)
+✔ draw: a locked tap in the shift select shows its message once, below the shift name (0.117708ms)
+✔ clear banner: a press in its last moments starts the next shift, an early one is forgotten (0.177958ms)
+✔ prompts: a board far from a ready dish waits; the dish comes first (0.284917ms)
+ℹ tests 68
+ℹ suites 0
+ℹ pass 68
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 209572.01475
+ℹ start of coverage report
+ℹ -------------------------------------------------------------------
+ℹ file               | line % | branch % | funcs % | uncovered lines
+ℹ -------------------------------------------------------------------
+ℹ src                |        |          |         | 
+ℹ  games             |        |          |         | 
+ℹ   conveyor-chef.js |  99.96 |    97.43 |  100.00 | 1218
+ℹ -------------------------------------------------------------------
+ℹ all files          |  99.96 |    97.43 |  100.00 | 
+ℹ -------------------------------------------------------------------
+ℹ end of coverage report

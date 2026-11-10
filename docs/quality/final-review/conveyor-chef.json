@@ -1,0 +1,65 @@
+{
+  "game": "conveyor-chef",
+  "date": "2026-11-10",
+  "reviewedRevision": "2299b80b (accepted build) plus the fixes in this commit",
+  "owner": "owner-conveyor",
+  "reviewer": "conveyor-fair, conveyor-robust and conveyor-present (parallel split review)",
+  "rounds": 1,
+  "process": "Lean final review at the user's request, with the review split across three parallel reviewers (fairness, robustness, presentation) as the user asked. The game already had 22 shifts. Five MEDIUM findings and the cheap LOW items were fixed and verified by a separate verification agent re-running the reviewers' own probes and one clean-worktree run, then by the browser check, without a second review round.",
+  "verdict": "pass",
+  "approvedSha256": {
+    "src/games/conveyor-chef.js": "968f5a565c82efb2ece6bd652872761c6ea19998bbbc306295b6d7e3a1c4b390",
+    "tests/conveyor-chef.test.js": "c56c8058f3a94da92f8adbb7c0322ed466bf5b1aef12016fbd76ca287ecff089",
+    "tests/conveyor-chef-quality.test.js": "44cd67b07de8e3ded0c78c953bf9b1a0a31326cc8d0f96f563fc79919501fce9"
+  },
+  "tests": {
+    "command": "node --experimental-test-coverage --test-coverage-include='src/games/conveyor-chef*.js' --test tests/conveyor-chef.test.js tests/conveyor-chef-quality.test.js",
+    "passed": 68,
+    "failed": 0,
+    "lineCoverage": 99.96,
+    "log": "conveyor-chef-coverage.txt"
+  },
+  "independentProbes": "On the final files the fairness reviewer's reaction-limited prompt follower (public getState only, world state seen late, 3 seeds) cleared all 22 shifts at 0.25 s and 0.35 s. Mastery shifts 16-22 now leave a mean satisfaction margin of 12.0 at 0.35 s (minimum 7.3) against 26.1 for combination shifts, where the review had found them equal; the owner's slow-reader policy (0.4-0.6 s) wins shift 21 about half the time. Blind bots (idle, mash, random, holds) cleared no shift in 1,056 runs, scripted input gave identical state across 30, 60 and 120 Hz including the shift-confirm frame, hostile dt and pointer values produced no throws or non-finite state, each run ended exactly once and froze, every broken progress store was safe, presses during the clear banner and in long frames are buffered, and EN and ZH text fits with no Latin words in Chinese.",
+  "findings": [
+    {
+      "id": "M1",
+      "severity": "medium",
+      "status": "fixed",
+      "observation": "Robustness finding: unlockedOf and the clear-time unlock called env.progress without try/catch, so a throwing store crashed the game at start or after a shift. Both are now guarded as in Shield Sentinel."
+    },
+    {
+      "id": "M2",
+      "severity": "medium",
+      "status": "fixed",
+      "observation": "Fairness finding: mastery shifts were only longer, with the same margin as combination shifts. Shifts 16-22 now have more overlapping tickets, tighter patience, higher satisfaction targets and faster belts on the last three, and a planner fix stops a chop prompt pulling the chef away from a dish about to burn."
+    },
+    {
+      "id": "M3",
+      "severity": "medium",
+      "status": "fixed",
+      "observation": "Presentation findings: tapping a locked shift drew its message over the shift name, Chinese prompts said 'Space' instead of 空格, and the open junction exit differed only by colour. The menu draws the message once, Chinese prompts use 空格, and the open exit is a filled triangle against two grey dots."
+    },
+    {
+      "id": "L1",
+      "severity": "low",
+      "status": "fixed",
+      "observation": "A press late in the clear banner now carries into the next shift, presses in long frames are buffered, the shift-confirm frame carries its time so shift starts match across frame rates, cleared shifts get a check mark, and the widest cook prompt is shorter."
+    }
+  ],
+  "openNotes": [
+    "The reviewers' fast bot still clears every mastery shift at 0.5 s reaction; failing it would make shifts 21-22 unwinnable for the in-repo fast player, so mastery pressure shows as lower margins and slow-player losses.",
+    "Several older quality floors for shifts 16-22 were lowered for slow and casual bots, while the fast-reader floor of 27 of 30 is kept on every shift.",
+    "The source is a single file of about 2,400 lines, over the repository's 800-line soft ceiling."
+  ],
+  "browser": {
+    "method": "Official Claude in Chrome extension, local server; real clicks on Start and the language toggle, synthetic in-page keys; only DOM text and the canvas were read.",
+    "servedSha256Prefixes": "968f5a56",
+    "observed": [
+      "With progress saved from earlier testing, Start opened the shift chooser with cleared shifts marked by a green check and the prompt 'Arrows: pick a shift. Space: start'.",
+      "Shift 1 showed one bread ticket, the crate, belt and window, 'Satisfied 0% / 60%' and the prompt 'Go to the bread crate: Space puts one on the belt'; walking to the crate and pressing Space sent bread down the belt and the status read 'Ticket served: +75.' with satisfaction 25%.",
+      "Chinese 390 px phone frame (388 px inner, no horizontal overflow): the start card in Chinese with the one- and two-player choice and touch buttons 左, 上, 下, 右, 操作 and 改道.",
+      "Not covered in the browser: a shift clear, a loss and the mastery shifts; the reviewers' probes, the verification run and the quality tests cover them."
+    ],
+    "screenshots": ["screenshots/conveyor-chef-en.png", "screenshots/conveyor-chef-phone-zh.png"]
+  }
+}
