@@ -50,6 +50,11 @@ export const RULES = Object.freeze({
   startReach: 12,
   thinkTicks: 12,
   lookStep: 0.075,
+  cutLook: 1.5,
+  cutMargin: 3,
+  aheadLook: 1,
+  aheadMargin: 2,
+  closeSlack: 0.5,
   maxLook: 12,
   stillLook: 2,
   fleeStep: 70,
@@ -307,7 +312,7 @@ const MEADOWS = [
   },
   {
     name: ['Flower Beds', '花丛'],
-    tip: ['Flowers block the lantern. Follow the dots around them.', '花丛挡路，沿着光点绕过去。'],
+    tip: ['Flowers block the way. Follow the dots around.', '花丛挡路，沿着光点绕过去。'],
     quota: 2,
     dawn: 60,
     wide: 7200,
@@ -347,7 +352,7 @@ const MEADOWS = [
   {
     name: ['Two Lanes', '双航线'],
     tip: [
-      'Wide loops fizzle. Keep loops small and mind the moths.',
+      'Wide loops fizzle. Keep them small; mind moths.',
       '太大的圈会失效：圈要小，还要留意飞蛾。',
     ],
     quota: 2,
@@ -363,10 +368,7 @@ const MEADOWS = [
   },
   {
     name: ['Drifting Pair', '漂移的一对'],
-    tip: [
-      'Both fireflies drift a little. Give each its own loop.',
-      '两只都在漂移，给每只单独画一个圈。',
-    ],
+    tip: ['Both fireflies drift. Give each its own loop.', '两只都在漂移，给每只单独画一个圈。'],
     quota: 2,
     dawn: 28,
     wide: 7200,
@@ -736,13 +738,14 @@ const TXT = {
   close: ['Press Space to close the loop', '按空格封圈', 'space'],
   wait: ['Moth near! Release the Arrows', '飞蛾靠近！松开方向键', 'wait'],
   flee: ['Moth close! Back away with the Arrows', '飞蛾太近！用方向键后退', 'go'],
+  cut: ['Moth cuts trail! Space closes, X cancels', '飞蛾要切断光迹！空格封圈，X取消', 'wait'],
   free: ['Arrows draw, Space closes, X cancels', '方向键画线，空格封圈，X取消', 'free'],
   idle: ['Arrows: go to a firefly, Space starts', '方向键靠近萤火虫，空格开始', 'free'],
   clear: ['Well done! Arrows keep moving', '做得好！方向键继续走', 'idle'],
   menu: ['Arrows choose, Space plays', '方向键选择，空格开始', 'menu'],
 };
-const URGENT = new Set(['start', 'close', 'wait', 'flee']);
-const DANGER = new Set(['wait', 'flee']);
+const URGENT = new Set(['start', 'close', 'wait', 'flee', 'cut']);
+const DANGER = new Set(['wait', 'flee', 'cut']);
 
 const say = (s, en, zh, time = RULES.msgTime) => {
   s.msg = { en, zh, time };
@@ -777,6 +780,24 @@ function loadMeadow(s, index) {
   think(s, true);
 }
 
+// Progress is a convenience: a store that throws or answers nonsense must not stop the game.
+function readUnlocked(progress) {
+  try {
+    const n = Math.floor(Number(progress?.unlocked?.()));
+    return Number.isNaN(n) ? 1 : clamp(n, 1, LEVEL_COUNT);
+  } catch {
+    return 1;
+  }
+}
+
+function saveUnlocked(progress, level) {
+  try {
+    progress?.unlock?.(level);
+  } catch {
+    // A broken store only costs the saved progress.
+  }
+}
+
 export function newState(env = {}) {
   const s = {
     phase: 'playing',
@@ -785,12 +806,12 @@ export function newState(env = {}) {
     acc: 0,
     ticks: 0,
     refresh: false,
+    queued: false,
     msg: null,
     progress: env.progress || null,
     stats: { loops: 0, caught: 0, cuts: 0, hits: 0, refused: 0, cancels: 0 },
   };
-  const raw = Math.floor(Number(s.progress?.unlocked?.()));
-  const unlocked = Number.isFinite(raw) ? clamp(raw, 1, LEVEL_COUNT) : 1;
+  const unlocked = readUnlocked(s.progress);
   loadMeadow(s, 0);
   if (unlocked > 1) {
     s.menu = { sel: unlocked, unlocked };
@@ -848,6 +869,16 @@ function hintOf(s) {
 
 // --- Look-ahead: would the lantern or its trail meet a moth while following the guide? ---
 
+const routeLength = (route) => route.reduce((n, q, i) => (i ? n + dist(route[i - 1], q) : 0), 0);
+
+function closestOnSegment(p, a, b) {
+  const dx = b.x - a.x;
+  const dy = b.y - a.y;
+  const len2 = dx * dx + dy * dy;
+  const t = len2 === 0 ? 0 : clamp(((p.x - a.x) * dx + (p.y - a.y) * dy) / len2, 0, 1);
+  return { x: a.x + t * dx, y: a.y + t * dy };
+}
+
 function along(poly, d) {
   let i = 1;
   let left = d;
@@ -863,6 +894,8 @@ function along(poly, d) {
   };
 }
 
+// The point of the stretch of poly between distances from and to that is nearest m, when that is
+// closer than reach; otherwise null.
 function laidNear(poly, from, to, m, reach) {
   let at = 0;
   for (let i = 1; i < poly.length; i++) {
@@ -872,15 +905,15 @@ function laidNear(poly, from, to, m, reach) {
     if (hi > lo) {
       const a = along(poly, lo);
       const b = along(poly, hi);
-      if (pointSegmentDistance(m, a, b) < reach) return true;
+      if (pointSegmentDistance(m, a, b) < reach) return closestOnSegment(m, a, b);
     }
     at += len;
   }
-  return false;
+  return null;
 }
 
 function mothsClear(s, poly, trailFrom, delay, horizon, doneAt = Infinity, pace = RULES.pace) {
-  const total = poly.reduce((n, p, i) => (i ? n + dist(poly[i - 1], p) : 0), 0);
+  const total = routeLength(poly);
   const old = s.trail.on ? s.trail.pts.filter((_, i) => i % 3 === 0) : [];
   const chase = s.moths.map((m) => m.u);
   let before = 0;
@@ -952,7 +985,7 @@ function guideSafe(s, hint) {
     const ringIn = way.findIndex((w) => w.i === ringAt);
     let trailFrom = lure ? Infinity : 0;
     for (let i = 1; i <= ringIn; i++) trailFrom += dist(poly[i - 1], poly[i]);
-    const length = poly.reduce((n, p, i) => (i ? n + dist(poly[i - 1], p) : 0), 0);
+    const length = routeLength(poly);
     return paces.every((pace) => {
       const horizon = Math.min(RULES.maxLook, length / (RULES.speed * pace) + 0.6);
       return delays.every((delay) =>
@@ -972,6 +1005,43 @@ function guideSafe(s, hint) {
 
 function stillSafe(s) {
   return mothsClear(s, [s.p, s.p], Infinity, 0, RULES.stillLook);
+}
+
+// Is a moth about to touch the trail that is already laid, or the stretch the lantern would lay by
+// following the route (when one is given)? A stalker is taken to come for the lantern where it
+// stands. Returns where on the trail the moth will meet it and when, so the warning can point there.
+function trailThreat(s, route = null) {
+  if (!s.trail.on) return null;
+  const laid = [...s.trail.pts, { x: s.p.x, y: s.p.y, t: s.t }];
+  const chase = s.moths.map((m) => m.u);
+  let before = 0;
+  for (let tau = 0; tau <= RULES.cutLook; tau += RULES.lookStep) {
+    for (const [i, m] of s.L.moths.entries()) {
+      let at;
+      if (m.hunt) {
+        const step = m.hunt.v * (tau - before);
+        chase[i] += clamp(laneU(m.hunt, s.p) - chase[i], -step, step);
+        at = laneAt(m.hunt, chase[i]);
+      } else at = m.at(s.t + tau);
+      const reach = m.r + RULES.cutMargin;
+      for (let k = 1; k < laid.length; k++) {
+        // A stretch that will have faded by then cannot be cut.
+        if (s.t + tau - laid[k - 1].t > s.L.fade) continue;
+        if (pointSegmentDistance(at, laid[k - 1], laid[k]) < reach)
+          return { ...closestOnSegment(at, laid[k - 1], laid[k]), at: tau, laid: true };
+      }
+      // The stretch the lantern would lay is judged closer to the moth and not as far ahead: it is
+      // only a forecast of a walk that may never happen.
+      const ahead =
+        route &&
+        s.p.moving &&
+        tau <= RULES.aheadLook &&
+        laidNear(route, 0, RULES.speed * tau, at, m.r + RULES.aheadMargin);
+      if (ahead) return { ...ahead, at: tau, laid: false };
+    }
+    before = tau;
+  }
+  return null;
 }
 
 // When neither walking on nor standing still is safe, back away: the eight directions are tried
@@ -995,8 +1065,20 @@ function fleeTarget(s) {
   return best?.q ?? null;
 }
 
+// A trail a moth is about to cross is not saved by walking on, unless the loop is nearly done:
+// closing it or cancelling it spares the light. A lantern that can finish the route well before the
+// moth arrives is left to do so.
+function cutCue(s, otherwise, route = null) {
+  const hit = trailThreat(s, route);
+  const finishes =
+    hit?.laid && route && routeLength(route) / RULES.speed + RULES.closeSlack < hit.at;
+  s.cutAt = hit && !finishes ? hit : null;
+  return s.cutAt ? 'cut' : otherwise;
+}
+
 function cueOf(s) {
   s.flee = null;
+  s.cutAt = null;
   if (s.menu) return 'menu';
   if (s.clear > 0) return 'clear';
   const hint = hintOf(s);
@@ -1006,7 +1088,7 @@ function cueOf(s) {
       s.flee = fleeTarget(s);
       if (s.flee) return 'flee';
     }
-    return s.trail.on ? 'free' : 'idle';
+    return s.trail.on ? cutCue(s, 'free') : 'idle';
   }
   if (hint.kind === 'close') return 'close';
   if (!s.L.moths.length || guideSafe(s, hint)) return hint.kind;
@@ -1022,7 +1104,7 @@ function cueOf(s) {
     return 'wait';
   }
   s.flee = fleeTarget(s);
-  return s.flee ? 'flee' : hint.kind;
+  return s.flee ? 'flee' : cutCue(s, hint.kind, [s.p, ...hint.remaining]);
 }
 
 // What the guide shows: the authored route, or the retreat point while the prompt says to back away.
@@ -1107,7 +1189,7 @@ function finishMeadow(s) {
   const clean = s.meadowTrouble === 0 ? RULES.cleanScore : 0;
   s.score += RULES.clearScore + RULES.lifeScore * s.lives + left * 2 + clean;
   s.inv = RULES.clearTime + 1;
-  s.progress?.unlock?.(Math.min(LEVEL_COUNT, s.level + 2));
+  saveUnlocked(s.progress, Math.min(LEVEL_COUNT, s.level + 2));
   say(s, 'Meadow clear!', '草地完成！', RULES.clearTime);
 }
 
@@ -1121,6 +1203,9 @@ function cutTrail(s, at, emit) {
 }
 
 function act(s, input, emit) {
+  // A Space pressed during the clear banner waits for the next meadow.
+  const space = s.queued || input.pressed('Space');
+  s.queued = false;
   if (input.pressed('KeyX') && s.trail.on) {
     s.trail = { on: false, pts: [] };
     s.stats.cancels++;
@@ -1128,7 +1213,7 @@ function act(s, input, emit) {
     resetPlan(s);
     think(s, true);
   }
-  if (!input.pressed('Space')) return;
+  if (!space) return;
   if (!s.trail.on) {
     s.trail = {
       on: true,
@@ -1335,14 +1420,18 @@ function menuInput(s, input, emit) {
   }
 }
 
-export function advance(s, dt, input, emit = () => {}) {
+const NO_INPUT = Object.freeze({ held: () => false, pressed: () => false });
+
+export function advance(s, dt, pad, emit = () => {}) {
+  const input = pad ?? NO_INPUT;
   if (s.phase !== 'playing' || !Number.isFinite(dt) || dt <= 0 || dt > RULES.maxDt) return false;
   if (s.menu) {
     menuInput(s, input, emit);
     presented(s);
     return true;
   }
-  if (s.clear <= 0) act(s, input, emit);
+  if (s.clear > 0) s.queued ||= input.pressed('Space');
+  else act(s, input, emit);
   const dx = (input.held('ArrowRight', 'KeyD') ? 1 : 0) - (input.held('ArrowLeft', 'KeyA') ? 1 : 0);
   const dy = (input.held('ArrowDown', 'KeyS') ? 1 : 0) - (input.held('ArrowUp', 'KeyW') ? 1 : 0);
   s.acc += dt;
@@ -1442,6 +1531,7 @@ export function snapshotOf(s) {
       on: s.trail.on,
       points: s.trail.pts.map((q) => ({ x: q.x, y: q.y, age: s.t - q.t })),
       life: oldest ? Math.max(0, L.fade - (s.t - oldest.t)) : null,
+      threat: s.line?.key === 'cut' && s.cutAt ? xy(s.cutAt) : null,
     },
     flies: s.flies.map((f) => ({ id: f.id, alive: f.alive, x: f.x, y: f.y })),
     moths: s.moths.map((m, i) => ({ kind: L.moths[i].kind, r: L.moths[i].r, x: m.x, y: m.y })),
@@ -1584,6 +1674,17 @@ function drawTrail(ctx, s) {
     line(ctx, [pts[i - 1], pts[i]], f > 0.5 ? '#ffb347' : '#a8531c', 3, [], f);
   }
   if (!s.trail.on) return;
+  // Where a moth is about to cut the trail: a pulsing red ring with a bar through it.
+  if (s.line?.key === 'cut' && s.cutAt) {
+    const r = 7 + 3 * (0.5 + 0.5 * Math.sin(s.ticks * 0.25));
+    ctx.strokeStyle = '#ff5d5d';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(s.cutAt.x, s.cutAt.y, r, 0, TAU);
+    ctx.stroke();
+    box2(ctx, '#ff5d5d', s.cutAt.x - 1, s.cutAt.y - 3, 2, 4);
+    box2(ctx, '#ff5d5d', s.cutAt.x - 1, s.cutAt.y + 2, 2, 2);
+  }
   const check = closeCheck(s);
   const color = check.ok
     ? '#7dffa0'
@@ -1778,7 +1879,15 @@ function drawHud(ctx, s, env) {
     );
   if (s.msg) text(ctx, env.t(s.msg.en, s.msg.zh), 240, 292, '#ffe9a0', 14, 'center');
   const prompt = s.line ? env.t(s.line.en, s.line.zh) : '';
-  text(ctx, prompt, 240, 306, s.line?.key === 'wait' ? '#ff9d7d' : '#ffffff', 14, 'center');
+  text(
+    ctx,
+    prompt,
+    240,
+    306,
+    s.line?.key === 'wait' || s.line?.key === 'cut' ? '#ff9d7d' : '#ffffff',
+    14,
+    'center',
+  );
 }
 
 const MENU = { x: 16, y: 66, w: 44, h: 36, dx: 56, dy: 46 };

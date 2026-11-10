@@ -1,0 +1,57 @@
+{
+  "game": "firefly-trail",
+  "date": "2026-11-10",
+  "reviewedRevision": "a3ef2a8d (accepted build) plus the fixes in this commit",
+  "owner": "owner-firefly and owner-firefly2",
+  "reviewer": "firefly-fair, firefly-robust and firefly-present (parallel split review)",
+  "rounds": 1,
+  "process": "Lean final review at the user's request, with the review split across three parallel reviewers (fairness, robustness, presentation) as the user asked. The game already had 24 meadows; presentation passed outright. Three MEDIUM findings and the cheap LOW items were fixed and verified by a separate verification agent re-running the reviewers' own probes and one clean-worktree run, then by the browser check, without a second review round.",
+  "verdict": "pass",
+  "approvedSha256": {
+    "src/games/firefly-trail.js": "b13576a5ae54b22f28eb1c79cee309770cef1674bbe080db2aaf2da196ab1ab0",
+    "tests/firefly-trail.test.js": "135e3efaac704053fdca93068debd06781f367bc636ec273ebae09e40668dfc9",
+    "tests/firefly-trail-quality.test.js": "dbcf6b3182c827dcddeb0651f33f3bc1a84d8a020577fb9d31d989cd743defa2"
+  },
+  "tests": {
+    "command": "node --experimental-test-coverage --test-coverage-include='src/games/firefly-trail*.js' --test tests/firefly-trail.test.js tests/firefly-trail-quality.test.js",
+    "passed": 89,
+    "failed": 0,
+    "lineCoverage": 98.67,
+    "log": "firefly-trail-coverage.txt"
+  },
+  "independentProbes": "On the final files the fairness reviewer's reaction-limited bot (public getState only, threats seen late, 60 Hz, 6 seeds) cleared all 24 meadows at 0.25 s and 0.35 s; mastery stays hardest at 0.44-0.50 hits per run against 0.00-0.13 earlier, and no hit came without a warning. The reviewer's three trail-cut repros (meadows 6, 19 and 24) now show each cut warned in advance. Blind bots cleared no meadow from 3 to 24, 9,600 chunk comparisons matched across 30, 60 and 120 Hz, every broken progress store was safe, a Space pressed during the clear banner now takes effect, and EN and ZH text fits.",
+  "findings": [
+    {
+      "id": "M1",
+      "severity": "medium",
+      "status": "fixed",
+      "observation": "Fairness finding: on meadows 6, 17, 19, 23 and 24 a moth could cut a freshly laid trail with no warning in the preceding second, costing a light. A look-ahead now watches the laid and planned trail 1.5 s ahead and shows 'Moth cuts trail! Space closes, X cancels' (飞蛾要切断光迹！空格封圈，X取消) with a pulsing ring on the spot, and a quality test requires 0.6-1.0 s of warning before every cut."
+    },
+    {
+      "id": "M2",
+      "severity": "medium",
+      "status": "fixed",
+      "observation": "Robustness findings: a throwing progress store crashed the game at start or at a meadow clear, and presses during the 1.4 s clear banner were dropped. Both store calls are now guarded as in Shield Sentinel, and a banner press is queued for the next meadow."
+    },
+    {
+      "id": "L1",
+      "severity": "low",
+      "status": "fixed",
+      "observation": "An Infinity progress value now clamps like any huge value, update(dt, undefined) is treated as an idle frame, and four meadow tips were shortened so the widest English line is about 437 px."
+    }
+  ],
+  "openNotes": [
+    "A press in a single frame longer than 0.1 s is still dropped; the host always steps at 1/120 s, so only direct API calls can hit it.",
+    "The source is a single file of about 1,900 lines, over the repository's 800-line soft ceiling."
+  ],
+  "browser": {
+    "method": "Official Claude in Chrome extension, local server; real clicks on Start and the language toggle, synthetic in-page keys; only DOM text and the canvas were read.",
+    "servedSha256Prefixes": "b13576a5",
+    "observed": [
+      "With progress saved from earlier testing, Start opened the meadow chooser; meadow 1 (First Light) showed the lantern, the dotted guide to the gold ring, the dawn timer and three lights, with the prompt 'Space starts a trail. Circle it, Space closes. Arrows: walk to the gold ring'.",
+      "Chinese 390 px phone frame (388 px inner, no horizontal overflow): the meadow chooser in Chinese with touch buttons 左, 右, 上, 下, 光迹 and 取消.",
+      "Not covered in the browser: a catch, a moth cut and a meadow clear; the reviewers' probes, the verification run and the quality tests cover them."
+    ],
+    "screenshots": ["screenshots/firefly-trail-en.png", "screenshots/firefly-trail-phone-zh.png"]
+  }
+}

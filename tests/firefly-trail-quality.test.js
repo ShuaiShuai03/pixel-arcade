@@ -50,6 +50,7 @@ function humanRun(
     drop = 0,
     jitterDt = false,
     distract = 0,
+    stubborn = false,
     log,
   } = {},
 ) {
@@ -105,7 +106,11 @@ function humanRun(
         pressed = ['Space'];
         pending = { t, kind: trailOn ? 'close' : 'begin' };
         holdOff = t + base + 0.2;
-      } else if (move === 'go' || (pending?.kind === 'begin' && hint)) {
+      } else if (
+        move === 'go' ||
+        (stubborn && move === 'wait') ||
+        (pending?.kind === 'begin' && hint)
+      ) {
         if (hint) {
           const ringAt = hint.route.findIndex(
             (p) => Math.abs(p.x - hint.ring.x) < 1e-6 && Math.abs(p.y - hint.ring.y) < 1e-6,
@@ -802,4 +807,52 @@ test('the drawn prompt line names a key, matches the state and fits the bottom b
         g.update(1 / 60, input(f % 90 < 45 ? ['ArrowRight'] : ['ArrowDown']));
       }
     }
+});
+
+// Every trail a moth cuts is announced beforehand: a stubborn player (delayed, and walking the
+// guide whatever the prompt says) is cut now and then, but never without a visible warning.
+const WARNING = /^Moth (near|close|cuts)/;
+const WARN_FROM = 1.0;
+const WARN_BY = 0.6;
+
+test('a moth never cuts the trail without a warning on screen at least 0.6 s before', () => {
+  let cuts = 0;
+  const bad = [];
+  for (let level = 1; level <= LEVEL_COUNT; level++)
+    for (const delay of [
+      [0.15, 0.15],
+      [0.25, 0.25],
+      [0.35, 0.35],
+      [0.5, 0.5],
+    ])
+      for (let seed = 1; seed <= 10; seed++) {
+        const seen = [];
+        let before = { cuts: 0, hits: 0, lives: RULES.lives };
+        humanRun(seed + level * 17, 60, {
+          level,
+          delay,
+          stubborn: true,
+          seconds: 100,
+          log: (st, _k, _p, t) => {
+            seen.push([t, WARNING.test(st.line.en)]);
+            // A sting that happens to cut a trail is a hit on the lantern, announced by the wait and
+            // back-away lines, and a cut under the shield of a recent sting costs nothing; this
+            // sweep is about trails a moth crosses on its own and that cost a light.
+            const cutOnly =
+              st.stats.cuts > before.cuts &&
+              st.stats.hits === before.hits &&
+              st.lives < before.lives;
+            if (cutOnly) {
+              cuts += st.stats.cuts - before.cuts;
+              const early = seen.some(([w, on]) => on && w >= t - WARN_FROM && w <= t - WARN_BY);
+              if (!early)
+                bad.push(`meadow ${level} lag ${delay[0]} seed ${seed} t=${t.toFixed(2)}`);
+            }
+            before = { cuts: st.stats.cuts, hits: st.stats.hits, lives: st.lives };
+          },
+        });
+      }
+  console.log(`cuts in the warning sweep: ${cuts}`);
+  assert.ok(cuts >= 4, `only ${cuts} cuts happened: the sweep proves little`);
+  assert.deepEqual(bad, [], `${bad.length} of ${cuts} cuts came without a warning`);
 });

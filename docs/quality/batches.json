@@ -269,7 +269,8 @@
       "orbit-gardener",
       "conveyor-chef",
       "echo-hunter",
-      "rail-switch"
+      "rail-switch",
+      "firefly-trail"
     ],
     "records": [
       "final-review/snowball-siege.json",
@@ -311,7 +312,8 @@
       "final-review/orbit-gardener.json",
       "final-review/conveyor-chef.json",
       "final-review/echo-hunter.json",
-      "final-review/rail-switch.json"
+      "final-review/rail-switch.json",
+      "final-review/firefly-trail.json"
     ]
   }
 }

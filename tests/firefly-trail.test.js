@@ -854,7 +854,8 @@ test('progress.unlocked() is floored and validated', () => {
   assert.equal(read(undefined), null);
   assert.equal(read(null), null);
   assert.equal(read('x'), null);
-  assert.equal(read(Infinity), null);
+  assert.equal(read(Infinity).unlocked, LEVEL_COUNT, 'consistent with a huge finite count');
+  assert.equal(read(-Infinity), null);
 });
 
 test('a later start offers continue and a select menu; the world waits behind it', () => {
@@ -1169,7 +1170,7 @@ test('long seeded chaos stays finite and bounded in every meadow', () => {
         const st = snapshotOf(s);
         const json = JSON.stringify(st);
         assert.ok(
-          !/null|NaN|Infinity/.test(json.replace(/"(hint|menu|message|life)":null/g, '')),
+          !/null|NaN|Infinity/.test(json.replace(/"(hint|menu|message|life|threat)":null/g, '')),
           json.slice(0, 200),
         );
         assert.ok(st.trail.points.length < 400);
@@ -1899,4 +1900,157 @@ test('wait and back-away never trade places faster than half a second, and a hel
   assert.equal(s.line.key, 'flee');
   assert.deepEqual(s.flee, keep);
   assert.equal(snapshotOf(s).hint.kind, 'flee');
+});
+
+// ---------------------------------------------------------------- final review fixes
+
+test('a progress store that throws never stops the game, on reading or on saving', () => {
+  const h = harness();
+  const boom = () => {
+    throw new Error('store down');
+  };
+  h.env.progress = { unlocked: boom, unlock: boom };
+  const g = createGame(h.env);
+  assert.equal(g.getState().menu, null);
+  assert.equal(g.getState().meadow, 1);
+  assert.equal(followZero(g, 1).meadow, 2, 'clearing a meadow still carries on');
+  const { h: h2 } = progressEnv(3);
+  h2.env.progress.unlock = boom;
+  const g2 = createGame(h2.env);
+  assert.equal(g2.getState().menu.unlocked, 3, 'only saving is broken');
+  g2.update(1 / 60, input([], ['Space']));
+  assert.equal(followZero(g2, 3).meadow, 4);
+});
+
+test('update tolerates a missing input object as an idle frame', () => {
+  const g = createGame(harness().env);
+  const before = g.getState();
+  assert.doesNotThrow(() => g.update(1 / 60, undefined));
+  assert.doesNotThrow(() => g.update(1 / 60, null));
+  const after = g.getState();
+  assert.ok(after.time > before.time);
+  assert.deepEqual(after.player.x, before.player.x);
+});
+
+// Walk the guide on a lab state until the meadow is cleared (the banner is running).
+function playToBanner(s) {
+  for (let t = 0; t < 60 && s.clear <= 0; t += 1 / 60) {
+    const now = snapshotOf(s);
+    const held = [];
+    const pressed = [];
+    if (now.line.move === 'go' && now.hint) {
+      if (now.hint.x - now.player.x > 2) held.push(R);
+      else if (now.hint.x - now.player.x < -2) held.push(L);
+      if (now.hint.y - now.player.y > 2) held.push(D);
+      else if (now.hint.y - now.player.y < -2) held.push(U);
+    } else if (now.line.move === 'space' && Math.round(t * 60) % 20 === 0) pressed.push('Space');
+    advance(s, 1 / 60, input(held, pressed), emit);
+  }
+  assert.ok(s.clear > 0, 'the meadow is cleared');
+}
+
+test('a Space pressed during the clear banner is kept and used in the next meadow', () => {
+  const s = lab(1);
+  playToBanner(s);
+  assert.equal(s.queued, false, 'ordinary presses are not queued');
+  advance(s, 1 / 60, input([], ['Space']), emit);
+  assert.equal(s.queued, true);
+  assert.equal(s.level, 0, 'still in the banner');
+  run(s, 2, []);
+  assert.equal(s.level, 1, 'the next meadow is loaded');
+  assert.equal(s.trail.on, true, 'the kept press began the trail there');
+  assert.equal(s.queued, false);
+
+  const quiet = lab(1);
+  playToBanner(quiet);
+  run(quiet, 2, []);
+  assert.equal(quiet.level, 1);
+  assert.equal(quiet.trail.on, false, 'without a press nothing starts');
+});
+
+// A straight trail laid along y by walking right from x0, with the clock moving on.
+function straightTrail(s, x0, y, seconds) {
+  at(s, x0, y);
+  run(s, 0.01, [], ['Space']);
+  run(s, seconds, [R]);
+  assert.ok(s.trail.on && s.trail.pts.length > 5);
+}
+
+test('a moth about to cross the laid trail is announced well ahead, with a mark on the spot', () => {
+  const s = lab(1);
+  setFlies(s, [[400, 250]]);
+  straightTrail(s, 150, 200, 1);
+  const t0 = s.t;
+  const lane = (t) => ({ x: 180, y: 130 + (t - t0) * 40 });
+  setMoths(s, [{ at: lane }]);
+  let warnedAt = null;
+  let cutAt = null;
+  for (let i = 0; i < 120 * 3 && cutAt === null; i++) {
+    advance(s, 1 / 120, input([], []), emit);
+    if (s.line.key === 'cut' && warnedAt === null) {
+      warnedAt = s.t;
+      const st = snapshotOf(s);
+      assert.equal(st.line.move, 'wait');
+      assert.match(st.line.en, /^Moth cuts trail/);
+      assert.match(st.line.zh, /飞蛾/);
+      assert.ok(Math.abs(st.trail.threat.x - 180) < 12 && Math.abs(st.trail.threat.y - 200) < 12);
+    }
+    if (s.stats.cuts > 0) cutAt = s.t;
+  }
+  assert.ok(warnedAt !== null && cutAt !== null, 'warned, then cut');
+  assert.ok(cutAt - warnedAt >= 0.6, `warned ${(cutAt - warnedAt).toFixed(2)} s ahead`);
+  assert.equal(snapshotOf(s).trail.threat, null, 'no mark once the trail is gone');
+});
+
+test('no cut warning when the moth stays clear, or the threatened stretch fades first', () => {
+  const far = lab(1);
+  setFlies(far, [[400, 250]]);
+  straightTrail(far, 150, 200, 1);
+  const t0 = far.t;
+  setMoths(far, [{ at: (t) => ({ x: 400, y: 100 + (t - t0) * 40 }) }]);
+  run(far, 1, []);
+  assert.notEqual(far.line.key, 'cut');
+  assert.equal(snapshotOf(far).trail.threat, null);
+
+  const fading = lab(1);
+  setFlies(fading, [[400, 250]]);
+  straightTrail(fading, 150, 200, 1);
+  const t1 = fading.t;
+  for (const q of fading.trail.pts) q.t = t1 - fading.L.fade + 0.05;
+  setMoths(fading, [{ at: (t) => ({ x: 180, y: 130 + (t - t1) * 40 }) }]);
+  run(fading, 0.5, []);
+  assert.notEqual(fading.line.key, 'cut', 'the stretch is gone before the moth arrives');
+});
+
+test('a stalker heading for the trail is announced too', () => {
+  const s = lab(18);
+  s.plan = null;
+  s.trail = {
+    on: true,
+    pts: [
+      { x: 200, y: 100, t: s.t },
+      { x: 300, y: 100, t: s.t },
+    ],
+    box: { x0: 200, y0: 100, x1: 300, y1: 100 },
+  };
+  at(s, 300, 100);
+  run(s, 0.3, []);
+  assert.equal(s.line.key, 'cut');
+  assert.ok(snapshotOf(s).trail.threat);
+  assert.equal(s.stats.cuts, 0, 'still time to react');
+});
+
+test('a lantern boxed in beside a moth is told the guide route would be cut, once it sets off', () => {
+  const s = lab(1);
+  at(s, 256, 100);
+  run(s, 0.01, [], ['Space']);
+  assert.ok(s.trail.on);
+  setMoths(s, [{ at: () => ({ x: 278, y: 100 }) }]);
+  run(s, 0.3, []);
+  assert.notEqual(s.line.key, 'cut', 'a lantern that stands still lays nothing for a moth to cut');
+  run(s, 0.1, [R]);
+  assert.equal(s.line.key, 'cut');
+  const mark = snapshotOf(s).trail.threat;
+  assert.ok(mark && Math.abs(mark.y - 100) < 3 && mark.x > 256 && mark.x < 290);
+  assert.equal(s.stats.cuts + s.stats.hits, 0);
 });

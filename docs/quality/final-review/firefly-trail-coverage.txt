@@ -1,0 +1,127 @@
+per-meadow wins, fast: 1:30 2:30 3:30 4:30 5:30 6:30 7:30 8:30 9:30 10:30 11:30 12:30 13:30 14:30 15:30 16:30 17:30 18:30 19:30 20:30 21:30 22:30 23:30 24:30
+per-meadow wins, slow: 1:30 2:30 3:30 4:30 5:30 6:30 7:30 8:30 9:30 10:30 11:30 12:30 13:30 14:30 15:30 16:30 17:30 18:30 19:30 20:30 21:30 22:30 23:30 24:30
+per-meadow wins, casual: 1:30 2:30 3:30 4:30 5:30 6:26 7:30 8:30 9:30 10:30 11:29 12:30 13:29 14:30 15:30 16:29 17:29 18:29 19:28 20:30 21:30 22:29 23:26 24:30
+campaign wins (0.15,0.35): 29/30
+campaign wins (0.4,0.6): 30/30
+contacts from anywhere: {"0":0,"0.25":0,"0.5":5} of {"0":141,"0.25":141,"0.5":141}
+crude wins/10 in 90 s:
+random     0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+mash       0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+holdspam   0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+circle     0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+pulse      2 1 0 0 0 1 0 2 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+free-play wins out of 2 per meadow:
+cautious box                 222221220000000000000000
+box without dodging          222222220000000000000000
+one giant loop               220222220000000000002000
+big margin, no wait          222220020000000000000000
+greedy box inside the limit  222222222202200020202002
+cuts in the warning sweep: 6
+✔ a delayed player (0.15-0.35 s) using only the drawn state clears every meadow in at least 27 of 30 runs at 30, 60 and 120 Hz (31375.02375ms)
+✔ a slow player (0.4-0.6 s with jitter) clears every meadow in at least 24 of 30 runs at 30, 60 and 120 Hz (45256.203042ms)
+✔ a casual player (0.5-0.8 s, now and then distracted, dropping keys) clears every meadow in at least 24 of 30 runs (70970.829666ms)
+✔ frame-rate sweep: five meadows at each rate with 30 seeds, fast and slow players (64292.418542ms)
+✔ the whole 24-meadow campaign is won in at least 27 of 30 fast runs and 24 of 30 slow runs (76471.721334ms)
+✔ every meadow has a scripted legal solution: a zero-lag planner replays through public keys (1064.936375ms)
+✔ perturbed input (dropped keys, irregular frame times) still clears representative meadows (10073.45825ms)
+✔ prompts name keys, are held at least half a second and rarely flip straight back (1254.707042ms)
+✔ a literal prompt follower that never looks at a moth is never led into a hit or a cut, at 0, 0.25 and 0.5 s of lag, in any meadow or frame rate (10701.219125ms)
+✔ a follower that honours every wait in full clears the long-wait meadows with at least 5 s of dawn to spare (23531.116459ms)
+✔ a prompt follower dropped in anywhere is never led into a sting or a cut at 0 and 0.25 s of lag, and almost never at 0.5 s (34383.599542ms)
+✔ the prompt line changes at most three times in any second (four at half a second of lag), wait and back-away included (7222.157375ms)
+✔ crude policies win at most half the runs in every meadow: random keys, mashing, spam, holding one way, circling and the pulse policy (46853.402ms)
+✔ the same crude policies stay at or under half with a 300 s budget (dawn, then the lights, run out) (28273.327458ms)
+✔ free-play bots that ignore the prompt and guide win at most half the runs on at least 15 meadows and on at most half of the late ones (23861.499875ms)
+✔ the drawn prompt line names a key, matches the state and fits the bottom band (170.193333ms)
+✔ a moth never cuts the trail without a warning on screen at least 0.6 s before (33675.955333ms)
+✔ metadata is complete, bilingual and the touch layout covers every action (1.180333ms)
+✔ there are at least 20 authored meadows with consistent, bilingual data (0.534375ms)
+✔ every tip fits the 480 px bottom band at a conservative 0.6 em per character (0.193291ms)
+✔ every scripted loop encloses its fireflies with room to spare, and the loops reach the quota (1.043709ms)
+✔ the first meadows teach one idea at a time, then combine, then master (0.222583ms)
+✔ geometry helpers: containment, crossings, distances and areas (0.114541ms)
+✔ invalid frame times are inert and never consume a press (1.083292ms)
+✔ the same aligned input gives identical full state at 30, 60 and 120 Hz (441.197375ms)
+✔ movement is free-form: eight directions at one speed, held keys only, WASD too (0.967875ms)
+✔ the lantern stays inside the field and flowers block it without trapping it (1.207625ms)
+✔ Space begins a trail where the lantern stands and X cancels it without penalty (0.347583ms)
+✔ the trail fades: points older than the meadow fade time disappear, oldest first (3.468958ms)
+✔ Space closes a loop by real polygon containment: only fireflies inside are caught (0.92925ms)
+✔ a concave loop does not capture a firefly sitting in its notch (0.177125ms)
+✔ too-small loops and closing lines that cross the trail are refused and keep the trail (0.15075ms)
+✔ crossing your own trail closes the loop right there and catches what is inside (3.367833ms)
+✔ a moth touching the trail cuts it; the cut is swept so even a very fast moth cannot tunnel (0.739333ms)
+✔ a moth that misses the trail leaves it alone (0.845167ms)
+✔ a moth stinging the lantern costs a light once, then grants a grace period (0.8575ms)
+✔ a fast moth cannot tunnel through the lantern either (0.21675ms)
+✔ stinging while drawing also cuts the trail (0.104959ms)
+✔ catching the quota clears the meadow once, scores it, unlocks the next and then loads it (2.065334ms)
+✔ one loop around several fireflies scores a combo bonus (2.057542ms)
+✔ an empty loop says so and costs nothing (0.801292ms)
+✔ terminal win: the last meadow ends the game once, frozen, with a single host-played jingle (49.956958ms)
+✔ terminal loss by dawn: ends once, silent on the final update, frozen, restart is fresh (4.859667ms)
+✔ terminal loss by moths: the fatal sting is silent, ends the game once and freezes it (58.417917ms)
+✔ progress: with only meadow 1 open (or no progress API) the game starts at once (0.147333ms)
+✔ progress.unlocked() is floored and validated (0.127625ms)
+✔ a later start offers continue and a select menu; the world waits behind it (0.197375ms)
+✔ clearing a meadow raises unlock to the next one and never past the last (16.426708ms)
+✔ drawing the select menu: no text overlaps a cell, in English and Chinese (5.224125ms)
+✔ the guide walks the player: ring, start, dots, close (0.795791ms)
+✔ starting away from the ring is free drawing, with its own prompt (0.107541ms)
+✔ crossing loops say so; the idle prompt appears when no loop is left (0.417625ms)
+✔ a moth lane on the way turns the prompt into a wait, then lets go again (156.817458ms)
+✔ prompt lines are replaced only after half a second unless urgent or forced by an action (0.22225ms)
+✔ dawn: the timer counts down and the meadow is lost when it runs out (4.181292ms)
+✔ the status is bilingual and names the meadow, the prompt and the firefly count (0.144375ms)
+✔ getState is JSON-safe, detached and offers no cheat API (0.353542ms)
+✔ sounds: a trail begins with move, a catch rings coin, a cut and a sting use hit, never win or lose (2.21375ms)
+✔ long seeded chaos stays finite and bounded in every meadow (1728.190291ms)
+✔ drawing: every phase renders; text is 14-16 px, on the canvas and inside the HUD bands (33.864791ms)
+✔ drawing: the HUD bands do not overlap and the top counters do not collide (5.262459ms)
+✔ drawing: actors are at least 16 px and the guide is drawn where the prompt points (5.000958ms)
+✔ drawing: previews, feedback marks, the stung lantern and terminals render (4.637042ms)
+✔ drawing: a game in progress, frozen and in the menu all render without throwing (154.135875ms)
+✔ the light reaches only so far: the covered and spread areas are measured honestly (0.282083ms)
+✔ wide loops fizzle: the trail is spent, nothing is caught, and fading the tail cannot shrink the loop (2.51225ms)
+✔ a crossing that would close a wide loop is ignored (2.396167ms)
+✔ the stalker shadows the lantern along its lane at its own speed and never leaves the lane (290.722208ms)
+✔ a stalker meeting the lantern stings it like any moth (0.349334ms)
+✔ moth hit radii match the drawn bodies (3.591583ms)
+✔ a cut costs a light unless the lantern is still shielded, and the third light ends the night (0.301291ms)
+✔ a clean meadow earns a bonus, and spare dawn counts double (1.223917ms)
+✔ flowers are never entered, even at a pinch between two of them (76.367166ms)
+✔ drawing: the trail fades to nothing, flashes use even-odd and every verdict has a shape (0.748375ms)
+✔ a prompt line is on screen for at least half a second at any frame rate, counted from its first drawn frame (13.645208ms)
+✔ the half-second hold starts when the line is first drawn, not when an action inside the update set it (0.086708ms)
+✔ late fireflies come in pairs that no single loop inside the light reaches (hawk corridor excepted) (0.213125ms)
+✔ crossing that would close a wide loop marks the spot and says so (1.475625ms)
+✔ when neither walking nor standing is safe the prompt says to back away, towards a safe spot (1.144583ms)
+✔ a stalker that parked beside the way sends the lantern back to draw it off again (23.975458ms)
+✔ closeCheck stays cheap with a long trail (1.295958ms)
+✔ wait and back-away never trade places faster than half a second, and a held line keeps its own target (0.730541ms)
+✔ a progress store that throws never stops the game, on reading or on saving (5.38375ms)
+✔ update tolerates a missing input object as an idle frame (0.201375ms)
+✔ a Space pressed during the clear banner is kept and used in the next meadow (3.234708ms)
+✔ a moth about to cross the laid trail is announced well ahead, with a mark on the spot (1.294292ms)
+✔ no cut warning when the moth stays clear, or the threatened stretch fades first (0.99875ms)
+✔ a stalker heading for the trail is announced too (0.355417ms)
+✔ a lantern boxed in beside a moth is told the guide route would be cut, once it sets off (0.162541ms)
+ℹ tests 89
+ℹ suites 0
+ℹ pass 89
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 509501.871875
+ℹ start of coverage report
+ℹ -------------------------------------------------------------------
+ℹ file               | line % | branch % | funcs % | uncovered lines
+ℹ -------------------------------------------------------------------
+ℹ src                |        |          |         | 
+ℹ  games             |        |          |         | 
+ℹ   firefly-trail.js |  98.67 |    97.73 |   99.27 | 1679-1687
+ℹ -------------------------------------------------------------------
+ℹ all files          |  98.67 |    97.73 |   99.27 | 
+ℹ -------------------------------------------------------------------
+ℹ end of coverage report
