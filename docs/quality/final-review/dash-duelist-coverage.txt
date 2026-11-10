@@ -1,0 +1,107 @@
+✔ quality: 20 distinct data-driven levels on a teaching, combination and mastery curve (1.096958ms)
+✔ quality: every level has bilingual names and tips that fit the banner (1.546708ms)
+✔ quality: tips describe what the level actually does (0.680417ms)
+✔ quality: the pilot clears every level at 60 Hz with a 0.25 s reaction time (169.196583ms)
+✔ quality: a 0.25 s pilot at 30 Hz clears at least 3/4 on every level (478.912375ms)
+✔ quality: a 0.25 s pilot at 60 Hz clears at least 3/4 on every level (542.123958ms)
+✔ quality: a 0.25 s pilot at 120 Hz clears at least 3/4 on every level (664.701875ms)
+✔ quality: a 0.35 s pilot at 30 Hz clears at least 3/4 on every level (552.585292ms)
+✔ quality: a 0.35 s pilot at 60 Hz clears at least 3/4 on every level (643.563ms)
+✔ quality: a 0.35 s pilot at 120 Hz clears at least 3/4 on every level (838.107ms)
+✔ quality: mastery costs more HP than the middle of the game, level 20 the most (893.517375ms)
+✔ quality: dashing is required for the game: a pilot that never dashes fails the heavy levels (5.926542ms)
+✔ quality: idle, mashing, held-direction and fixed-period dash patterns win at most 25% from level 3 (1179.958667ms)
+✔ quality: an idle player loses no HP in the first 4 s of any level and can read the tip (6.868042ms)
+✔ quality: the tip banner stays above every fighter and the arena (0.058ms)
+✔ quality: no progress store starts level 1 at once; a fresh store too (0.105709ms)
+✔ quality: junk progress values are clamped, and a broken store never stops the game (0.160625ms)
+✔ quality: clearing a level unlocks the next one, and a throwing store cannot hurt the run (4.9945ms)
+✔ quality: the select continues at the highest unlocked level and never lowers it (0.1705ms)
+✔ quality: taps pick levels; locked cells refuse with a sound; hostile pointers are ignored (0.24075ms)
+✔ quality: the level select draws in both languages with tier tags and a caption (0.512875ms)
+✔ quality: state is identical at 30, 60 and 120 Hz on the late levels too (21.114416ms)
+✔ quality: hostile dt values are inert in the select, in play and after the end (5.584333ms)
+✔ quality: a loss ends the run once, in English and Chinese, and the state freezes (2.711791ms)
+✔ quality: clearing level 20 reports a win exactly once, in both languages, then freezes (15.276042ms)
+✔ quality: touch controls cover every action and no reserved key is bound (0.588125ms)
+✔ quality: every rival tell has a text label, so colour is never the only cue (9.489958ms)
+✔ quality: the tip, message and HUD text fit the canvas in both languages (11.915083ms)
+✔ quality: scores and HUD pips agree with the rules (0.08125ms)
+✔ quality: every danger prompt fits 480 px at 16 px, in English and Chinese (1.158ms)
+✔ quality: a press on the dash NOW word covers a heavy hit for fast and slow players (0.054375ms)
+✔ meta documents bilingual copy, keys and complete touch controls (1.279458ms)
+✔ a new game starts immediately with a player, a first rival and full resources (0.355416ms)
+✔ invalid or huge dt is inert and does not consume input (0.688583ms)
+✔ state is identical at 30, 60 and 120 Hz for input aligned to 1/30 s (9.057834ms)
+✔ the player moves in eight directions at constant speed and stays inside the arena (1.855583ms)
+✔ fighters cannot walk through each other (0.166958ms)
+✔ Space starts exactly one strike per press; holding keys never repeats actions (0.369583ms)
+✔ a pressed action during recovery is buffered briefly, then dropped (0.34675ms)
+✔ reed: slash telegraph commits and the drawn shape is exactly the hit area (10.764958ms)
+✔ mira: thrust telegraph commits and the drawn shape is exactly the hit area (11.107916ms)
+✔ kade: sweep telegraph commits and the drawn shape is exactly the hit area (5.684334ms)
+✔ kade: bigSweep telegraph commits and the drawn shape is exactly the hit area (2.817167ms)
+✔ mira: charge telegraph commits and the drawn shape is exactly the hit area (7.14975ms)
+✔ a chained attack re-commits its direction to where the player stands at the second windup (0.275167ms)
+✔ the rival cycle gives the stated openings: windup, active, recovery, then a gap (0.370625ms)
+✔ strikes only hurt a rival in its recovery window; guarded strikes say so (0.124417ms)
+✔ one swing hurts at most once and the opening has a stated length (0.460625ms)
+✔ the opening closes: a strike after recovery ends is guarded (0.131041ms)
+✔ dash spends one of three charges, recharges visibly, and refuses at zero (3.68675ms)
+✔ dash moves the stated distance in the held direction, or backs away from the rival (0.170417ms)
+✔ dash invulnerability is bounded: it blocks the hit inside the window and not after (0.306041ms)
+✔ dashing through a committed attack scores a dodge and takes no damage (0.128333ms)
+✔ a dash cannot pass through the rival (0.069666ms)
+✔ hit stun and post-hit invulnerability limit damage to one hit per window (0.117166ms)
+✔ a hit is knocked back, stuns briefly and cancels the swing (0.205167ms)
+✔ an attacking rival is guarded and an open rival is harmless, so damage never trades in one tick (14.799708ms)
+✔ a lethal hit on the player ends the duel as a loss even if the rival is also on 1 HP (0.160875ms)
+✔ the player dies first when a lethal rival hit and a later strike would both happen (0.130708ms)
+✔ winning a level restores HP and dashes, then the next level steps in (0.287333ms)
+✔ winning the final duel freezes the world and scores the remaining HP (0.075208ms)
+✔ the opening closes after one clean hit, so one opening is worth one point of damage (0.099417ms)
+✔ a passive player loses fairly: one HP per rival hit, one terminal callback (4.872667ms)
+✔ status is a bilingual string with rival, HP, dash, transient events and a prompt (0.297917ms)
+✔ ring, lane and sector prompts name the source side and keys (0.348542ms)
+✔ draw works in early, telegraph, recovery, intermission and terminal states in both languages (20.26275ms)
+✔ text is 14-16 px, HUD text stays in the HUD bands and fighters stay between them (23.811ms)
+✔ Chinese prompts and English prompts fit the canvas width (0.081333ms)
+✔ seeded random play at 30 Hz stays finite and bounded (46.467792ms)
+✔ seeded random play at 60 Hz stays finite and bounded (83.819833ms)
+✔ seeded random play at 120 Hz stays finite and bounded (123.505583ms)
+✔ sound events map to allowed host sounds (2.311583ms)
+✔ fighter art is 10x14 at 2x, matching the 20x28 collider, with a distinct silhouette each (0.187291ms)
+✔ each rival has its own weapon and every pose draws something different (1.479042ms)
+✔ each tier fights in its own courtyard (0.374083ms)
+✔ the HUD labels the rival, you and the dash pips in both languages (0.435125ms)
+✔ the dash hint in the danger prompt follows the live charge count (0.066292ms)
+✔ a strike prompt is only shown while its shape is drawn (24.593333ms)
+✔ heavy attacks cost 3 HP, are drawn as heavy, and a dash on sight carries out of the big ring (0.239ms)
+✔ without charges the heavy prompt says to run, in both languages (0.061208ms)
+✔ a run that never dashes cannot survive two heavy hits from Kade (0.186708ms)
+✔ a heavy shape says wait, then dash NOW, so even a slow press still covers the hit (5.387291ms)
+ℹ tests 82
+ℹ suites 0
+ℹ pass 82
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 6114.756208
+ℹ start of coverage report
+ℹ ---------------------------------------------------------------------------
+ℹ file                       | line % | branch % | funcs % | uncovered lines
+ℹ ---------------------------------------------------------------------------
+ℹ src                        |        |          |         | 
+ℹ  games                     |        |          |         | 
+ℹ   dash-duelist-art.js      | 100.00 |   100.00 |  100.00 | 
+ℹ   dash-duelist-draw.js     |  98.42 |    98.35 |  100.00 | 79 273-276
+ℹ   dash-duelist-geometry.js |  93.24 |    96.88 |  100.00 | 58-62
+ℹ   dash-duelist-levels.js   | 100.00 |    85.71 |  100.00 | 
+ℹ   dash-duelist-menu.js     | 100.00 |   100.00 |  100.00 | 
+ℹ   dash-duelist-world.js    | 100.00 |    99.53 |  100.00 | 
+ℹ   dash-duelist.js          | 100.00 |   100.00 |  100.00 | 
+ℹ ---------------------------------------------------------------------------
+ℹ all files                  |  99.38 |    98.91 |  100.00 | 
+ℹ ---------------------------------------------------------------------------
+ℹ end of coverage report

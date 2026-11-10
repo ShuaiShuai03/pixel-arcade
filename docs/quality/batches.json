@@ -258,7 +258,8 @@
       "wallrunner-relay",
       "shield-sentinel",
       "raft-rush",
-      "burrow-rescue"
+      "burrow-rescue",
+      "dash-duelist"
     ],
     "records": [
       "final-review/snowball-siege.json",
@@ -289,7 +290,8 @@
       "final-review/wallrunner-relay.json",
       "final-review/shield-sentinel.json",
       "final-review/raft-rush.json",
-      "final-review/burrow-rescue.json"
+      "final-review/burrow-rescue.json",
+      "final-review/dash-duelist.json"
     ]
   }
 }

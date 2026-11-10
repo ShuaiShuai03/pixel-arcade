@@ -17,7 +17,7 @@ Effort: S = level data only, M = data plus some mechanics or tests, L = structur
 | burrow-rescue    |             20 | `LEVELS`         |   S    | done (final review) |
 | raft-rush        |             20 | `LEVELS`         |   S    | done (final review) |
 | shield-sentinel  |             20 | `LEVELS`         |   S    | done (final review) |
-| dash-duelist     |              3 | `RIVALS`         |   S    | queued              |
+| dash-duelist     |             20 | `LEVELS`         |   S    | done (final review) |
 | tether-twins     |              3 | `ROOMS`          |   S    | queued              |
 | vine-warden      |              3 | `PLOTS`          |   S    | queued              |
 | river-hop        |             20 | `LEVELS`         |   S    | done (final review) |

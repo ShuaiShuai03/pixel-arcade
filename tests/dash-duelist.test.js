@@ -9,11 +9,14 @@ import {
   shapeHitsBody,
   promptFor,
   PLAYER,
+  DASH_NOW,
   ATTACKS,
-  RIVALS,
+  LEVEL_COUNT,
+  levelOf,
   ARENA,
   PLAY_TOP,
   PLAY_BOTTOM,
+  BODY,
   PROMPTS,
   FIGHTERS,
   COURTS,
@@ -26,7 +29,16 @@ const TICK = 1 / 120;
 const advance = (w, seconds, inp = input()) => {
   for (let i = 0; i < Math.round(seconds / TICK); i++) stepWorld(w, TICK, inp);
 };
-const fresh = (seed = 1) => createWorld(seeded(seed));
+const fresh = (seed = 1, level = 1) => createWorld(seeded(seed), level);
+const FIRST = levelOf(1).rival;
+const W1 = FIRST.patterns[0].steps[0].windup;
+// The same path the campaign uses: a duel is won and the next level begins.
+function toLevel(w, n) {
+  w.level = n - 1;
+  w.r = null;
+  w.between = TICK;
+  stepWorld(w, TICK, input());
+}
 // Put the world at the moment just before the rival's next windup, with chosen positions.
 function setup(w, { px = 200, py = 168, rx = 250, ry = 168, pattern = 0 } = {}) {
   Object.assign(w.p, { x: px, y: py });
@@ -37,6 +49,14 @@ function untilState(w, state, limit = 6, inp = input()) {
   return w.r && w.r.state === state;
 }
 const holdOnly = (...held) => input(held);
+// Words drawn under a fighter: the attack name (heavy ones prefixed with !!) or the OPEN mark.
+const LABELS = new Set(
+  ['OPEN', '破绽'].concat(
+    Object.values(ATTACKS).flatMap(({ label: [en, zh], heavy }) =>
+      heavy ? [`!! ${en.toUpperCase()}`, `!! ${zh}`] : [en.toUpperCase(), zh],
+    ),
+  ),
+);
 
 test('meta documents bilingual copy, keys and complete touch controls', () => {
   assert.equal(meta.id, 'dash-duelist');
@@ -49,7 +69,7 @@ test('meta documents bilingual copy, keys and complete touch controls', () => {
   for (const c of meta.touchControls) assert.ok(c.label.en && c.label.zh && c.side);
   assert.deepEqual(
     meta.keys.map((k) => k.keys),
-    ['WASD / Arrows', 'Space', 'X'],
+    ['WASD / Arrows', 'Space', 'X', 'Arrows / Space'],
   );
 });
 
@@ -57,7 +77,9 @@ test('a new game starts immediately with a player, a first rival and full resour
   const h = harness();
   const s = createGame(h.env).getState();
   assert.equal(s.phase, 'playing');
-  assert.equal(s.rivalNumber, 1);
+  assert.equal(s.level, 1);
+  assert.equal(s.levelCount, LEVEL_COUNT);
+  assert.equal(s.menu, null);
   assert.equal(s.rival.id, 'reed');
   assert.equal(s.player.hp, PLAYER.maxHp);
   assert.equal(s.player.charges, PLAYER.maxCharges);
@@ -179,24 +201,16 @@ test('a pressed action during recovery is buffered briefly, then dropped', () =>
 // ----------------------------------------------------------- telegraphs
 
 const STEP_CASES = [
-  ['slash', 'reed', 0, { rx: 250 }],
-  ['thrust', 'mira', 1, { rx: 280 }],
-  ['sweep', 'kade', 2, { rx: 250, pattern: 2 }],
-  ['bigSweep', 'kade', 2, { rx: 250, pattern: 1 }],
-  ['charge', 'mira', 1, { rx: 280, pattern: 2 }],
+  ['slash', 'reed', 1, { rx: 250 }],
+  ['thrust', 'mira', 3, { rx: 280 }],
+  ['sweep', 'kade', 7, { rx: 250 }],
+  ['bigSweep', 'kade', 10, { rx: 250, pattern: 1 }],
+  ['charge', 'mira', 5, { rx: 280 }],
 ];
-function toRival(w, index) {
-  // the same path the campaign uses: an intermission ends and the next rival spawns
-  w.rivalIndex = index - 1;
-  w.r = null;
-  w.between = TICK;
-  stepWorld(w, TICK, input());
-}
-
-for (const [name, id, index, pos] of STEP_CASES) {
+for (const [name, id, level, pos] of STEP_CASES) {
   test(`${id}: ${name} telegraph commits and the drawn shape is exactly the hit area`, () => {
     const w = fresh();
-    if (index) toRival(w, index);
+    if (level > 1) toLevel(w, level);
     assert.equal(w.r.cfg.id, id);
     setup(w, { ...pos, px: pos.rx - 50 });
     assert.ok(untilState(w, 'windup'));
@@ -216,8 +230,7 @@ for (const [name, id, index, pos] of STEP_CASES) {
       outside = 0;
     for (let gx = -110; gx <= 110; gx += 22)
       for (let gy = -110; gy <= 110; gy += 22) {
-        const probe = fresh();
-        probe.rivalIndex = w.rivalIndex;
+        const probe = fresh(1, w.level);
         probe.r = { ...w.r, atk: { ...w.r.atk }, state: 'windup' };
         probe.p.x = Math.min(ARENA.x1, Math.max(ARENA.x0, tg.ox + gx));
         probe.p.y = Math.min(ARENA.y1, Math.max(ARENA.y0, tg.oy + gy));
@@ -235,18 +248,9 @@ for (const [name, id, index, pos] of STEP_CASES) {
   });
 }
 
-test('the three rivals have different stances: wide slash, narrow lane, chained slash and ring', () => {
-  const shapes = RIVALS.map((r) =>
-    r.patterns.map((p) => p.steps.map((s) => ATTACKS[s].shape).join('+')).join('|'),
-  );
-  assert.deepEqual(shapes, ['sector', 'lane|lane+lane|lane', 'sector+sector|ring|ring|ring']);
-  assert.equal(new Set(RIVALS.map((r) => r.trigger)).size, 3);
-  for (const a of Object.values(ATTACKS)) assert.ok(a.windup >= 0.5, 'reactable telegraph');
-});
-
 test('a chained attack re-commits its direction to where the player stands at the second windup', () => {
   const w = fresh();
-  toRival(w, 2);
+  toLevel(w, 6);
   setup(w, { px: 200, py: 168, rx: 240 });
   assert.ok(untilState(w, 'windup'));
   const first = w.r.atk.angle;
@@ -277,9 +281,9 @@ test('the rival cycle gives the stated openings: windup, active, recovery, then 
     'idle',
   ]);
   const dur = (i) => seen[i + 1][1] - seen[i][1];
-  assert.ok(Math.abs(dur(1) - ATTACKS.slash.windup) < 0.02);
+  assert.ok(Math.abs(dur(1) - W1) < 0.02);
   assert.ok(Math.abs(dur(2) - ATTACKS.slash.active) < 0.02);
-  assert.ok(Math.abs(dur(3) - RIVALS[0].patterns[0].recover) < 0.02);
+  assert.ok(Math.abs(dur(3) - FIRST.patterns[0].recover) < 0.02);
 });
 
 // --------------------------------------------------------- recovery windows
@@ -295,7 +299,7 @@ test('strikes only hurt a rival in its recovery window; guarded strikes say so',
   w.r.gapT = 99;
   stepWorld(w, TICK, input([], ['Space']));
   advance(w, 0.3);
-  assert.equal(w.r.hp, RIVALS[0].hp, 'idle rival is guarded');
+  assert.equal(w.r.hp, FIRST.hp, 'idle rival is guarded');
   assert.ok(snapshot(w).status.en.includes('Guarded'));
   assert.equal(snapshot(w).rival.vulnerable, false);
   // windup is guarded too
@@ -305,7 +309,7 @@ test('strikes only hurt a rival in its recovery window; guarded strikes say so',
   w2.p.hitInv = 99;
   stepWorld(w2, TICK, input([], ['Space']));
   advance(w2, 0.3);
-  assert.equal(w2.r.hp, RIVALS[0].hp);
+  assert.equal(w2.r.hp, FIRST.hp);
   // recovery is open
   const w3 = fresh();
   setup(w3, { px: 200, rx: 236 });
@@ -314,7 +318,7 @@ test('strikes only hurt a rival in its recovery window; guarded strikes say so',
   w3.r.atk = null;
   stepWorld(w3, TICK, input([], ['Space']));
   advance(w3, 0.25);
-  assert.equal(w3.r.hp, RIVALS[0].hp - 1);
+  assert.equal(w3.r.hp, FIRST.hp - 1);
   assert.equal(w3.stats.hits, 1);
   assert.ok(w3.score >= 50);
 });
@@ -325,12 +329,12 @@ test('one swing hurts at most once and the opening has a stated length', () => {
   assert.ok(untilState(w, 'recover'));
   const open = snapshot(w).rival;
   assert.equal(open.vulnerable, true);
-  assert.ok(Math.abs(open.recoverRemaining - RIVALS[0].patterns[0].recover) < 0.02);
+  assert.ok(Math.abs(open.recoverRemaining - FIRST.patterns[0].recover) < 0.02);
   w.p.hitInv = 99;
   inRange(w);
   stepWorld(w, TICK, input([], ['Space']));
   advance(w, 0.4);
-  assert.equal(w.r.hp, RIVALS[0].hp - 1);
+  assert.equal(w.r.hp, FIRST.hp - 1);
   advance(w, 5, input());
   assert.ok(w.r.state !== 'recover');
 });
@@ -344,7 +348,7 @@ test('the opening closes: a strike after recovery ends is guarded', () => {
   w.r.cfg = { ...w.r.cfg, gap: 5 };
   stepWorld(w, TICK, input([], ['Space']));
   advance(w, 0.3);
-  assert.equal(w.r.hp, RIVALS[0].hp);
+  assert.equal(w.r.hp, FIRST.hp);
 });
 
 // --------------------------------------------------------------- dash
@@ -404,7 +408,7 @@ test('dash invulnerability is bounded: it blocks the hit inside the window and n
   assert.equal(hit.stats.damageTaken, 1);
   // dashing in place into the active window: no damage while invulnerable
   const safe = make();
-  advance(safe, ATTACKS.slash.windup - 0.1);
+  advance(safe, W1 - 0.1);
   safe.p.dashInv = PLAYER.dashInvuln;
   safe.p.state = 'free';
   advance(safe, 0.12);
@@ -412,18 +416,18 @@ test('dash invulnerability is bounded: it blocks the hit inside the window and n
   assert.ok(safe.r.atk.dodged);
   // invulnerability that expires before the active window ends no longer protects
   const late = make();
-  advance(late, ATTACKS.slash.windup - 0.01);
+  advance(late, W1 - 0.01);
   late.p.dashInv = 0.04;
   advance(late, 0.2);
   assert.equal(late.stats.damageTaken, 1);
-  assert.ok(PLAYER.dashInvuln <= 0.3 && PLAYER.dashInvuln < PLAYER.dashTime);
+  assert.ok(PLAYER.dashInvuln <= 0.4 && PLAYER.dashInvuln <= PLAYER.dashTime + 0.1);
 });
 
 test('dashing through a committed attack scores a dodge and takes no damage', () => {
   const w = fresh();
   setup(w, { px: 240, rx: 280 });
   assert.ok(untilState(w, 'windup'));
-  advance(w, ATTACKS.slash.windup - 0.1);
+  advance(w, W1 - 0.1);
   const score = w.score;
   stepWorld(w, TICK, input(['ArrowDown'], ['KeyX']));
   advance(w, 0.4);
@@ -461,7 +465,7 @@ test('a hit is knocked back, stuns briefly and cancels the swing', () => {
   assert.ok(untilState(w, 'windup'));
   stepWorld(w, TICK, input([], ['Space']));
   assert.equal(w.p.state, 'strike');
-  advance(w, ATTACKS.slash.windup + 0.01);
+  advance(w, W1 + 0.01);
   assert.equal(w.p.state === 'stagger' || w.p.state === 'free', true);
   assert.ok(w.p.x < 240 || w.p.hitInv > 0);
 });
@@ -523,35 +527,33 @@ function defeatCurrent(w) {
   advance(w, 0.3);
 }
 
-test('defeating a rival heals, refills dashes, then the next distinct rival steps in', () => {
+test('winning a level restores HP and dashes, then the next level steps in', () => {
   const w = fresh();
   w.p.hp = 2;
   w.p.charges = 0;
   defeatCurrent(w);
   assert.equal(w.r, null);
-  assert.equal(w.p.hp, 4);
-  assert.equal(w.p.charges, PLAYER.maxCharges);
   assert.ok(w.between > 0);
   const mid = snapshot(w);
   assert.equal(mid.rival, null);
   assert.equal(mid.prompt.en, PROMPTS.between[0]);
-  assert.ok(mid.status.en.startsWith('Rival 1/3 down'));
+  assert.ok(mid.status.en.startsWith('Level 1/20 won'));
   assert.ok(w.score >= 300);
   advance(w, 1.7);
-  assert.equal(w.r.cfg.id, 'mira');
+  assert.equal(w.level, 2);
+  assert.equal(w.r.cfg.id, levelOf(2).rival.id);
   assert.equal(w.r.state, 'enter');
+  assert.equal(w.p.hp, PLAYER.maxHp);
+  assert.equal(w.p.charges, PLAYER.maxCharges);
   assert.equal(snapshot(w).prompt.en, PROMPTS.enter[0]);
-  assert.equal(w.rivalIndex, 1);
-  advance(w, 1.05);
+  assert.equal(snapshot(w).tip.visible, true);
+  assert.deepEqual(snapshot(w).levelName, levelOf(2).name);
+  advance(w, 2.05);
   assert.notEqual(w.r.state, 'enter');
-  w.p.hp = 5;
-  defeatCurrent(w);
-  assert.equal(w.p.hp, PLAYER.maxHp, 'healing is capped');
 });
 
-test('winning the third duel freezes the world and scores the remaining HP', () => {
-  const w = fresh();
-  toRival(w, 2);
+test('winning the final duel freezes the world and scores the remaining HP', () => {
+  const w = fresh(1, LEVEL_COUNT);
   w.p.hp = 3;
   defeatCurrent(w);
   assert.equal(w.phase, 'won');
@@ -562,47 +564,21 @@ test('winning the third duel freezes the world and scores the remaining HP', () 
   assert.equal(snapshot(w).status.en.endsWith(PROMPTS.won[0]), true);
 });
 
-test('createGame reports a win once through env.end and ignores later updates', () => {
-  const h = harness({ seed: 5, lang: 'zh' });
-  const game = createGame(h.env);
-  // drive the hidden world through its public inputs: stand next to an opening and strike
-  let guard = 0;
-  while (guard++ < 40000 && game.getState().phase === 'playing') {
-    const s = game.getState();
-    const r = s.rival;
-    let held = [];
-    let pressed = [];
-    if (r && r.vulnerable) {
-      const dx = r.x - s.player.x,
-        dy = r.y - s.player.y;
-      if (Math.hypot(dx, dy) < 32) pressed = ['Space'];
-      else {
-        if (dx > 6) held.push('ArrowRight');
-        if (dx < -6) held.push('ArrowLeft');
-        if (dy > 6) held.push('ArrowDown');
-        if (dy < -6) held.push('ArrowUp');
-      }
-    } else if (r && r.telegraph && !r.telegraph.active) {
-      held = s.player.y > r.y ? ['ArrowDown'] : ['ArrowUp'];
-      if (s.player.charges && r.telegraph.remaining < 0.2 && s.player.state === 'free')
-        pressed = ['KeyX'];
-    }
-    game.update(1 / 60, input(held, pressed));
-  }
-  const s = game.getState();
-  assert.ok(['won', 'lost'].includes(s.phase));
-  assert.equal(h.ends.length, 1);
-  const before = JSON.stringify(s);
-  for (let i = 0; i < 200; i++) game.update(1 / 60, input(['ArrowLeft'], ['Space', 'KeyX']));
-  assert.equal(JSON.stringify(game.getState()), before);
-  assert.equal(h.ends.length, 1);
-  assert.equal(typeof h.ends[0].message, 'string');
-  assert.ok(h.sounds.includes(h.ends[0].won ? 'win' : 'lose'));
-  const again = createGame(harness({ seed: 5 }).env).getState();
-  assert.equal(again.phase, 'playing');
-  assert.equal(again.score, 0);
-  assert.equal(again.rivalNumber, 1);
-  assert.equal(again.player.hp, PLAYER.maxHp);
+test('the opening closes after one clean hit, so one opening is worth one point of damage', () => {
+  const w = fresh(1, 3);
+  setup(w, { px: 200, rx: 236 });
+  w.r.state = 'recover';
+  w.r.t = 5;
+  w.r.atk = null;
+  w.p.hitInv = 99;
+  stepWorld(w, TICK, input([], ['Space']));
+  advance(w, 0.25);
+  assert.equal(w.r.hp, levelOf(3).rival.hp - 1);
+  advance(w, 0.1);
+  assert.equal(snapshot(w).rival.vulnerable, false, 'the rival guards again');
+  stepWorld(w, TICK, input([], ['Space']));
+  advance(w, 0.6);
+  assert.equal(w.r.hp, levelOf(3).rival.hp - 1);
 });
 
 test('a passive player loses fairly: one HP per rival hit, one terminal callback', () => {
@@ -628,8 +604,8 @@ test('status is a bilingual string with rival, HP, dash, transient events and a 
   const s0 = snapshot(w);
   assert.equal(typeof s0.status.en, 'string');
   assert.equal(typeof s0.status.zh, 'string');
-  assert.equal(s0.status.en, 'Rival 1/3 · HP 5 · Dash 3 · Arrows move · Space strike · X dash');
-  assert.ok(s0.status.zh.startsWith('对手 1/3 · 生命 5 · 闪身 3'));
+  assert.equal(s0.status.en, 'Level 1/20 · HP 5 · Dash 3 · Arrows move · Space strike · X dash');
+  assert.ok(s0.status.zh.startsWith('第1/20关 · 生命 5 · 闪身 3'));
   setup(w, { px: 200, rx: 236 });
   assert.ok(untilState(w, 'windup'));
   const danger = snapshot(w);
@@ -656,22 +632,20 @@ test('status is a bilingual string with rival, HP, dash, transient events and a 
 });
 
 test('ring, lane and sector prompts name the source side and keys', () => {
-  for (const [id, index, pattern, rx, re] of [
-    ['mira', 1, 0, 280, /^Thrust from the \w+! Sidestep or X: dash$/],
-    ['kade', 2, 2, 250, /^Ring sweep! Run out or X: dash$/],
-    ['kade', 2, 1, 250, /^HEAVY ring sweep! X: dash through!$/],
-    ['mira', 1, 2, 280, /^HEAVY charge from the \w+! X: dash through!$/],
+  for (const [id, level, pattern, rx, re] of [
+    ['mira', 3, 0, 280, /^Thrust from the \w+! Sidestep or X: dash$/],
+    ['kade', 7, 0, 250, /^Ring sweep! Run out or X: dash$/],
+    ['kade', 10, 1, 250, /^HEAVY ring sweep! Wait for the fill$/],
+    ['mira', 5, 0, 280, /^HEAVY charge from the \w+! Wait for the fill$/],
+    ['kade', 6, 0, 250, /^Cut from the \w+! Sidestep or X: dash$/],
   ]) {
     const w = fresh();
-    w.rivalIndex = index - 1;
-    w.between = TICK;
-    w.r = null;
-    stepWorld(w, TICK, input());
+    toLevel(w, level);
     assert.equal(w.r.cfg.id, id);
     setup(w, { px: rx - 50, rx, pattern });
     assert.ok(untilState(w, 'windup'));
     assert.match(snapshot(w).prompt.en, re);
-    assert.match(promptFor(w)[1], /斩击|突刺|环形横扫|冲锋/);
+    assert.match(promptFor(w)[1], /斩击|劈砍|突刺|环形横扫|冲锋/);
   }
   for (const [px, py, side] of [
     [200, 168, 'Right'],
@@ -748,8 +722,8 @@ test('text is 14-16 px, HUD text stays in the HUD bands and fighters stay betwee
     const size = Number(/(\d+)px/.exec(t.font)[1]);
     assert.ok(size >= 14 && size <= 16, `${t.str} ${size}px`);
     const hud = t.y + size <= PLAY_TOP + 1 || t.y >= PLAY_BOTTOM;
-    const banner = t.y >= PLAY_TOP && t.y + size < 50;
-    const marker = t.str === '!';
+    const banner = t.y >= PLAY_TOP && t.y + size <= ARENA.y0 - BODY.hh;
+    const marker = t.str === '!' || t.str === '!!' || LABELS.has(t.str);
     assert.ok(hud || banner || marker, `${t.str} at y=${t.y}`);
     assert.ok(t.str.length * size * 0.62 <= 480 || t.y < PLAY_TOP, `${t.str} fits`);
   }
@@ -868,8 +842,10 @@ test('each rival has its own weapon and every pose draws something different', (
   assert.ok(draw('mira', 'active').includes('closePath'), 'the spear has a head');
 });
 
-test('each rival fights in its own courtyard', () => {
-  const frames = COURTS.map((_, i) => {
+test('each tier fights in its own courtyard', () => {
+  const courts = [1, 8, 15].map((n) => levelOf(n).court);
+  assert.equal(new Set(courts).size, 3);
+  const frames = courts.map((i) => {
     const c = logCalls();
     drawCourtyard(c.ctx, 0, i);
     return c.log();
@@ -881,8 +857,8 @@ test('each rival fights in its own courtyard', () => {
 
 test('the HUD labels the rival, you and the dash pips in both languages', () => {
   for (const [lang, labels] of [
-    ['en', ['1/3 Reed', 'You', 'Dash']],
-    ['zh', ['1/3 芦苇', '你', '闪身']],
+    ['en', ['1/20 Reed', 'You', 'Dash']],
+    ['zh', ['1/20 芦苇', '你', '闪身']],
   ]) {
     const game = createGame(harness({ lang }).env);
     const { ctx, calls } = recordingContext();
@@ -907,28 +883,27 @@ test('the dash hint in the danger prompt follows the live charge count', () => {
 test('a strike prompt is only shown while its shape is drawn', () => {
   for (const seed of [1, 2, 3]) {
     const w = fresh(seed);
-    toRival(w, 2);
+    toLevel(w, 10);
     w.p.hitInv = 1e9;
     for (let i = 0; i < 120 * 40; i++) {
       stepWorld(w, TICK, input(i % 200 < 100 ? ['ArrowLeft'] : ['ArrowRight']));
       const s = snapshot(w);
-      const striking = /^(Slash|Thrust|Ring|HEAVY)/.test(s.prompt.en);
+      const striking = /^(Slash|Cut|Thrust|Ring|HEAVY)/.test(s.prompt.en);
       assert.equal(striking, !!(s.rival && s.rival.telegraph), `${s.prompt.en} @${w.time}`);
     }
   }
 });
 
-test('heavy attacks cost 3 HP, are drawn as heavy, and cannot be walked out of in time', () => {
+test('heavy attacks cost 3 HP, are drawn as heavy, and a dash on sight carries out of the big ring', () => {
   for (const name of ['charge', 'bigSweep']) {
     assert.equal(ATTACKS[name].heavy, true);
     assert.ok(ATTACKS[name].windup >= 0.6, 'still a human-reactable telegraph');
   }
-  // from the distance the rival strikes at, leaving the big ring on foot takes longer than a
-  // quick human has left after noticing it
-  const reach = ATTACKS.bigSweep.r1 + 14 - RIVALS[2].trigger;
-  assert.ok(reach / PLAYER.speed > ATTACKS.bigSweep.windup - 0.35);
+  // from the distance the rival strikes at, one dash on sight leaves the big ring
+  const gap = ATTACKS.bigSweep.r1 + BODY.hw + BODY.hh - levelOf(10).rival.trigger;
+  assert.ok(gap < PLAYER.dashSpeed * PLAYER.dashTime);
   const w = fresh();
-  toRival(w, 2);
+  toLevel(w, 10);
   setup(w, { px: 200, rx: 250, pattern: 1 });
   assert.ok(untilState(w, 'windup'));
   const tg = snapshot(w).rival.telegraph;
@@ -947,27 +922,66 @@ test('heavy attacks cost 3 HP, are drawn as heavy, and cannot be walked out of i
 
 test('without charges the heavy prompt says to run, in both languages', () => {
   const w = fresh();
-  toRival(w, 2);
+  toLevel(w, 10);
   setup(w, { px: 200, rx: 250, pattern: 1 });
   w.p.charges = 0;
   assert.ok(untilState(w, 'windup'));
   const s = snapshot(w);
-  assert.ok(s.prompt.en.endsWith('No dash: run if you can!'));
-  assert.ok(s.prompt.zh.endsWith('无闪身：尽力跑开！'));
+  assert.ok(s.prompt.en.endsWith('No dash: run!'));
+  assert.ok(s.prompt.zh.endsWith('无闪身：快跑！'));
   assert.ok(s.prompt.en.length <= 46 && s.prompt.zh.length <= 26);
 });
 
 test('a run that never dashes cannot survive two heavy hits from Kade', () => {
   const w = fresh();
-  toRival(w, 2);
-  w.p.hp = PLAYER.maxHp - 3 + PLAYER.healAfterRival; // HP after taking Mira's charge and healing
+  toLevel(w, 10);
   setup(w, { px: 200, rx: 250, pattern: 1 });
   assert.ok(untilState(w, 'windup'));
   advance(w, 1.2);
   assert.equal(w.phase, 'playing');
+  assert.equal(w.p.hp, PLAYER.maxHp - 3);
   w.p.hitInv = 0;
-  Object.assign(w.r, { state: 'idle', gapT: 0, patternIndex: 3, atk: null });
+  Object.assign(w.r, { state: 'idle', gapT: 0, patternIndex: 1, atk: null });
   assert.ok(untilState(w, 'windup'));
   advance(w, 1.2);
   assert.equal(w.phase, 'lost');
+});
+
+test('a heavy shape says wait, then dash NOW, so even a slow press still covers the hit', () => {
+  for (const [level, pattern, rx] of [
+    [10, 1, 250],
+    [5, 0, 280],
+  ]) {
+    for (const delay of [0.2, 0.25, 0.35, 0.42, 0.48]) {
+      const w = fresh();
+      toLevel(w, level);
+      setup(w, { px: rx - 50, rx, pattern });
+      assert.ok(untilState(w, 'windup'));
+      const early = snapshot(w).prompt;
+      assert.ok(early.en.endsWith('Wait for the fill') && early.zh.endsWith('等待填满'));
+      let now = null;
+      for (let i = 0; i < 2 / TICK && !now; i++) {
+        stepWorld(w, TICK, input());
+        if (snapshot(w).prompt.en.endsWith('X: dash NOW!')) now = snapshot(w).prompt;
+      }
+      assert.ok(now && now.zh.endsWith('现在按X闪身！'));
+      assert.ok(Math.abs(w.r.atk.t - DASH_NOW) < 0.02, `flips at ${w.r.atk.t}`);
+      const control = fresh();
+      toLevel(control, level);
+      setup(control, { px: rx - 50, rx, pattern });
+      assert.ok(untilState(control, 'windup'));
+      advance(control, 1.5);
+      assert.equal(control.stats.damageTaken, 3, 'without a dash the shape lands');
+      advance(w, delay);
+      stepWorld(w, TICK, input([], ['KeyX']));
+      advance(w, 1.2);
+      assert.equal(w.stats.damageTaken, 0, `level ${level} pressed ${delay} s after the prompt`);
+    }
+  }
+  const out = fresh();
+  toLevel(out, 10);
+  setup(out, { px: 200, rx: 250, pattern: 1 });
+  assert.ok(untilState(out, 'windup'));
+  advance(out, 0.95);
+  assert.equal(snapshot(out).prompt.en, 'HEAVY ring sweep! X: dash NOW!');
 });

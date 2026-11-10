@@ -1,0 +1,71 @@
+{
+  "game": "dash-duelist",
+  "date": "2026-11-10",
+  "reviewedRevision": "2fe044c plus the rework in this commit",
+  "owner": "owner-dash",
+  "reviewer": "final-dash",
+  "rounds": 1,
+  "process": "Lean final review at the user's request: the known 3-rival shortfall went straight to a retrofit, followed by one independent review round. Its two MEDIUM findings (a dash prompt that invited a too-early dash, and an overflowing danger prompt) were fixed and verified by re-running the reviewer's own pilot, blind, text-fit and correctness scripts, one clean-worktree run and the browser check, without a second review round.",
+  "verdict": "pass",
+  "approvedSha256": {
+    "src/games/dash-duelist.js": "66061a6ee8a8f96a8114a522d7cc14c16050d5fa09988b3dbd34940de631a112",
+    "src/games/dash-duelist-art.js": "4a7f1c826947c35986720fcf60c23c1f877aa55e96d018d4e7e8582e1994aa7b",
+    "src/games/dash-duelist-draw.js": "376237dda3007d3245eedd7b478f90f75f263d658caefad3b87394b4f3c1606e",
+    "src/games/dash-duelist-geometry.js": "ec0f364b4207228208d8a43fde8818f15016817c9cd479f9c1a114f778610325",
+    "src/games/dash-duelist-levels.js": "9ae4c9ac517f39e1452fb4a1e0a72f3981d2f32d7db4d7f0cfc7ae95a1dfce86",
+    "src/games/dash-duelist-menu.js": "be7596477c3c4d9fdf3693fd1426359039fbce2b33b1f56d366a81ea14a426c2",
+    "src/games/dash-duelist-world.js": "39cb393786ab547132447c28bd4fffbfcf59b78895c06130b6113bb9d7773622",
+    "tests/dash-duelist.test.js": "232901aa4346656893fa5ec9041d5f020f304822ebac490aadec5be0ba6e1486",
+    "tests/dash-duelist-quality.test.js": "e38d69ef3e2b3b17406e4969111eb4a0731586bd09c82767a4442738de1a7b86"
+  },
+  "tests": {
+    "command": "node --experimental-test-coverage --test-coverage-include='src/games/dash-duelist*.js' --test tests/dash-duelist.test.js tests/dash-duelist-quality.test.js",
+    "passed": 82,
+    "failed": 0,
+    "lineCoverage": 99.38,
+    "log": "dash-duelist-coverage.txt"
+  },
+  "independentProbes": "On the final files the reviewer's reaction-limited bot (public getState only, rival telegraphs and openings seen late, 60 Hz) cleared all 20 duels in every run at 0.25 s (6 seeds) and 0.35 s (10 seeds); a player who dashes as soon as a heavy shape appears, and one who obeys the 'X: dash NOW!' prompt 0.35 s late, also cleared every run. Mastery levels 15-20 force 6-13 dashes per duel against 0-5 earlier. Forty-six blind patterns (idle, mash, random keys, alternating moves and dashes at 0.3-3 s, dash-and-strike rhythms) won at most 1.4% overall; the worst single cell, dash and strike while standing at 0.8 s on level 3, won 4 of 24 runs (16.7%). Final states matched at 30, 60 and 120 Hz on levels 2, 9, 15 and 20, a hostile fuzz never threw or produced non-finite state, each run ended exactly once and froze, and broken progress stores were safe. No EN or ZH text overflows the 480 px canvas.",
+  "findings": [
+    {
+      "id": "R1",
+      "severity": "blocking",
+      "status": "fixed",
+      "observation": "Only 3 rivals, with no select or continue. There are now 20 data-driven duels (teaching 1-7, combination 8-14, mastery 15-20) against Reed, Mira and Kade with slashes, thrusts, cuts, rings and heavy charges, accurate EN/ZH tips, a level select with bilingual tier tags and env.progress continue; each opening allows one clean hit, every tell has a text label, input is buffered for 0.25 s, and the 1,153-line file is split into seven modules."
+    },
+    {
+      "id": "M1",
+      "severity": "medium",
+      "status": "fixed",
+      "observation": "Review finding: heavy shapes showed 'X: dash through!' from the first frame of a 0.9 s windup while the dash protected for only 0.3 s, so a 0.35 s player who obeyed it was hit (0 of 10 clears on levels 10, 13, 17, 19 and 20). Heavy shapes now read 'Wait for the fill' and switch to 'X: dash NOW!' (现在按X闪身！) 0.5 s before the hit, the dash protects for 0.4 s, the big ring is smaller, level 18 was retimed, and the tips for levels 2, 5, 10, 18 and 20 say to dash at the last moment."
+    },
+    {
+      "id": "M2",
+      "severity": "medium",
+      "status": "fixed",
+      "observation": "Review finding: the no-dash heavy-charge warning was 499-504 px wide and clipped on the 480 px canvas. It now reads 'HEAVY charge from the Left! No dash: run!', and a quality test checks every dynamic danger prompt in EN and ZH."
+    },
+    {
+      "id": "L1",
+      "severity": "low",
+      "status": "fixed",
+      "observation": "Review finding: at 0.42 s reaction, levels 13, 15, 17 and 19 took 100-200 s because the opening was narrow. Their opening is now 1.5 s, cutting those clears to about 40 s."
+    }
+  ],
+  "openNotes": [
+    "With well-timed dashes the bot loses almost no HP on any level; mastery difficulty comes from forced dashes and tighter windups rather than damage.",
+    "Standing still and alternating dash and strike every 0.8 s wins level 3 about one run in six; it fails every level from 4.",
+    "The text probe flags the middle dot in three English prompts as CJK; this is a probe false positive, not a game bug."
+  ],
+  "browser": {
+    "method": "Official Claude in Chrome extension, local server; real clicks on Start and the language toggle, synthetic in-page keys; only DOM text and the canvas were read.",
+    "servedSha256Prefixes": "66061a6e 4a7f1c82 376237dd ec0f364b 9ae4c9ac be759647 39cb3937",
+    "observed": [
+      "English: Start opened duel 1 of 20 against Reed with HP, dash charges and the tip 'Step out of the red shape, then press Space when OPEN shows. Each opening allows one hit.' above the arena, both fighters unobscured.",
+      "Loss: standing idle, each slash was announced as 'Slash from the Right! Sidestep or X: dash', cost 1 HP and was followed by 'OPEN! Close in and press Space'; at 0 HP the run ended with 'One more try?' and 'You fell in the courtyard. Read the windups and try again.'",
+      "Chinese 390 px phone frame (388 px inner, no horizontal overflow): duel 1 in Chinese with touch buttons 左, 上, 下, 右, 出招 and 闪身.",
+      "Not covered in the browser: a duel win and the heavy 'dash NOW' prompt; the reviewer's pilot and the quality tests cover them."
+    ],
+    "screenshots": ["screenshots/dash-duelist-en.png", "screenshots/dash-duelist-phone-zh.png"]
+  }
+}
