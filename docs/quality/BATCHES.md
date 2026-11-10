@@ -49,6 +49,7 @@ Phase Tiles completed batch 18 and the 50-game target, Pixel Parkour included. T
 | Echo Hunter      | Passed in one round: 20 caverns, warned crawler bites ([record](final-review/echo-hunter.json))                       |
 | Rail Switch      | Passed in one round: 20 timetables, late calls on mastery ([record](final-review/rail-switch.json))                   |
 | Firefly Trail    | Passed in one round: 24 meadows, warned trail cuts ([record](final-review/firefly-trail.json))                        |
+| Tilt Lab         | Passed in one round: 22 labs, hidden route on mastery ([record](final-review/tilt-lab.json))                          |
 
 ## Completed batch 18
 

@@ -1384,7 +1384,7 @@ test('a timed gate draws a fuse that burns down, blinks at the end and closes th
       r.g.draw(cap.ctx);
       const x = gateCell.c * CELL + 1;
       const bar = cap.rects.find(
-        (q) => q.x === x && q.h === 2 && q.y === RULES.top + gateCell.r * CELL + 7,
+        (q) => q.x === x && q.h === 2 && q.y === RULES.top + gateCell.r * CELL + 10,
       );
       if (bar) widths.push(bar.w);
     }
@@ -1611,4 +1611,302 @@ test('the banner behind the end overlay names the outcome: out of lives on a los
   g.draw(drawn.ctx);
   assert.ok(drawn.texts.some((t) => t.str === 'Out of lives'));
   assert.ok(!drawn.texts.some((t) => /cleared/i.test(t.str)));
+});
+
+test('a throwing progress store never stops a game from opening or a lab from clearing', () => {
+  const broken = (unlocked) => ({
+    unlocked: () => {
+      throw new Error('store down');
+    },
+    unlock: (n) => unlocked.push(n),
+  });
+  const reads = harness();
+  reads.env.progress = broken([]);
+  const g = createGame(reads.env);
+  assert.equal(g.getState().level, 1);
+  assert.equal(g.getState().menu, null, 'an unreadable store falls back to a fresh start');
+  const writes = harness();
+  writes.env.progress = {
+    unlocked: () => 3,
+    unlock: () => {
+      throw new Error('store down');
+    },
+  };
+  const w = createGame(writes.env);
+  assert.equal(w.getState().menu.unlocked, 3);
+  w.update(1 / 60, input([], ['Space']));
+  assert.equal(w.getState().level, 3);
+  for (const keys of frameKeys(SOLUTIONS[2])) w.update(1 / 60, input(keys, []));
+  for (let i = 0; i < 120; i++) w.update(1 / 60, input([], []));
+  assert.equal(w.getState().level, 4, 'the clear still counts when the store refuses to save');
+  assert.ok(w.getState().score > 0);
+});
+
+test('update tolerates a missing input object', () => {
+  const g = createGame(harness().env);
+  assert.doesNotThrow(() => g.update(1 / 60, undefined));
+  assert.doesNotThrow(() => g.update(1 / 60, null));
+  const hostMenu = harness();
+  progressEnv(4, hostMenu);
+  const menu = createGame(hostMenu.env);
+  assert.doesNotThrow(() => menu.update(1 / 60, undefined));
+  assert.ok(menu.getState().menu, 'with no input the select screen simply waits');
+  assert.equal(advance(newState({}), 1 / 60, undefined, noop), true);
+});
+
+test('from lab 15 the route arrow and the roll named in the prompt wait for a fall or a long stall', () => {
+  const readLine = (s) => snapshotOf(s);
+  for (const level of [1, 7, 14]) {
+    const s = labState(level);
+    frames(s, 1.2, []);
+    const st = readLine(s);
+    assert.equal(st.prompt.id, 'tilt', `lab ${level} keeps its teaching prompt`);
+    assert.ok(st.guide, `lab ${level} keeps its guide`);
+    assert.equal(st.routeHint, true);
+  }
+  for (const level of [RULES.guideFrom, 18, LAB_COUNT]) {
+    const s = labState(level);
+    frames(s, 1.2, []);
+    const st = readLine(s);
+    assert.equal(st.routeHint, false, `lab ${level} hides the route`);
+    assert.equal(st.guide, null);
+    assert.equal(st.prompt.id, 'read');
+    assert.ok(!/[←→↑↓]/.test(`${st.line.en}${st.line.zh}`), 'no direction in the text');
+    assert.match(st.line.zh, /观察台面/);
+    // Nothing a player tries makes the prompt confirm a guess: the line is the same for any tilt.
+    const guessed = labState(level);
+    frames(guessed, 0.6, ['ArrowLeft']);
+    frames(guessed, 0.6, ['ArrowDown']);
+    assert.ok(['read', 'hold', 'level', 'wait'].includes(readLine(guessed).prompt.id));
+    assert.equal(readLine(guessed).guide, null);
+    // Idle for a long stall: the arrow and the direction come back.
+    frames(s, RULES.helpStall + 1, []);
+    const late = readLine(s);
+    assert.equal(late.routeHint, true, `lab ${level} helps after ${RULES.helpStall} s`);
+    assert.equal(late.prompt.id, 'tilt');
+    assert.ok(late.guide);
+    assert.match(late.line.en, /^Tilt [←→↑↓]/);
+  }
+});
+
+test('a fall brings the route arrow back on a mastery lab and the help lasts for that lab', () => {
+  const level = RULES.guideFrom;
+  const hole = LABS[level - 1].holes[0];
+  const s = labState(level);
+  frames(s, 1.2, []);
+  assert.equal(snapshotOf(s).routeHint, false);
+  s.marble = { x: hole.x - 3, y: hole.y, vx: 60, vy: 0 };
+  frames(s, 0.3, []);
+  assert.ok(s.fall, 'the marble went in');
+  frames(s, 3, []);
+  const st = snapshotOf(s);
+  assert.equal(st.falls, 1);
+  assert.equal(st.routeHint, true);
+  assert.equal(st.prompt.id, 'tilt');
+  assert.ok(st.guide);
+  frames(s, 5, []);
+  assert.equal(snapshotOf(s).routeHint, true, 'the help stays on until the lab ends');
+});
+
+test('a stalled player is only helped if no new resting spot is reached, and a new lab starts hidden again', () => {
+  const level = RULES.guideFrom;
+  const s = labState(level);
+  const cells = LABS[level - 1];
+  // Keep reaching new spots (a roll right, then down) so the stall clock keeps restarting.
+  frames(s, 1, []);
+  const before = s.progressAt;
+  place(s, cells.start.c + 2, cells.start.r);
+  frames(s, 1, []);
+  assert.ok(s.progressAt > before, 'a new resting spot restarts the stall clock');
+  assert.equal(snapshotOf(s).routeHint, false);
+  const goal = cells.goal;
+  s.marble = { x: cx(goal.c), y: cy(goal.r), vx: 0, vy: 0 };
+  s.helped = true;
+  frames(s, 1, []);
+  frames(s, 2, []);
+  assert.equal(snapshotOf(s).level, level + 1);
+  assert.equal(snapshotOf(s).routeHint, level + 1 < RULES.guideFrom);
+});
+
+test('"Level the board" is only said while tilt.level is false; the turn line asks for zero tilt', () => {
+  for (const level of [3, RULES.guideFrom]) {
+    const turn = new Set();
+    for (const v of [0.1, 0.4, 1, 1.7, RULES.levelTol, 2.4, 3.5]) {
+      const s = labState(level);
+      frames(s, 0.6, []);
+      s.tx = v;
+      s.ty = -v;
+      s.line = null;
+      frames(s, 0.1, []);
+      const st = snapshotOf(s);
+      if (!st.tilt.level) continue;
+      if (st.prompt.id === 'level') turn.add(`${st.line.en}|${st.line.zh}`);
+      assert.ok(!/Level the board|放平台面/.test(`${st.line.en}${st.line.zh}`), st.line.en);
+    }
+    assert.deepEqual(
+      [...turn],
+      ['Zero the tilt (Space) before turning|先把倾角归零（空格）再转向'],
+    );
+  }
+  // The socket line follows the same rule: once tilt.level reads true it stops asking to level.
+  const s = labState(1);
+  const goal = LABS[0].goal;
+  s.marble = { x: cx(goal.c), y: cy(goal.r), vx: 0, vy: 0 };
+  s.tx = 4;
+  s.line = null;
+  frames(s, 0.05, []);
+  assert.equal(snapshotOf(s).tilt.level, false);
+  assert.match(snapshotOf(s).line.en, /Level the board \(Space\) to settle/);
+  s.tx = 1;
+  s.line = null;
+  s.restT = 0;
+  frames(s, 0.05, []);
+  const near = snapshotOf(s);
+  assert.equal(near.tilt.level, true);
+  assert.ok(!/Level the board/.test(near.line.en), near.line.en);
+});
+
+// Independent copies of the letters so the test does not lean on the module's own tables.
+const LETTERS = [
+  ['.#.', '#.#', '###', '#.#', '#.#'],
+  ['##.', '#.#', '##.', '#.#', '##.'],
+  ['.##', '#..', '#..', '#..', '.##'],
+];
+const pixelsOf = (rects, x, y, w, h, scale) => {
+  const rows = [];
+  for (let j = 0; j < 5; j++) {
+    let row = '';
+    for (let i = 0; i < 3; i++)
+      row += rects.some(
+        (q) => q.x === x + i * scale && q.y === y + j * scale && q.w === scale && q.h === scale,
+      )
+        ? '#'
+        : '.';
+    rows.push(row);
+  }
+  return rows;
+};
+
+test('plates and gates carry a shared letter mark, so the pairing never depends on colour', () => {
+  for (const level of [10, 17]) {
+    const b = LABS[level - 1];
+    const { g } = start(level);
+    const canvas = capture();
+    g.draw(canvas.ctx);
+    const letters = new Set();
+    for (const p of b.plates) {
+      const x = p.c * CELL + CELL / 2 - 1;
+      const y = cy(p.r) - 2;
+      const onPlate = pixelsOf(canvas.rects, x, y, 3, 5, 1);
+      assert.deepEqual(onPlate, LETTERS[p.gate], `lab ${level} plate ${p.gate}`);
+      const gate = b.gates.find((q) => q.id === p.gate);
+      const onGate = pixelsOf(
+        canvas.rects,
+        gate.c * CELL + 5,
+        RULES.top + gate.r * CELL + 3,
+        6,
+        10,
+        2,
+      );
+      assert.deepEqual(onGate, LETTERS[p.gate], `lab ${level} gate ${p.gate}`);
+      letters.add(onPlate.join());
+    }
+    assert.equal(letters.size, b.plates.length, 'each pair has its own letter');
+  }
+  // An open gate keeps its letter, small, in its own colour.
+  const { g } = start(5);
+  for (const keys of frameKeys(SOLUTIONS[4])) {
+    if (g.getState().gates[0].open) break;
+    g.update(1 / 60, input(keys, []));
+  }
+  assert.ok(g.getState().gates[0].open, 'the plate opened the gate');
+  const gate = LABS[4].gates[0];
+  const canvas = capture();
+  g.draw(canvas.ctx);
+  const x = gate.c * CELL + 6;
+  const y = RULES.top + gate.r * CELL + 3;
+  assert.deepEqual(pixelsOf(canvas.rects, x, y, 3, 5, 1), LETTERS[0]);
+});
+
+test('locked lab tiles show a padlock and a legend instead of only a dimmer number', () => {
+  const locked = harness();
+  progressEnv(3, locked);
+  const g = createGame(locked.env);
+  const canvas = capture();
+  g.draw(canvas.ctx);
+  const lockColor = canvas.rects.filter((q) => q.color === '#6b7490');
+  assert.ok(lockColor.length >= 3 * 5, 'a padlock on each of the 19 locked tiles');
+  const tileX = (i) => 20 + ((i - 1) % 11) * 40;
+  assert.ok(
+    lockColor.some((q) => q.x >= tileX(4) && q.x < tileX(4) + 32),
+    'lab 4 is padlocked',
+  );
+  assert.ok(!lockColor.some((q) => q.x >= tileX(3) && q.x < tileX(3) + 32 && q.y < 100));
+  const numbers = canvas.texts.map((t) => t.str);
+  for (const open of ['1', '2', '3']) assert.ok(numbers.includes(open));
+  assert.ok(!numbers.includes('4'), 'a locked tile hides its number behind the padlock');
+  assert.ok(numbers.includes('Padlock: clear the earlier labs first'));
+  const zh = harness({ lang: 'zh' });
+  progressEnv(3, zh);
+  const gz = createGame(zh.env);
+  const zc = capture();
+  gz.draw(zc.ctx);
+  assert.ok(zc.texts.some((t) => t.str === '挂锁：先完成前面的实验'));
+  const all = harness();
+  progressEnv(LAB_COUNT, all);
+  const open = createGame(all.env);
+  const oc = capture();
+  open.draw(oc.ctx);
+  assert.ok(!oc.rects.some((q) => q.color === '#6b7490'), 'no padlock when everything is open');
+  assert.ok(!oc.texts.some((t) => /Padlock/.test(t.str)));
+});
+
+test('the clock reads in seconds in both languages and spent lives are rings, not only a darker colour', () => {
+  for (const lang of ['en', 'zh']) {
+    const h = harness({ lang });
+    progressEnv(3, h);
+    const g = createGame(h.env);
+    g.update(1 / 60, input([], ['Space']));
+    for (let i = 0; i < 60; i++) g.update(1 / 60, input([], []));
+    const full = capture();
+    g.draw(full.ctx);
+    const clock = full.texts.find((t) => / \/ /.test(t.str));
+    assert.ok(clock, 'the clock is drawn');
+    assert.match(clock.str, lang === 'en' ? /^\d+\.\ds \/ 55s$/ : /^\d+\.\d秒 \/ 55秒$/);
+    assert.ok(!full.rects.some((q) => q.color === '#4a5578'), 'no spent life yet');
+  }
+  const roll = lethalRoll();
+  const lost = start(roll.level);
+  for (let i = 0; i < 60 * 30 && lost.g.getState().falls < 1; i++)
+    lost.g.update(1 / 60, input([roll.key], []));
+  for (let i = 0; i < 70; i++) lost.g.update(1 / 60, input([], []));
+  assert.equal(lost.g.getState().lives, RULES.lives - 1);
+  const canvas = capture();
+  lost.g.draw(canvas.ctx);
+  assert.ok(
+    canvas.rects.some((q) => q.color === '#4a5578'),
+    'a spent life is an outlined ring',
+  );
+  assert.ok(
+    canvas.rects.some((q) => q.color === '#bfe9ff' && q.y < 20),
+    'a spare life is solid',
+  );
+});
+
+test('checkpoint flags: the saved one is solid, the others are outlines', () => {
+  const level = 8;
+  const { g } = start(level);
+  const initial = capture();
+  g.draw(initial.ctx);
+  const outlines = (c) => c.rects.filter((q) => q.color === '#6a8aa6' && q.w === 6 && q.h === 1);
+  const solid = (c) => c.rects.filter((q) => q.color === '#7dff9a' && q.w === 6 && q.h === 4);
+  assert.equal(solid(initial).length, 0, 'the start is the saved spot, not a flag');
+  assert.equal(outlines(initial).length, 2 * LABS[level - 1].checkpoints.length);
+  for (const keys of frameKeys(SOLUTIONS[level - 1]).slice(0, 34 + 54 + 240))
+    g.update(1 / 60, input(keys, []));
+  const saved = capture();
+  g.draw(saved.ctx);
+  assert.equal(g.getState().checkpoint.c, 28);
+  assert.equal(solid(saved).length, 1);
+  assert.equal(outlines(saved).length, 2 * (LABS[level - 1].checkpoints.length - 1));
 });

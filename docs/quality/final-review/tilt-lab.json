@@ -1,0 +1,63 @@
+{
+  "game": "tilt-lab",
+  "date": "2026-11-10",
+  "reviewedRevision": "54e8579b (accepted build) plus the fixes in this commit",
+  "owner": "owner-tilt",
+  "reviewer": "tilt-fair, tilt-robust and tilt-present (parallel split review)",
+  "rounds": 1,
+  "process": "Lean final review at the user's request, with the review split across three parallel reviewers (fairness, robustness, presentation) as the user asked. The game already had 22 labs. Six MEDIUM findings and the cheap LOW items were fixed and verified by a separate verification agent re-running the reviewers' own probes and one clean-worktree run, then by the browser check, without a second review round.",
+  "verdict": "pass",
+  "approvedSha256": {
+    "src/games/tilt-lab.js": "fcded35df17dfd51109ac0fcbef79e8739908b709d556d8e4575865b4b52b8e3",
+    "tests/tilt-lab.test.js": "8e17afe6c543ca0e22675fb5eb95d64c9819a816d735b7259b01a3ab9f0f1d89",
+    "tests/tilt-lab-quality.test.js": "413f1069fece2e4c4cb917157555ce8c95e5f9fa9d51cdd4bf4dcba5f04ea1db"
+  },
+  "tests": {
+    "command": "node --experimental-test-coverage --test-coverage-include='src/games/tilt-lab*.js' --test tests/tilt-lab.test.js tests/tilt-lab-quality.test.js",
+    "passed": 82,
+    "failed": 0,
+    "lineCoverage": 99.95,
+    "log": "tilt-lab-coverage.txt"
+  },
+  "independentProbes": "On the final files the fairness reviewer's guide-following bot (public getState only, 4 seeds) cleared every lab at 0.25 s and 0.35 s. With the route arrow hidden on labs 15-22 it falls there at 0.35 s and, by the owner's measurement, needs 73-79 s per mastery lab against 45 s with the arrow, because it waits for the arrow to return after a stall; a bot that already knows the whole layout loses nothing, so the added demand is reading the board. Blind patterns cleared at most 8% of lab 14 over 36 seeds and 0% elsewhere apart from a 25% single-seed cell. Twenty core checks (determinism across 30, 60 and 120 Hz, hostile dt, one end per run, isolation, soft-locks) passed, every broken progress store was safe, and EN and ZH text fits with the widest English string about 454 px.",
+  "findings": [
+    {
+      "id": "M1",
+      "severity": "medium",
+      "status": "fixed",
+      "observation": "Fairness finding: the yellow guide arrow showed the full route on every roll, so a guide follower cleared every lab with no falls and mastery was flat. On labs 15-22 the arrow and route prompt are hidden ('Read the board, then tilt toward your next stop') and return only after a fall or a 30 s stall; labs 1-14 keep full guidance, and the description explains it."
+    },
+    {
+      "id": "M2",
+      "severity": "medium",
+      "status": "fixed",
+      "observation": "Robustness findings: a throwing progress store crashed the game at start or at the first clear. Both calls are now guarded as in Shield Sentinel."
+    },
+    {
+      "id": "M3",
+      "severity": "medium",
+      "status": "fixed",
+      "observation": "Presentation findings: the lab 5 tip ran off the canvas and the lab 11 tip had no margin, the Chinese timer showed 's', plates were linked to their gates only by colour, and locked menu labs differed only by shade. Both tips are now about 420 px, the timer shows 秒, each plate and gate share a letter A, B or C, and locked labs show a padlock with a legend."
+    },
+    {
+      "id": "L1",
+      "severity": "low",
+      "status": "fixed",
+      "observation": "The turn prompt now says 'Zero the tilt' so it never asks to level an already level board, the active checkpoint is solid while others are outlines, spent lives are hollow rings, and update tolerates missing input."
+    }
+  ],
+  "openNotes": [
+    "On mastery labs a stalled player gets the arrow back after 30 s, trading time for help.",
+    "The source is a single file of about 1,950 lines, over the repository's 800-line soft ceiling."
+  ],
+  "browser": {
+    "method": "Official Claude in Chrome extension, local server; real clicks on Start and the language toggle, synthetic in-page keys; only DOM text and the canvas were read.",
+    "servedSha256Prefixes": "fcded35d",
+    "observed": [
+      "With progress saved from earlier testing, Start opened the lab chooser; lab 15 (Flap Maze) showed the board with holes, flaps and the goal socket, no route arrow, the prompt 'Read the board, then tilt toward your next stop' and the timer in seconds, and the description explained that from lab 15 the arrow appears only after a fall or a long stall.",
+      "Chinese 390 px phone frame (388 px inner, no horizontal overflow): the lab chooser in Chinese with touch buttons 左, 右, 上, 下 and 放平.",
+      "Not covered in the browser: a fall, the returning arrow and a lab clear; the reviewers' probes, the verification run and the quality tests cover them."
+    ],
+    "screenshots": ["screenshots/tilt-lab-en.png", "screenshots/tilt-lab-phone-zh.png"]
+  }
+}

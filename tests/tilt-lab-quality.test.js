@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { createGame, RULES, LAB_COUNT, LABS } from '../src/games/tilt-lab.js';
+import { createGame, RULES, LAB_COUNT, LABS, planRoute } from '../src/games/tilt-lab.js';
 import { harness, input, seeded } from './harness.js';
 
 const HZS = [30, 60, 120];
@@ -18,6 +18,34 @@ function begin(level, seed = 1, lang = 'en') {
   return { g, h };
 }
 
+const ARROW_OF = { R: '→', L: '←', U: '↑', D: '↓' };
+
+// From lab 15 the prompt no longer names the roll until a fall or a stall, so a follower there reads
+// the board itself: it takes the first roll of the shortest route from where the marble rests and,
+// like any player, keeps holding that arrow until the board has tilted far enough.
+function reader() {
+  let commit = null;
+  return (st) => {
+    const sign = { R: 1, L: -1, D: 1, U: -1 };
+    const along = (dir) => sign[dir] * (dir === 'R' || dir === 'L' ? st.tilt.x : st.tilt.y);
+    if (st.prompt.id === 'hold' && commit && along(commit) < RULES.goTilt)
+      return `Tilt ${ARROW_OF[commit]}: keep going`;
+    if (st.prompt.id !== 'read') {
+      commit = null;
+      return st.line.en;
+    }
+    const open = st.gates.reduce((m, g) => (g.open ? m | (1 << g.id) : m), 0);
+    const plan = planRoute(
+      LABS[st.level - 1],
+      Math.floor(st.marble.x / RULES.cell),
+      Math.floor((st.marble.y - RULES.top) / RULES.cell),
+      open,
+    );
+    commit = plan ? plan.dir : null;
+    return plan ? `Tilt ${ARROW_OF[plan.dir]}: read the board` : st.line.en;
+  };
+}
+
 // The keys a player does for the prompt they read: an arrow to tilt that way, Space to level, else none.
 function keysFor(line) {
   const tilt = /^Tilt ([←→↑↓])/.exec(line);
@@ -30,6 +58,7 @@ function keysFor(line) {
 // seconds late, with jitter, and presses exactly what the line says. It sees nothing else.
 function humanRun(level, hz, { delay = FAST, seed = 1, seconds = 240, jitter = 0.1, log } = {}) {
   const { g, h } = begin(level, seed);
+  const lineFor = reader();
   const rnd = seeded(seed * 7919 + 13);
   const base = delay[0] + rnd() * (delay[1] - delay[0]);
   const history = [];
@@ -39,7 +68,7 @@ function humanRun(level, hz, { delay = FAST, seed = 1, seconds = 240, jitter = 0
     const st = g.getState();
     if (st.phase !== 'playing' || st.level !== level) break;
     falls = st.falls;
-    history.push({ t, line: st.line.en });
+    history.push({ t, line: lineFor(st) });
     if (history.length > 400) history.shift();
     const seenAt = t - Math.max(0, base + (rnd() - 0.5) * jitter);
     let k = history.length - 1;
@@ -130,7 +159,7 @@ test('the prompt never leads a literal follower to a hole or a livelock: lives s
   for (let level = 1; level <= LAB_COUNT; level++) {
     const r = humanRun(level, 60, { delay: [0.3, 0.3], jitter: 0, seed: level });
     assert.equal(r.st.lives === RULES.lives || r.st.level > level || r.st.phase === 'won', true);
-    assert.ok(r.cleared);
+    assert.ok(r.cleared, `lab ${level} not cleared (${r.st.phase}, ${Math.round(r.t)} s)`);
     assert.ok(r.t < 8 * (r.st.par || 1) + 120, `lab ${level} took ${r.t}s`);
   }
 });
@@ -142,6 +171,7 @@ test('every prompt line is held at least half a second, names a direction or an 
     for (const level of [1, 3, 5, 9, 11, 13, 16, 17, 18, 22])
       for (const hz of [30, 120]) {
         const { g } = begin(level, level, lang);
+        const lineFor = reader();
         let last = null;
         let changedAt = 0;
         let falls = 0;
@@ -162,7 +192,8 @@ test('every prompt line is held at least half a second, names a direction or an 
             last = null; // a fall reloads the line
           }
           if (line !== last) {
-            if (last !== null) {
+            // The verdict on a lab (cleared) or a run (lost) is never held back.
+            if (last !== null && st.prompt.id !== 'cleared' && st.prompt.id !== 'lost') {
               minHold = Math.min(minHold, t - changedAt);
               assert.ok(
                 t - changedAt >= 0.5 - 1e-6,
@@ -173,7 +204,7 @@ test('every prompt line is held at least half a second, names a direction or an 
             last = line;
             changedAt = t;
           }
-          g.update(1 / hz, input(keysFor(line), []));
+          g.update(1 / hz, input(keysFor(lineFor(st)), []));
         }
       }
   assert.ok(changes > 40, `only ${changes} prompt changes observed`);
@@ -185,6 +216,7 @@ test('the guide arrow always agrees with the tilt the prompt asks for', () => {
   let checked = 0;
   for (let level = 1; level <= LAB_COUNT; level++) {
     const { g } = begin(level, 3);
+    const lineFor = reader();
     for (let i = 0; i < 60 * 90; i++) {
       const st = g.getState();
       if (st.level !== level || st.phase !== 'playing') break;
@@ -194,7 +226,7 @@ test('the guide arrow always agrees with the tilt the prompt asks for', () => {
         assert.equal(st.guide.dir, map[m[1]]);
         checked++;
       }
-      g.update(1 / 60, input(keysFor(st.line.en), []));
+      g.update(1 / 60, input(keysFor(lineFor(st)), []));
     }
   }
   assert.ok(checked > 1000);
@@ -344,10 +376,11 @@ test('the same key schedule gives the identical outcome at 30, 60 and 120 Hz on 
 test('jittered frame times (down to half a frame) still give a stable, finite and bounded game', () => {
   for (const level of [2, 11, 16, 22]) {
     const { g } = begin(level, 2);
+    const lineFor = reader();
     const rnd = seeded(level);
     let keys = [];
     for (let i = 0; i < 4000; i++) {
-      if (i % 40 === 0) keys = keysFor(g.getState().line.en);
+      if (i % 40 === 0) keys = keysFor(lineFor(g.getState()));
       const dt = (0.5 + rnd() * 1.5) / 60;
       g.update(dt, input(keys, []));
       const st = g.getState();
@@ -362,6 +395,7 @@ test('jittered frame times (down to half a frame) still give a stable, finite an
 // for a random fraction of a degree of tilt (up to `error`) once the marble is moving.
 function noisyRun(level, hz, seed, error) {
   const { g } = begin(level, seed);
+  const lineFor = reader();
   const rnd = seeded(seed * 17 + level);
   const history = [];
   let lastLine = '';
@@ -370,7 +404,7 @@ function noisyRun(level, hz, seed, error) {
   for (let t = 0; t < 200; t += 1 / hz) {
     const st = g.getState();
     if (st.phase !== 'playing' || st.level !== level) break;
-    history.push({ t, line: st.line.en });
+    history.push({ t, line: lineFor(st) });
     if (history.length > 100) history.shift();
     let k = history.length - 1;
     while (k > 0 && history[k].t > t - 0.25) k--;
@@ -420,4 +454,38 @@ test('every bridge lab can be crossed by a follower who adds up to 0.5 degrees o
     );
   }
   console.log(`bridge crossings with cross-tilt noise: ${report.join(', ')}`);
+});
+
+test('mastery labs hide the route yet stay fair: a reader clears them, and a prompt-only player is helped after a stall', () => {
+  for (let level = RULES.guideFrom; level <= LAB_COUNT; level++) {
+    const { g } = begin(level, 2);
+    const lineFor = reader();
+    let sawHidden = false;
+    let readerKeys = [];
+    let t = 0;
+    for (; t < 150; t += 1 / 60) {
+      const st = g.getState();
+      if (st.level !== level || st.phase !== 'playing') break;
+      if (st.prompt.id === 'read') {
+        sawHidden = true;
+        assert.equal(st.guide, null);
+        assert.equal(st.routeHint, false);
+      }
+      readerKeys = keysFor(lineFor(st));
+      g.update(1 / 60, input(readerKeys, []));
+    }
+    const end = g.getState();
+    assert.ok(sawHidden, `lab ${level}: the route was never hidden`);
+    assert.ok(end.level > level || end.phase === 'won', `lab ${level}: a reader did not clear`);
+
+    // A player who only follows the written prompt waits out the stall, then follows the arrow.
+    const literal = begin(level, 2).g;
+    let cleared = false;
+    for (let f = 0; f < 60 * 240 && !cleared; f++) {
+      const st = literal.getState();
+      cleared = st.level > level || st.phase === 'won';
+      if (!cleared) literal.update(1 / 60, input(keysFor(st.line.en), []));
+    }
+    assert.ok(cleared, `lab ${level}: the prompt-only player never got help`);
+  }
 });

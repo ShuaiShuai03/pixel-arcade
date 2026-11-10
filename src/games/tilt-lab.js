@@ -9,8 +9,8 @@ export const meta = {
   players: '1',
   touch: true,
   description: {
-    en: 'Tilt the whole lab board to roll a glass marble past holes and into the goal socket. Hold an arrow to tilt that way (the tilt stays when you let go, so tilt gently); hold Space to ease the board back to level. Pressure plates open gates, but a plate and the socket only register while the board is level and the marble is slow. Ice slides far, sand drags, flaps open one way and moving blocks bounce you. Falling into a hole costs one of three lives. Clear all 22 labs; progress is saved.',
-    zh: '倾斜整个实验台，让玻璃弹珠绕过坑洞滚进目标凹槽。按住方向键向该方向倾斜（松手后倾角保持不变，请轻轻倾斜），按住空格让台面缓缓回到水平。压力板能打开闸门，但压力板和凹槽只在台面水平且弹珠足够慢时才会起效。冰面滑得远，沙地拖慢，挡板只能单向通过，移动挡块会把你弹开。掉进坑里会失去三条命中的一条。完成全部 22 个实验，进度会被保存。',
+    en: 'Tilt the whole lab board to roll a glass marble past holes and into the goal socket. Hold an arrow to tilt that way (the tilt stays when you let go, so tilt gently); hold Space to ease the board back to level. Pressure plates open gates, but a plate and the socket only register while the board is level and the marble is slow. Ice slides far, sand drags, flaps open one way and moving blocks bounce you. Falling into a hole costs one of three lives. The yellow guide arrow leads the way at first; from lab 15 it appears only after a fall or a long stall. Clear all 22 labs; progress is saved.',
+    zh: '倾斜整个实验台，让玻璃弹珠绕过坑洞滚进目标凹槽。按住方向键向该方向倾斜（松手后倾角保持不变，请轻轻倾斜），按住空格让台面缓缓回到水平。压力板能打开闸门，但压力板和凹槽只在台面水平且弹珠足够慢时才会起效。冰面滑得远，沙地拖慢，挡板只能单向通过，移动挡块会把你弹开。掉进坑里会失去三条命中的一条。黄色引导箭头起初会带路；从第 15 个实验起，只有在掉落或长时间卡住后才会出现。完成全部 22 个实验，进度会被保存。',
   },
   keys: [
     { label: { en: 'Tilt the board', zh: '倾斜台面' }, keys: 'Arrows / WASD' },
@@ -42,6 +42,11 @@ export const RULES = Object.freeze({
   easeRate: 24, // deg/s while Space is held
   goTilt: 8, // deg the guide asks for before a roll
   levelTol: 2, // deg: plates and the socket need a board at least this flat
+  turnTol: 0.25, // deg: a turn at rest needs the board flatter than this, or the marble drifts
+  guideFrom: 15, // 1-based lab where the route arrow stops showing until a fall or a stall
+  pinSpeed: 2, // px/s: a marble this slow under a full tilt is pinned against something
+  pinTime: 0.12, // s pinned before the hidden-route prompt reminds the player to level
+  helpStall: 30, // s without reaching a new resting spot before the hidden route arrow returns
   rollFriction: Object.freeze({ floor: 40, ice: 4, sand: 130 }), // px/s^2 rolling resistance per surface
   restitution: 0.3,
   bounceMin: 12, // px/s: slower wall impacts are perfectly inelastic
@@ -361,10 +366,7 @@ const LAB_DEFS = [
   ),
   lab(
     ['Dune Bridge', '沙丘窄桥'],
-    [
-      'A bridge made of sand: slow, so keep it level and tilt on',
-      '沙子铺成的桥：很慢，保持水平并持续倾斜',
-    ],
+    ['Sand bridge: slow, so level first and keep tilting', '沙桥很慢：先放平台面，再持续倾斜'],
     65,
     [
       '##############################',
@@ -511,8 +513,8 @@ const LAB_DEFS = [
   lab(
     ['Race the Clock', '与时间赛跑'],
     [
-      'Ice to the plate, sand to the gate: it shuts behind the clock',
-      '冰面冲向压力板，沙地冲向闸门：时间一到门就关',
+      'Ice to the plate, sand to the gate: beat the clock',
+      '冰面冲向压力板，沙地冲向闸门：赶在门关上之前',
     ],
     100,
     [
@@ -1059,13 +1061,16 @@ const HINTS = {
   sand: ['sand: keep tilting', '沙地：保持倾斜'],
 };
 const WORDS = {
-  level: ['Level the board (Space) before turning', '先放平台面（空格）再转向'],
+  level: ['Zero the tilt (Space) before turning', '先把倾角归零（空格）再转向'],
   plateLevel: ['Level the board (Space) to stop on the plate', '放平台面（空格），停在压力板上'],
   plateHold: ['Hold still: the plate is charging', '保持不动：压力板正在充能'],
   settle: ['Level the board (Space) to settle in the socket', '放平台面（空格），停进凹槽'],
+  settleHold: ['Hold still: the marble is settling in', '保持不动：弹珠正在停进凹槽'],
+  read: ['Read the board, then tilt toward your next stop', '观察台面，再朝下一个停靠点倾斜'],
   hold: ['Steady: let the marble roll', '保持住：让弹珠滚动'],
   fall: ['Falling: back to the last checkpoint', '掉落了：回到上一个检查点'],
   nopath: ['Level the board (Space) and try another way', '放平台面（空格），换条路试试'],
+  nopathLevel: ['No way from here: try another tilt', '这里走不通：换个方向倾斜'],
   cleared: ['Lab cleared!', '实验完成！'],
   lost: ['Out of lives', '生命用完'],
   menu: ['Arrows pick a lab, Space starts it', '方向键选择实验，空格开始'],
@@ -1074,6 +1079,11 @@ const WORDS = {
 const waitWords = (dir, block) => [
   `Wait for the block ${block} to pass, then tilt ${ARROW[dir]}`,
   `等挡块${block}过去，再向${ARROW[dir]}倾斜`,
+];
+
+const waitBlindWords = (block) => [
+  `Wait for the block ${block} to pass, then tilt`,
+  `等挡块${block}过去，再倾斜`,
 ];
 
 const tiltWords = (dir, hint) => [
@@ -1126,6 +1136,9 @@ const blockArrow = (mv) =>
 const dist = (x, y, p) => Math.hypot(x - p.x, y - p.y);
 const centreOf = (p) => ({ x: cellX(p.c), y: cellY(p.r) });
 const isLevel = (s) => Math.abs(s.tx) <= R.levelTol && Math.abs(s.ty) <= R.levelTol;
+// From lab `guideFrom` on, the route arrow and the direction in the prompt are held back until the
+// player has fallen or gone `helpStall` seconds without reaching a new resting spot.
+const isBlind = (s) => s.level + 1 >= R.guideFrom && !s.helped;
 const speedOf = (m) => Math.hypot(m.vx, m.vy);
 
 function loadLab(s, index) {
@@ -1146,6 +1159,7 @@ function loadLab(s, index) {
     fall: null,
     settleT: 0,
     restT: 0,
+    pinT: 0,
     freeze: 0,
     pending: null,
     menu: null,
@@ -1162,6 +1176,9 @@ function loadLab(s, index) {
       blockAt: -1e9,
     },
     falls: 0,
+    helped: false,
+    progressAt: 0,
+    seen: new Set(),
   });
   s.timedFor = [0, 1, 2].map((id) => b.timed[String.fromCharCode(97 + id)] || 0);
   s.world = {
@@ -1170,6 +1187,24 @@ function loadLab(s, index) {
     movers: b.movers.map((mv) => moverAt(mv, 0)),
   };
   think(s);
+}
+
+// Progress is a convenience: a broken or hostile store must never stop the game.
+function readUnlocked(progress) {
+  try {
+    const n = Math.floor(Number(progress?.unlocked?.()));
+    return Number.isFinite(n) ? clamp(n, 1, LAB_COUNT) : 1;
+  } catch {
+    return 1;
+  }
+}
+
+function saveUnlocked(progress, level) {
+  try {
+    progress?.unlock?.(level);
+  } catch {
+    // The clear still counts for this session.
+  }
 }
 
 export function newState(env = {}) {
@@ -1184,8 +1219,7 @@ export function newState(env = {}) {
     best: Array(LAB_COUNT).fill(0),
     stats: { falls: 0, plates: 0, bounces: 0, cleared: 0, blocks: 0 },
   };
-  const raw = Number(s.progress?.unlocked?.());
-  const unlocked = Number.isFinite(raw) ? clamp(Math.floor(raw), 1, LAB_COUNT) : 1;
+  const unlocked = readUnlocked(s.progress);
   loadLab(s, 0);
   if (unlocked > 1) {
     s.menu = { sel: unlocked, unlocked };
@@ -1208,7 +1242,7 @@ function adviceOf(s) {
   if (s.fall) return { id: 'fall', words: WORDS.fall };
   const goal = centreOf(b.goal);
   if (dist(m.x, m.y, goal) <= R.dishR && speedOf(m) <= R.captureSpeed)
-    return { id: 'settle', words: WORDS.settle };
+    return { id: 'settle', words: isLevel(s) ? WORDS.settleHold : WORDS.settle };
   const cell = cellOf(m.x, m.y);
   const rest = s.restT >= R.restTime;
   const plate = b.plateAt[cell.r][cell.c];
@@ -1222,14 +1256,27 @@ function adviceOf(s) {
       ? { id: 'plateHold', words: WORDS.plateHold }
       : { id: 'plateLevel', words: WORDS.plateLevel };
   const plan = s.adv.plan;
-  if (!plan)
-    return rest ? { id: 'nopath', words: WORDS.nopath } : { id: 'hold', words: WORDS.hold };
-  const other = Math.abs(plan.dir === 'R' || plan.dir === 'L' ? s.ty : s.tx);
+  if (!plan) {
+    if (!rest) return { id: 'hold', words: WORDS.hold };
+    return { id: 'nopath', words: isLevel(s) ? WORDS.nopathLevel : WORDS.nopath };
+  }
+  const blind = isBlind(s);
+  // Out of sight the line never reveals which way the plan goes: it asks for a flat board when the
+  // marble sits pinned under a full tilt, and otherwise only when the weaker axis strays.
+  const off = !blind
+    ? Math.abs(plan.dir === 'R' || plan.dir === 'L' ? s.ty : s.tx)
+    : s.pinT >= R.pinTime
+      ? Math.max(Math.abs(s.tx), Math.abs(s.ty))
+      : Math.min(Math.abs(s.tx), Math.abs(s.ty));
   const along = SIGN[plan.dir] * (AXIS[plan.dir] === 'x' ? s.tx : s.ty);
   const guide = { dir: plan.dir, c: plan.c, r: plan.r };
-  if (rest && other > 0.25) return { id: 'level', words: WORDS.level };
+  // A turn needs the tilt at zero (turnTol), tighter than tilt.level, so this line never says "level".
+  if (rest && off > R.turnTol) return { id: 'level', words: WORDS.level };
   if (rest && s.adv.block && along < 0.5)
-    return { id: 'wait', dir: plan.dir, words: waitWords(plan.dir, s.adv.block), guide };
+    return blind
+      ? { id: 'wait', words: waitBlindWords(s.adv.block) }
+      : { id: 'wait', dir: plan.dir, words: waitWords(plan.dir, s.adv.block), guide };
+  if (blind) return rest ? { id: 'read', words: WORDS.read } : { id: 'hold', words: WORDS.hold };
   if (along < R.goTilt - 1e-6)
     return { id: 'tilt', dir: plan.dir, words: tiltWords(plan.dir, plan.hint), guide };
   return { id: 'hold', dir: plan.dir, words: WORDS.hold, guide };
@@ -1245,6 +1292,10 @@ function think(s) {
   adv.stuck = rest && pinned ? adv.stuck + R.think * STEP : 0;
   if (rest) {
     const key = `${cell.c},${cell.r},${s.open}`;
+    if (!s.seen.has(key)) {
+      s.seen.add(key);
+      s.progressAt = s.clock;
+    }
     if (adv.key !== key) {
       Object.assign(adv, { key, failed: new Set(), stuck: 0, waited: 0 });
       adv.plan = planRoute(s.lab, cell.c, cell.r, s.open);
@@ -1258,6 +1309,7 @@ function think(s) {
       }
     }
   }
+  if (!s.helped && (s.falls > 0 || s.clock - s.progressAt > R.helpStall)) s.helped = true;
   const along = adv.plan ? SIGN[adv.plan.dir] * (AXIS[adv.plan.dir] === 'x' ? s.tx : s.ty) : 0;
   const watching = rest && adv.plan && s.lab.movers.length && along < 0.5 && adv.waited < R.waitMax;
   if (!watching) adv.block = null;
@@ -1280,7 +1332,9 @@ function think(s) {
     s.line.guide = s.advice.guide || null;
     return;
   }
-  if (s.line && s.line.age < R.promptHold) return;
+  // The last word on a lab or a run is never held back.
+  const final = s.advice.id === 'cleared' || s.advice.id === 'lost';
+  if (s.line && s.line.age < R.promptHold && !final) return;
   s.line = { en: words[0], zh: words[1], age: 0, id: s.advice.id, guide: s.advice.guide || null };
 }
 
@@ -1407,7 +1461,7 @@ function clearLab(s, emit) {
   const gained = R.clearScore + s.lives * R.lifeScore + left;
   s.best[s.level] = Math.max(s.best[s.level], gained);
   s.score = s.best.reduce((a, v) => a + v, 0);
-  s.progress?.unlock?.(Math.min(LAB_COUNT, s.level + 2));
+  saveUnlocked(s.progress, Math.min(LAB_COUNT, s.level + 2));
   s.stats.cleared++;
   s.settleT = 0;
   emit('coin');
@@ -1473,6 +1527,9 @@ function tick(s, keys, emit) {
     stepTilt(s, keys);
     rollStep(s, emit);
     s.restT = speedOf(s.marble) < R.restSpeed ? s.restT + STEP : 0;
+    const pinned =
+      speedOf(s.marble) < R.pinSpeed && Math.max(Math.abs(s.tx), Math.abs(s.ty)) >= R.goTilt - 1e-6;
+    s.pinT = pinned ? s.pinT + STEP : 0;
     if (!s.fall) sensors(s, emit);
   }
   if (s.ticks % R.think === 0 || s.phase !== 'playing') think(s);
@@ -1500,8 +1557,10 @@ const keysOf = (input) => ({
 });
 
 const NO_KEYS = Object.freeze({ dx: 0, dy: 0, level: false });
+const NO_INPUT = Object.freeze({ held: () => false, pressed: () => false });
 
-export function advance(s, dt, input, emit = () => {}) {
+export function advance(s, dt, pad, emit = () => {}) {
+  const input = pad ?? NO_INPUT;
   if (s.phase !== 'playing' || !Number.isFinite(dt) || dt <= 0 || dt > R.maxDt) return false;
   if (s.menu) {
     menuInput(s, input, emit);
@@ -1598,6 +1657,7 @@ export function snapshotOf(s) {
     prompt: { en: line.en, zh: line.zh, id: line.id || null },
     line: { en: line.en, zh: line.zh },
     guide: finished || !line.guide ? null : { ...line.guide },
+    routeHint: !isBlind(s),
     message: s.msg ? { en: s.msg.en, zh: s.msg.zh } : null,
     menu: s.menu ? { ...s.menu } : null,
     stats: { ...s.stats },
@@ -1633,6 +1693,31 @@ const box = (ctx, color, x, y, w, h) => {
   ctx.fillStyle = color;
   ctx.fillRect(Math.round(x), Math.round(y), w, h);
 };
+
+// 3 x 5 letters A, B, C: each plate and its gate carry the same one, so the pairing never relies on colour.
+const MARKS = [
+  ['.#.', '#.#', '###', '#.#', '#.#'],
+  ['##.', '#.#', '##.', '#.#', '##.'],
+  ['.##', '#..', '#..', '#..', '.##'],
+];
+const PADLOCK = [
+  '..###..',
+  '.#...#.',
+  '.#...#.',
+  '#######',
+  '#######',
+  '###.###',
+  '#######',
+  '#######',
+];
+
+function bitmap(ctx, rows, color, x, y, scale = 1) {
+  rows.forEach((row, j) =>
+    [...row].forEach((ch, i) => {
+      if (ch === '#') box(ctx, color, x + i * scale, y + j * scale, scale, scale);
+    }),
+  );
+}
 
 function disc(ctx, color, cx, cy, r) {
   ctx.fillStyle = color;
@@ -1697,6 +1782,7 @@ function drawFeatures(ctx, s, b) {
     const c = centreOf(p);
     disc(ctx, PALETTE.gate[p.gate], c.x, c.y, R.plateR - 1);
     disc(ctx, on ? '#f4fff0' : '#16212e', c.x, c.y, R.plateR - 4);
+    bitmap(ctx, MARKS[p.gate], on ? '#16212e' : '#f4fff0', c.x - 1, c.y - 2);
     const charge = on ? 0 : Math.min(1, s.dwell[p.gate] / R.plateTime);
     if (charge > 0) box(ctx, '#7dff9a', c.x - 6, c.y + R.plateR - 3, Math.round(12 * charge), 2);
   }
@@ -1708,16 +1794,17 @@ function drawFeatures(ctx, s, b) {
       box(ctx, PALETTE.gate[g.id], x, y, CELL, 2);
       box(ctx, PALETTE.gate[g.id], x, y + CELL - 2, CELL, 2);
       const total = s.timedFor[g.id];
+      bitmap(ctx, MARKS[g.id], PALETTE.gate[g.id], x + 6, y + 3);
       if (total) {
         // A fuse that burns down across the doorway; it blinks in the last five seconds.
         const left = s.timers[g.id] / total;
         const late = s.timers[g.id] < 5 && Math.floor(s.ticks / 30) % 2 === 0;
-        box(ctx, '#0b1018', x, y + 6, CELL, 4);
+        box(ctx, '#0b1018', x, y + 9, CELL, 4);
         box(
           ctx,
           late ? '#ff6b5b' : PALETTE.gate[g.id],
           x + 1,
-          y + 7,
+          y + 10,
           Math.round((CELL - 2) * left),
           2,
         );
@@ -1725,6 +1812,8 @@ function drawFeatures(ctx, s, b) {
     } else {
       box(ctx, '#1b1f2a', x, y, CELL, CELL);
       for (let i = 0; i < CELL; i += 4) box(ctx, PALETTE.gate[g.id], x + i, y + 1, 2, CELL - 2);
+      box(ctx, '#1b1f2a', x + 3, y + 2, 9, 12);
+      bitmap(ctx, MARKS[g.id], '#f4fff0', x + 5, y + 3, 2);
     }
   }
   for (let r = 0; r < R.rows; r++)
@@ -1735,14 +1824,14 @@ function drawFeatures(ctx, s, b) {
   for (const k of b.checkpoints) {
     const c = centreOf(k);
     box(ctx, '#d8e4f0', c.x - 4, c.y - 6, 1, 12);
-    box(
-      ctx,
-      s.check.c === k.c && s.check.r === k.r ? '#7dff9a' : '#6a8aa6',
-      c.x - 3,
-      c.y - 6,
-      6,
-      4,
-    );
+    if (s.check.c === k.c && s.check.r === k.r) box(ctx, '#7dff9a', c.x - 3, c.y - 6, 6, 4);
+    else {
+      // A saved flag is solid; the others are only outlines.
+      box(ctx, '#6a8aa6', c.x - 3, c.y - 6, 6, 1);
+      box(ctx, '#6a8aa6', c.x - 3, c.y - 3, 6, 1);
+      box(ctx, '#6a8aa6', c.x - 3, c.y - 6, 1, 4);
+      box(ctx, '#6a8aa6', c.x + 2, c.y - 6, 1, 4);
+    }
   }
   for (const m of s.world.movers) {
     box(ctx, '#2a2118', m.x0, m.y0, m.x1 - m.x0, m.y1 - m.y0);
@@ -1850,7 +1939,12 @@ function drawHud(ctx, s, env) {
     14,
   );
   for (let i = 0; i < R.lives; i++) {
-    disc(ctx, i < s.lives ? '#bfe9ff' : '#2a3350', 440 + i * 14, 11, 5);
+    // A spent life is a hollow ring, a spare one a solid marble.
+    if (i < s.lives) disc(ctx, '#bfe9ff', 440 + i * 14, 11, 5);
+    else {
+      disc(ctx, '#4a5578', 440 + i * 14, 11, 5);
+      disc(ctx, '#070b1f', 440 + i * 14, 11, 3);
+    }
   }
   const line = env.t(s.line.en, s.line.zh);
   text(ctx, line, 240, 23, '#ffffff', 14, 'center');
@@ -1866,7 +1960,18 @@ function drawHud(ctx, s, env) {
     14,
   );
   if (s.msg) text(ctx, env.t(s.msg.en, s.msg.zh), 474, bottom + 4, '#ffe066', 14, 'right');
-  else text(ctx, `${s.clock.toFixed(1)}s / ${b.par}s`, 474, bottom + 4, '#cfd6ea', 14, 'right');
+  else {
+    const unit = env.t('s', '秒');
+    text(
+      ctx,
+      `${s.clock.toFixed(1)}${unit} / ${b.par}${unit}`,
+      474,
+      bottom + 4,
+      '#cfd6ea',
+      14,
+      'right',
+    );
+  }
 }
 
 function drawMenu(ctx, s, env) {
@@ -1879,11 +1984,22 @@ function drawMenu(ctx, s, env) {
     const open = i <= unlocked;
     box(ctx, i === sel ? '#ffe066' : '#3a4258', x - 2, y - 2, 36, 36);
     box(ctx, open ? '#262c3e' : '#14171f', x, y, 32, 32);
-    text(ctx, String(i), x + 16, y + 9, open ? '#ffffff' : '#555d75', 14, 'center');
+    if (open) text(ctx, String(i), x + 16, y + 9, '#ffffff', 14, 'center');
+    else bitmap(ctx, PADLOCK, '#6b7490', x + 9, y + 8, 2);
   }
   const b = LABS[sel - 1];
   text(ctx, `${sel}/${LAB_COUNT}  ${env.t(...b.name)}`, 240, 170, '#ffffff', 16, 'center');
   text(ctx, env.t(...b.tip), 240, 200, '#8d9ac4', 14, 'center');
+  if (unlocked < LAB_COUNT)
+    text(
+      ctx,
+      env.t('Padlock: clear the earlier labs first', '挂锁：先完成前面的实验'),
+      240,
+      240,
+      '#8d9ac4',
+      14,
+      'center',
+    );
   text(ctx, env.t(...WORDS.menu), 240, 270, '#cfd6ea', 14, 'center');
 }
 

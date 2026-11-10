@@ -1,0 +1,120 @@
+per-lab wins, fast: 1:30 2:30 3:30 4:30 5:30 6:30 7:30 8:30 9:30 10:30 11:30 12:30 13:30 14:30 15:30 16:30 17:30 18:30 19:30 20:30 21:30 22:30
+per-lab wins, slow: 1:30 2:30 3:30 4:30 5:30 6:30 7:30 8:30 9:30 10:30 11:30 12:30 13:30 14:30 15:30 16:30 17:30 18:30 19:30 20:30 21:30 22:30
+lag 0.25 s: 0/330 runs lost a marble; lag 0.5 s: 0/264, 0 block bumps
+crude policies, wins per lab:
+  idle       1:0 2:0 3:0 4:0 5:0 6:0 7:0 8:0 9:0 10:0 11:0 12:0 13:0 14:0 15:0 16:0 17:0 18:0 19:0 20:0 21:0 22:0 (of 1)
+  mash       1:0 2:0 3:0 4:0 5:0 6:0 7:0 8:0 9:0 10:0 11:0 12:0 13:0 14:0 15:0 16:0 17:0 18:0 19:0 20:0 21:0 22:0 (of 1)
+  holdRight  1:0 2:0 3:0 4:0 5:0 6:0 7:0 8:0 9:0 10:0 11:0 12:0 13:0 14:0 15:0 16:0 17:0 18:0 19:0 20:0 21:0 22:0 (of 1)
+  holdLeft   1:0 2:0 3:0 4:0 5:0 6:0 7:0 8:0 9:0 10:0 11:0 12:0 13:0 14:0 15:0 16:0 17:0 18:0 19:0 20:0 21:0 22:0 (of 1)
+  holdUp     1:0 2:0 3:0 4:0 5:0 6:0 7:0 8:0 9:0 10:0 11:0 12:0 13:0 14:0 15:0 16:0 17:0 18:0 19:0 20:0 21:0 22:0 (of 1)
+  holdDown   1:0 2:0 3:0 4:0 5:0 6:0 7:0 8:0 9:0 10:0 11:0 12:0 13:0 14:0 15:0 16:0 17:0 18:0 19:0 20:0 21:0 22:0 (of 1)
+  diagonal   1:0 2:0 3:0 4:0 5:0 6:0 7:0 8:0 9:0 10:0 11:0 12:0 13:0 14:0 15:0 16:0 17:0 18:0 19:0 20:0 21:0 22:0 (of 1)
+  cycle      1:0 2:0 3:0 4:0 5:0 6:0 7:0 8:0 9:0 10:0 11:0 12:0 13:0 14:0 15:0 16:0 17:0 18:0 19:0 20:0 21:0 22:0 (of 1)
+  cycleFast  1:0 2:0 3:0 4:0 5:0 6:0 7:0 8:0 9:0 10:0 11:0 12:0 13:0 14:0 15:0 16:0 17:0 18:0 19:0 20:0 21:0 22:0 (of 1)
+  cycleSpace 1:0 2:0 3:0 4:0 5:0 6:0 7:0 8:0 9:0 10:0 11:0 12:0 13:0 14:0 15:0 16:0 17:0 18:0 19:0 20:0 21:0 22:0 (of 1)
+  towardGoal 1:1 2:0 3:0 4:0 5:0 6:0 7:0 8:0 9:0 10:0 11:0 12:0 13:0 14:0 15:0 16:0 17:0 18:0 19:0 20:0 21:0 22:0 (of 1)
+  random     1:39 2:0 3:0 4:0 5:1 6:0 7:2 8:1 9:0 10:0 11:0 12:0 13:0 14:8 15:1 16:0 17:0 18:1 19:1 20:2 21:0 22:0 (of 40)
+  randomSlow 1:40 2:0 3:2 4:1 5:1 6:2 7:1 8:4 9:0 10:0 11:0 12:0 13:0 14:9 15:1 16:0 17:0 18:1 19:2 20:4 21:0 22:3 (of 40)
+  randomTap  1:13 2:0 3:3 4:0 5:0 6:0 7:1 8:0 9:0 10:0 11:0 12:0 13:0 14:1 15:5 16:0 17:0 18:0 19:2 20:0 21:0 22:2 (of 40)
+bridge crossings with cross-tilt noise: Narrow Bridge: 60/60, Dune Bridge: 60/60, Ice Bridge: 60/60, Spiral Stair: 60/60
+✔ a prompt-following player (0.15-0.35 s lag) clears every lab in at least 27 of 30 runs at 30, 60 and 120 Hz (18258.835334ms)
+✔ a slow prompt-following player (0.4-0.6 s lag) clears every lab in at least 24 of 30 runs at 30, 60 and 120 Hz (23546.074334ms)
+✔ a literal follower at lag 0 never loses a marble, at lag 0.25 s rarely does and at 0.5 s loses at most 1 run in 12 (21252.152375ms)
+✔ crossing guards and the pendulum: a follower 0.5 s late never loses a marble or bumps a block (14374.373625ms)
+✔ the prompt never leads a literal follower to a hole or a livelock: lives stay full and every clear is timely (600.547ms)
+✔ every prompt line is held at least half a second, names a direction or an action and fits the canvas (1155.996042ms)
+✔ the guide arrow always agrees with the tilt the prompt asks for (458.214167ms)
+✔ crude policies fail: per lab, no policy beats 50% from lab 3 on or 25% from lab 5 on, and idle never wins (225043.934125ms)
+✔ the same key schedule gives the identical outcome at 30, 60 and 120 Hz on every lab (723.358334ms)
+✔ jittered frame times (down to half a frame) still give a stable, finite and bounded game (260.131375ms)
+✔ every bridge lab can be crossed by a follower who adds up to 0.5 degrees of random cross-tilt on each roll (3377.646875ms)
+✔ mastery labs hide the route yet stay fair: a reader clears them, and a prompt-only player is helped after a stall (636.727625ms)
+✔ meta follows the contract, is bilingual and the touch layout covers every key (1.05625ms)
+✔ RULES is frozen and states the numbers the prompts and HUD rely on (0.05625ms)
+✔ there are at least 20 distinct authored labs with a named teaching idea each (0.154625ms)
+✔ the labs introduce each mechanic in order and the later labs combine them (1.341792ms)
+✔ buildLab rejects boards with the wrong size or without a start and socket (0.318083ms)
+✔ every lab has a legal path and a scripted solution that clears it with no falls (383.510167ms)
+✔ the scripted solution is not a trivial hold: an idle board never reaches the socket (342.945542ms)
+✔ invalid, zero, negative, huge and non-numeric frame times are inert (0.216542ms)
+✔ the simulation has a fixed step: sub-step frames accumulate and never lose time (0.085208ms)
+✔ the same input gives identical full state at 30, 60 and 120 Hz (4.04775ms)
+✔ tilt ramps at a limited rate, clamps and the level key eases it back (2.187333ms)
+✔ acceleration is g sin(angle), scaled, with rolling friction and a standstill below it (0.477ms)
+✔ speed is capped and surfaces differ: ice slides far, sand drags, floor between (4.372333ms)
+✔ energy never increases in a free roll or a wall bounce, at any step length (68.51825ms)
+✔ a bounce keeps at most the restitution fraction of the normal speed and slow impacts stop dead (0.141584ms)
+✔ no wall tunnelling at the speed cap with any step length, into walls, corners and thin walls (80.588417ms)
+✔ contact resolution never teleports: the marble moves at most its travel plus a hair (2.149417ms)
+✔ a marble that starts overlapping a wall is pushed out along the normal, not thrown (0.147708ms)
+✔ a marble in a corner at full tilt stays inside and does not jitter or gain speed (6.78975ms)
+✔ a hole captures the marble by its real centre and radius, not by its cell (0.853959ms)
+✔ a marble creeping onto the drawn rim tips in, but a fast one passes just outside it (0.21125ms)
+✔ a fast marble cannot skip over a hole between two steps (0.072875ms)
+✔ a fall costs a life, runs the animation, then resets to the start or the last checkpoint (0.38075ms)
+✔ checkpoints save the place after a fall and the flag is shown as reached (0.208375ms)
+✔ running out of lives loses once, freezes the board and reports a loss (1.523958ms)
+✔ through the game object, a loss ends the game once with won false and the lose sound (3.285292ms)
+✔ pressure plates need a level board and a slow marble held for a moment (1.142208ms)
+✔ closed gates are solid walls and open gates let the marble through (0.469792ms)
+✔ a timed gate closes again after its time and never on top of the marble (6.993ms)
+✔ one-way flaps let a marble through in their direction and turn it back the other way (0.646875ms)
+✔ slideFrom reports where a roll ends and refuses rolls into holes and one-way flaps (0.099625ms)
+✔ moving blocks follow a deterministic path and bounce the marble without adding energy (13.475583ms)
+✔ a vertical mover is solid too and moving walls cannot squeeze the marble through a wall (0.068833ms)
+✔ the socket settles the marble only when it is slow, near the centre and the board is level (0.864125ms)
+✔ clearing a lab scores it once, unlocks the next, pauses, then loads it with fresh lives (3.430208ms)
+✔ the pause after a clear ignores input and then loads the next lab (0.413583ms)
+✔ score is the sum of each lab best: a slower replay cannot lower it and a fast one cannot farm (0.579542ms)
+✔ winning the last lab ends the game once with a win and freezes it; a new instance starts fresh (16.330541ms)
+✔ progress: hosts without it still play; bad values are clamped; clearing needs no unlock hook (3.465292ms)
+✔ select screen: it opens when more than one lab is unlocked, moves, clamps and starts the lab (0.18125ms)
+✔ getState returns copies and exposes no cheat controls; the HUD bands are reported (0.239ms)
+✔ prompts name the next action with a direction and the guide arrow matches it (0.660125ms)
+✔ prompt ids cover the situations: tilt, hold, level, plate, settle, nopath, fall, cleared and menu (357.786208ms)
+✔ the planner finds a roll for every rest cell on the scripted routes and hints name the feature (5.449833ms)
+✔ a blocked direction is dropped from the plan after the marble stalls against it (0.305917ms)
+✔ long seeded chaos stays finite, bounded and well-formed on every lab (923.42575ms)
+✔ drawing renders every lab, the menu, a fall and the pause in both languages (69.164917ms)
+✔ drawing covers gates open and shut, plates, checkpoints, movers, flaps, guide arrows and the end screens (39.935833ms)
+✔ the HUD text is 14-16 px and the drawn rows stay inside the canvas (3.48975ms)
+✔ a gate is drawn shut, then open once its plate has been pressed (13.675583ms)
+✔ the plate prompt covers the whole charge, a charging bar fills and the gate opens after it (0.632333ms)
+✔ a timed gate draws a fuse that burns down, blinks at the end and closes the gate (154.442041ms)
+✔ the prompt says to wait for a moving block, then tilt, and a follower 0.5 s late never bumps one (571.665ms)
+✔ a marble nudged into a wall is settled back on its surface, even from dead on the face (0.399583ms)
+✔ no moving block sweeps into a wall: there is open floor beyond both ends of its travel (0.08525ms)
+✔ RULES, its friction table and LABS are deeply frozen so no caller can retune the game (0.24125ms)
+✔ the guide arrow and the target frame are only ever drawn on open floor (2170.18175ms)
+✔ the HUD never overlaps: the bottom band swaps the clock for a message and every line fits (2430.083375ms)
+✔ the drawn socket dish is exactly as wide as the region that pulls the marble (0.428083ms)
+✔ the banner behind the end overlay names the outcome: out of lives on a loss, cleared on a win (20.45825ms)
+✔ a throwing progress store never stops a game from opening or a lab from clearing (7.692625ms)
+✔ update tolerates a missing input object (0.16375ms)
+✔ from lab 15 the route arrow and the roll named in the prompt wait for a fall or a long stall (31.306375ms)
+✔ a fall brings the route arrow back on a mastery lab and the help lasts for that lab (3.328916ms)
+✔ a stalled player is only helped if no new resting spot is reached, and a new lab starts hidden again (3.158417ms)
+✔ "Level the board" is only said while tilt.level is false; the turn line asks for zero tilt (4.032459ms)
+✔ plates and gates carry a shared letter mark, so the pairing never depends on colour (5.410083ms)
+✔ locked lab tiles show a padlock and a legend instead of only a dimmer number (0.846542ms)
+✔ the clock reads in seconds in both languages and spent lives are rings, not only a darker colour (2.576875ms)
+✔ checkpoint flags: the saved one is solid, the others are outlines (4.591083ms)
+ℹ tests 82
+ℹ suites 0
+ℹ pass 82
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 309753.070875
+ℹ start of coverage report
+ℹ --------------------------------------------------------------
+ℹ file          | line % | branch % | funcs % | uncovered lines
+ℹ --------------------------------------------------------------
+ℹ src           |        |          |         | 
+ℹ  games        |        |          |         | 
+ℹ   tilt-lab.js |  99.95 |    99.51 |   98.99 | 1131
+ℹ --------------------------------------------------------------
+ℹ all files     |  99.95 |    99.51 |   98.99 | 
+ℹ --------------------------------------------------------------
+ℹ end of coverage report

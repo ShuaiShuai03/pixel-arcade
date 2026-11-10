@@ -270,7 +270,8 @@
       "conveyor-chef",
       "echo-hunter",
       "rail-switch",
-      "firefly-trail"
+      "firefly-trail",
+      "tilt-lab"
     ],
     "records": [
       "final-review/snowball-siege.json",
@@ -313,7 +314,8 @@
       "final-review/conveyor-chef.json",
       "final-review/echo-hunter.json",
       "final-review/rail-switch.json",
-      "final-review/firefly-trail.json"
+      "final-review/firefly-trail.json",
+      "final-review/tilt-lab.json"
     ]
   }
 }
