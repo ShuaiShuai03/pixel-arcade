@@ -1,0 +1,63 @@
+{
+  "game": "rail-switch",
+  "date": "2026-11-10",
+  "reviewedRevision": "93677e02 (accepted build) plus the fixes in this commit",
+  "owner": "owner-rail and owner-rail2",
+  "reviewer": "rail-fair, rail-robust and rail-present (parallel split review)",
+  "rounds": 1,
+  "process": "Lean final review at the user's request, with the review split across three parallel reviewers (fairness, robustness, presentation) as the user asked. The game already had 20 timetables. Five MEDIUM findings and the cheap LOW items were fixed and verified by a separate verification agent re-running the reviewers' own probes and one clean-worktree run, then by the browser check, without a second review round.",
+  "verdict": "pass",
+  "approvedSha256": {
+    "src/games/rail-switch.js": "479616ab1dcf1c04e342880e1c9b22bac8121e7d75535b109d6625e64eb029bd",
+    "tests/rail-switch.test.js": "1c29de1d036ebdfa0c9d64ec1ba116dc94130bef1a67612412f92828601e1456",
+    "tests/rail-switch-quality.test.js": "27195a99a93ab635a1fc9ff52137f8ff015c6efde9a65c7168c7e962f825a4ca"
+  },
+  "tests": {
+    "command": "node --experimental-test-coverage --test-coverage-include='src/games/rail-switch*.js' --test tests/rail-switch.test.js tests/rail-switch-quality.test.js",
+    "passed": 88,
+    "failed": 0,
+    "lineCoverage": 99.91,
+    "log": "rail-switch-coverage.txt"
+  },
+  "independentProbes": "On the final files the fairness reviewer's reaction-limited dispatcher bot (public getState only, 60 Hz, 3 seeds) cleared every timetable at 0.25 s and 0.35 s, taking strikes only on timetable 13 at 0.35 s. At 0.5 s timetables 9-12 still clear without strikes while mastery timetables 13, 14 and 20 fail and 16 and 18 take strikes, where the review had found a prompt-follower clearing everything with no strikes at any delay. Blind strategies cleared no timetable from 3 to 20 (the review had found mash clearing timetable 4 in 4 of 12 runs). Gameplay state matched across 30, 60 and 120 Hz, hostile input threw nothing, presses during the clear banner are no longer dropped, each run ended exactly once and froze, every broken progress store was safe, and the presentation probes found no text problems and no preview mismatches.",
+  "findings": [
+    {
+      "id": "M1",
+      "severity": "medium",
+      "status": "fixed",
+      "observation": "Fairness finding: the dispatcher prompt named every flip up to 9 s ahead on all timetables, so following it cleared everything with no strikes. Timetables 13-20 now call flips only 2-3 s ahead (otherwise 'No call yet - watch the X train'), timetables 1-12 keep full guidance, and the description and the timetable 13 tip explain it."
+    },
+    {
+      "id": "M2",
+      "severity": "medium",
+      "status": "fixed",
+      "observation": "Robustness findings: mash cleared timetable 4 in 33% of runs, and presses during the 2 s clear banner were dropped silently. Timetable 4's quota leaves one spare train, and banner presses are answered and replayed on the next timetable."
+    },
+    {
+      "id": "M3",
+      "severity": "medium",
+      "status": "fixed",
+      "observation": "Presentation findings: the description and key label said X previews the next train although it previews the next train through the selected junction, and red signal lamps and held portals differed only by colour. The wording now matches the behaviour, red lamps carry a stop bar and held portals a pause mark."
+    },
+    {
+      "id": "L1",
+      "severity": "low",
+      "status": "fixed",
+      "observation": "The express tip now says 'white stripe', Enter flips a junction like Space and is listed, update tolerates input without pressed or pointer, and prompt and banner timers count simulation steps so the HUD text no longer depends on frame rate."
+    }
+  ],
+  "openNotes": [
+    "A bot that reads the board exactly still clears the mastery timetables at 0.35 s; the added difficulty shows at slower reactions.",
+    "The source is a single file of about 2,200 lines, over the repository's 800-line soft ceiling."
+  ],
+  "browser": {
+    "method": "Official Claude in Chrome extension, local server; real clicks on Start and the language toggle, synthetic in-page keys; only DOM text and the canvas were read.",
+    "servedSha256Prefixes": "479616ab",
+    "observed": [
+      "With progress saved from earlier testing, Start opened the timetable chooser; timetable 13 (Traffic Light) showed the yard, strikes, spare count and the prompt 'No call yet - watch the red train', and the description explained that from timetable 13 flips are called only 2-3 s ahead.",
+      "Chinese 390 px phone frame (388 px inner, no horizontal overflow): the timetable chooser in Chinese with touch buttons 左, 右, 上, 下, 扳道 and 路线.",
+      "Not covered in the browser: a delivery, a strike and a timetable clear; the reviewers' probes, the verification run and the quality tests cover them."
+    ],
+    "screenshots": ["screenshots/rail-switch-en.png", "screenshots/rail-switch-phone-zh.png"]
+  }
+}

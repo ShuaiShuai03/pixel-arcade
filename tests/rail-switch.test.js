@@ -1092,3 +1092,131 @@ test('spare never shows a negative number, even on the loss screen', () => {
   assert.ok(zh.texts.includes('余量 0'));
   assert.ok(!en.texts.some((t) => /-\d/.test(t)));
 });
+
+// ---------------------------------------------------------------------------------------------
+// Final-review fixes: shorter guidance, buffered presses, honest wording, shape cues
+// ---------------------------------------------------------------------------------------------
+const promptKind = (s) => {
+  advance(s, 1 / 60, none);
+  return snapshotOf(s).prompt.kind;
+};
+
+test('a level horizon limits how early the dispatcher calls a flip', () => {
+  const late = [[9, 'a', '2', 'n', 'A:1']];
+  const taught = newState({}, [compile({ trains: late, horizon: 12 })]);
+  const read = newState({}, [compile({ trains: late, horizon: 2 })]);
+  assert.equal(compile({ trains: late }).horizon, RULES.horizon);
+  assert.equal(promptKind(taught), 'flip');
+  assert.equal(promptKind(read), 'watch', 'a train 8 s away is not called yet');
+  assert.match(snapshotOf(read).prompt.en, /^No call yet/);
+  assert.match(snapshotOf(read).prompt.zh, /^暂无指令/);
+  run(read, 9);
+  assert.equal(promptKind(read), 'flip', 'the call comes in the last 2 s');
+});
+
+test('mastery timetables call flips 2 to 3 seconds ahead, teaching ones keep the full horizon', () => {
+  const horizons = LEVELS.map((L) => compileLevel(L).horizon);
+  assert.ok(horizons.slice(0, 12).every((h) => h === RULES.horizon));
+  assert.ok(horizons.slice(12).every((h) => h >= 2 && h <= 3));
+  assert.match(LEVELS[12].tip[0], /2 to 3 seconds/);
+  assert.match(LEVELS[12].tip[1], /2 到 3 秒/);
+  assert.match(meta.description.en, /timetable 13/);
+});
+
+test('presses made during the clear banner are answered at once and replayed on the next timetable', () => {
+  const two = () => newState({}, [compile({ quota: 1 }), compile({ quota: 1, init: { A: 0 } })]);
+  const s = two();
+  while (s.clear <= 0) advance(s, 1 / 60, none);
+  const heard = [];
+  advance(s, 1 / 60, press('Space', 'KeyX'), (name) => heard.push(name));
+  assert.deepEqual(heard, ['move']);
+  assert.equal(s.carry.length, 2);
+  run(s, 2.1);
+  assert.equal(s.level, 1);
+  assert.equal(s.carry.length, 0);
+  assert.equal(s.w.sw[0], 1, 'the buffered flip reached the new timetable');
+  assert.equal(s.preview, true, 'so did the preview toggle');
+  const full = two();
+  while (full.clear <= 0) advance(full, 1 / 60, none);
+  for (let n = 0; n < 20; n++) advance(full, 1 / 60, press('Space'));
+  assert.ok(full.carry.length <= 8, 'the buffer is bounded');
+});
+
+test('timers count simulation steps, so the prompt and banner do not depend on the frame rate', () => {
+  const at = (hz) => {
+    const s = newState({}, [compileLevel(LEVELS[0])]);
+    run(s, 3, () => none, hz);
+    return { age: s.msg.age, line: s.line.age, clear: s.clear };
+  };
+  const base = at(120);
+  for (const hz of [30, 60]) assert.deepEqual(at(hz), base);
+  const c = (hz) => {
+    const s = newState({}, [compile({ quota: 1 }), compile()]);
+    while (s.clear <= 0) advance(s, 1 / hz, none);
+    run(s, 1.5, () => none, hz);
+    return s.clear;
+  };
+  assert.ok(Math.abs(c(30) - c(120)) < 1 / 100);
+});
+
+test('an input without pressed() or pointer is treated as no input', () => {
+  const s = world();
+  assert.doesNotThrow(() => advance(s, 1 / 60, {}));
+  assert.doesNotThrow(() => advance(s, 1 / 60, undefined));
+  assert.equal(s.stats.flips, 0);
+  const g = createGame({ ...harness().env, progress: { unlocked: () => 1, unlock() {} } });
+  assert.doesNotThrow(() => g.update(1 / 60, { held: () => false }));
+});
+
+test('the key list names Enter and the X preview as the next train through the selected junction', () => {
+  const flip = meta.keys.find((k) => /Flip/.test(k.label.en));
+  assert.equal(flip.keys, 'Space / Enter');
+  const view = meta.keys.find((k) => k.keys === 'X');
+  assert.match(view.label.en, /through the selected junction/);
+  assert.match(view.label.zh, /选中道岔/);
+  assert.match(meta.description.en, /next train to use the selected junction/);
+  assert.match(meta.description.zh, /经过选中道岔/);
+  assert.match(LEVELS[4].tip[0], /white stripe/);
+  assert.doesNotMatch(LEVELS[4].tip[0], /striped/);
+});
+
+// Rectangles drawn for one tile, found by asking the draw call for a fresh context per case.
+function rectsDrawn(setup) {
+  const rects = [];
+  const ctx = mockContext();
+  let fill = '';
+  Object.defineProperty(ctx, 'fillStyle', { get: () => fill, set: (v) => (fill = v) });
+  ctx.fillRect = (x, y, w, h) => rects.push({ x, y, w, h, fill });
+  const s = setup();
+  drawGame(ctx, s, { t: (en) => en });
+  return { rects, s };
+}
+
+test('a red lamp carries a stop bar and a held portal a pause mark, so colour is not the only cue', () => {
+  const lamp = (t) => () => {
+    const s = newState({}, [compileLevel(LEVELS[6])]);
+    s.w.t = t;
+    return s;
+  };
+  const lit = (t) => snapshotOf(lamp(t)()).signals;
+  const redAt = [...Array(40).keys()].find((t) => lit(t).every((g) => !g.green));
+  const greenAt = [...Array(40).keys()].find((t) => lit(t).every((g) => g.green));
+  const bars = (t) =>
+    rectsDrawn(lamp(t)).rects.filter((r) => r.w === 6 && r.h === 2 && r.fill === '#10151d');
+  assert.equal(bars(redAt).length, LEVELS[6].sig.length, 'every red lamp has a stop bar');
+  assert.equal(bars(greenAt).length, 0, 'green lamps are solid');
+  const portal = (hold) => () => {
+    const s = newState({}, [compile({ trains: [[hold ? 0 : 99, 'a', '1', 'n', 'A:0']] })]);
+    s.w.t = 0.01;
+    for (const tr of s.w.trains) tr.held = hold;
+    return s;
+  };
+  const marks = (hold) => rectsDrawn(portal(hold)).rects.filter((r) => r.w === 2 && r.h === 8);
+  assert.equal(marks(true).length >= 2, true, 'held portal: two pause bars');
+  assert.equal(marks(false).length, 0, 'open portal: a solid square instead');
+});
+
+test('level 4 keeps one spare train so button mashing cannot clear it', () => {
+  const L = compileLevel(LEVELS[3]);
+  assert.equal(L.trains.length - L.quota, 1);
+});

@@ -47,6 +47,7 @@ Phase Tiles completed batch 18 and the 50-game target, Pixel Parkour included. T
 | Orbit Gardener   | Passed in one round: 24 gardens, faster mastery rocks, dusk explained ([record](final-review/orbit-gardener.json))    |
 | Conveyor Chef    | Passed in one round: 22 shifts, tighter mastery, 空格 prompts ([record](final-review/conveyor-chef.json))             |
 | Echo Hunter      | Passed in one round: 20 caverns, warned crawler bites ([record](final-review/echo-hunter.json))                       |
+| Rail Switch      | Passed in one round: 20 timetables, late calls on mastery ([record](final-review/rail-switch.json))                   |
 
 ## Completed batch 18
 

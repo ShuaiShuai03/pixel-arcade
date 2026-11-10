@@ -9,13 +9,19 @@ export const meta = {
   players: '1',
   touch: true,
   description: {
-    en: 'Run a rail yard through 20 timetables. Trains leave their portals on schedule and each must reach the platform that shows its own colour and cargo symbol. Arrow keys select a junction, Space flips it (a junction is locked while a train is on it) and X previews the route of the next train. Set the points before the train arrives: a train sent to the wrong platform, two trains meeting head-on or on a crossing, or a fast train catching a slow one each cost a strike, and the third strike ends the timetable. Deliver the quota to clear a timetable: Spare shows how many more trains you can still lose, and every strike is explained on screen. A train that circles a loop for more than 2 minutes is written off as late and costs a strike too. Loops, passing loops, timed signals and express trains join in later. You can also tap a junction: once to select it, again to flip it.',
-    zh: '在 20 张时刻表里调度铁路编组场。列车按时刻表从入口出发，必须开到标有自己颜色和货物符号的站台。方向键选择道岔，空格扳动道岔（有列车在上面时道岔会锁定），X 键预览下一列车的路线。要在列车到达前扳好道岔：开错站台、两列车迎面相撞或在交叉口相撞、快车追尾慢车，每次都扣一次失误，三次失误则本张时刻表失败。送达指定数量即可过关：屏幕上的“余量”表示还能损失几列车，每次失误都会说明原因。列车在环线上绕行超过 2 分钟会被撤销，同样扣一次失误。后面会出现环线、会让线、定时信号灯和特快列车。也可以直接点按道岔：点一次选中，再点一次扳动。',
+    en: 'Run a rail yard through 20 timetables. Trains leave their portals on schedule and each must reach the platform that shows its own colour and cargo symbol. Arrow keys select a junction, Space or Enter flips it (a junction is locked while a train is on it) and X previews the route of the next train to use the selected junction. Set the points before the train arrives: a train sent to the wrong platform, two trains meeting head-on or on a crossing, or a fast train catching a slow one each cost a strike, and the third strike ends the timetable. Deliver the quota to clear a timetable: Spare shows how many more trains you can still lose, and every strike is explained on screen. A train that circles a loop for more than 2 minutes is written off as late and costs a strike too. Loops, passing loops, timed signals and express trains join in later, and from timetable 13 on the dispatcher calls a flip only 2 to 3 seconds before it is due, so read the board ahead. You can also tap a junction: once to select it, again to flip it.',
+    zh: '在 20 张时刻表里调度铁路编组场。列车按时刻表从入口出发，必须开到标有自己颜色和货物符号的站台。方向键选择道岔，空格或回车扳动道岔（有列车在上面时道岔会锁定），X 键预览下一列经过选中道岔的列车的路线。要在列车到达前扳好道岔：开错站台、两列车迎面相撞或在交叉口相撞、快车追尾慢车，每次都扣一次失误，三次失误则本张时刻表失败。送达指定数量即可过关：屏幕上的“余量”表示还能损失几列车，每次失误都会说明原因。列车在环线上绕行超过 2 分钟会被撤销，同样扣一次失误。后面会出现环线、会让线、定时信号灯和特快列车，从第 13 张时刻表起，调度员只在道岔该扳前 2 到 3 秒才报出，要提前看懂线路。也可以直接点按道岔：点一次选中，再点一次扳动。',
   },
   keys: [
     { label: { en: 'Select a junction', zh: '选择道岔' }, keys: 'Arrows / WASD' },
-    { label: { en: 'Flip the selected junction', zh: '扳动选中的道岔' }, keys: 'Space' },
-    { label: { en: 'Preview the next train route', zh: '预览下一列车路线' }, keys: 'X' },
+    { label: { en: 'Flip the selected junction', zh: '扳动选中的道岔' }, keys: 'Space / Enter' },
+    {
+      label: {
+        en: 'Preview the next train through the selected junction',
+        zh: '预览下一列经过选中道岔的列车路线',
+      },
+      keys: 'X',
+    },
     { label: { en: 'Pause', zh: '暂停' }, keys: 'P' },
   ],
   touchControls: touch([
@@ -238,6 +244,7 @@ export function compileLevel(def, index = 0) {
     platforms,
     trains,
     quota: def.quota ?? Math.max(1, trains.length - 2),
+    horizon: def.horizon ?? RULES.horizon,
     cx: Float64Array.from({ length: COLS * ROWS }, (_, c) => (c % COLS) + 0.5),
     cy: Float64Array.from({ length: COLS * ROWS }, (_, c) => Math.floor(c / COLS) + 0.5),
   };
@@ -518,11 +525,12 @@ const alive = (tr) => tr.st === 'wait' || tr.st === 'run';
 const pending = (w, e) => alive(w.trains[e.tr]) && w.trains[e.tr].pc[e.j] <= e.n;
 
 // The most urgent junction that must be flipped now: the next train to use it needs the other
-// setting and nothing is on it. Later trains never trigger an early flip.
+// setting and nothing is on it. Later trains never trigger an early flip. Teaching levels call a
+// flip up to RULES.horizon seconds ahead; mastery levels set a shorter `horizon` of their own.
 function nextAction(w, plan) {
   const seen = new Set();
   for (const e of plan.events) {
-    if (e.eta - w.t > RULES.horizon) break;
+    if (e.eta - w.t > w.L.horizon) break;
     if (!pending(w, e) || seen.has(e.j)) continue;
     seen.add(e.j);
     if (w.sw[e.j] !== e.need && !locked(w, e.j)) return e;
@@ -584,6 +592,7 @@ export function newState(env = {}, levels = BUILT) {
     menu: null,
     line: null,
     actSeq: 0,
+    carry: [],
   };
   const raw = savedLevel(s.progress);
   const unlocked = Number.isNaN(raw) ? 1 : clamp(raw, 1, levels.length);
@@ -674,18 +683,24 @@ function select(s, to, emit) {
   emit('move');
 }
 
+const MOVE_KEYS = [
+  ['ArrowUp', 'KeyW'],
+  ['ArrowRight', 'KeyD'],
+  ['ArrowDown', 'KeyS'],
+  ['ArrowLeft', 'KeyA'],
+];
+const FLIP_KEYS = ['Space', 'Enter'];
+const PREVIEW_KEYS = ['KeyX'];
+// Keyboard actions in the order act() applies them; the first code of a group names it.
+const ACTION_KEYS = [...MOVE_KEYS, FLIP_KEYS, PREVIEW_KEYS];
+const CARRY_LIMIT = 8;
+
 function act(s, input, emit) {
-  for (let d = 0; d < 4; d++) {
-    const keys = [
-      ['ArrowUp', 'KeyW'],
-      ['ArrowRight', 'KeyD'],
-      ['ArrowDown', 'KeyS'],
-      ['ArrowLeft', 'KeyA'],
-    ][d];
+  MOVE_KEYS.forEach((keys, d) => {
     if (input.pressed(...keys)) select(s, neighbourJunction(s.L.junctions, s.sel, d), emit);
-  }
-  if (input.pressed('Space', 'Enter')) flip(s, emit);
-  if (input.pressed('KeyX')) s.preview = !s.preview;
+  });
+  if (input.pressed(...FLIP_KEYS)) flip(s, emit);
+  if (input.pressed(...PREVIEW_KEYS)) s.preview = !s.preview;
   const p = input.pointer;
   if (p?.clicked) {
     const x = p.x / TILE - 0.5;
@@ -702,6 +717,17 @@ function act(s, input, emit) {
     if (ji === s.sel) flip(s, emit);
     else select(s, ji, emit);
   }
+}
+
+// Presses made during the clear banner are answered at once and replayed on the next timetable.
+function carryPresses(s, input) {
+  for (const keys of ACTION_KEYS)
+    if (input.pressed(...keys) && s.carry.length < CARRY_LIMIT) s.carry.push(keys[0]);
+}
+
+function replayCarry(s) {
+  for (const code of s.carry) act(s, { pressed: (...codes) => codes.includes(code) }, () => {});
+  s.carry = [];
 }
 
 function lose(s, cause) {
@@ -783,10 +809,8 @@ function describe(s) {
       kind: 'watch',
       target: null,
       press: null,
-      en: c
-        ? `Junctions are set - watch the ${c.en} train`
-        : 'Junctions are set - last trains rolling',
-      zh: c ? `道岔已就位，留意${c.zh}列车` : '道岔已就位，最后几列车正在行驶',
+      en: c ? `No call yet - watch the ${c.en} train` : 'No call yet - last trains rolling',
+      zh: c ? `暂无指令，留意${c.zh}列车` : '暂无指令，最后几列车正在行驶',
     };
   }
   const j = s.L.junctions[e.j];
@@ -810,6 +834,15 @@ function describe(s) {
     en: `Press Space: flip ${j.id} to ${arrow} for the ${c.en} train`,
     zh: `按空格，把道岔 ${j.id} 扳向${arrow}（${c.zh}列车）`,
   };
+}
+
+// Whole simulation steps that `dt` adds up to; the remainder waits in s.acc. Every clock in the
+// game counts these steps, so timings do not depend on the frame rate.
+function takeSteps(s, dt) {
+  s.acc += dt;
+  const steps = Math.floor(s.acc / STEP + 1e-6);
+  s.acc = Math.max(0, s.acc - steps * STEP);
+  return steps;
 }
 
 function advise(s, dt) {
@@ -865,22 +898,33 @@ function menuCellAt(px, py) {
 export function advance(s, dt, input, emit = () => {}) {
   if (s.phase !== 'playing' || !Number.isFinite(dt) || dt <= 0) return false;
   dt = Math.min(dt, RULES.maxDt);
+  const keys = {
+    pressed: (...codes) => typeof input?.pressed === 'function' && input.pressed(...codes),
+    pointer: input?.pointer ?? null,
+  };
   if (s.menu) {
-    menuInput(s, input, emit);
+    menuInput(s, keys, emit);
     return true;
   }
   if (s.clear > 0) {
-    s.clear -= dt;
-    if (s.clear <= 0) loadLevel(s, s.level + 1);
+    carryPresses(s, keys);
+    act(s, keys, emit);
+    const span = takeSteps(s, dt) * STEP;
+    s.clear -= span;
+    if (s.clear <= 1e-9) {
+      loadLevel(s, s.level + 1);
+      replayCarry(s);
+    }
     return true;
   }
-  act(s, input, emit);
-  s.acc += dt;
-  const steps = Math.floor(s.acc / STEP + 1e-6);
-  s.acc = Math.max(0, s.acc - steps * STEP);
-  for (let n = 0; n < steps && s.phase === 'playing' && s.clear <= 0; n++) tick(s, emit);
-  s.msg.age += dt;
-  if (s.phase === 'playing') advise(s, dt);
+  act(s, keys, emit);
+  const steps = takeSteps(s, dt);
+  for (let n = 0; n < steps && s.phase === 'playing' && s.clear <= 0; n++) {
+    tick(s, emit);
+    s.msg.age += STEP;
+    if (s.phase === 'playing') advise(s, STEP);
+  }
+  if (steps === 0) advise(s, 0);
   return true;
 }
 
@@ -1098,11 +1142,18 @@ function drawTile(ctx, s, t, tick) {
   } else if (t.kind === 'portal') {
     const open = !s.w.trains.some((tr) => tr.st === 'wait' && tr.held && tr.d.portal === t.cell);
     box(ctx, '#161616', x + 2, y + 2, 12, 12);
-    box(ctx, open ? '#3fb950' : tick % 20 < 10 ? '#f2994a' : '#7a3b13', x + 6, y + 6, 4, 4);
+    // Open portals show a solid square, a portal holding a train shows a pause mark.
+    if (open) box(ctx, '#3fb950', x + 6, y + 6, 4, 4);
+    else {
+      const held = tick % 20 < 10 ? '#f2994a' : '#7a3b13';
+      box(ctx, held, x + 5, y + 4, 2, 8);
+      box(ctx, held, x + 9, y + 4, 2, 8);
+    }
   } else if (s.L.sigAt[t.cell] >= 0) {
     const green = signalGreen(s.L.sigs[s.L.sigAt[t.cell]], s.w.t);
     box(ctx, '#10151d', x + 4, y + 4, 8, 8);
     box(ctx, green ? '#3fb950' : '#e5484d', x + 5, y + 5, 6, 6);
+    if (!green) box(ctx, '#10151d', x + 5, y + 7, 6, 2); // a stop bar marks the red lamp
   }
 }
 
@@ -1397,6 +1448,7 @@ export const LEVELS = [
     ],
     stem: { P: 'W', m: 'E', Y: 'W' },
     init: { P: 1, Y: 1 },
+    quota: 11,
     map: [
       '..............................',
       '..............................',
@@ -1433,8 +1485,8 @@ export const LEVELS = [
   {
     name: ['Comb Yard', '梳形编组场'],
     tip: [
-      'Four platforms along one line. Express trains (striped) arrive much sooner - watch the clock.',
-      '一条线上有四个站台。带条纹的特快列车来得更快，注意时间。',
+      'Four platforms along one line. Express trains (white stripe) arrive much sooner - watch the clock.',
+      '一条线上有四个站台。带白条的特快列车来得更快，注意时间。',
     ],
     stem: { A: 'W', B: 'W', C: 'W' },
     init: { A: 1, B: 1, C: 1 },
@@ -1771,8 +1823,8 @@ export const LEVELS = [
   {
     name: ['Traffic Light', '红绿灯路口'],
     tip: [
-      'Timed lamps share the crossing. Send a train round the bypass to skip the red lamp and the crossing.',
-      '定时信号灯共用一个交叉口。把列车引上旁路，可以避开红灯和交叉口。',
+      'Timed lamps share the crossing: take the bypass to skip the red lamp. From here on, flips are called only 2 to 3 seconds ahead.',
+      '定时信号灯共用交叉口，走旁路可避开红灯。从这一张起，道岔只在该扳前 2 到 3 秒才报出。',
     ],
     stem: { P: 'W', m: 'E', Y: 'W', Z: 'N' },
     init: { P: 1, Y: 1 },
@@ -1781,6 +1833,7 @@ export const LEVELS = [
       [12, 5, 0],
     ],
     quota: 13,
+    horizon: 2,
     map: [
       '..............................',
       '..............................',
@@ -1827,6 +1880,7 @@ export const LEVELS = [
     stem: { A: 'E', B: 'E', C: 'W', D: 'E', E: 'W', G: 'E', H: 'W' },
     init: { A: 1, B: 1, C: 1, G: 1, H: 1 },
     quota: 9,
+    horizon: 3,
     map: [
       '..............................',
       '..............................',
@@ -1869,6 +1923,7 @@ export const LEVELS = [
     stem: { A: 'W', m: 'E', B: 'W', q: 'E', G: 'W', n: 'E', D: 'W', r: 'E' },
     init: { A: 1, B: 1, G: 1 },
     quota: 13,
+    horizon: 3,
     map: [
       '..............................',
       '..............................',
@@ -1914,6 +1969,7 @@ export const LEVELS = [
     stem: { m: 'E', n: 'E', A: 'W', B: 'W', C: 'W' },
     init: { A: 1, C: 1 },
     quota: 14,
+    horizon: 2.5,
     map: [
       '..............................',
       '..............................',
@@ -1961,6 +2017,7 @@ export const LEVELS = [
     init: { C: 1 },
     sig: [[10, 6, 0]],
     quota: 12,
+    horizon: 2.5,
     map: [
       '..............................',
       '..............................',
@@ -2004,6 +2061,7 @@ export const LEVELS = [
     stem: { A: 'E', B: 'W', C: 'E', K: 'E', N: 'E', G: 'W', D: 'E' },
     init: { A: 1, K: 1 },
     quota: 11,
+    horizon: 2.5,
     map: [
       '..............................',
       '..............................',
@@ -2048,6 +2106,7 @@ export const LEVELS = [
     init: { P: 1, Y: 1 },
     sig: [[10, 5, 0]],
     quota: 13,
+    horizon: 2.5,
     map: [
       '..............................',
       '..............................',
@@ -2097,6 +2156,7 @@ export const LEVELS = [
       [9, 5, 6],
     ],
     quota: 15,
+    horizon: 2.5,
     map: [
       '..............................',
       '..............................',

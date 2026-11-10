@@ -949,3 +949,27 @@ test('quality: the end message is explicit and bilingual for both a loss and a w
     assert.equal(won.h.ends[0].won, true);
   }
 });
+
+test('quality: reading only the prompt is not enough late on: a 1 s delay loses mastery timetables that it clears while teaching', () => {
+  const wins = (levels) =>
+    levels.map((level) => {
+      let n = 0;
+      for (let seed = 1; seed <= 10; seed++)
+        if (play({ level, seed, hz: 60, delay: [1, 1] }).cleared) n++;
+      return n;
+    });
+  const mastery = wins([13, 14, 16, 17, 19, 20]);
+  const teaching = wins([1, 2, 3, 4, 7, 11]);
+  assert.ok(
+    teaching.every((n) => n >= 9),
+    `teaching wins ${teaching.join(',')} of 10`,
+  );
+  assert.ok(
+    mastery.some((n) => n <= 5),
+    `mastery wins ${mastery.join(',')} of 10`,
+  );
+  assert.ok(
+    mastery.reduce((a, b) => a + b) < teaching.reduce((a, b) => a + b),
+    'mastery is harder than the teaching timetables for a slow reader',
+  );
+});
