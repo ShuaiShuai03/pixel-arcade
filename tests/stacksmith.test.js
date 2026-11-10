@@ -204,16 +204,24 @@ test('every level has a scripted legal solution through public input, at three f
     }
 });
 
-test('the plan windows are wide: every level still clears when each drop is up to 4 px off the mark', () => {
+function noisyClears(noise) {
   let runs = 0;
   let wins = 0;
   for (let level = 1; level <= LEVELS.length; level++)
     for (let seed = 1; seed <= 4; seed++) {
-      const r = solve(level, { noise: 4, seed: seed * 13 + level });
+      const r = solve(level, { noise, seed: seed * 13 + level });
       runs++;
       if (cleared(r, level)) wins++;
     }
-  assert.ok(wins / runs >= 0.95, `${wins}/${runs} noisy scripted clears`);
+  return { runs, wins };
+}
+
+test('the plan windows are wide: every level still clears when each drop is 2 px off, and nearly every one at 4 px', () => {
+  const near = noisyClears(2);
+  assert.ok(near.wins / near.runs >= 0.98, `${near.wins}/${near.runs} clears at 2 px`);
+  // the outline jobs judge the fit on a finer grid, so they are the ones that notice 4 px
+  const far = noisyClears(4);
+  assert.ok(far.wins / far.runs >= 0.9, `${far.wins}/${far.runs} clears at 4 px`);
 });
 
 test('no level is hopeless at the start and the budget always holds a spare or an exact fit', () => {
@@ -1334,9 +1342,9 @@ test('goals only take loads of their own kind', () => {
 });
 
 test('on windy and rocking jobs the landing prediction appears only while the prompt asks for the drop', () => {
-  const windy = LEVELS.map((L, i) => (L.wind || L.sea ? i + 1 : 0)).filter(Boolean);
+  const windy = LEVELS.map((L, i) => ((L.wind || L.sea) && !L.aim ? i + 1 : 0)).filter(Boolean);
   const calm = LEVELS.map((L, i) => (L.wind || L.sea ? 0 : i + 1)).filter(Boolean);
-  assert.ok(windy.length >= 6 && calm.length >= 10);
+  assert.ok(windy.length >= 4 && calm.length >= 10);
   const run = (level) => {
     const { g } = begin(level, { seed: 4 });
     const seen = { drop: 0, other: 0, otherWith: 0 };
@@ -1459,4 +1467,406 @@ test('every required load has a visible goal picture, and similar loads are told
     labelsAt(21).includes(`${Math.round(S.kindMass('weight') / 100)}t`),
     'steel weight label',
   );
+});
+
+// --- Outline jobs, progress stores, buffered presses, pauses and labels ---
+
+// A canvas that records every text (with its box) and rectangle that is drawn.
+function boxContext() {
+  const texts = [];
+  const rects = [];
+  const ctx = mockContext();
+  return new Proxy(ctx, {
+    get: (t, p) => {
+      if (p === 'fillText')
+        return (str, x, y) => {
+          const size = Number(/(\d+)px/.exec(t.font)[1]);
+          const w = [...String(str)].reduce(
+            (n, ch) => n + (/[一-鿿]/.test(ch) ? size : size * 0.6),
+            0,
+          );
+          const left = t.textAlign === 'center' ? x - w / 2 : t.textAlign === 'right' ? x - w : x;
+          texts.push({ str: String(str), x0: left, x1: left + w, y0: y, y1: y + size, size });
+        };
+      if (p === 'fillRect') return (x, y, w, h) => rects.push({ x, y, w, h, color: t.fillStyle });
+      if (p === 'texts') return texts;
+      if (p === 'rects') return rects;
+      return t[p];
+    },
+    set: (t, p, v) => ((t[p] = v), true),
+  });
+}
+const touching = (a, b) => a.x0 < b.x1 && b.x0 < a.x1 && a.y0 < b.y1 && b.y0 < a.y1;
+const outlineJobs = LEVELS.map((L, i) => (L.aim === 'outline' ? i + 1 : 0)).filter(Boolean);
+
+test('the last seven jobs show outlines only: no mark, no direction, no swap named, and the landing preview stays on', () => {
+  assert.deepEqual(outlineJobs, [16, 17, 18, 19, 20, 21, 22]);
+  for (const level of outlineJobs) {
+    const { g } = begin(level, { seed: 2 });
+    const ids = new Set();
+    let hooked = 0;
+    for (let i = 0; i < 60 * 45; i++) {
+      const st = g.getState();
+      if (st.level !== level || st.phase !== 'playing') break;
+      ids.add(st.prompt.id);
+      assert.doesNotMatch(st.line.en, /^(Move|Press X|Press Space)/, st.line.en);
+      if (st.hook) {
+        hooked++;
+        assert.equal(st.guide.x, null, 'no per-step x');
+        assert.equal(st.guide.outline, true);
+        assert.equal(st.guide.dir, 0);
+        assert.ok(st.guide.landing, `job ${level}: landing preview`);
+      }
+      const keys = i % 360 < 180 ? [KEYS.left] : [KEYS.right];
+      g.update(1 / 60, input(keys, i % 200 === 199 ? ['Space', 'KeyX'] : []));
+    }
+    assert.ok(hooked > 100);
+    for (const id of ids)
+      assert.ok(
+        [
+          'reel',
+          'aim',
+          'steady',
+          'settle',
+          'hold',
+          'failed',
+          'collapsed',
+          'wasted',
+          'cleared',
+        ].includes(id),
+        id,
+      );
+  }
+  // and the teaching jobs keep their exact marker
+  for (const level of [1, 3, 5, 9, 15]) {
+    const { g } = begin(level);
+    seconds(g, 3);
+    const st = g.getState();
+    assert.equal(st.guide.outline, false);
+    assert.ok(Number.isFinite(st.guide.x), `job ${level}`);
+  }
+});
+
+test('an outline job is still judged on the exact fit: the same drop that meets a teaching goal can fall short', () => {
+  const def = LEVELS[outlineJobs[0] - 1];
+  const level = S.compileLevel(def);
+  assert.ok(level.outline);
+  const [goal] = level.goals;
+  const fit = (dx) => {
+    const w = S.buildWorld(level);
+    S.spawnLoad(w, goal.kind, goal.x + goal.w / 2 + dx, goal.y + goal.h / 2 - 1);
+    for (let i = 0; i < 300; i++) S.stepWorld(w, 1 / 120);
+    return S.goalFill(w, level.goals)[0];
+  };
+  assert.ok(fit(0) >= goal.need, 'centred meets the goal');
+  assert.ok(fit(2) >= goal.need, 'a small slip still meets it');
+  assert.ok(fit(14) < goal.need, 'a wide slip does not');
+  assert.ok(goal.w === KINDS[goal.kind].w, "the outline is the load's own footprint");
+});
+
+test('a progress store that throws never stops the game: reads, writes and odd values', () => {
+  const boom = {
+    unlocked: () => {
+      throw new Error('read failed');
+    },
+    unlock: () => {
+      throw new Error('write failed');
+    },
+  };
+  const a = createGame({ ...harness().env, progress: boom });
+  assert.equal(a.getState().menu, null, 'a failed read starts at job 1');
+  assert.equal(a.getState().level, 1);
+  const { g } = (() => {
+    const h = harness();
+    h.env.progress = {
+      unlocked: () => 1,
+      unlock: () => {
+        throw new Error('write failed');
+      },
+    };
+    return { g: createGame(h.env) };
+  })();
+  // clear job 1 through the public input with the unlock write throwing
+  const plan = LEVELS[0].plan;
+  let step = 0;
+  for (let i = 0; i < 60 * 120 && g.getState().level === 1; i++) {
+    const st = g.getState();
+    let held = [];
+    let pressed = [];
+    if (st.hook && step < plan.length) {
+      const d = plan[step][1] - st.hook.x;
+      if (Math.abs(d) > 2.5 && Math.abs(st.hook.vx) < 6) held = [d > 0 ? KEYS.right : KEYS.left];
+      else if (Math.abs(d) <= 3.5 && Math.abs(st.hook.vx) < 4 && st.quiet) {
+        pressed = ['Space'];
+        step++;
+      }
+    }
+    assert.doesNotThrow(() => g.update(1 / 60, input(held, pressed)));
+  }
+  assert.equal(g.getState().stats.cleared, 1, 'the job still counts as cleared');
+  const cases = [
+    [Infinity, 22],
+    [1e9, 22],
+    [-Infinity, 1],
+    [NaN, 1],
+    ['x', 1],
+    [null, 1],
+    [undefined, 1],
+    [7.9, 7],
+  ];
+  for (const [raw, want] of cases) {
+    const h = harness();
+    h.env.progress = { unlocked: () => raw, unlock() {} };
+    const game = createGame(h.env);
+    assert.equal(game.getState().menu?.unlocked ?? 1, want, `unlocked() = ${String(raw)}`);
+  }
+  const none = createGame({ ...harness().env, progress: undefined });
+  assert.equal(none.getState().level, 1);
+});
+
+test('a press made while the next load is being hooked on is kept and used the moment it attaches', () => {
+  const { g } = begin(3);
+  seconds(g, 0.3);
+  assert.equal(g.getState().hook, null);
+  g.update(1 / 60, input([], ['Space']));
+  seconds(g, 0.5);
+  assert.equal(g.getState().stats.drops, 0, 'nothing hangs yet');
+  seconds(g, 0.4);
+  assert.equal(g.getState().stats.drops, 1, 'the press waited for the hook');
+  // the same for X during a swap
+  const level = LEVELS.findIndex((L) => L.swaps === 2) + 1;
+  const x = begin(level).g;
+  seconds(x, 1.6);
+  x.update(1 / 60, input([], ['KeyX']));
+  seconds(x, 0.3);
+  x.update(1 / 60, input([], ['KeyX']));
+  seconds(x, 1.2);
+  assert.equal(x.getState().stats.swaps, 2, 'a second X during the swap is kept');
+  // a key already down when the game starts, or a second tap right after an action, is not a press
+  const held = begin(1).g;
+  held.update(1 / 60, input(['Space'], []));
+  seconds(held, 2.5, ['Space']);
+  assert.equal(held.getState().stats.drops, 0, 'a held key from before the start is ignored');
+  const tap = begin(3).g;
+  seconds(tap, 1.6);
+  tap.update(1 / 60, input([], ['Space']));
+  tap.update(1 / 60, input([], ['Space']));
+  seconds(tap, 2.5);
+  assert.equal(tap.getState().stats.drops, 1, 'a bounce after a drop does not drop the next load');
+});
+
+test('a press in the clear or fail pause carries on at once, but not in the first moment of the pause', () => {
+  for (const mode of ['cleared', 'failed']) {
+    const { g } = begin(2);
+    const play = (until) => {
+      const plan = LEVELS[1].plan;
+      let step = 0;
+      for (let i = 0; i < 60 * 150 && g.getState().mode !== until; i++) {
+        const st = g.getState();
+        let held = [];
+        let pressed = [];
+        if (st.hook && st.level === 2) {
+          if (mode === 'failed') {
+            held = st.hook.x > 60 ? [KEYS.left] : [];
+            pressed = st.hook.x <= 60 ? ['Space'] : [];
+          } else if (step < plan.length) {
+            const d = plan[step][1] - st.hook.x;
+            if (Math.abs(d) > 2.5 && Math.abs(st.hook.vx) < 6)
+              held = [d > 0 ? KEYS.right : KEYS.left];
+            else if (Math.abs(d) <= 3.5 && Math.abs(st.hook.vx) < 4 && st.quiet) {
+              pressed = ['Space'];
+              step++;
+            }
+          }
+        }
+        g.update(1 / 60, input(held, pressed));
+      }
+    };
+    play(mode);
+    assert.equal(g.getState().mode, mode);
+    const level = g.getState().level;
+    g.update(1 / 60, input([], ['Space']));
+    seconds(g, 0.3);
+    assert.equal(g.getState().mode, mode, 'too early to skip');
+    seconds(g, 0.6);
+    g.update(1 / 60, input([], ['Space']));
+    seconds(g, 0.1);
+    assert.equal(g.getState().mode, 'play', `${mode}: Space carries on`);
+    assert.equal(g.getState().level, mode === 'cleared' ? level + 1 : level);
+    // tapping on through the next job's opening second must not drop its first load
+    const dropsBefore = g.getState().stats.drops;
+    for (let i = 0; i < 9; i++) frames(g, 6, [], ['Space']);
+    seconds(g, 1.5);
+    assert.equal(
+      g.getState().stats.drops,
+      dropsBefore,
+      `${mode}: taps after the skip dropped a load`,
+    );
+  }
+});
+
+test('mass labels use 吨 in Chinese and t in English, stay on the canvas and fit their goal', () => {
+  for (const lang of ['en', 'zh'])
+    for (let level = 1; level <= LEVELS.length; level++) {
+      const { g } = begin(level, { lang });
+      for (let i = 0; i < 60 * 12; i++) {
+        g.update(1 / 60, input([i % 400 < 200 ? KEYS.left : KEYS.right], []));
+        if (i % 20) continue;
+        const ctx = boxContext();
+        g.draw(ctx);
+        for (const t of ctx.texts) {
+          assert.ok(t.x0 >= 0 && t.x1 <= 480, `job ${level} ${lang} "${t.str}" ${t.x0}..${t.x1}`);
+          if (lang === 'zh')
+            assert.doesNotMatch(t.str, /^\d+t$/, `Latin unit in Chinese: ${t.str}`);
+        }
+        const labels = ctx.texts.filter(
+          (t) => /^\d+(t|吨)?$/.test(t.str) && t.size >= 7 && t.size <= 9,
+        );
+        for (const a of labels)
+          for (const b of labels)
+            if (a !== b && a.str !== b.str) assert.ok(!touching(a, b), `${a.str} on ${b.str}`);
+      }
+    }
+  const zh = boxContext();
+  const { g } = begin(2, { lang: 'zh' });
+  seconds(g, 1.6);
+  g.draw(zh);
+  assert.ok(
+    zh.texts.some((t) => /^\d+吨$/.test(t.str)),
+    'the hung load says 吨',
+  );
+  const en = boxContext();
+  const e = begin(2).g;
+  seconds(e, 1.6);
+  e.draw(en);
+  assert.ok(en.texts.some((t) => /^\d+t$/.test(t.str)));
+});
+
+test('goal labels never spill their goal: the unit drops first, then the size', () => {
+  for (const lang of ['en', 'zh']) {
+    const level = LEVELS.findIndex((L) => L.goals.some((g) => g[5] === 'weight')) + 1;
+    const { g } = begin(level, { lang });
+    seconds(g, 0.5);
+    const ctx = boxContext();
+    g.draw(ctx);
+    const weights = LEVELS[level - 1].goals.filter((x) => x[5] === 'weight');
+    for (const w of weights) {
+      const cx = w[0] + w[2] / 2;
+      const inside = ctx.texts.filter(
+        (t) => t.y0 < w[1] + w[3] && t.y1 > w[1] && Math.abs((t.x0 + t.x1) / 2 - cx) < 1.5,
+      );
+      assert.ok(inside.length > 0, `${lang}: weight goal label drawn`);
+      for (const t of inside)
+        assert.ok(
+          t.x1 - t.x0 <= w[2] + 0.01,
+          `${lang}: "${t.str}" ${t.x1 - t.x0} px > goal ${w[2]} px`,
+        );
+    }
+  }
+});
+
+test('tries differ by shape as well as colour, and a job message clears the opening title and tip', () => {
+  const rectsAt = (g) => {
+    const ctx = boxContext();
+    g.draw(ctx);
+    return ctx.rects.filter((r) => r.y >= 6 && r.y <= 16 && r.x >= 392 && r.x < 436);
+  };
+  const fresh = begin(3).g;
+  seconds(fresh, 0.5);
+  const full = rectsAt(fresh);
+  // use up a try: drop the first load far from its mark until the job fails
+  const f = begin(3).g;
+  for (let i = 0; i < 60 * 200 && f.getState().tries === 3; i++) {
+    const st = f.getState();
+    f.update(
+      1 / 60,
+      input(
+        st.hook && st.hook.x > 60 ? [KEYS.left] : [],
+        st.hook && st.hook.x <= 60 ? ['Space'] : [],
+      ),
+    );
+  }
+  assert.ok(f.getState().tries < 3);
+  seconds(f, 3.6);
+  while (f.getState().mode !== 'play') seconds(f, 0.5);
+  const spent = rectsAt(f);
+  assert.ok(
+    spent.length > full.length,
+    'a spent try is drawn with more strokes than a solid square',
+  );
+  assert.ok(
+    new Set(spent.map((r) => `${r.w}x${r.h}`)).size >
+      new Set(full.map((r) => `${r.w}x${r.h}`)).size - 1,
+  );
+  // a message that appears during the opening banner is drawn clear of the title and the tip
+  const m = begin(3).g;
+  m.update(1 / 60, input([], ['Space']));
+  let checked = false;
+  for (let i = 0; i < 60 * 4; i++) {
+    m.update(1 / 60, input([], []));
+    const st = m.getState();
+    if (!st.message || st.time >= RULES.introTime) continue;
+    const ctx = boxContext();
+    m.draw(ctx);
+    const msg = ctx.texts.find((t) => t.str === st.message.en);
+    const title = ctx.texts.find((t) => t.str === st.levelName.en);
+    const tip = ctx.texts.find((t) => t.str === st.tip.en);
+    assert.ok(msg && title && tip, 'message, title and tip are all drawn');
+    assert.ok(!touching(msg, title) && !touching(msg, tip), 'no overlap with the opening banner');
+    checked = true;
+    break;
+  }
+  assert.ok(checked, 'a message was shown during the opening banner');
+});
+
+test('every level name fits the menu cell, and every EN tip fits the intro panel', () => {
+  const width = (str, size) =>
+    [...str].reduce((n, ch) => n + (/[一-鿿←→]/.test(ch) ? size : size * 0.6), 0);
+  for (const L of LEVELS) {
+    assert.ok(width(L.name[0], 8) <= 62, `${L.name[0]} in the menu`);
+    assert.ok(width(L.name[1], 8) <= 62, `${L.name[1]} in the menu`);
+    assert.ok(width(L.tip[0], 10) <= 400, `${L.tip[0]} in the intro`);
+    assert.ok(width(L.tip[1], 10) <= 400, `${L.tip[1]} in the intro`);
+  }
+});
+
+test('Lean Tower steps right on every brick', () => {
+  const lean = LEVELS.find((L) => L.name[0] === 'Lean Tower');
+  const xs = lean.plan.map((p) => p[1]);
+  for (let i = 1; i < xs.length; i++) assert.ok(xs[i] > xs[i - 1], `step ${i}: ${xs.join(',')}`);
+});
+
+test('outline jobs list their goals bottom row first, so the list does not give away the build order', () => {
+  for (const level of outlineJobs) {
+    const { g } = begin(level);
+    const goals = g.getState().goals;
+    for (let i = 1; i < goals.length; i++) {
+      const prev = goals[i - 1];
+      const cur = goals[i];
+      assert.ok(
+        prev.y + prev.h >= cur.y + cur.h,
+        `job ${level}: goal ${i} is lower than the one before`,
+      );
+      if (prev.y + prev.h === cur.y + cur.h)
+        assert.ok(prev.x <= cur.x, `job ${level}: left to right`);
+    }
+    assert.equal(goals.length, LEVELS[level - 1].goals.length);
+  }
+  const marked = begin(8).g.getState().goals;
+  assert.deepEqual(
+    marked.map((x) => x.kind),
+    LEVELS[7].goals.map((x) => x[5]),
+    'marked jobs keep the plan order',
+  );
+});
+
+test('an off-plan drop on an outline job does not announce the plan', () => {
+  const { g } = begin(outlineJobs[0]);
+  let seen = null;
+  for (let i = 0; i < 60 * 40 && !seen; i++) {
+    const st = g.getState();
+    if (st.message) seen = st.message.en;
+    g.update(1 / 60, input([KEYS.left], i % 90 === 89 ? ['Space'] : []));
+  }
+  assert.ok(seen === null || !/plan/i.test(seen), String(seen));
 });

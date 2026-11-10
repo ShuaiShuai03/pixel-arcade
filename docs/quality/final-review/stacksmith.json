@@ -1,0 +1,65 @@
+{
+  "game": "stacksmith",
+  "date": "2026-11-10",
+  "reviewedRevision": "4a8dc2b0 (accepted build) plus the fixes in this commit",
+  "owner": "owner-stack and owner-stack2, with one coordinator tuning change",
+  "reviewer": "stack-fair, stack-robust and stack-present (parallel split review)",
+  "rounds": 1,
+  "process": "Lean final review at the user's request, with the review split across three parallel reviewers (fairness, robustness, presentation) as the user asked. The game already had 22 jobs. Seven MEDIUM findings and the cheap LOW items were fixed and checked by a separate verification agent; the coordinator then found that agent's fairness run had used a scratch copy with lighter wind on job 19, re-ran the bot on the repository file, saw job 19 clear only 33% at 0.25 s, set job 19's first wind gust from 12 to 9, and re-ran the bot, the test suite, the gates and the blind probe before the browser check. No second review round.",
+  "verdict": "pass",
+  "approvedSha256": {
+    "src/games/stacksmith.js": "e1f9bd1c70bc684c738edfcb6f871e94eea0b2231629d8956a8df1b1ba590904",
+    "tests/stacksmith.test.js": "f1bc0841e4d274d3912799c406bdac7061ab080494ad4aa3b392e91d5d71adb0",
+    "tests/stacksmith-quality.test.js": "4fba2fb00132e27a4e22d2f03dcbfe1fdb324c3955d43358169bff6af5199fd6"
+  },
+  "tests": {
+    "command": "node --experimental-test-coverage --test-coverage-include='src/games/stacksmith*.js' --test tests/stacksmith.test.js tests/stacksmith-quality.test.js",
+    "passed": 84,
+    "failed": 0,
+    "lineCoverage": 99.67,
+    "log": "stacksmith-coverage.txt"
+  },
+  "independentProbes": "On the final file a reaction-limited bot that aims at the goal outline when no drop marker is shown (public getState only, 6 seeds) cleared every job at least 75% at 0.35 s and 0.25 s; job 19 is the hardest at 83% at 0.35 s, mastery averages 0.07 failures per job at 0.35 s against none in the teaching and combination tiers, and every mastery job now needs placement judged from the outline alone. Blind policies won 0 of 8 runs on every job from 3 to 22 with no stuck runs. Six scripted runs matched across 30, 60 and 120 Hz, a scripted campaign won with exactly one env.end and froze, every broken progress store was safe, a press during the crane reel is now used, and EN and ZH text fits with no untranslated units.",
+  "findings": [
+    {
+      "id": "M1",
+      "severity": "medium",
+      "status": "fixed",
+      "observation": "Fairness finding: the drop marker gave the exact plan position and the prompt named the swap load, so a marker follower cleared every job with no failures and mastery was flat. Jobs 16-22 now show only the goal outline ('Line the load up with its outline, then drop') with no marker or named swap; teaching jobs keep the marker, and the description explains it."
+    },
+    {
+      "id": "M2",
+      "severity": "medium",
+      "status": "fixed",
+      "observation": "Robustness findings: a throwing progress store crashed the game at start or at a clear, and Space or X pressed while the crane reeled in or swapped was discarded. Both store calls are guarded as in Shield Sentinel, and a press stays pending until the hook attaches (an immediate double tap within 0.25 s is treated as key bounce)."
+    },
+    {
+      "id": "M3",
+      "severity": "medium",
+      "status": "fixed",
+      "observation": "Presentation findings: Chinese mass labels showed 't', eight English intro tips overflowed their panel, job messages overlapped the intro title and tip, and tries were colour-only. Chinese labels use 吨, tips fit (widest 390 of 400 px), messages sit under the HUD, and tries are solid or hollow-with-cross squares."
+    },
+    {
+      "id": "L1",
+      "severity": "low",
+      "status": "fixed",
+      "observation": "An Infinity progress value clamps to 22, a press during the clear or fail pause skips ahead with a hint, label and menu-name spills were fixed ('Dock Bridge', 'Master Mason'), the job 9 tip matches its plan, pillar goals on jobs 20 and 22 were eased slightly, and job 19's first wind gust was lowered from 12 to 9 so it clears fairly at 0.25 s as well as 0.35 s."
+    }
+  ],
+  "openNotes": [
+    "A precise outline-aiming bot still clears the calm mastery jobs (17, 18, 21) without failures; the added difficulty is judging placement without a marker.",
+    "Job 19 remains the hardest job, at about 83% for the bot at 0.35 s.",
+    "The source is a single file of about 2,350 lines, over the repository's 800-line soft ceiling."
+  ],
+  "browser": {
+    "method": "Official Claude in Chrome extension, local server; real clicks on Start and the language toggle, synthetic in-page keys; only DOM text and the canvas were read.",
+    "servedSha256Prefixes": "e1f9bd1c",
+    "observed": [
+      "With progress saved from earlier testing, Start opened the job chooser with the shortened names (Dock Bridge, Master Mason) and the description explaining that the last seven jobs show only outlines.",
+      "Job 19 (Storm Bridge) showed the dashed goal outline, the load queue, swaps, solid try squares and the prompt 'Line the load up with its outline, then drop', with no placement marker.",
+      "Chinese 390 px phone frame (388 px inner, no horizontal overflow): the job chooser in Chinese with touch buttons 左移, 右移, 放下 and 换载.",
+      "Not covered in the browser: a drop, a collapse and a job clear; the bots, probes and quality tests cover them."
+    ],
+    "screenshots": ["screenshots/stacksmith-en.png", "screenshots/stacksmith-phone-zh.png"]
+  }
+}

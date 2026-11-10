@@ -1,0 +1,123 @@
+per-job wins, fast: 1:30 2:30 3:30 4:30 5:30 6:30 7:30 8:30 9:30 10:30 11:30 12:30 13:30 14:30 15:30 16:30 17:30 18:30 19:30 20:30 21:30 22:30
+per-job wins, slow: 1:30 2:30 3:30 4:30 5:30 6:30 7:30 8:30 9:30 10:30 11:30 12:30 13:30 14:30 15:30 16:29 17:30 18:30 19:28 20:30 21:30 22:30
+first-try clears: 1@0:21/21 1@0.25:21/21 2@0:21/21 2@0.25:21/21 3@0:21/21 3@0.25:21/21 4@0:21/21 4@0.25:21/21 5@0:21/21 5@0.25:21/21 6@0:21/21 6@0.25:21/21 7@0:21/21 7@0.25:21/21 8@0:21/21 8@0.25:21/21 9@0:21/21 9@0.25:21/21 10@0:21/21 10@0.25:21/21 11@0:21/21 11@0.25:21/21 12@0:21/21 12@0.25:21/21 13@0:21/21 13@0.25:21/21 14@0:21/21 14@0.25:21/21 15@0:21/21 15@0.25:21/21 16@0:21/21 16@0.25:21/21 17@0:21/21 17@0.25:21/21 18@0:21/21 18@0.25:21/21 19@0:21/21 19@0.25:21/21 20@0:21/21 20@0.25:21/21 21@0:21/21 21@0.25:21/21 22@0:21/21 22@0.25:21/21
+lag 0.5 s: 2/264 runs lost a try
+noisy followers: 88/88
+crude policies, wins per job:
+  idle          1:0 2:0 3:0 4:0 5:0 6:0 7:0 8:0 9:0 10:0 11:0 12:0 13:0 14:0 15:0 16:0 17:0 18:0 19:0 20:0 21:0 22:0 (of 1)
+  mash          1:1 2:0 3:0 4:0 5:0 6:0 7:0 8:0 9:0 10:0 11:0 12:0 13:0 14:0 15:0 16:0 17:0 18:0 19:0 20:0 21:0 22:0 (of 1)
+  holdRight     1:0 2:0 3:0 4:0 5:0 6:0 7:0 8:0 9:0 10:0 11:0 12:0 13:0 14:0 15:0 16:0 17:0 18:0 19:0 20:0 21:0 22:0 (of 1)
+  holdLeft      1:0 2:0 3:0 4:0 5:0 6:0 7:0 8:0 9:0 10:0 11:0 12:0 13:0 14:0 15:0 16:0 17:0 18:0 19:0 20:0 21:0 22:0 (of 1)
+  holdRightMash 1:0 2:0 3:0 4:0 5:0 6:0 7:0 8:0 9:0 10:0 11:0 12:0 13:0 14:0 15:0 16:0 17:0 18:0 19:0 20:0 21:0 22:0 (of 1)
+  sweep         1:0 2:0 3:0 4:0 5:0 6:0 7:0 8:0 9:0 10:0 11:0 12:0 13:0 14:0 15:0 16:0 17:0 18:0 19:0 20:0 21:0 22:0 (of 1)
+  randomKeys    1:5 2:0 3:0 4:0 5:0 6:0 7:0 8:0 9:0 10:0 11:0 12:0 13:0 14:0 15:0 16:0 17:0 18:0 19:0 20:0 21:0 22:0 (of 30)
+  randomTap     1:24 2:0 3:0 4:0 5:0 6:0 7:0 8:0 9:0 10:0 11:0 12:0 13:0 14:0 15:0 16:0 17:0 18:0 19:0 20:0 21:0 22:0 (of 30)
+  randomSpot    1:0 2:0 3:0 4:0 5:0 6:0 7:0 8:0 9:0 10:0 11:0 12:0 13:0 14:0 15:0 16:0 17:0 18:0 19:0 20:0 21:0 22:0 (of 20)
+smart heuristics win: centredMass: 1,12 | centredTop: 1,12 | centredQuay: 1,12 | centredHere: 1
+col: 1:100 2:100 3:90 4:0 5:0 6:0 7:0 8:0 9:80 10:100 11:0 12:50 13:100 14:30 15:0 16:0 17:0 18:0 19:0 20:0 21:0 22:0 | >=50%: 7
+fit: 1:100 2:100 3:90 4:0 5:0 6:10 7:0 8:0 9:80 10:100 11:0 12:50 13:100 14:30 15:0 16:0 17:0 18:60 19:0 20:0 21:0 22:0 | >=50%: 8
+near: 1:100 2:100 3:0 4:0 5:0 6:0 7:0 8:0 9:80 10:100 11:0 12:50 13:100 14:0 15:0 16:0 17:0 18:0 19:0 20:0 21:0 22:0 | >=50%: 6
+kind matcher: 1:100 2:100 3:100 4:100 5:100 6:0 7:100 8:0 9:100 10:100 11:0 12:25 13:100 14:0 15:0 16:0 17:25 18:0 19:13 20:0 21:100 22:0 | >=50%: 10
+✔ a prompt-following player (0.15-0.35 s lag) clears every job in at least 27 of 30 runs at 30, 60 and 120 Hz (19780.847417ms)
+✔ a slow prompt-following player (0.4-0.6 s lag) clears every job in at least 24 of 30 runs at 30, 60 and 120 Hz (24011.407875ms)
+✔ a literal follower at lag 0 and at 0.25 s clears every job on the first try in at least 18 of 20 runs (27393.579417ms)
+✔ a follower 0.5 s late still clears every marked job, at least 5 in 6 runs of each outline job, and loses a try in at most 1 run in 12 (9576.812834ms)
+✔ the prompt never leads a literal follower into a failure or a livelock: every clear is timely (636.532166ms)
+✔ input noise: stray arrow taps and early lifts (about one per two seconds) still leave 90% of jobs clearable (2658.133958ms)
+✔ every prompt line is held at least half a second, names an action or a state and fits the canvas (931.636125ms)
+✔ the drop guide always agrees with the prompt: arrow direction, mark position and predicted landing (outline jobs show none) (577.804ms)
+✔ crude policies fail: from job 3 on none clears more than 25% of runs, and idle never wins (89121.408292ms)
+✔ the "centre it over the stack" heuristic wins at most half the jobs and none of the last third (3806.020833ms)
+✔ policies that read only the drawn silhouette (lowest goal first, best-fitting width, nearest goal) clear at most 11 jobs and at most one of the last third (39204.541708ms)
+✔ a kind-matching reader of the silhouette (support-aware, swapping, dumping spares) clears at most half the jobs and at most 4 of the last 8 (11115.10575ms)
+✔ the same key schedule gives the identical outcome at 30, 60 and 120 Hz on every job (2547.92875ms)
+✔ a followed run is also identical at 30, 60 and 120 Hz when the player reacts on the same schedule (279.71725ms)
+✔ jittered frame times (down to half a frame) still give a stable, finite and bounded game (256.751042ms)
+✔ real play never lets a load tunnel through the quay or sink into another: bodies stay above the quay and apart (86.71225ms)
+✔ the game is robust to junk input: random keys and pointers for thousands of frames never throw or corrupt the state (160.74325ms)
+✔ meta is bilingual, lists every control and the touch buttons cover every action (1.423125ms)
+✔ createGame follows the contract: update, draw and getState; one end callback; copies out (0.999125ms)
+✔ the state is JSON-safe and finite throughout a played level (10.655084ms)
+✔ the level table is frozen (0.170625ms)
+✔ there are at least 20 distinct, well-formed levels with a real difficulty curve (0.414625ms)
+✔ every level plan is physically stable: loads dropped at the plan spots come to rest flat and meet the goals (168.211792ms)
+✔ every level has a scripted legal solution through public input, at three frame rates (2640.205958ms)
+✔ the plan windows are wide: every level still clears when each drop is 2 px off, and nearly every one at 4 px (7091.544542ms)
+✔ no level is hopeless at the start and the budget always holds a spare or an exact fit (0.26925ms)
+✔ rectangle and gable bodies get the right mass, centre of mass and inertia (0.123542ms)
+✔ contact detection: separated, touching, overlapping, rotated and speculative pairs (0.247125ms)
+✔ resting stacks stop completely: sleeping bodies keep exactly the same pose and nothing jitters (10.198709ms)
+✔ a block never sinks into or passes through the one below: overlaps stay under 1.5 px (68.383875ms)
+✔ support geometry: a plank on a crate stays while its centre of mass is over the crate and tips over the edge beyond it (19.178208ms)
+✔ support geometry: the combined centre of mass of everything above must lie over the support below (23.109834ms)
+✔ a counterweight behind the pivot lets a heavy tip stand; the same tip without it tips the plank (8.593292ms)
+✔ heavy and light loads: a steel weight on a pier-bridging beam stays, shifted off the piers it falls (5.08775ms)
+✔ a tower of crates, each over the one below, stays; an unbalanced pile falls (23.586ms)
+✔ fast thin planks do not tunnel through the quay or each other (3.81175ms)
+✔ energy never rises: after a load is released the mechanical energy only falls (up to resting-contact noise) (49.552334ms)
+✔ sleep: a settled world stops simulating, and a new load wakes it (1.295708ms)
+✔ goal helpers: samples cover the rectangle, point tests follow rotated bodies (0.192208ms)
+✔ the hook is a damped pendulum: its period follows the rope length and gravity, and the swing decays (6.036166ms)
+✔ releasing a swinging load keeps its momentum: the fall starts with the hook velocity (0.560083ms)
+✔ wind pushes the hook to a new equilibrium and a rocking sea moves the whole boom (11.450083ms)
+✔ arrow keys and A/D move the trolley, opposite keys cancel, and it stops at the rail ends (3.279792ms)
+✔ the trolley creeps near the drop mark so a late stop cannot overshoot it (4.149667ms)
+✔ Space releases once per press, from either a pressed edge or a rising held key, and never repeats while held (2.072417ms)
+✔ X swaps the hooked load for the next one while swaps remain, and only then (0.740417ms)
+✔ zero, negative and non-finite steps do nothing and keep key presses; oversized steps are clamped to the maximum step (0.866167ms)
+✔ with unlocked levels a level select opens: arrows move, locked jobs are skipped, Space/Enter/tap start (0.278625ms)
+✔ without saved progress the game starts at job 1 and a bad progress value is clamped (0.21475ms)
+✔ clearing a job holds the tower for 3 s, banners the result, unlocks the next job and then starts it (6.138625ms)
+✔ the hold timer restarts if the tower is disturbed before 3 seconds pass (7.2975ms)
+✔ spending every load without meeting the goals fails the job, costs a try and restarts it fresh (9.078833ms)
+✔ running out of material before the budget ends fails at once and says so, without claiming a collapse (14.665083ms)
+✔ a real collapse (coverage that was reached and then lost) is reported as a fall (0.313792ms)
+✔ three failed tries end the campaign with a loss, one end callback and a frozen state (67.884292ms)
+✔ finishing the last job wins the campaign: one end callback, a win sound, a frozen state (48.89175ms)
+✔ a restart is a fresh game: identical first state and no leftover bodies or score (0.905042ms)
+✔ a load that falls into the sea or is left beside the lot is cleared away and counted (4.782292ms)
+✔ the prompt names the next action with a direction, and the guide matches it (11.408458ms)
+✔ when the plan is lost the prompt aims at the empty part of the silhouette instead (1.61425ms)
+✔ a plan that expects a different load makes the prompt fall back to the gap, not lock up (0.620083ms)
+✔ every screen draws in both languages: menu, play, banners, hold bar, wind, sea and the end states (540.593833ms)
+✔ tipped and flying loads are drawn rotated in every material, and the queue and swap counters stay non-negative (95.839041ms)
+✔ draw is safe on every kind of load and on the sea, wind and menu helpers (1.045833ms)
+✔ sounds are only the allowed names (6.052167ms)
+✔ state advance and snapshot are usable without a host: newState, advance, snapshotOf (0.110167ms)
+✔ unbuilt goal pictures and the marker ghost are drawn translucent, never as solid blocks (0.647917ms)
+✔ only upright loads fill the silhouette: a tilted or toppled load fills nothing (0.070125ms)
+✔ goals only take loads of their own kind (0.0725ms)
+✔ on windy and rocking jobs the landing prediction appears only while the prompt asks for the drop (213.174917ms)
+✔ order traps are real: the tip before the steel ballast, or a skipped steel weight, ruins the build (64.345792ms)
+✔ every required load has a visible goal picture, and similar loads are told apart by their mass label (0.725583ms)
+✔ the last seven jobs show outlines only: no mark, no direction, no swap named, and the landing preview stays on (364.511416ms)
+✔ an outline job is still judged on the exact fit: the same drop that meets a teaching goal can fall short (1.077833ms)
+✔ a progress store that throws never stops the game: reads, writes and odd values (8.083167ms)
+✔ a press made while the next load is being hooked on is kept and used the moment it attaches (1.921625ms)
+✔ a press in the clear or fail pause carries on at once, but not in the first moment of the pause (25.722417ms)
+✔ mass labels use 吨 in Chinese and t in English, stay on the canvas and fit their goal (254.181917ms)
+✔ goal labels never spill their goal: the unit drops first, then the size (0.605625ms)
+✔ tries differ by shape as well as colour, and a job message clears the opening title and tip (24.047792ms)
+✔ every level name fits the menu cell, and every EN tip fits the intro panel (0.286958ms)
+✔ Lean Tower steps right on every brick (0.052125ms)
+✔ outline jobs list their goals bottom row first, so the list does not give away the build order (0.264792ms)
+✔ an off-plan drop on an outline job does not announce the plan (46.670375ms)
+ℹ tests 84
+ℹ suites 0
+ℹ pass 84
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 232206.096125
+ℹ start of coverage report
+ℹ ----------------------------------------------------------------
+ℹ file            | line % | branch % | funcs % | uncovered lines
+ℹ ----------------------------------------------------------------
+ℹ src             |        |          |         | 
+ℹ  games          |        |          |         | 
+ℹ   stacksmith.js |  99.67 |    97.47 |   99.30 | 
+ℹ ----------------------------------------------------------------
+ℹ all files       |  99.67 |    97.47 |   99.30 | 
+ℹ ----------------------------------------------------------------
+ℹ end of coverage report

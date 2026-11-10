@@ -271,7 +271,8 @@
       "echo-hunter",
       "rail-switch",
       "firefly-trail",
-      "tilt-lab"
+      "tilt-lab",
+      "stacksmith"
     ],
     "records": [
       "final-review/snowball-siege.json",
@@ -315,7 +316,8 @@
       "final-review/echo-hunter.json",
       "final-review/rail-switch.json",
       "final-review/firefly-trail.json",
-      "final-review/tilt-lab.json"
+      "final-review/tilt-lab.json",
+      "final-review/stacksmith.json"
     ]
   }
 }

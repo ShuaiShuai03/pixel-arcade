@@ -9,8 +9,8 @@ export const meta = {
   players: '1',
   touch: true,
   description: {
-    en: 'Run a harbour crane through 22 building jobs. The load hangs from a real pendulum: move the trolley with the arrow keys, let the swing die down, then press Space to drop it. Loads are rigid blocks of different sizes and weights, and a stack only stands when the combined centre of mass of everything above lies over the support below. Overhang too far and the block tips over the edge and falls. Build the dashed silhouette from the loads in the budget, then keep it standing for 3 seconds. The prompt names the next action and a mark on the ground shows where to drop. X swaps the hooked load for the next one when a job allows swaps. Wind and a rocking sea push the load later on. You have 3 tries per job, and finished jobs stay unlocked.',
-    zh: '操纵港口起重机完成 22 项搭建任务。吊载是一个真实的单摆：用方向键移动小车，等摆动平息后按空格放下。吊载是不同大小和重量的刚性方块，只有当上方所有方块的合重心落在下方支撑面之内，塔才站得住；悬出太多，方块会绕边缘翻倒坠落。用预算内的吊载拼出虚线轮廓，并让它稳稳站立 3 秒。提示会说出下一步动作，地面标记会告诉你该在哪里放下。部分任务允许按 X 把挂钩上的吊载换成下一件。后面的任务会有风和摇晃的海面推动吊载。每项任务有 3 次机会，完成的任务会保持解锁。',
+    en: 'Run a harbour crane through 22 building jobs. The load hangs from a real pendulum: move the trolley with the arrow keys, let the swing die down, then press Space to drop it. Loads are rigid blocks of different sizes and weights, and a stack only stands when the combined centre of mass of everything above lies over the support below. Overhang too far and the block tips over the edge and falls. Build the dashed silhouette from the loads in the budget, then keep it standing for 3 seconds. Early jobs name each action and mark the ground where to drop; the last seven only show the outlines, so you judge the placement yourself. X swaps the hooked load for the next one when a job allows swaps. Wind and a rocking sea push the load later on. You have 3 tries per job, and finished jobs stay unlocked.',
+    zh: '操纵港口起重机完成 22 项搭建任务。吊载是一个真实的单摆：用方向键移动小车，等摆动平息后按空格放下。吊载是不同大小和重量的刚性方块，只有当上方所有方块的合重心落在下方支撑面之内，塔才站得住；悬出太多，方块会绕边缘翻倒坠落。用预算内的吊载拼出虚线轮廓，并让它稳稳站立 3 秒。前面的任务会说出下一步动作，并在地面标出放下的位置；最后七项只显示轮廓，要自己判断放在哪里。部分任务允许按 X 把挂钩上的吊载换成下一件。后面的任务会有风和摇晃的海面推动吊载。每项任务有 3 次机会，完成的任务会保持解锁。',
   },
   keys: [
     {
@@ -59,6 +59,9 @@ export const RULES = Object.freeze({
   swapTime: 0.9,
   introTime: 4,
   clearPause: 3,
+  skipAfter: 0.8,
+  skipQuiet: 1,
+  bounce: 0.25,
   failPause: 3.2,
   moveStart: 3.6,
   moveStop: 3,
@@ -68,6 +71,7 @@ export const RULES = Object.freeze({
   readyAhead: Object.freeze([0, 0.2, 0.4, 0.6]),
   goalNeed: 0.55,
   goalCell: 6,
+  outlineCell: 3,
   flatAngle: 0.1,
   planWindow: 12,
   impactSound: 70,
@@ -534,9 +538,9 @@ export function pointInBody(b, px, py) {
 }
 
 // Sample points of a goal rectangle {x, y, w, h} (top-left origin) on a coarse grid.
-export function goalSamples(rect) {
-  const nx = Math.max(1, Math.round(rect.w / R.goalCell));
-  const ny = Math.max(1, Math.round(rect.h / R.goalCell));
+export function goalSamples(rect, cell = R.goalCell) {
+  const nx = Math.max(1, Math.round(rect.w / cell));
+  const ny = Math.max(1, Math.round(rect.h / cell));
   const pts = [];
   for (let j = 0; j < ny; j++)
     for (let i = 0; i < nx; i++)
@@ -561,12 +565,14 @@ export function goalFill(world, goals) {
 // --- Level compilation ---
 
 export function compileLevel(def) {
+  // Outline jobs are judged on a finer grid, so a load that sits off its outline is measurably short.
+  const cell = def.aim === 'outline' ? R.outlineCell : R.goalCell;
   const goals = def.goals.map(([x, y, w, h, need, kind]) => {
     const rect = { x, y, w, h };
     return {
       ...rect,
       kind: kind || null,
-      samples: goalSamples(rect),
+      samples: goalSamples(rect, cell),
       need: need ?? def.need ?? R.goalNeed,
     };
   });
@@ -579,6 +585,7 @@ export function compileLevel(def) {
     plan: def.plan.map(([kind, x]) => ({ kind, x })),
     goals,
     swaps: def.swaps || 0,
+    outline: def.aim === 'outline',
     wind: def.wind || null,
     sea: def.sea || null,
     start: def.start ?? 240,
@@ -744,7 +751,7 @@ export const LEVELS = deepFreeze([
   {
     name: ['The Gate', '石门'],
     tip: [
-      'Two pillars, a beam across them and a roof on top. Swap if the roof arrives early.',
+      'Two pillars, a beam, then a roof. Swap if the roof comes first.',
       '两根石柱，架上横梁，再盖屋顶。屋顶先到时按 X 换件。',
     ],
     lot: [120, 360],
@@ -765,7 +772,7 @@ export const LEVELS = deepFreeze([
     start: 350,
   },
   {
-    name: ['Dockside Bridge', '码头小桥'],
+    name: ['Dock Bridge', '码头小桥'],
     tip: [
       'The piers are fixed. Lay the beam, then load the deck.',
       '桥墩是固定的。先架横梁，再在桥面上装货。',
@@ -792,7 +799,7 @@ export const LEVELS = deepFreeze([
   {
     name: ['Cantilever', '悬臂'],
     tip: [
-      'Heavy steel behind the plank first, then the far end. Swap to put them in order.',
+      'Steel behind the plank, then the far end. Swap to reorder.',
       '先在板后方放钢锭，再放远端。按 X 调整顺序。',
     ],
     lot: [120, 360],
@@ -806,7 +813,7 @@ export const LEVELS = deepFreeze([
     goals: [
       [212, 258, 60, 12, null, 'slab'],
       [220, 250, 72, 8, null, 'plank'],
-      [233, 234, 13, 16, null, 'weight'],
+      [232, 234, 15, 16, null, 'weight'],
       [270, 234, 16, 16, null, 'brick'],
     ],
     swaps: 1,
@@ -863,22 +870,25 @@ export const LEVELS = deepFreeze([
   },
   {
     name: ['Lean Tower', '斜塔'],
-    tip: ['Each brick steps a little to the right.', '每块石砖都向右挪一点。'],
+    tip: [
+      'Each brick sits a little further right than the one below.',
+      '每块石砖都比下面那块再靠右一点。',
+    ],
     lot: [120, 360],
     loads: ['brick', 'brick', 'brick', 'brick', 'brick', 'brick'],
     plan: [
       ['brick', 228],
-      ['brick', 228],
-      ['brick', 232],
       ['brick', 230],
+      ['brick', 232],
       ['brick', 234],
+      ['brick', 236],
     ],
     goals: [
       [220, 254, 16, 16, null, 'brick'],
-      [220, 238, 16, 16, null, 'brick'],
+      [222, 238, 16, 16, null, 'brick'],
       [224, 222, 16, 16, null, 'brick'],
-      [222, 206, 16, 16, null, 'brick'],
-      [226, 190, 16, 16, null, 'brick'],
+      [226, 206, 16, 16, null, 'brick'],
+      [228, 190, 16, 16, null, 'brick'],
     ],
     start: 350,
   },
@@ -907,7 +917,7 @@ export const LEVELS = deepFreeze([
   {
     name: ['Long Arm', '长臂'],
     tip: [
-      'A beam reaches out over the water. Steel behind the arm goes on before the tip.',
+      'Beam over the water: steel behind the arm before the tip.',
       '长梁伸向水面。尖端之前，先在臂后方放钢锭。',
     ],
     lot: [120, 360],
@@ -921,7 +931,7 @@ export const LEVELS = deepFreeze([
     goals: [
       [206, 258, 60, 12, null, 'slab'],
       [206, 248, 104, 10, null, 'beam'],
-      [217, 232, 13, 16, null, 'weight'],
+      [216, 232, 15, 16, null, 'weight'],
       [291, 224, 12, 24, null, 'cube'],
     ],
     swaps: 1,
@@ -930,7 +940,7 @@ export const LEVELS = deepFreeze([
   {
     name: ['Lighthouse', '灯塔'],
     tip: [
-      'Wind and swell sway the load. Release as it swings through the mark.',
+      'Wind and swell sway the load. Release as it crosses the mark.',
       '风和涌浪让吊载摇摆。在它摆过标记时放下。',
     ],
     lot: [120, 360],
@@ -1034,7 +1044,7 @@ export const LEVELS = deepFreeze([
   {
     name: ['Windy Wall', '风中砖墙'],
     tip: [
-      'Bricks, a slab and a roof in a steady wind. Swap if the roof comes first.',
+      'Bricks, slab, roof in steady wind. Swap if the roof is early.',
       '强风中砌砖墙、盖石板和屋顶。屋顶先到时按 X 换件。',
     ],
     lot: [120, 360],
@@ -1051,24 +1061,25 @@ export const LEVELS = deepFreeze([
       ['gable', 240],
     ],
     goals: [
-      [210, 254, 16, 16, null, 'brick'],
-      [254, 254, 16, 16, null, 'brick'],
-      [166, 254, 16, 16, null, 'brick'],
-      [298, 254, 16, 16, null, 'brick'],
-      [188, 238, 16, 16, null, 'brick'],
-      [232, 238, 16, 16, null, 'brick'],
-      [276, 238, 16, 16, null, 'brick'],
-      [210, 226, 60, 12, null, 'slab'],
+      [202, 254, 32, 16, 0.7, 'brick'],
+      [246, 254, 32, 16, 0.7, 'brick'],
+      [158, 254, 32, 16, 0.7, 'brick'],
+      [290, 254, 32, 16, 0.7, 'brick'],
+      [180, 238, 32, 16, 0.7, 'brick'],
+      [224, 238, 32, 16, 0.7, 'brick'],
+      [268, 238, 32, 16, 0.7, 'brick'],
+      [210, 226, 60, 12, 0.78, 'slab'],
       [225, 216, 30, 8, null, 'gable'],
     ],
     swaps: 1,
+    aim: 'outline',
     start: 350,
     wind: [24, 12, 9],
   },
   {
-    name: ['Careful Order', '讲究顺序'],
+    name: ['Right Order', '讲究顺序'],
     tip: [
-      'Two swaps. The slab goes first, and the steel goes on before the tip.',
+      'Two swaps. Slab first; steel goes on before the tip.',
       '允许换两次。石板最先放，钢锭要在尖端之前放。',
     ],
     lot: [120, 360],
@@ -1080,18 +1091,19 @@ export const LEVELS = deepFreeze([
       ['brick', 272],
     ],
     goals: [
-      [198, 258, 60, 12, null, 'slab'],
-      [212, 250, 72, 8, null, 'plank'],
-      [217, 234, 13, 16, null, 'weight'],
-      [263, 234, 16, 16, null, 'brick'],
+      [198, 258, 60, 12, 0.78, 'slab'],
+      [212, 250, 72, 8, 0.78, 'plank'],
+      [210.5, 234, 26, 16, 0.68, 'weight'],
+      [255, 234, 32, 16, 0.7, 'brick'],
     ],
     swaps: 2,
+    aim: 'outline',
     start: 350,
   },
   {
     name: ['Left Reach', '向左伸出'],
     tip: [
-      'Reach out to the left. Put the steel behind the arm first, then the tip.',
+      'Reach left. Steel behind the arm first, then the tip.',
       '向左伸出长臂。先放臂后方的钢锭，再放尖端。',
     ],
     lot: [120, 360],
@@ -1103,45 +1115,43 @@ export const LEVELS = deepFreeze([
       ['cube', 182],
     ],
     goals: [
-      [214, 258, 60, 12, null, 'slab'],
-      [170, 248, 104, 10, null, 'beam'],
-      [250, 232, 13, 16, null, 'weight'],
-      [177, 224, 12, 24, null, 'cube'],
+      [214, 258, 60, 12, 0.78, 'slab'],
+      [170, 248, 104, 10, 0.78, 'beam'],
+      [243.5, 232, 26, 16, 0.68, 'weight'],
+      [171, 224, 24, 24, 0.68, 'cube'],
     ],
     swaps: 1,
+    aim: 'outline',
     start: 130,
   },
   {
     name: ['Storm Bridge', '风暴天桥'],
     tip: [
-      'Two crate towers, a plank across them and a crate on top, in a strong wind.',
+      'Two crate towers, a plank across and a crate on top. Strong wind.',
       '两座木箱塔，架上木板，再放一个木箱，风很大。',
     ],
     lot: [120, 360],
-    loads: ['cube', 'cube', 'cube', 'cube', 'cube', 'plank', 'cube', 'cube', 'cube'],
+    loads: ['cube', 'cube', 'cube', 'plank', 'cube', 'cube', 'cube', 'cube'],
     plan: [
       ['cube', 204],
       ['cube', 204],
-      ['cube', 204],
-      ['cube', 276],
       ['cube', 276],
       ['cube', 276],
       ['plank', 240],
       ['cube', 240],
     ],
     goals: [
-      [198, 246, 12, 24, null, 'cube'],
-      [198, 222, 12, 24, null, 'cube'],
-      [198, 198, 12, 24, null, 'cube'],
-      [270, 246, 12, 24, null, 'cube'],
-      [270, 222, 12, 24, null, 'cube'],
-      [270, 198, 12, 24, null, 'cube'],
-      [204, 190, 72, 8, null, 'plank'],
-      [234, 166, 12, 24, null, 'cube'],
+      [192, 246, 24, 24, 0.5, 'cube'],
+      [192, 222, 24, 24, 0.5, 'cube'],
+      [264, 246, 24, 24, 0.5, 'cube'],
+      [264, 222, 24, 24, 0.5, 'cube'],
+      [204, 214, 72, 8, 0.78, 'plank'],
+      [228, 190, 24, 24, 0.5, 'cube'],
     ],
     swaps: 1,
+    aim: 'outline',
     start: 350,
-    wind: [12, 8, 7],
+    wind: [9, 8, 7],
     sea: [8, 6.5],
   },
   {
@@ -1160,12 +1170,13 @@ export const LEVELS = deepFreeze([
       ['gable', 240],
     ],
     goals: [
-      [208, 258, 60, 12, null, 'slab'],
-      [212, 218, 20, 40, 0.3, 'pillar'],
-      [242, 218, 20, 40, 0.3, 'pillar'],
-      [188, 208, 104, 10, null, 'beam'],
+      [208, 258, 60, 12, 0.78, 'slab'],
+      [214.5, 218, 15, 40, 0.4, 'pillar'],
+      [244.5, 218, 15, 40, 0.4, 'pillar'],
+      [188, 208, 104, 10, 0.78, 'beam'],
       [225, 198, 30, 8, null, 'gable'],
     ],
+    aim: 'outline',
     start: 350,
     sea: [8, 6.5],
   },
@@ -1185,17 +1196,18 @@ export const LEVELS = deepFreeze([
       ['plank', 240],
     ],
     goals: [
-      [210, 258, 60, 12, null, 'slab'],
-      [204, 250, 72, 8, null, 'plank'],
-      [212, 234, 13, 16, null, 'weight'],
-      [255, 234, 13, 16, null, 'weight'],
-      [204, 226, 72, 8, null, 'plank'],
+      [210, 258, 60, 12, 0.78, 'slab'],
+      [204, 250, 72, 8, 0.78, 'plank'],
+      [205.5, 234, 26, 16, 0.68, 'weight'],
+      [248.5, 234, 26, 16, 0.68, 'weight'],
+      [204, 226, 72, 8, 0.78, 'plank'],
     ],
     swaps: 2,
+    aim: 'outline',
     start: 350,
   },
   {
-    name: ['Master Builder', '建造大师'],
+    name: ['Master Mason', '建造大师'],
     tip: [
       'Wind, swell and swaps together. Build the gatehouse.',
       '风、涌浪和换件一起来。建成门楼。',
@@ -1214,13 +1226,14 @@ export const LEVELS = deepFreeze([
       ['gable', 240],
     ],
     goals: [
-      [188, 220, 104, 10, null, 'beam'],
-      [204, 180, 20, 40, 0.3, 'pillar'],
-      [256, 180, 20, 40, 0.3, 'pillar'],
-      [210, 168, 60, 12, null, 'slab'],
+      [188, 220, 104, 10, 0.78, 'beam'],
+      [206.5, 180, 15, 40, 0.4, 'pillar'],
+      [258.5, 180, 15, 40, 0.4, 'pillar'],
+      [210, 168, 60, 12, 0.78, 'slab'],
       [225, 158, 30, 8, null, 'gable'],
     ],
     swaps: 2,
+    aim: 'outline',
     start: 350,
     wind: [10, 8, 8],
     sea: [8, 6.5],
@@ -1236,6 +1249,7 @@ const WORDS = {
   settle: ['Wait for the tower to settle', '等待塔身稳定'],
   hold: ['Tower built: keep clear for 3 seconds', '塔已建成：保持 3 秒不要动'],
   steady: ['Let the swing die down, then drop', '等摆动平息，再放下'],
+  aim: ['Line the load up with its outline, then drop', '把吊载对准它的轮廓，再放下'],
   drop: ['Press Space to release the load', '按空格放下吊载'],
   cleared: ['Job done. The next job is coming up', '任务完成，下一项任务即将开始'],
   failed: ['Out of loads. Try again', '吊载用完了，再试一次'],
@@ -1274,8 +1288,11 @@ function loadLevel(s, index, keepTries = false) {
   s.dirty = false;
   s.sleepT = 0;
   s.marker = null;
+  s.creepAt = null;
   s.pendingRelease = false;
   s.pendingSwap = false;
+  s.actedAt = -1e9;
+  s.quietUntil = -1e9;
   s.line = null;
   s.msg = null;
   s.intro = R.introTime;
@@ -1285,6 +1302,25 @@ function loadLevel(s, index, keepTries = false) {
   s.lost = 0;
   s.menu = null;
   think(s, true);
+}
+
+// Saved progress is a convenience: a broken store must never stop the game.
+function readUnlocked(progress) {
+  try {
+    const raw = Number(progress?.unlocked?.());
+    if (raw === Infinity) return LEVEL_COUNT;
+    return Number.isFinite(raw) ? clamp(Math.floor(raw), 1, LEVEL_COUNT) : 1;
+  } catch {
+    return 1;
+  }
+}
+
+function saveUnlocked(progress, level) {
+  try {
+    progress?.unlock?.(level);
+  } catch {
+    // The level is still cleared in this session even when the store refuses the write.
+  }
 }
 
 export function newState(env = {}) {
@@ -1297,12 +1333,11 @@ export function newState(env = {}) {
     progress: env.progress || null,
     best: Array(LEVEL_COUNT).fill(0),
     stats: { drops: 0, tips: 0, lost: 0, swaps: 0, cleared: 0, failed: 0 },
-    prevSpace: false,
-    prevSwap: false,
+    prevSpace: null,
+    prevSwap: null,
     menu: null,
   };
-  const raw = Number(s.progress?.unlocked?.());
-  const unlocked = Number.isFinite(raw) ? clamp(Math.floor(raw), 1, LEVEL_COUNT) : 1;
+  const unlocked = readUnlocked(s.progress);
   loadLevel(s, 0);
   if (unlocked > 1) {
     s.menu = { sel: unlocked, unlocked };
@@ -1366,8 +1401,11 @@ function forecastHook(s, delays) {
 function craneTick(s, dir) {
   const c = s.crane;
   let target = dir * R.trolleySpeed;
-  if (dir !== 0 && s.marker !== null) {
-    const cap = Math.max(R.creepSpeed, R.creepGain * Math.abs(restX(s) - s.marker));
+  // The trolley eases in near its target. On outline jobs the target is the nearest empty outline of the
+  // hooked load's kind (all of them are drawn), and only an approach is eased, never a departure.
+  const aimAt = s.marker ?? s.creepAt;
+  if (dir !== 0 && aimAt !== null && (s.marker !== null || dir * (aimAt - restX(s)) > 0)) {
+    const cap = Math.max(R.creepSpeed, R.creepGain * Math.abs(restX(s) - aimAt));
     target = dir * Math.min(R.trolleySpeed, cap);
   }
   const braking = Math.abs(target) < Math.abs(c.v) || target * c.v < 0;
@@ -1400,6 +1438,8 @@ function releaseLoad(s, emit) {
   s.next = s.queue.shift() || null;
   s.reel = R.reelTime;
   s.dirty = true;
+  s.actedAt = s.time;
+  think(s, true);
   emit('move');
 }
 
@@ -1411,6 +1451,8 @@ function swapLoad(s, emit) {
   s.swapsLeft--;
   s.stats.swaps++;
   s.reel = R.swapTime;
+  s.actedAt = s.time;
+  think(s, true);
   emit('move');
 }
 
@@ -1434,6 +1476,17 @@ function currentTarget(s) {
   return { x: clamp(gap ?? (lot[0] + lot[1]) / 2, R.trolleyMin, R.trolleyMax), swap: false };
 }
 
+// Outline jobs name no target: the prompt only says when the load is calm enough, never where to put it.
+function outlineAdvice(s) {
+  if (!asleep(s)) return { id: 'settle', words: WORDS.settle, marker: null };
+  const calm = s.clock - s.movedAt >= R.holdStill;
+  const speedOk = Math.abs(hookOf(s).vx) <= R.readySpeed + seaSpeed(s.def);
+  const steering = Math.abs(s.crane.v) > 0.3;
+  return steering || (calm && speedOk)
+    ? { id: 'aim', words: WORDS.aim, marker: null }
+    : { id: 'steady', words: WORDS.steady, marker: null };
+}
+
 function adviceOf(s) {
   if (s.phase === 'won' || s.phase === 'lost')
     return { id: s.phase, words: WORDS[s.phase], marker: null };
@@ -1448,10 +1501,11 @@ function adviceOf(s) {
     if (allMet(s) && asleep(s)) return { id: 'hold', words: WORDS.hold, marker: null };
     return { id: 'settle', words: WORDS.settle, marker: null };
   }
-  if (allMet(s) && (s.offPlan || s.step >= s.def.plan.length))
+  if (allMet(s) && (s.def.outline || s.offPlan || s.step >= s.def.plan.length))
     return asleep(s)
       ? { id: 'hold', words: WORDS.hold, marker: null }
       : { id: 'settle', words: WORDS.settle, marker: null };
+  if (s.def.outline) return outlineAdvice(s);
   const goal = currentTarget(s);
   if (goal.swap) {
     const k = KINDS[goal.kind].name;
@@ -1492,7 +1546,8 @@ function adviceOf(s) {
 
 // On windy or rocking jobs the landing prediction would do the timing for the player, so it only shows
 // while the prompt is asking for the drop itself.
-export const landingShown = (s) => !(s.def.wind || s.def.sea) || s.line?.id === 'drop';
+export const landingShown = (s) =>
+  !(s.def.wind || s.def.sea) || s.def.outline || s.line?.id === 'drop';
 
 function think(s, reset = false) {
   // A player who reads the prompt late keeps the trolley moving for a moment after a move line ends.
@@ -1505,6 +1560,18 @@ function think(s, reset = false) {
     cur.age += R.think * STEP;
   }
   s.marker = a.marker ?? null;
+  s.creepAt = s.def.outline && s.hook ? nearestOutline(s) : null;
+}
+
+function nearestOutline(s) {
+  const here = restX(s);
+  let best = null;
+  s.def.goals.forEach((g, i) => {
+    if (g.kind !== s.hook.kind || s.fills[i] >= g.need) return;
+    const x = g.x + g.w / 2;
+    if (best === null || Math.abs(x - here) < Math.abs(best - here)) best = x;
+  });
+  return best;
 }
 
 // --- Simulation tick ---
@@ -1558,7 +1625,8 @@ function checkDrop(s) {
   const b = v.body;
   if (Math.abs(b.x - plan.x) > R.planWindow || Math.abs(b.a) > 0.12) {
     s.stats.tips++;
-    if (!s.offPlan) say(s, 'Off plan: that load shifted', '偏离计划：这件吊载移位了');
+    if (!s.offPlan && !s.def.outline)
+      say(s, 'Off plan: that load shifted', '偏离计划：这件吊载移位了');
     s.offPlan = true;
   }
 }
@@ -1568,7 +1636,7 @@ function finishLevel(s, emit) {
   const gained = R.scoreLevel + spare * R.scoreSpare + (s.tries === R.tries ? R.scoreClean : 0);
   s.best[s.level] = Math.max(s.best[s.level], gained);
   s.score = s.best.reduce((a, v) => a + v, 0);
-  s.progress?.unlock?.(Math.min(LEVEL_COUNT, s.level + 2));
+  saveUnlocked(s.progress, Math.min(LEVEL_COUNT, s.level + 2));
   s.stats.cleared++;
   if (s.level === LEVEL_COUNT - 1) {
     s.phase = 'won';
@@ -1614,9 +1682,17 @@ function tick(s, dir, emit) {
   s.splashes = s.splashes.filter((p) => (p.t += STEP) < 1);
   if (s.mode !== 'play') {
     s.modeT -= STEP;
+    // A fresh Space or X press after the first moment of the pause carries on at once.
+    const length = s.mode === 'cleared' ? R.clearPause : R.failPause;
+    const skipped = (s.pendingRelease || s.pendingSwap) && length - s.modeT >= R.skipAfter;
+    if (skipped) s.modeT = 0;
+    s.pendingRelease = false;
+    s.pendingSwap = false;
     if (s.modeT <= 0) {
       if (s.mode === 'cleared') loadLevel(s, s.level + 1);
       else loadLevel(s, s.level, true);
+      // Taps that carried the banner on must not also drop the first load of the next job.
+      if (skipped) s.quietUntil = s.time + R.skipQuiet;
     }
     if (s.ticks % R.think === 0) think(s);
     return;
@@ -1630,10 +1706,16 @@ function tick(s, dir, emit) {
   craneTick(s, dir);
   const railTarget = boomHeight(s.world);
   s.rail += clamp(railTarget - s.rail, -R.boomSpeed * STEP, R.boomSpeed * STEP);
-  if (s.pendingRelease && s.hook) releaseLoad(s, emit);
-  else if (s.pendingSwap && s.hook && s.swapsLeft > 0 && s.queue.length) swapLoad(s, emit);
-  s.pendingRelease = false;
-  s.pendingSwap = false;
+  // A press made while the next load is still being hooked on waits for the hook instead of vanishing.
+  if (s.hook) {
+    if (s.pendingRelease) releaseLoad(s, emit);
+    else if (s.pendingSwap && s.swapsLeft > 0 && s.queue.length) swapLoad(s, emit);
+    s.pendingRelease = false;
+    s.pendingSwap = false;
+  } else if (s.reel <= 0 && !s.next) {
+    s.pendingRelease = false;
+    s.pendingSwap = false;
+  }
   const wasAwake = !asleep(s);
   const impact = stepWorld(s.world, STEP);
   if (impact > R.impactSound && s.time - s.lastImpact > 0.15) {
@@ -1700,15 +1782,23 @@ const MENU = { x0: 36, y0: 78, cw: 68, ch: 40 };
 export function advance(s, dt, input, emit = () => {}) {
   if (s.phase !== 'playing' || !Number.isFinite(dt) || dt <= 0) return false;
   dt = Math.min(dt, R.maxDt);
+  const space = input.held('Space');
+  const swap = input.held('KeyX');
   if (s.menu) {
     menuInput(s, input, emit);
+    // The key that opened a job must not count as a drop on the job's first frame.
+    s.prevSpace = space;
+    s.prevSwap = swap;
     think(s);
     return true;
   }
-  const space = input.held('Space');
-  const swap = input.held('KeyX');
-  if (input.pressed('Space') || (space && !s.prevSpace)) s.pendingRelease = true;
-  if (input.pressed('KeyX') || (swap && !s.prevSwap)) s.pendingSwap = true;
+  // A second tap right after an action is key bounce, not a request for the next load.
+  const bouncing = s.time - s.actedAt < R.bounce || s.time < s.quietUntil;
+  // A key already down when the game was created (the key that started it) is not a press.
+  const spaceEdge = input.pressed('Space') || (space && s.prevSpace === false);
+  const swapEdge = input.pressed('KeyX') || (swap && s.prevSwap === false);
+  if (!bouncing && spaceEdge) s.pendingRelease = true;
+  if (!bouncing && swapEdge) s.pendingSwap = true;
   s.prevSpace = space;
   s.prevSwap = swap;
   const dir =
@@ -1736,6 +1826,22 @@ const bodyView = (b) => ({
   awake: b.awake,
   verts: polyOf(b),
 });
+
+// The goals as the player sees them. On outline jobs they are listed bottom row first, left to right,
+// so the list does not give away the order the loads are meant to go in.
+function goalViews(s) {
+  const views = s.def.goals.map((g, i) => ({
+    x: g.x,
+    y: g.y,
+    w: g.w,
+    h: g.h,
+    need: g.need,
+    kind: g.kind,
+    fill: s.fills[i],
+    met: s.fills[i] >= g.need,
+  }));
+  return s.def.outline ? views.sort((a, b) => b.y + b.h - (a.y + a.h) || a.x - b.x) : views;
+}
 
 export function snapshotOf(s) {
   const finished = s.phase !== 'playing';
@@ -1774,16 +1880,7 @@ export function snapshotOf(s) {
     },
     bodies: loads.map(bodyView),
     statics: s.world.bodies.filter((b) => b.fixed).map(bodyView),
-    goals: def.goals.map((g, i) => ({
-      x: g.x,
-      y: g.y,
-      w: g.w,
-      h: g.h,
-      need: g.need,
-      kind: g.kind,
-      fill: s.fills[i],
-      met: s.fills[i] >= g.need,
-    })),
+    goals: goalViews(s),
     hold: { time: s.holdT, need: R.holdTime },
     quiet: asleep(s),
     energy: worldEnergy(s.world, R.quayTop),
@@ -1798,6 +1895,7 @@ export function snapshotOf(s) {
         : {
             x: s.marker,
             dir: line.dir,
+            outline: def.outline,
             landing: land && landingShown(s) ? { x: land.x, y: land.y } : null,
           },
     message: s.msg ? { en: s.msg.en, zh: s.msg.zh } : null,
@@ -2030,7 +2128,40 @@ function dashedRect(ctx, x, y, w, h, color) {
   }
 }
 
-function drawGoals(ctx, s) {
+const WIDE_CHAR = /[　-鿿＀-￯]/;
+const textWidth = (str, size) =>
+  [...str].reduce((w, ch) => w + (WIDE_CHAR.test(ch) ? size : size * 0.6), 0);
+const massTonnes = (kind) => Math.round(kindMass(kind) / 100);
+
+// A mass label that fits `room` pixels: the unit goes first when it does not fit, then the size.
+function massLabel(kind, zh, room, size = 8) {
+  const n = String(massTonnes(kind));
+  const tries = [
+    [`${n}${zh ? '吨' : 't'}`, size],
+    [`${n}${zh ? '吨' : 't'}`, size - 1],
+    [n, size],
+  ];
+  const fit = tries.find(([str, sz]) => textWidth(str, sz) <= room) || [n, size - 1];
+  return { str: fit[0], size: fit[1], w: textWidth(fit[0], fit[1]) };
+}
+
+// Mass labels stay inside the canvas, and labels never sit on top of each other.
+const LABEL_EDGE = 3;
+const labelBox = (label, cx, y) => {
+  const x = clamp(cx, LABEL_EDGE + label.w / 2, W - LABEL_EDGE - label.w / 2);
+  return { x0: x - label.w / 2 - 1, x1: x + label.w / 2 + 1, y0: y, y1: y + label.size + 1, x };
+};
+const boxesTouch = (a, b) => a.x0 < b.x1 && b.x0 < a.x1 && a.y0 < b.y1 && b.y0 < a.y1;
+
+function hookLabel(s, zh) {
+  if (!s.hook || s.mode !== 'play') return null;
+  const h = hookOf(s);
+  const label = massLabel(s.hook.kind, zh, 40, 9);
+  return { label, ...labelBox(label, h.x, h.y - 14) };
+}
+
+function drawGoals(ctx, s, zh) {
+  const hung = hookLabel(s, zh);
   s.def.goals.forEach((g, i) => {
     const met = s.fills[i] >= g.need;
     if (met) {
@@ -2045,11 +2176,15 @@ function drawGoals(ctx, s) {
         const k = KINDS[g.kind];
         const cy = g.kind === 'gable' ? g.y + g.h + 2 - k.h / 2 : g.y + g.h / 2;
         drawLoad(ctx, g.kind, g.x + g.w / 2, cy, 0, 0.22);
-        // The mass tells similar-looking loads apart (a stone block is 11t, a steel weight 21t).
-        ctx.globalAlpha = 0.9;
-        const label = `${Math.round(kindMass(g.kind) / 100)}t`;
-        text(ctx, label, g.x + g.w / 2 + 1, cy - 3, PAL.panel, 8, 'center');
-        text(ctx, label, g.x + g.w / 2, cy - 4, MATS[k.mat].light, 8, 'center');
+        // The mass tells similar-looking loads apart (a stone block is 11 t, a steel weight 21 t). It is
+        // left out while a banner covers the scene or the hung load's own label passes over it.
+        const label = massLabel(g.kind, zh, g.w);
+        const spot = labelBox(label, g.x + g.w / 2, cy - 4);
+        if (s.mode === 'play' && !(hung && boxesTouch(spot, hung))) {
+          ctx.globalAlpha = 0.9;
+          text(ctx, label.str, spot.x + 1, cy - 3, PAL.panel, label.size, 'center');
+          text(ctx, label.str, spot.x, cy - 4, MATS[k.mat].light, label.size, 'center');
+        }
       }
       ctx.globalAlpha = 1;
     }
@@ -2086,7 +2221,7 @@ function drawGuide(ctx, s, t) {
   }
 }
 
-function drawCrane(ctx, s) {
+function drawCrane(ctx, s, zh) {
   const sea = seaOffset(s.def, s.clock);
   const y = Math.round(s.rail);
   for (const x of [6, W - 14]) {
@@ -2117,12 +2252,31 @@ function drawCrane(ctx, s) {
     ctx.lineTo(h.x + k.w / 2 - 2, top + 1);
     ctx.stroke();
     drawLoad(ctx, s.hook.kind, h.x, top + k.h / 2, 0);
-    text(ctx, `${Math.round(kindMass(s.hook.kind) / 100)}t`, h.x, h.y - 14, PAL.ink, 9, 'center');
+    const tag = hookLabel(s, zh);
+    if (tag) text(ctx, tag.label.str, tag.x, h.y - 14, PAL.ink, tag.label.size, 'center');
   } else if (s.reel > 0) {
     const f = clamp(1 - s.reel / R.reelTime, 0, 1);
     ctx.globalAlpha = 0.5 * f;
     box(ctx, h.x - 6, h.y + 6, 12, 6, PAL.dim);
     ctx.globalAlpha = 1;
+  }
+}
+
+// A try left is a solid square; a try used up is a hollow square with a cross, so colour is not needed.
+function drawTry(ctx, x, left) {
+  if (left) {
+    box(ctx, x, 6, 10, 10, PAL.bad);
+    box(ctx, x, 6, 10, 2, '#ff9d92');
+    return;
+  }
+  const dim = '#8a5560';
+  box(ctx, x, 6, 10, 1, dim);
+  box(ctx, x, 15, 10, 1, dim);
+  box(ctx, x, 6, 1, 10, dim);
+  box(ctx, x + 9, 6, 1, 10, dim);
+  for (let k = 2; k < 8; k++) {
+    box(ctx, x + k, 6 + k, 1, 1, dim);
+    box(ctx, x + 9 - k, 6 + k, 1, 1, dim);
   }
 }
 
@@ -2134,8 +2288,7 @@ function drawHud(ctx, s, env) {
   const left = Math.max(0, s.queue.length + (s.hook ? 1 : 0) + (s.next ? 1 : 0));
   const swaps = s.def.swaps ? `  ${env.t('Swaps', '换件')} ${Math.max(0, s.swapsLeft)}` : '';
   text(ctx, `${env.t('Loads', '吊载')} ${left}${swaps}`, 380, 5, PAL.gold, 11, 'right');
-  for (let i = 0; i < R.tries; i++)
-    box(ctx, 392 + i * 14, 6, 10, 10, i < s.tries ? PAL.bad : '#3a2a30');
+  for (let i = 0; i < R.tries; i++) drawTry(ctx, 392 + i * 14, i < s.tries);
   const met = s.fills.filter((f, i) => f >= s.def.goals[i].need).length;
   text(
     ctx,
@@ -2195,10 +2348,14 @@ function drawBanner(ctx, s, env) {
       ? `${env.t('Score', '得分')} ${s.score}`
       : `${env.t('Tries left', '剩余机会')} ${Math.max(0, s.tries)}`;
     text(ctx, sub, 240, 148, PAL.ink, 12, 'center');
+    text(ctx, env.t('Press Space to continue', '按空格继续'), 240, 164, PAL.dim, 10, 'center');
   }
   if (s.msg && s.mode === 'play') {
-    box(ctx, 80, 46, 320, 16, 'rgba(10,18,32,0.78)');
-    text(ctx, s.msg[env.lang === 'zh' ? 'zh' : 'en'], 240, 49, PAL.gold, 10, 'center');
+    // Messages sit under the HUD, clear of the job title and tip that open each job.
+    const line = s.msg[env.lang === 'zh' ? 'zh' : 'en'];
+    const half = Math.ceil(textWidth(line, 10) / 2) + 8;
+    box(ctx, 240 - half, 26, half * 2, 14, 'rgba(10,18,32,0.78)');
+    text(ctx, line, 240, 28, PAL.gold, 10, 'center');
   }
 }
 
@@ -2258,14 +2415,14 @@ function drawGame(ctx, s, env) {
   drawSky(ctx, s.time);
   drawSea(ctx, s.time, seaOffset(s.def, s.clock));
   drawQuay(ctx);
-  drawGoals(ctx, s);
+  drawGoals(ctx, s, env.lang === 'zh');
   for (const b of s.world.bodies) {
     if (b.fixed) {
       if (b.tag === 'pier') drawPier(ctx, b);
     } else drawLoad(ctx, b.tag, b.x, b.y, b.a);
   }
   drawGuide(ctx, s, s.time);
-  drawCrane(ctx, s);
+  drawCrane(ctx, s, env.lang === 'zh');
   for (const p of s.splashes) {
     const r = 3 + p.t * 18;
     ctx.globalAlpha = 1 - p.t;

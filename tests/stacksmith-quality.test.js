@@ -27,8 +27,38 @@ function keysFor(line) {
   return [];
 }
 
-// A literal player. It reads only the prompt line the host shows (getState().line) `delay`
-// seconds late, with jitter, and presses exactly what the line says. It sees nothing else.
+const isOutline = (level) => LEVELS[level - 1].aim === 'outline';
+
+// What a player who has matched the loads to their outlines does on an outline job. The prompt names no
+// direction there, so this player steers toward the planned spot from what they see (the hook, the
+// trolley and the preview), eases off near it, and drops once the prompt says the load is calm.
+function outlineKeys(level, seen, lag = 0) {
+  if (!seen.hook) return [];
+  const [kind, x] =
+    LEVELS[level - 1].plan[Math.min(seen.plan.step, LEVELS[level - 1].plan.length - 1)];
+  if (seen.hook.kind !== kind && seen.swapsLeft > 0 && seen.queue[0] === kind) return ['KeyX'];
+  // where the hook hangs when the trolley stands still (the wind leans it), and what the preview says
+  const rest = seen.crane.x + RULES.rope * Math.sin(Math.atan(seen.wind / RULES.gravity));
+  const e = x - rest;
+  const settled = Math.abs(e) <= 2 && Math.abs(seen.crane.v) < 1;
+  if (settled) {
+    // the player knows how late they are and leads the moving preview by that much
+    const lands = (seen.guide.landing ? seen.guide.landing.x : seen.hook.x) + seen.hook.vx * lag;
+    return seen.prompt.id === 'aim' && Math.abs(lands - x) <= 3 ? ['Space'] : [];
+  }
+  const toward = Math.sign(seen.crane.v) === Math.sign(e);
+  const cap = Math.max(RULES.creepSpeed, RULES.creepGain * Math.abs(e));
+  // a key lifted now still carries the trolley on for the player's own lag plus the braking distance
+  const reach =
+    Math.abs(seen.crane.v) * lag + (seen.crane.v * seen.crane.v) / (2 * RULES.trolleyBrake);
+  const braking = toward && reach >= Math.abs(e);
+  if (Math.abs(e) > 1.5 && !braking && (!toward || Math.abs(seen.crane.v) < cap))
+    return [e > 0 ? 'ArrowRight' : 'ArrowLeft'];
+  return [];
+}
+
+// A literal player. It reads only what the host shows `delay` seconds late, with jitter that never runs
+// backwards: the prompt line, and on outline jobs also the hook and the trolley. It presses what it reads.
 function humanRun(
   level,
   hz,
@@ -42,17 +72,23 @@ function humanRun(
   let tries = RULES.tries;
   let t = 0;
   let extra = null;
+  let latest = 0;
   for (; t < seconds; t += 1 / hz) {
     const st = g.getState();
     if (st.phase !== 'playing' || st.level !== level) break;
     tries = st.tries;
-    history.push({ t, line: st.line.en });
+    history.push({ t, line: st.line.en, st });
     if (history.length > 500) history.shift();
-    const seenAt = t - Math.max(0, base + (rnd() - 0.5) * jitter);
+    latest = Math.max(latest, t - Math.max(0, base + (rnd() - 0.5) * jitter));
     let k = history.length - 1;
-    while (k > 0 && history[k].t > seenAt) k--;
+    while (k > 0 && history[k].t > latest) k--;
     // the player starts reading the screen at a random moment, so every phase of the swing and sea is met
-    let held = t < idle ? [] : keysFor(history[k].line);
+    let held =
+      t < idle
+        ? []
+        : isOutline(level)
+          ? outlineKeys(level, history[k].st, base)
+          : keysFor(history[k].line);
     if (wobble) {
       // finger noise: a stray tap of the wrong arrow now and then, and a hand that lifts early
       if (extra && t < extra.until) held = [...held, extra.key];
@@ -120,17 +156,24 @@ test('a literal follower at lag 0 and at 0.25 s clears every job on the first tr
   console.log(`first-try clears: ${report.join(' ')}`);
 });
 
-test('a follower 0.5 s late still clears every job and loses a try in at most 1 run in 12', () => {
+test('a follower 0.5 s late still clears every marked job, at least 5 in 6 runs of each outline job, and loses a try in at most 1 run in 12', () => {
   let lost = 0;
   let runs = 0;
-  for (let level = 1; level <= COUNT; level++)
+  for (let level = 1; level <= COUNT; level++) {
+    let wins = 0;
+    let n = 0;
     for (const hz of HZS)
       for (let seed = 1; seed <= 4; seed++) {
         const r = humanRun(level, hz, { delay: [0.5, 0.5], jitter: 0, seed: seed + level * 17 });
         runs++;
-        assert.ok(r.cleared, `job ${level} @${hz} Hz seed ${seed}`);
+        n++;
+        if (r.cleared) wins++;
+        else if (!isOutline(level)) assert.fail(`job ${level} @${hz} Hz seed ${seed}`);
         if (r.tries < RULES.tries) lost++;
       }
+    // outline jobs have no marker to hold the trolley still for the player, so a slow hand may miss a swell
+    assert.ok(wins / n >= (isOutline(level) ? 5 / 6 : 1), `job ${level}: ${wins}/${n}`);
+  }
   console.log(`lag 0.5 s: ${lost}/${runs} runs lost a try`);
   assert.ok(lost / runs <= 1 / 12, `${lost}/${runs} runs lost a try at lag 0.5 s`);
 });
@@ -157,7 +200,7 @@ test('input noise: stray arrow taps and early lifts (about one per two seconds) 
   assert.ok(wins / runs >= 0.9, `${wins}/${runs}`);
 });
 
-test('every prompt line is held at least half a second, names a direction or an action and fits the canvas', () => {
+test('every prompt line is held at least half a second, names an action or a state and fits the canvas', () => {
   let changes = 0;
   let minHold = Infinity;
   for (const lang of ['en', 'zh'])
@@ -167,6 +210,7 @@ test('every prompt line is held at least half a second, names a direction or an 
         let last = null;
         let changedAt = 0;
         let tries = RULES.tries;
+        let acts = 0;
         for (let t = 0; t < 150; t += 1 / hz) {
           const st = g.getState();
           if (st.level !== level || st.phase !== 'playing') break;
@@ -183,8 +227,14 @@ test('every prompt line is held at least half a second, names a direction or an 
             !/\d/.test(line.replace('Press X', '').replace('3 seconds', '')),
             `no changing digits: ${line}`,
           );
-          if (st.tries !== tries || st.mode !== 'play') {
+          // a release or swap makes the old instruction obsolete, so it is replaced at once
+          if (
+            st.tries !== tries ||
+            st.mode !== 'play' ||
+            st.stats.drops + st.stats.swaps !== acts
+          ) {
             tries = st.tries;
+            acts = st.stats.drops + st.stats.swaps;
             last = null;
           }
           if (line !== last) {
@@ -199,14 +249,14 @@ test('every prompt line is held at least half a second, names a direction or an 
             last = line;
             changedAt = t;
           }
-          g.update(1 / hz, input(keysFor(line), []));
+          g.update(1 / hz, input(isOutline(level) ? outlineKeys(level, st) : keysFor(line), []));
         }
       }
   assert.ok(changes > 100, `only ${changes} prompt changes observed`);
   assert.ok(minHold >= 0.5 - 1e-6);
 });
 
-test('the drop guide always agrees with the prompt: arrow direction, mark position and predicted landing', () => {
+test('the drop guide always agrees with the prompt: arrow direction, mark position and predicted landing (outline jobs show none)', () => {
   let checked = 0;
   for (let level = 1; level <= COUNT; level++) {
     const { g } = begin(level, 3);
@@ -215,7 +265,13 @@ test('the drop guide always agrees with the prompt: arrow direction, mark positi
       const st = g.getState();
       if (st.level !== level || st.phase !== 'playing') break;
       // right after a release the old line is held for its minimum time while the hook is empty
-      if (st.hook && /^(Move|Press Space|Let the swing)/.test(st.line.en)) {
+      if (st.hook && isOutline(level)) {
+        // outline jobs name no spot: no x, no arrow, but the preview is always on
+        assert.equal(st.guide.x, null, `job ${level}: ${st.line.en}`);
+        assert.equal(st.guide.dir, 0);
+        assert.ok(st.guide.landing && Number.isFinite(st.guide.landing.x), `job ${level} landing`);
+        checked++;
+      } else if (st.hook && /^(Move|Press Space|Let the swing)/.test(st.line.en)) {
         assert.ok(
           st.guide && Number.isFinite(st.guide.x),
           `job ${level}: ${st.line.en} without a guide`,
@@ -239,7 +295,7 @@ test('the drop guide always agrees with the prompt: arrow direction, mark positi
       if (m) assert.equal(st.guide.dir, m[1] === '→' ? 1 : -1);
       if (st.hook && /^Press Space/.test(st.line.en))
         assert.ok(Math.abs(st.guide.landing.x - st.guide.x) < 10);
-      g.update(1 / 60, input(keysFor(st.line.en), []));
+      g.update(1 / 60, input(isOutline(level) ? outlineKeys(level, st) : keysFor(st.line.en), []));
     }
   }
   assert.ok(checked > 3000);
@@ -430,7 +486,7 @@ function silhouettePolicy(variant, g, r) {
   };
 }
 
-test('policies that read only the drawn silhouette (lowest goal first, best-fitting width, nearest goal) clear at most 11 jobs and none of the last third', () => {
+test('policies that read only the drawn silhouette (lowest goal first, best-fitting width, nearest goal) clear at most 11 jobs and at most one of the last third', () => {
   const lastThird = COUNT - Math.floor(COUNT / 3);
   for (const variant of ['col', 'fit', 'near']) {
     const row = [];
@@ -456,9 +512,10 @@ test('policies that read only the drawn silhouette (lowest goal first, best-fitt
     }
     console.log(`${variant}: ${row.join(' ')} | >=50%: ${strong.length}`);
     assert.ok(strong.length <= 11, `${variant} clears ${strong.length} jobs: ${strong}`);
+    // the outlines are now the load's own footprint, so a width-matching reader may get one late job
     assert.ok(
-      strong.every((l) => l < lastThird),
-      `${variant} clears a late job: ${strong}`,
+      strong.filter((l) => l >= lastThird).length <= 1,
+      `${variant} clears late jobs: ${strong}`,
     );
   }
 });
