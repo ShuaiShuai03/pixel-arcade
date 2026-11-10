@@ -19,7 +19,7 @@ Effort: S = level data only, M = data plus some mechanics or tests, L = structur
 | shield-sentinel  |             20 | `LEVELS`         |   S    | done (final review) |
 | dash-duelist     |             20 | `LEVELS`         |   S    | done (final review) |
 | tether-twins     |              3 | `ROOMS`          |   S    | queued              |
-| vine-warden      |              3 | `PLOTS`          |   S    | queued              |
+| vine-warden      |             20 | `LEVELS`         |   S    | done (final review) |
 | river-hop        |             20 | `LEVELS`         |   S    | done (final review) |
 | snowball-siege   |             30 | `FLOORS`         |   M    | done (batch 16)     |
 | starbreaker      |             20 | `LEVELS`         |   M    | done (final review) |

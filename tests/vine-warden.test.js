@@ -2,12 +2,12 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
   INVADERS,
-  PLOTS,
+  LEVELS,
   PROMPTS,
   RULES,
   advance,
   createGame,
-  loadPlot,
+  loadLevel,
   meta,
   newState,
   render,
@@ -46,18 +46,18 @@ function addPest(s, kind, c, r) {
   s.invaders.push(pest);
   return pest;
 }
-// A quiet plot: no pest is ever scheduled, so a test places exactly the pests it studies.
+// A quiet level: no pest is ever scheduled, so a test places exactly the pests it studies.
 function quiet(index = 0) {
   const s = newState();
-  loadPlot(s, index);
-  s.plotTicks = -1e9;
+  loadLevel(s, index + 1);
+  s.levelTicks = -1e9;
   return s;
 }
-// A plot whose last pest has already been dealt with.
+// A level whose last pest has already been dealt with.
 function finished(index = 0) {
   const s = quiet(index);
-  s.plotTicks = 0;
-  s.spawned = PLOTS[index].spawns.length;
+  s.levelTicks = 0;
+  s.spawned = LEVELS[index].spawns.length;
   return s;
 }
 const face = (s, dx, dy) => Object.assign(s.player.facing, { dx, dy });
@@ -76,13 +76,13 @@ test('meta follows the contract and every control has a touch button', () => {
   assert.ok(meta.keys.length >= 3);
 });
 
-test('maps are 20x11, reachable, and give every plot soil beside the pest path', () => {
-  PLOTS.forEach((plot, index) => {
+test('maps are 20x11, reachable, and give every level soil beside the pest path', () => {
+  LEVELS.forEach((level, index) => {
     const s = quiet(index);
-    assert.equal(plot.map.length, 11);
-    assert.ok(plot.map.every((row) => row.length === 20));
-    assert.ok(s.usefulSoil.length >= 8, `plot ${index + 1} soil`);
-    assert.ok(s.gates.length >= 1 && plot.spawns.every((e) => s.gates[e[1]]));
+    assert.equal(level.map.length, 11);
+    assert.ok(level.map.every((row) => row.length === 20));
+    assert.ok(s.usefulSoil.length >= 8, `level ${index + 1} soil`);
+    assert.ok(s.gates.length >= 1 && level.spawns.every((e) => s.gates[e[1]]));
     for (const g of s.gates) {
       const seen = new Set([`${g.c},${g.r}`]);
       const queue = [g];
@@ -95,14 +95,14 @@ test('maps are 20x11, reachable, and give every plot soil beside the pest path',
         ]) {
           const c = queue[i].c + dx;
           const r = queue[i].r + dy;
-          if (!'.Gh'.includes(plot.map[r]?.[c] ?? '#') || seen.has(`${c},${r}`)) continue;
+          if (!'.Gh'.includes(level.map[r]?.[c] ?? '#') || seen.has(`${c},${r}`)) continue;
           seen.add(`${c},${r}`);
           queue.push({ c, r });
         }
       }
       assert.ok(seen.has(`${s.heart.c},${s.heart.r}`), 'gate reaches the bloom');
     }
-    assert.ok(!'#h'.includes(plot.map[plot.start.r][plot.start.c]));
+    assert.ok(!'#h'.includes(level.map[level.start.r][level.start.c]));
   });
 });
 
@@ -110,7 +110,7 @@ test('invalid dt is inert and does not consume the buffered action', () => {
   const s = newState();
   face(s, 0, -1);
   const before = JSON.stringify(s);
-  for (const dt of [0, -1, NaN, Infinity, 0.5]) {
+  for (const dt of [0, -1, NaN, Infinity, -Infinity, '0.01', null, undefined]) {
     assert.equal(advance(s, dt, input(['ArrowUp'], ['Space', 'KeyX'])), false);
   }
   assert.equal(JSON.stringify(s), before);
@@ -358,14 +358,14 @@ test('seed supply is sustainable: a plant always returns at least the seed it co
   assert.equal(t.seeds, 2);
 });
 
-test('seeds plus plants never decrease over seeded random play in every plot', () => {
-  for (let index = 0; index < PLOTS.length; index++) {
+test('seeds plus plants never decrease over seeded random play in every level', () => {
+  for (let index = 0; index < LEVELS.length; index++) {
     const s = newState();
-    loadPlot(s, index);
+    loadLevel(s, index + 1);
     const rnd = seeded(40 + index);
     let floor = s.seeds;
     const all = ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'];
-    for (let n = 0; n < 4000 && s.phase === 'playing' && s.plot === index; n++) {
+    for (let n = 0; n < 400 && s.phase === 'playing' && s.level === index + 1; n++) {
       const held = rnd() < 0.7 ? [all[Math.floor(rnd() * 4)]] : [];
       const pressed = rnd() < 0.2 ? [rnd() < 0.5 ? 'Space' : 'KeyX'] : [];
       for (let k = 0; k < 20; k++) advance(s, TICK * 6, input(held, k ? [] : pressed));
@@ -378,7 +378,7 @@ test('seeds plus plants never decrease over seeded random play in every plot', (
 
 test('wary weevils route around live roots while beetles walk straight in', () => {
   const lanes = (kind, withRoots, oddId = false) => {
-    const s = quiet(1);
+    const s = quiet(4);
     s.nextId = oddId ? 21 : 20;
     if (withRoots) addPlant(s, 8, 7);
     const pest = addPest(s, kind, 4, 5);
@@ -393,7 +393,7 @@ test('wary weevils route around live roots while beetles walk straight in', () =
   assert.equal(lanes('beetle', false, true), 6, 'beetles always break ties downwards');
   // A lane with several blooms is not worse than one bloom: both are rooted, so weevils alternate.
   const heavy = (oddId) => {
-    const s = quiet(1);
+    const s = quiet(4);
     s.nextId = oddId ? 31 : 30;
     [8, 9, 10].forEach((c) => addPlant(s, c, 3));
     addPlant(s, 8, 7);
@@ -422,7 +422,7 @@ test('pests never overlap, wait for a claimed tile and hold the gate until it is
   const gate = t.gates[0];
   const blocker = addPest(t, 'beetle', gate.c, gate.r);
   blocker.plan = { c: gate.c, r: gate.r };
-  t.plotTicks = secs(PLOTS[0].spawns[0][0]) + 5;
+  t.levelTicks = secs(LEVELS[0].spawns[0][0]) + 5;
   advance(t, TICK, input([]));
   assert.equal(t.spawned, 0, 'no spawn onto an occupied gate');
 });
@@ -436,7 +436,7 @@ test('pests head to the bloom by the shortest path, never turning back', () => {
     if (!seen.length || seen.at(-1) !== `${pest.c},${pest.r}`) seen.push(`${pest.c},${pest.r}`);
   }
   assert.equal(new Set(seen).size, seen.length);
-  assert.equal(s.health, PLOTS[0].health - 1);
+  assert.equal(s.health, LEVELS[0].health - 1);
   assert.equal(s.invaders.length, 0);
 });
 
@@ -451,7 +451,7 @@ test('routing falls back safely at dead ends and unreachable tiles', () => {
   assert.equal(lost.left, 0, 'a pest off the path simply waits');
 });
 
-test('a pest at the bloom costs one health, flashes the bloom and ends the plot at zero', () => {
+test('a pest at the bloom costs one health, flashes the bloom and ends the level at zero', () => {
   const h = harness();
   const g = createGame(h.env);
   const s = quiet();
@@ -484,21 +484,21 @@ test('loss: callback fires once, the world freezes, and a new instance starts fr
   assert.equal(g.getState().prompt.key, 'lost');
   const fresh = createGame(harness().env).getState();
   assert.equal(fresh.phase, 'playing');
-  assert.equal(fresh.plot, 1);
-  assert.equal(fresh.seeds, PLOTS[0].seeds);
+  assert.equal(fresh.level, 1);
+  assert.equal(fresh.seeds, LEVELS[0].seeds);
   assert.equal(fresh.score, 0);
 });
 
-test('clearing a plot pays out, shows a visible countdown and starts the next garden fresh', () => {
+test('clearing a level pays out, shows a visible countdown and starts the next garden fresh', () => {
   const s = finished();
   addPlant(s, 6, 2);
   s.seeds = 0;
   run(s, 2);
   assert.ok(s.clear >= RULES.clearTicks - 2);
-  assert.equal(s.score, RULES.plotScore + RULES.healthScore * 5);
+  assert.equal(s.score, RULES.levelScore + RULES.healthScore * 5);
   run(s, 6);
   assert.equal(s.shownKey, 'saved');
-  assert.match(s.message.en, /Plot 1 saved/);
+  assert.match(s.message.en, /Level 1 cleared/);
   run(s, secs(1));
   assert.equal(
     s.plants[0].age > GROWN - 1,
@@ -506,20 +506,20 @@ test('clearing a plot pays out, shows a visible countdown and starts the next ga
     'plants keep growing while the garden is celebrated',
   );
   run(s, secs(2.1));
-  assert.equal(s.plot, 1);
-  assert.equal(s.seeds, PLOTS[1].seeds);
+  assert.equal(s.level, 2);
+  assert.equal(s.seeds, LEVELS[1].seeds);
   assert.equal(s.plants.length, 0);
-  assert.equal(s.health, PLOTS[1].health);
+  assert.equal(s.health, LEVELS[1].health);
   assert.equal(s.invaders.length, 0);
-  assert.equal(s.shownKey, 'intro2');
+  assert.equal(s.shownKey, 'tip');
 });
 
-test('win: finishing the third plot is terminal and the score counts remaining health', () => {
-  const done = finished(2);
+test('win: finishing the last level is terminal and the score counts remaining health', () => {
+  const done = finished(19);
   done.health = 3;
   run(done, 2);
   assert.equal(done.phase, 'won');
-  assert.equal(done.score, RULES.plotScore + 3 * RULES.healthScore);
+  assert.equal(done.score, RULES.levelScore + 3 * RULES.healthScore);
   const frozen = JSON.stringify(done);
   assert.equal(advance(done, TICK, input(['ArrowUp'], ['Space'])), false);
   assert.equal(JSON.stringify(done), frozen);
@@ -530,15 +530,16 @@ test('status strings are bilingual, include the event message, and track resourc
   const first = g.getState();
   assert.equal(typeof first.status.en, 'string');
   assert.equal(typeof first.status.zh, 'string');
-  assert.match(first.status.en, /^Plot 1\/3 · Seeds 3 · Health 5 · Plot 1: Seedling Row · /);
-  assert.match(first.status.zh, /^花圃 1\/3 · 种子 3 · 生命 5 · /);
+  assert.match(first.status.en, /^Level 1\/20 · Seeds 3 · Health 5 · Level 1: Seedling Row · /);
+  assert.match(first.status.zh, /^第 1\/20 关 · 种子 3 · 生命 5 · /);
   assert.match(first.status.zh, /育苗畦/);
   assert.deepEqual(first.hud, { top: [0, 28], bottom: [292, 320] });
   g.update(1 / 60, input(['ArrowUp'], ['Space']));
   const later = g.getState();
   assert.ok(later.status.en.length > 20);
-  assert.equal(later.prompt.key, 'intro1');
-  assert.match(PROMPTS[later.prompt.key][0], /Space/);
+  assert.equal(later.prompt.key, 'tip');
+  assert.equal(later.prompt.en, LEVELS[0].tip.en);
+  assert.match(PROMPTS.plant[0], /Space/);
 });
 
 test('prompts follow the situation and always name a key', () => {
@@ -549,7 +550,7 @@ test('prompts follow the situation and always name a key', () => {
     run(s, 6);
     return s.shownKey;
   };
-  s.plotTicks = secs(7);
+  s.levelTicks = secs(7);
   assert.equal(key(), 'plant');
   s.seeds = 0;
   addPlant(s, 8, 2, 0);
@@ -570,12 +571,12 @@ test('prompts follow the situation and always name a key', () => {
   assert.equal(key(), 'harvestFull');
   const g = createGame(harness().env);
   const state = g.getState();
-  assert.equal(state.prompt.en, PROMPTS.intro1[0]);
+  assert.equal(state.prompt.en, LEVELS[0].tip.en);
   const wait = { ...PROMPTS.wait };
   assert.ok(PROMPTS.wait[0].includes('{n}') && wait);
 });
 
-test('the prompt never changes more than once per 0.6 s outside plot changes', () => {
+test('the prompt never changes more than once per 0.6 s outside level changes', () => {
   const s = newState();
   const rnd = seeded(8);
   let last = s.shownKey;
@@ -584,7 +585,7 @@ test('the prompt never changes more than once per 0.6 s outside plot changes', (
     const held = rnd() < 0.5 ? ['ArrowDown'] : ['ArrowUp'];
     advance(s, TICK, input(held, n % 97 === 0 ? ['Space'] : n % 131 === 0 ? ['KeyX'] : []));
     if (s.shownKey !== last) {
-      if (!s.shownKey.startsWith('intro') && s.shownKey !== 'saved' && !last.startsWith('intro')) {
+      if (s.shownKey !== 'tip' && s.shownKey !== 'saved' && last !== 'tip') {
         assert.ok(
           n - since >= RULES.promptHoldTicks - 6,
           `${last} -> ${s.shownKey} after ${n - since}`,
@@ -621,7 +622,7 @@ test('seeded random play stays finite and every array stays bounded', () => {
 test('drawing covers every stage, pest, state and language without throwing', () => {
   for (const lang of ['en', 'zh']) {
     const env = harness({ lang }).env;
-    for (let index = 0; index < PLOTS.length; index++) {
+    for (let index = 0; index < LEVELS.length; index++) {
       const s = quiet(index);
       [0, 1, 2, 3].forEach((stage, n) => {
         const spot = s.usefulSoil[n];
@@ -677,7 +678,7 @@ test('hud draws the countdown to the next pest and the last-pest label', () => {
   const s = newState();
   render(ctx, s, harness().env);
   assert.ok(lines.some((l) => /Next 8s/.test(l)));
-  s.spawned = PLOTS[0].spawns.length;
+  s.spawned = LEVELS[0].spawns.length;
   lines.length = 0;
   render(ctx, s, harness().env);
   assert.ok(lines.some((l) => /Last one/.test(l)));
@@ -685,7 +686,7 @@ test('hud draws the countdown to the next pest and the last-pest label', () => {
 
 test('wait countdown counts only plants that are still growing', () => {
   const s = quiet();
-  s.plotTicks = secs(7);
+  s.levelTicks = secs(7);
   s.seeds = 0;
   const ripe = addPlant(s, 6, 2);
   ripe.grip = 9;
@@ -723,8 +724,8 @@ test('copy tells players that weevils dodge live roots', () => {
 });
 
 test('a bare lane is announced, drawn ahead of the pest, and ends once a root covers it', () => {
-  const s = quiet(1);
-  s.plotTicks = secs(7);
+  const s = quiet(4);
+  s.levelTicks = secs(7);
   const pest = addPest(s, 'beetle', 4, 5);
   pest.prev = { c: 3, r: 5 };
   const key = () => {
@@ -747,7 +748,7 @@ test('a bare lane is announced, drawn ahead of the pest, and ends once a root co
 
 test('an unused full bloom is flagged idle after 15 s and offered for harvest when seeds run out', () => {
   const s = quiet();
-  s.plotTicks = secs(7);
+  s.levelTicks = secs(7);
   s.seeds = 0;
   const bloom = addPlant(s, 6, 2);
   bloom.bloomTicks = secs(14);

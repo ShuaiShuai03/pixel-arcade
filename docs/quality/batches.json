@@ -259,7 +259,8 @@
       "shield-sentinel",
       "raft-rush",
       "burrow-rescue",
-      "dash-duelist"
+      "dash-duelist",
+      "vine-warden"
     ],
     "records": [
       "final-review/snowball-siege.json",
@@ -291,7 +292,8 @@
       "final-review/shield-sentinel.json",
       "final-review/raft-rush.json",
       "final-review/burrow-rescue.json",
-      "final-review/dash-duelist.json"
+      "final-review/dash-duelist.json",
+      "final-review/vine-warden.json"
     ]
   }
 }

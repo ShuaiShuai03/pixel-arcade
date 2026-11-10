@@ -1,0 +1,68 @@
+{
+  "game": "vine-warden",
+  "date": "2026-11-10",
+  "reviewedRevision": "c1aa1d4 plus the rework in this commit",
+  "owner": "owner-vine",
+  "reviewer": "final-vine",
+  "rounds": 1,
+  "process": "Lean final review at the user's request: the known 3-plot shortfall went straight to a retrofit, followed by one independent review round. Its MEDIUM random-key finding and three cheap LOW items were fixed and verified by re-running the reviewer's own blind, pilot, correctness and text-fit scripts, one clean-worktree run and the browser check, without a second review round.",
+  "verdict": "pass",
+  "approvedSha256": {
+    "src/games/vine-warden.js": "6fa70bc91b499833ccf4b27cd6a09595157908e5cdb0b5479626bf4502e322db",
+    "src/games/vine-warden-art.js": "cc11aa5e4f93016b962c96fb40d04be667393c13063b7227c10b0061fd0ca049",
+    "src/games/vine-warden-core.js": "961a46ff1eb92aed860b7534f575fe539cfd9c6341fb33dbd544c863bc850b07",
+    "src/games/vine-warden-draw.js": "924e11ceaca0c61a713406a47a249d4232d57bb210062e7fbfa069d49f9b5dae",
+    "src/games/vine-warden-levels.js": "33ace9a2d32aef9c320f4b67be07520ec8db3f73585741b7d04473afe135a2ef",
+    "src/games/vine-warden-menu.js": "c3109fda9c4853998796980bea478a868c9240184ebc89109a0d7c023fd9e627",
+    "src/games/vine-warden-prompts.js": "d99c16a81a4d8d65a6fcab85f89487784898a1f3fd94102f660612315f811c65",
+    "src/games/vine-warden-route.js": "22fa0e56a9c6a8dd1be065db42c7efd0de1ca74556a3b895096476045a68b858",
+    "src/games/vine-warden-world.js": "731ce93ea5b4c36cfb4d23331109ae0b6f14ce84efd8936991edcd81a2d8d11e",
+    "tests/vine-warden.test.js": "497bc7e685ca48b473463d424743195343173a361e116eee98879ba0e218ad4e",
+    "tests/vine-warden-quality.test.js": "8036f70eb4dd1cfef3d21be012e87a250b07c045a1eebb588633f4b84a3f1064"
+  },
+  "tests": {
+    "command": "node --experimental-test-coverage --test-coverage-include='src/games/vine-warden*.js' --test tests/vine-warden.test.js tests/vine-warden-quality.test.js",
+    "passed": 61,
+    "failed": 0,
+    "lineCoverage": 99.95,
+    "log": "vine-warden-coverage.txt"
+  },
+  "independentProbes": "On the final files six random-key patterns over 200 runs per level won at most 14.5% of any level from 3 to 20 (dense random keys on level 7), and the other 33 deterministic patterns (idle, mash, hold-and-alternate at 0.1-2 s, spins and planting squares) won nothing. The reviewer's reaction-limited bot (pests seen late, public getState only) cleared 100 of 100 runs at 0.35 s and 60 of 60 at 0.25 s, ending mastery levels with 4-5 health, and a lazy variant that never pre-plants cleared 60 of 60 with 1-4 health on mastery. Mastery is busier rather than deadlier: 6-56% idle time and about 90-120 presses per level against 60-75% idle on the teaching levels. Final states matched at 30, 60 and 120 Hz, 20,000 hostile updates threw nothing, each run ended exactly once and froze, broken progress stores were safe, no soft-lock was found, and no EN or ZH text overflows.",
+  "findings": [
+    {
+      "id": "R1",
+      "severity": "blocking",
+      "status": "fixed",
+      "observation": "Only 3 plots, with no select or continue. There are now 20 data-driven greenhouse levels (teaching 1-7, combination 8-14, mastery 15-20) with beetles, hoppers, weevils, several lanes and gates, accurate EN/ZH tips, a level select and env.progress continue, and the 1,157-line file is split into nine modules."
+    },
+    {
+      "id": "M1",
+      "severity": "medium",
+      "status": "fixed",
+      "observation": "Review finding: random key presses cleared level 7 (Two Gates) 36% of the time, and a denser random pattern 53%, with levels 4, 6, 11 and 13 also above 20%. Levels 3-20 now send 20-34 pests at 2.4-5.5 s gaps, levels 6, 7, 11, 13 and 14 start with 4 health, and the multi-lane levels 9, 14, 17, 19 and 20 were rebalanced for reaction-limited play."
+    },
+    {
+      "id": "L1",
+      "severity": "low",
+      "status": "fixed",
+      "observation": "Review findings: the Chinese HUD showed '下一只 8s', a cleared level 20 never showed CLEARED on the select screen, and Space or X pressed in the same frame as a turn acted on the old facing. The HUD now reads 秒, winning level 20 marks it cleared, and a turn is applied before the action."
+    }
+  ],
+  "openNotes": [
+    "Levels now take about 80-120 s, and the teaching levels are mostly waiting.",
+    "Random key play still wins roughly one run in seven on levels 6, 7 and 11, under the 25% cap.",
+    "On the 4-health levels a reaction-limited player keeps a margin of about 2 health."
+  ],
+  "browser": {
+    "method": "Official Claude in Chrome extension, local server; real clicks on Start and the language toggle, synthetic in-page keys; only DOM text and the canvas were read.",
+    "servedSha256Prefixes": "6fa70bc9 cc11aa5e 961a46ff 924e11ce 33ace9a2 c3109fda d99c16a8 22fa0e56 731ce93e",
+    "observed": [
+      "English: Start opened level 1 of 20 (Seedling Row) with seeds, health, pest count and the next-pest timer, the banner over the top wall row and the tip 'Space plants a seed by the path. It blooms in 6s.' in the bottom band.",
+      "Pressing Space off soil showed 'Seeds only grow on brown soil'; turning up and pressing Space showed 'Planted! It blooms in 6s', the bloom caught two beetles (+100 each), and beetles that passed cost health.",
+      "Loss: with no more planting the run ended with 'One more try?' and 'Pests overran the garden bloom. Keep blooms ready on the path.'",
+      "Chinese 390 px phone frame (388 px inner, no horizontal overflow): level 1 in Chinese with the HUD reading 下一只 7秒 and touch buttons 左, 上, 下, 右, 播种 and 收获.",
+      "Not covered in the browser: a level win and the cleared level 20 marker; the reviewer's pilot and the quality tests cover them."
+    ],
+    "screenshots": ["screenshots/vine-warden-en.png", "screenshots/vine-warden-phone-zh.png"]
+  }
+}

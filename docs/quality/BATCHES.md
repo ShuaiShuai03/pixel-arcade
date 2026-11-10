@@ -38,6 +38,7 @@ Phase Tiles completed batch 18 and the 50-game target, Pixel Parkour included. T
 | Raft Rush        | Passed in one round with no changes: 20 rivers, flags and back-currents ([record](final-review/raft-rush.json))   |
 | Burrow Rescue    | Passed in one round: 20 mines, beams and air planning ([record](final-review/burrow-rescue.json))                 |
 | Dash Duelist     | Passed in one round: 20 duels, timed dash prompt ([record](final-review/dash-duelist.json))                       |
+| Vine Warden      | Passed in one round: 20 greenhouses, tighter early levels ([record](final-review/vine-warden.json))               |
 
 ## Completed batch 18
 

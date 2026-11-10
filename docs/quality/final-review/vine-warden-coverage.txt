@@ -1,0 +1,88 @@
+✔ quality: there are 20 data-driven levels on a teaching, combination and mastery curve (1.969083ms)
+✔ quality: exported level data is frozen (0.393958ms)
+✔ quality: every map is legal, every gate reaches the bloom and every soil tile is reachable (6.931125ms)
+✔ quality: every level has accurate bilingual names and tips that fit the 480 px canvas (0.3765ms)
+✔ quality: tips only name what the level really contains, and each pest is taught where it first appears (0.491917ms)
+✔ quality: a 0.25 s and a 0.35 s reaction-limited player clear every level at 30, 60 and 120 Hz (12721.655333ms)
+✔ quality: a casual player who follows the prompts clears the teaching levels (971.965167ms)
+✔ quality: the whole campaign can be played from level 1 and saves every clear (185.041792ms)
+✔ quality: a player who never acts survives the opening and then loses fairly (341.127334ms)
+✔ quality: the level banner and tip never cover the gardener, a gate or the bloom (1.029208ms)
+✔ quality: idle, mash, random and hold-plus-alternate players win at most 10% of any level from level 3 (6254.423375ms)
+✔ quality: prompts name keys, stay put long enough to read and never flip back and forth (355.599708ms)
+✔ quality: a harvest prompt always names a plant that X can harvest right now (276.710875ms)
+✔ quality: the select screen, every level and every tier tag draw in both languages at 14 px or larger (36.792292ms)
+✔ quality: the level select lists the saved progress, starts the chosen level and clamps junk (0.892333ms)
+✔ quality: clearing a level unlocks the next, survives broken stores and never lowers progress (213.830333ms)
+✔ quality: a key still held from the level select does not plant a seed (0.186917ms)
+✔ quality: a plant or harvest pressed during a step, a turn or between ticks is buffered (0.140542ms)
+✔ quality: hostile dt and pointer values never throw or corrupt the game (6.23125ms)
+✔ quality: a long frame is capped, still takes the key press and never skips a pest (0.118167ms)
+✔ quality: the final level ends the game exactly once with an EN or ZH win, then freezes (232.670666ms)
+✔ quality: losing ends the game exactly once with an EN or ZH message, then freezes (5.253333ms)
+✔ quality: the same scripted input gives the same game at every frame rate (29.035125ms)
+✔ quality: every action has a keyboard and a touch route, and no reserved key is bound (0.30325ms)
+✔ quality: after the last level is cleared the select shows every cell, level 20 included, as cleared (116.53025ms)
+✔ quality: the Chinese HUD counts the next pest in seconds (0.844042ms)
+✔ quality: Space pressed in the same frame as a direction tap acts on the new facing (0.114708ms)
+✔ meta follows the contract and every control has a touch button (1.01075ms)
+✔ maps are 20x11, reachable, and give every level soil beside the pest path (4.538958ms)
+✔ invalid dt is inert and does not consume the buffered action (1.92675ms)
+✔ full game state is identical at 30, 60 and 120 Hz for aligned input (20.373333ms)
+✔ tap turns without walking, a hold walks one tile per 0.15 s, and solids block (2.013833ms)
+✔ seeds only go into visibly suitable soil and never into occupied or unaffordable tiles (0.495208ms)
+✔ a planted seed passes through stated stages and only blooms after 6 seconds (1.964292ms)
+✔ growth delay: a fresh plant cannot trap a pest standing on its roots (0.593583ms)
+✔ seedlings, sprouts and buds never hold or damage a pest (1.574708ms)
+✔ a bloom holds a pest in reach, bites every 0.8 s and catches it for a score (0.364833ms)
+✔ roots reach the 3x3 tiles around a bloom and one bloom holds one pest at a time (0.149833ms)
+✔ spent roots release a surviving pest and the plant wilts for a smaller harvest (0.281375ms)
+✔ harvesting returns seeds by the stated rule and rejects every illegal harvest (0.311291ms)
+✔ seed supply is sustainable: a plant always returns at least the seed it cost (3.207584ms)
+✔ seeds plus plants never decrease over seeded random play in every level (62.892542ms)
+✔ wary weevils route around live roots while beetles walk straight in (0.784917ms)
+✔ pests never overlap, wait for a claimed tile and hold the gate until it is free (11.092459ms)
+✔ pests head to the bloom by the shortest path, never turning back (0.610333ms)
+✔ routing falls back safely at dead ends and unreachable tiles (0.145833ms)
+✔ a pest at the bloom costs one health, flashes the bloom and ends the level at zero (0.667875ms)
+✔ loss: callback fires once, the world freezes, and a new instance starts fresh (3.143125ms)
+✔ clearing a level pays out, shows a visible countdown and starts the next garden fresh (0.446167ms)
+✔ win: finishing the last level is terminal and the score counts remaining health (0.129417ms)
+✔ status strings are bilingual, include the event message, and track resources (0.165875ms)
+✔ prompts follow the situation and always name a key (0.2055ms)
+✔ the prompt never changes more than once per 0.6 s outside level changes (6.209208ms)
+✔ seeded random play stays finite and every array stays bounded (22.948334ms)
+✔ drawing covers every stage, pest, state and language without throwing (62.090792ms)
+✔ hud draws the countdown to the next pest and the last-pest label (1.062084ms)
+✔ wait countdown counts only plants that are still growing (0.755667ms)
+✔ harvest copy is singular for one seed and plural for two (0.116333ms)
+✔ copy tells players that weevils dodge live roots (0.037625ms)
+✔ a bare lane is announced, drawn ahead of the pest, and ends once a root covers it (0.592834ms)
+✔ an unused full bloom is flagged idle after 15 s and offered for harvest when seeds run out (0.36475ms)
+ℹ tests 61
+ℹ suites 0
+ℹ pass 61
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 21845.747417
+ℹ start of coverage report
+ℹ -------------------------------------------------------------------------
+ℹ file                     | line % | branch % | funcs % | uncovered lines
+ℹ -------------------------------------------------------------------------
+ℹ src                      |        |          |         | 
+ℹ  games                   |        |          |         | 
+ℹ   vine-warden-art.js     | 100.00 |   100.00 |  100.00 | 
+ℹ   vine-warden-core.js    | 100.00 |   100.00 |  100.00 | 
+ℹ   vine-warden-draw.js    | 100.00 |    95.33 |  100.00 | 
+ℹ   vine-warden-levels.js  | 100.00 |   100.00 |  100.00 | 
+ℹ   vine-warden-menu.js    |  98.96 |    82.14 |  100.00 | 29
+ℹ   vine-warden-prompts.js | 100.00 |   100.00 |  100.00 | 
+ℹ   vine-warden-route.js   | 100.00 |   100.00 |  100.00 | 
+ℹ   vine-warden-world.js   | 100.00 |    98.62 |  100.00 | 
+ℹ   vine-warden.js         | 100.00 |   100.00 |  100.00 | 
+ℹ -------------------------------------------------------------------------
+ℹ all files                |  99.95 |    97.73 |  100.00 | 
+ℹ -------------------------------------------------------------------------
+ℹ end of coverage report
