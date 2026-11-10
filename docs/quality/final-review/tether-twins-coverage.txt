@@ -1,0 +1,98 @@
+✔ twenty distinct, frozen, data-driven rooms with bilingual tips that fit the canvas (1.3405ms)
+✔ the curve teaches one idea at a time, combines them, then masters them together (0.482416ms)
+✔ every room starts on safe floor with nothing live near the robots, and idle play never loses (219.573959ms)
+✔ short-cable rooms really need both robots: the partner start is out of reach of the far pad (0.158333ms)
+✔ every room is cleared through the public room select by a perfect marker follower, with no zaps (289.481292ms)
+✔ a reaction-limited bot (0.25 s and 0.35 s) clears every room at 30, 60 and 120 Hz with margin (13926.322ms)
+✔ the late rooms cost the slow bot more zaps and more time than the early and middle rooms (0.1455ms)
+✔ co-op: two players on their own keys clear the whole campaign, once (285.200375ms)
+✔ the marker never leads a robot straight through a static live strip (323.949791ms)
+✔ waiting markers only release once the strip is dark long enough to cross (323.379541ms)
+✔ idle, mash, random, timed hold-and-alternate and straight-to-pad play win at most 25% of any room from room 3 (10771.025917ms)
+✔ blind co-op mashing cannot win either (357.129417ms)
+✔ aligned input gives identical state at 30, 60 and 120 Hz in early, middle and late rooms (731.445666ms)
+✔ hostile dt, pointer and key values never crash, advance or corrupt state (10.336875ms)
+✔ a broken or hostile progress store never stops the game and is clamped (12.797333ms)
+✔ clearing a room unlocks the next one, and the select lets the player continue there (27.86925ms)
+✔ wins and losses end exactly once with an English or Chinese message and then freeze (526.178625ms)
+✔ no input is dropped during the zap pause: X still switches and held keys apply when it ends (1.898875ms)
+✔ touch buttons and the room select cover every action in both layouts (0.151834ms)
+✔ prompts name their keys, hold for half a second, never oscillate and are translated (863.130375ms)
+✔ every room, tip, message and end text exists in Chinese (7.542416ms)
+✔ English and Chinese text fits the 480x320 canvas at phone scale in every room and on the select (112.914292ms)
+✔ relay rooms: a marker reached without wrapping the relay sends the partner back, and play then clears (89.671583ms)
+✔ meta follows the module contract and covers every action with keys and touch (1.119417ms)
+✔ initial state is a fair start in room 1 with full cells and no pending events (0.998709ms)
+✔ invalid or oversized dt is inert and does not consume pressed input (1.002583ms)
+✔ the same aligned input gives identical full state at 30, 60 and 120 Hz (838.291375ms)
+✔ solo: X switches the active robot once per press and the idle partner holds still (1.989417ms)
+✔ co-op: Red uses WASD, Blue uses the arrows, both move at once and X is ignored (1.246833ms)
+✔ co-op campaign is playable with both robots driven by their own keys (243.94125ms)
+✔ every room is finishable solo in order with the marker alone and no cell lost (324.967459ms)
+✔ winch: reeling takes up slack only, never drags a robot, and paying out stops at the spool (11.035791ms)
+✔ fuzz: the cable never stretches, never crosses a wall or post, and robots never overlap solids (897.521125ms)
+✔ robots never teleport, overlap each other or end up inside a wall under dense random keys (1704.438917ms)
+✔ a slow player steering through the gate opening leaves no phantom hook on a wall corner (143.629292ms)
+✔ replayed slow-player input leaves no phantom wall hook and a straight cable through the gate (22.372708ms)
+✔ the cable constraint is symmetric: each robot alone and both together are stopped equally (13.535917ms)
+✔ no energy is injected: cable contact never accelerates a robot and idle robots stay at rest (104.336792ms)
+✔ cable wraps the wall corners of a doorway and releases them once it runs straight (2.001042ms)
+✔ cable wraps a post on the side it came from, can be unwound again, and is never inside the post (4.257292ms)
+✔ a wrapped cable cannot be pulled through a wall: the move snags and nothing moves (2.020792ms)
+✔ corner assist eases a robot clipping a wall corner instead of sticking (2.517291ms)
+✔ a plate lights only while the cable lies across it, with or without a robot on it (0.093333ms)
+✔ a gate opens when powered, holds open for a robot or the cable, and then closes (1.341ms)
+✔ a plate inside a live pit is reached by the cable alone and lights without a zap (3.829625ms)
+✔ the live ring round a pit plate cannot be entered: a robot never reaches the plate (8.515834ms)
+✔ tension relay: a slack wrap does nothing, a taut wrap locks the gate open and sinks the relay (7.288542ms)
+✔ a live strip zaps only on body contact: reset, one cell lost, input frozen for a moment (0.716916ms)
+✔ a simultaneous touch is resolved evenly: one cell, both robots named, neither favoured (0.088042ms)
+✔ copy: singular and plural cell counts (0.090167ms)
+✔ three zaps end the run: lost once, frozen, and a new instance restores everything (8.766791ms)
+✔ the full campaign is won through public input: score, one callback, frozen afterwards, fresh restart (345.178667ms)
+✔ after the guide ends it still points at any robot that left its pad (0.181833ms)
+✔ a reeled-in taut cable tells the player to pay out instead of leaving a stale waypoint (3.414625ms)
+✔ co-op taut recovery prompt names both pay-out keys in English and Chinese (1.663916ms)
+✔ scoring rewards each gate once per room and clears keep cells topped up (0.148ms)
+✔ seeded long random play stays finite, bounded and reversible in every room (219.294542ms)
+✔ status and prompt are bilingual strings that name the room, the active robot and the keys (5.779167ms)
+✔ every essential entity and marker sits between the HUD bands and text sizes stay readable (369.530209ms)
+✔ drawing covers all rooms, languages, zaps, locks, win and loss without throwing (1071.227375ms)
+✔ flashing strips are live, go dark, flicker as a warning, then zap anything caught inside (1.922666ms)
+✔ flashing groups alternate: when one lane is dark the other is live (1.349125ms)
+✔ the guide waits for a dark strip, steps back when a held plate is dropped, and then resumes (0.787ms)
+✔ a robot that slips off its pad is sent back to it before the guide moves on (0.085459ms)
+✔ the room select draws in both languages inside the canvas and highlights the cursor (0.476083ms)
+ℹ tests 65
+ℹ suites 0
+ℹ pass 65
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 28942.736625
+ℹ start of coverage report
+ℹ ---------------------------------------------------------------------------
+ℹ file                       | line % | branch % | funcs % | uncovered lines
+ℹ ---------------------------------------------------------------------------
+ℹ src                        |        |          |         | 
+ℹ  games                     |        |          |         | 
+ℹ   tether-twins-body.js     | 100.00 |   100.00 |  100.00 | 
+ℹ   tether-twins-cable.js    | 100.00 |    97.96 |  100.00 | 
+ℹ   tether-twins-draw.js     | 100.00 |    91.30 |  100.00 | 
+ℹ   tether-twins-guide.js    | 100.00 |    98.96 |  100.00 | 
+ℹ   tether-twins-menu.js     | 100.00 |   100.00 |  100.00 | 
+ℹ   tether-twins-plan.js     | 100.00 |   100.00 |  100.00 | 
+ℹ   tether-twins-rooms-a.js  | 100.00 |   100.00 |  100.00 | 
+ℹ   tether-twins-rooms-b.js  | 100.00 |   100.00 |  100.00 | 
+ℹ   tether-twins-rooms.js    | 100.00 |   100.00 |  100.00 | 
+ℹ   tether-twins-rules.js    | 100.00 |   100.00 |  100.00 | 
+ℹ   tether-twins-sim.js      | 100.00 |    98.80 |  100.00 | 
+ℹ   tether-twins-snapshot.js | 100.00 |    97.83 |  100.00 | 
+ℹ   tether-twins-text.js     | 100.00 |   100.00 |  100.00 | 
+ℹ   tether-twins-world.js    | 100.00 |    98.51 |  100.00 | 
+ℹ   tether-twins.js          | 100.00 |   100.00 |  100.00 | 
+ℹ ---------------------------------------------------------------------------
+ℹ all files                  | 100.00 |    97.55 |  100.00 | 
+ℹ ---------------------------------------------------------------------------
+ℹ end of coverage report

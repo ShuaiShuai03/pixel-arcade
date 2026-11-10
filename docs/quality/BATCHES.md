@@ -39,6 +39,7 @@ Phase Tiles completed batch 18 and the 50-game target, Pixel Parkour included. T
 | Burrow Rescue    | Passed in one round: 20 mines, beams and air planning ([record](final-review/burrow-rescue.json))                 |
 | Dash Duelist     | Passed in one round: 20 duels, timed dash prompt ([record](final-review/dash-duelist.json))                       |
 | Vine Warden      | Passed in one round: 20 greenhouses, tighter early levels ([record](final-review/vine-warden.json))               |
+| Tether Twins     | Passed in one round: 20 rooms, relay guide fixed ([record](final-review/tether-twins.json))                       |
 
 ## Completed batch 18
 

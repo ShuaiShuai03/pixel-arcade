@@ -260,7 +260,8 @@
       "raft-rush",
       "burrow-rescue",
       "dash-duelist",
-      "vine-warden"
+      "vine-warden",
+      "tether-twins"
     ],
     "records": [
       "final-review/snowball-siege.json",
@@ -293,7 +294,8 @@
       "final-review/raft-rush.json",
       "final-review/burrow-rescue.json",
       "final-review/dash-duelist.json",
-      "final-review/vine-warden.json"
+      "final-review/vine-warden.json",
+      "final-review/tether-twins.json"
     ]
   }
 }

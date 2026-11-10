@@ -54,7 +54,7 @@ function pilotKeys(st) {
   }
   return { held, pressed };
 }
-function autoplay(g, hz, { seconds = 200, onFrame = () => {}, mode = 1 } = {}) {
+function autoplay(g, hz, { seconds = 400, onFrame = () => {}, mode = 1 } = {}) {
   const every = hz / 30;
   let keys = { held: [], pressed: [] };
   for (let f = 0; f < seconds * hz; f++) {
@@ -104,7 +104,7 @@ test('initial state is a fair start in room 1 with full cells and no pending eve
   assert.equal(s.score, 0);
   assert.equal(s.cells, RULES.cells);
   assert.equal(s.room, 1);
-  assert.equal(s.rooms, 3);
+  assert.equal(s.rooms, 20);
   assert.equal(s.active, 'red');
   assert.equal(s.robots.length, 2);
   for (const r of s.robots) {
@@ -218,7 +218,7 @@ test('every room is finishable solo in order with the marker alone and no cell l
   });
   const s = g.getState();
   assert.equal(s.phase, 'won');
-  assert.equal(clearedAt.length, 3);
+  assert.equal(clearedAt.length, 20);
   assert.equal(s.stats.zaps, 0);
   assert.ok(clearedAt.every((t, i) => t > (clearedAt[i - 1] || 0) + 5));
 });
@@ -308,7 +308,7 @@ test('fuzz: the cable never stretches, never crosses a wall or post, and robots 
     'Comma',
     'Period',
   ];
-  for (const room of [0, 1, 2])
+  for (const room of [0, 3, 4])
     for (const mode of [1, 2]) {
       const rnd = seeded(room * 17 + mode);
       const s = raw(room, mode);
@@ -535,7 +535,7 @@ test('the cable constraint is symmetric: each robot alone and both together are 
 test('no energy is injected: cable contact never accelerates a robot and idle robots stay at rest', () => {
   const rnd = seeded(7);
   const codes = ['KeyA', 'KeyD', 'KeyW', 'KeyS', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'];
-  for (const room of [0, 1, 2]) {
+  for (const room of [0, 3, 4]) {
     const s = raw(room, 2);
     for (let burst = 0; burst < 30; burst++) {
       run(
@@ -579,7 +579,7 @@ test('cable wraps the wall corners of a doorway and releases them once it runs s
 });
 
 test('cable wraps a post on the side it came from, can be unwound again, and is never inside the post', () => {
-  const s = raw(1);
+  const s = raw(3);
   s.active = 1;
   put(s, 0, 180, 230);
   put(s, 1, 100, 74);
@@ -690,7 +690,7 @@ test('a gate opens when powered, holds open for a robot or the cable, and then c
 });
 
 test('a plate inside a live pit is reached by the cable alone and lights without a zap', () => {
-  const s = raw(1);
+  const s = raw(3);
   s.active = 1;
   put(s, 0, 180, 242);
   put(s, 1, 100, 74);
@@ -707,7 +707,7 @@ test('the live ring round a pit plate cannot be entered: a robot never reaches t
     [180, 242, ['KeyW']],
     [250, 158, ['KeyA']],
   ]) {
-    const s = raw(1);
+    const s = raw(3);
     s.open.A = true;
     put(s, 0, x, y);
     put(s, 1, x + 1, y > 200 ? 74 : 100);
@@ -721,7 +721,7 @@ test('the live ring round a pit plate cannot be entered: a robot never reaches t
 });
 
 test('tension relay: a slack wrap does nothing, a taut wrap locks the gate open and sinks the relay', () => {
-  const s = raw(2);
+  const s = raw(4);
   s.active = 0;
   run(s, 75, ['KeyD']); // Red sweeps the cable across the relay post
   let st = view(s);
@@ -750,35 +750,29 @@ test('tension relay: a slack wrap does nothing, a taut wrap locks the gate open 
 });
 
 test('a live strip zaps only on body contact: reset, one cell lost, input frozen for a moment', () => {
-  const hazard = view(raw(0)).hazards[0];
-  // Cable laid across a live strip is insulated.
-  const t = raw(0, 2);
-  t.open.A = true;
-  put(t, 0, hazard.x + 12, hazard.y - 40);
-  put(t, 1, hazard.x + 12, hazard.y + hazard.h + 40);
-  t.robots[1].y = hazard.y + hazard.h + 40;
-  put(t, 1, hazard.x + 12, 250);
-  put(t, 0, hazard.x + 12, 120);
-  t.open.A = true;
+  // The Gauntlet fence (room 3) has strips in column 9, rows 1-4 (x 216-240).
+  // A cable laid across a live strip is insulated.
+  const t = raw(2, 2);
+  put(t, 0, 190, 86);
+  put(t, 1, 262, 86);
   run(t, 60);
   assert.equal(t.cells, 3, 'cable over the strip is harmless');
-  const s = raw(0);
-  put(s, 1, 200, 146);
-  put(s, 0, hazard.x + 12, hazard.y - 30);
-  s.open.A = true;
-  for (let i = 0; i < 400 && s.stats.zaps === 0; i++) run(s, 1, ['KeyS']);
+  assert.equal(t.stats.zaps, 0);
+  const s = raw(2);
+  put(s, 0, 190, 86);
+  for (let i = 0; i < 400 && s.stats.zaps === 0; i++) run(s, 1, ['KeyD']);
   assert.equal(s.cells, 2);
   assert.equal(s.stats.zaps, 1);
   const st = view(s);
   assert.deepEqual(
     st.robots.map((r) => [r.x, r.y]),
     [
-      [60, 86],
-      [60, 230],
+      [60, 158],
+      [60, 206],
     ],
   );
   assert.ok(st.zap);
-  assert.match(st.message.en, /Red touched a live strip/);
+  assert.match(st.message.en, /Red hit a live strip/);
   assert.match(st.status.zh, /碰到带电条/);
   const frozen = JSON.stringify(st.robots);
   run(s, 50, ['KeyD']);
@@ -788,56 +782,38 @@ test('a live strip zaps only on body contact: reset, one cell lost, input frozen
 });
 
 test('a simultaneous touch is resolved evenly: one cell, both robots named, neither favoured', () => {
-  const s = raw(0, 2);
-  put(s, 0, 444, 158);
-  put(s, 1, 444, 182);
+  const s = raw(2, 2);
+  put(s, 0, 228, 62);
+  put(s, 1, 228, 86);
   run(s, 1);
   assert.equal(s.cells, 2);
   assert.equal(s.stats.zaps, 1);
   assert.deepEqual(view(s).zap.who, [0, 1]);
-  assert.match(view(s).message.en, /^Both robots touched a live strip/);
+  assert.match(view(s).message.en, /^Both robots hit a live strip/);
   assert.match(view(s).message.zh, /^两个机器人碰到带电条/);
 });
 
-test('copy: singular cell count and a loss text that blames the robots, not the insulated cable', () => {
-  const s = raw(0);
+test('copy: singular and plural cell counts', () => {
+  const s = raw(2);
   s.cells = 2;
-  put(s, 0, 444, 170);
+  put(s, 0, 228, 62);
   run(s, 1);
   assert.match(view(s).message.en, /Room reset, 1 cell left$/);
   assert.match(view(s).message.zh, /剩余1格电量$/);
-  const t3 = raw(0);
-  put(t3, 0, 444, 170);
-  run(t3, 1);
-  assert.match(view(t3).message.en, /Room reset, 2 cells left$/);
-  const { h, g } = fresh();
-  let keys = { held: [], pressed: [] };
-  for (let f = 0; f < 60 * 120 && g.getState().phase === 'playing'; f++) {
-    const st = g.getState();
-    if (f % 2 === 0) keys = pilotKeys(st);
-    if (st.robots[0].x >= 300 && st.active === 'red') {
-      const [red] = st.robots;
-      keys = { held: [red.x < 440 ? 'KeyD' : 'KeyA', red.y < 170 ? 'KeyS' : 'KeyW'], pressed: [] };
-    }
-    g.update(1 / 60, input(keys.held, f % 2 === 0 ? keys.pressed : []));
-  }
-  assert.match(h.ends[0].message, /Keep the robots off live strips/);
-  assert.doesNotMatch(h.ends[0].message, /cable off/);
+  const t = raw(2);
+  put(t, 0, 228, 62);
+  run(t, 1);
+  assert.match(view(t).message.en, /Room reset, 2 cells left$/);
 });
 
 test('three zaps end the run: lost once, frozen, and a new instance restores everything', () => {
-  const { h, g } = fresh();
-  let keys = { held: [], pressed: [] };
-  for (let f = 0; f < 60 * 120 && g.getState().phase === 'playing'; f++) {
-    const st = g.getState();
-    if (st.zap && f % 5 === 0) g.draw(mockContext());
-    if (f % 2 === 0) keys = pilotKeys(st);
-    // Sabotage: once Red is through the gate, steer it down into the live strip.
-    if (st.robots[0].x >= 300 && st.active === 'red') {
-      const [red] = st.robots;
-      keys = { held: [red.x < 440 ? 'KeyD' : 'KeyA', red.y < 170 ? 'KeyS' : 'KeyW'], pressed: [] };
-    }
-    g.update(1 / 60, input(keys.held, f % 2 === 0 ? keys.pressed : []));
+  const h = harness();
+  h.env.progress = { unlocked: () => 3, unlock() {} };
+  const g = createGame(h.env);
+  g.update(1 / 60, input([], ['Space']));
+  for (let f = 0; f < 60 * 60 && g.getState().phase === 'playing'; f++) {
+    if (g.getState().zap && f % 5 === 0) g.draw(mockContext());
+    g.update(1 / 60, input(['KeyD']));
   }
   const s = g.getState();
   assert.equal(s.phase, 'lost');
@@ -847,6 +823,7 @@ test('three zaps end the run: lost once, frozen, and a new instance restores eve
   assert.equal(h.ends[0].won, false);
   assert.ok(h.sounds.includes('lose'));
   assert.match(s.status.en, /Cells empty/);
+  assert.match(h.ends[0].message, /Keep the robots off live strips/);
   const snap = JSON.stringify(g.getState());
   for (let i = 0; i < 200; i++) g.update(1 / 60, input(['KeyD', 'KeyF'], ['KeyX']));
   assert.equal(JSON.stringify(g.getState()), snap);
@@ -858,10 +835,6 @@ test('three zaps end the run: lost once, frozen, and a new instance restores eve
   assert.equal(again.room, 1);
 });
 
-// ---------------------------------------------------------------------------
-// Campaign
-// ---------------------------------------------------------------------------
-
 test('the full campaign is won through public input: score, one callback, frozen afterwards, fresh restart', () => {
   const { h, g } = fresh();
   const final = autoplay(g, 60);
@@ -869,19 +842,9 @@ test('the full campaign is won through public input: score, one callback, frozen
   assert.equal(h.ends.length, 1);
   assert.equal(h.ends[0].won, true);
   assert.equal(h.ends[0].score, final.score);
-  assert.equal(
-    final.score,
-    3 * RULES.roomScore +
-      3 * RULES.cellScore * 3 +
-      5 * RULES.gateScore +
-      0 * 1 -
-      0 +
-      0 +
-      (final.score - (3 * RULES.roomScore + 9 * RULES.cellScore + 5 * RULES.gateScore)),
-  );
-  assert.ok(final.score >= 3 * RULES.roomScore + 3 * RULES.cellScore * 3);
+  assert.ok(final.score >= 20 * RULES.roomScore + 20 * RULES.cellScore * 3);
   assert.ok(h.sounds.includes('win'));
-  assert.match(h.ends[0].message, /three rooms/);
+  assert.match(h.ends[0].message, /twenty rooms/);
   assert.match(final.status.en, /All rooms wired/);
   const snap = JSON.stringify(g.getState());
   for (let i = 0; i < 300; i++) g.update(1 / 60, input(['KeyD', 'KeyW', 'KeyF'], ['KeyX']));
@@ -1010,17 +973,23 @@ test('status and prompt are bilingual strings that name the room, the active rob
     const st = g.getState();
     assert.equal(typeof st.status.en, 'string');
     assert.equal(typeof st.status.zh, 'string');
-    assert.match(st.status.en, /^Room 1\/3 · Active: Red · /);
-    assert.match(st.status.zh, /^房间 1\/3 · 当前: 红色 · /);
-    assert.match(st.prompt.en, /Press X to control Blue/);
-    assert.match(st.prompt.zh, /按 X 切换到蓝色/);
-    assert.ok(st.prompt.en.length <= 50 && st.prompt.zh.length <= 30);
+    assert.match(st.status.en, /^Room 1\/20 · Active: Red · A cable across a plate/);
+    assert.match(st.status.zh, /^房间 1\/20 · 当前: 红色 · 电缆压过电板/);
     const { ctx, calls } = recorder();
     g.draw(ctx);
     assert.ok(
-      calls.texts.some((t) => t.str === (lang === 'zh' ? '1/3 线轴测试' : '1/3 Spool Test')),
+      calls.texts.some((t) => t.str === (lang === 'zh' ? '1/20 线轴测试' : '1/20 Spool Test')),
     );
-    assert.ok(calls.texts.some((t) => t.str === st.prompt[lang]));
+    assert.ok(calls.texts.some((t) => t.str === st.tip[lang]));
+    // After the tip has been shown for a few seconds the guide prompt takes over the bar.
+    for (let i = 0; i < 240; i++) g.update(1 / 60, input([]));
+    const later = g.getState();
+    const second = recorder();
+    g.draw(second.ctx);
+    assert.ok(second.calls.texts.some((t) => t.str === later.prompt[lang]));
+    assert.match(later.prompt.en, /Press X to control Blue/);
+    assert.match(later.prompt.zh, /按 X 切换到蓝色/);
+    assert.ok(later.prompt.en.length <= 50 && later.prompt.zh.length <= 30);
   }
   // Co-op prompts name each player's own keys.
   const duo = fresh({ mode: 2 }).g.getState();
@@ -1083,19 +1052,15 @@ test('drawing covers all rooms, languages, zaps, locks, win and loss without thr
       assert.equal(g.getState().phase, 'won');
       g.draw(mockContext());
     }
-  const hot = fresh();
-  const hz = hot.g.getState().hazards[0];
-  for (let i = 0; i < 400; i++) {
-    const red = hot.g.getState().robots[0];
-    const dx = hz.x + 12 - red.x;
-    hot.g.update(1 / 60, input(dx > 3 ? ['KeyD', 'KeyS'] : dx < -3 ? ['KeyA'] : ['KeyS']));
-    if (i % 7 === 0) hot.g.draw(mockContext());
+  const hot = harness();
+  hot.env.progress = { unlocked: () => 3, unlock() {} };
+  const hg = createGame(hot.env);
+  hg.update(1 / 60, input([], ['Space']));
+  for (let i = 0; i < 4000 && hg.getState().phase === 'playing'; i++) {
+    hg.update(1 / 60, input(['KeyD']));
+    if (i % 7 === 0) hg.draw(mockContext());
   }
-  for (let i = 0; i < 4000 && hot.g.getState().phase === 'playing'; i++) {
-    const red = hot.g.getState().robots[0];
-    hot.g.update(1 / 60, input(red.x < hz.x + 10 ? ['KeyD', 'KeyS'] : ['KeyS']));
-  }
-  hot.g.draw(mockContext());
+  hg.draw(mockContext());
   // Slack, taut, snag and pad highlights.
   const s = raw(0, 2);
   run(s, 600, ['KeyF']);
@@ -1103,4 +1068,125 @@ test('drawing covers all rooms, languages, zaps, locks, win and loss without thr
   const g2 = fresh({ mode: 2 }).g;
   g2.draw(ctx);
   assert.ok(calls.rects.length > 100);
+});
+
+// ---------------------------------------------------------------------------
+// Flashing strips, guide memory and the room select
+// ---------------------------------------------------------------------------
+
+test('flashing strips are live, go dark, flicker as a warning, then zap anything caught inside', () => {
+  const s = raw(5); // Flicker Lane: the strip fills the doorway, period 4 s, live 1.2 s
+  const lane = () => view(s).hazards;
+  assert.ok(lane().length === 2 && lane().every((h) => h.pulse && h.live && !h.go && !h.warn));
+  run(s, 140);
+  assert.ok(
+    lane().every((h) => h.live),
+    'still live at 1.17 s',
+  );
+  assert.ok(Math.abs(lane()[0].change - 0.03) < 0.01);
+  run(s, 6);
+  assert.ok(
+    lane().every((h) => !h.live && !h.go),
+    'just went dark: not yet safe to start',
+  );
+  run(s, 12);
+  assert.ok(
+    lane().every((h) => !h.live && h.go && !h.warn),
+    'dark long enough to cross',
+  );
+  // A robot may stand in the dark strip; the cable lies across it harmlessly.
+  put(s, 0, 228, 146);
+  run(s, 60);
+  assert.equal(s.stats.zaps, 0);
+  run(s, 220); // past the go window, into the flicker
+  assert.ok(
+    lane().every((h) => !h.live && !h.go && h.warn),
+    'flickering before it goes live',
+  );
+  run(s, 40);
+  assert.equal(s.stats.zaps, 0, 'the warning itself is harmless');
+  for (let i = 0; i < 200 && s.stats.zaps === 0; i++) run(s, 1);
+  assert.equal(s.stats.zaps, 1, 'caught inside when it went live');
+  assert.equal(s.cells, 2);
+  assert.equal(s.clock < 0.1, true, 'the room restarts its cycle');
+  assert.match(view(s).message.en, /Red hit a live strip/);
+});
+
+test('flashing groups alternate: when one lane is dark the other is live', () => {
+  const s = raw(9); // Twin Lanes: lane p and lane q are half a cycle apart
+  const live = () => {
+    const h = view(s).hazards;
+    return [h.find((z) => z.x === 144).live, h.find((z) => z.x === 240).live];
+  };
+  assert.deepEqual(live(), [true, false]);
+  run(s, 180);
+  assert.deepEqual(live(), [false, false], 'both dark for the pocket crossing');
+  run(s, 140);
+  assert.deepEqual(live(), [false, true]);
+});
+
+test('the guide waits for a dark strip, steps back when a held plate is dropped, and then resumes', () => {
+  const s = raw(5);
+  s.shownAge = 1;
+  put(s, 0, 180, 146); // Red at the waiting spot
+  run(s, 2);
+  assert.equal(view(s).hint.wait, true, 'wait marker while the strip is live');
+  assert.match(view(s).prompt.en, /for the dark/);
+  run(s, 160);
+  s.shownAge = 1;
+  run(s, 2);
+  assert.equal(view(s).hint.wait, false, 'released once it is dark long enough');
+  assert.match(view(s).prompt.en, /cross the dark strip/);
+
+  const t = raw(0);
+  t.active = 0;
+  put(t, 1, 132, 206); // Blue holds the plate
+  run(t, 2);
+  put(t, 0, 201, 146); // Red walks up to the gate
+  run(t, 2);
+  assert.ok(t.stage >= 2, `guide moved on (stage ${t.stage})`);
+  const resumeTo = t.stage;
+  put(t, 1, 60, 230); // Blue wanders off the plate: the gate shuts
+  t.shownAge = 1;
+  run(t, 2);
+  assert.equal(t.open.A, false);
+  assert.equal(t.stage, 0, 'guide sends Blue back to the plate');
+  put(t, 1, 132, 206);
+  t.shownAge = 1;
+  run(t, 2);
+  assert.ok(t.stage >= resumeTo, 'and carries on where it left off');
+});
+
+test('a robot that slips off its pad is sent back to it before the guide moves on', () => {
+  const s = raw(1);
+  s.stage = 5;
+  put(s, 0, 396, 230);
+  put(s, 1, 100, 230);
+  s.shownAge = 1;
+  run(s, 2);
+  assert.ok(s.resume && s.stage <= 5);
+});
+
+test('the room select draws in both languages inside the canvas and highlights the cursor', () => {
+  for (const lang of ['en', 'zh']) {
+    const h = harness({ lang });
+    h.env.progress = { unlocked: () => 7, unlock() {} };
+    const g = createGame(h.env);
+    const { ctx, calls } = recorder();
+    g.draw(ctx);
+    const strings = calls.texts.map((t) => t.str);
+    assert.ok(strings.includes('7'));
+    assert.ok(strings.some((t) => /LOCKED|未解锁/.test(t)));
+    assert.ok(strings.some((t) => /CLEARED|已通关/.test(t)));
+    assert.ok(strings.some((t) => /NEXT|下一关/.test(t)));
+    assert.match(
+      g.getState().status[lang],
+      lang === 'en' ? /Choose a room · 7\/20/ : /选择房间 · 7\/20/,
+    );
+    for (const t of calls.texts) {
+      const px = Number(/(\d+)px/.exec(t.font)[1]);
+      const w = [...t.str].reduce((n, ch) => n + (/[一-鿿]/.test(ch) ? px : px * 0.6), 0);
+      assert.ok(w <= 480, `"${t.str}" is ${w}px wide`);
+    }
+  }
 });

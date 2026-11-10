@@ -1,0 +1,74 @@
+{
+  "game": "tether-twins",
+  "date": "2026-11-10",
+  "reviewedRevision": "366b88f plus the rework in this commit",
+  "owner": "owner-tether",
+  "reviewer": "final-tether",
+  "rounds": 1,
+  "process": "Lean final review at the user's request: the known 3-room shortfall went straight to a retrofit, followed by one independent review round. Its MEDIUM guide finding and one LOW message-width item were fixed and verified by re-running the reviewer's own relay, pilot and blind scripts, one clean-worktree run and the browser check, without a second review round.",
+  "verdict": "pass",
+  "approvedSha256": {
+    "src/games/tether-twins.js": "e20ef10ae824eb1e0b5b0eecece880e68bab574d2785cbc47f354a152adcfb2e",
+    "src/games/tether-twins-body.js": "7fc6c178946da358027be5f2021a1f8d72e8e942e21d450571a1c336e2dbcc44",
+    "src/games/tether-twins-cable.js": "e508c4730a5fe9337915c629781db6a8d9c81edabe3ad313cad08cf7841e5292",
+    "src/games/tether-twins-draw.js": "e2a92f9e44efe98b8445fa49fa81f66573bfed3c93ed0ac969a3d8988c02a37a",
+    "src/games/tether-twins-guide.js": "784c67c29dfb35abefca9d2fdabea8653a8f5e98cc23d66e218129dea35d900d",
+    "src/games/tether-twins-menu.js": "005ec3e51a570a97d58cf70ec377f40af4168fbedd8ec62c1f747347559a0250",
+    "src/games/tether-twins-plan.js": "8514892f12d4b99e3e3bd6d163c2f4375710a05cfd097ece05c58f5bafccdca5",
+    "src/games/tether-twins-rooms.js": "4fbc3e1363bc7378235de136dfe8116b3e0824208c55f3a12ead3ae1b16f6641",
+    "src/games/tether-twins-rooms-a.js": "ee3ffd605b4d4b0b597de16a03b925d23c7472fc5ec707e9b9d04c4b2f6b1f87",
+    "src/games/tether-twins-rooms-b.js": "f329e527feb726ef8d58bf2adc0d7db8db4d2a5dd24f143be317c245b8d6746c",
+    "src/games/tether-twins-rules.js": "afb0b451b6790a7937903d5b3b2e7a9d3b1df6eb2f887e701c40a23dec6f9713",
+    "src/games/tether-twins-sim.js": "804aa1863a51a2410bd42f805669649e261614830cae00e0155f88576ca9fadc",
+    "src/games/tether-twins-snapshot.js": "14bd09f97109090b2db38fda3b63afc4d6ca21a030d5b428ee0f4b2f9d50a049",
+    "src/games/tether-twins-text.js": "b1f4d61127ab40831be79ac95a858dcd35bc84e540bb42ccb0d91e7128847413",
+    "src/games/tether-twins-world.js": "2e79e49e2aef275baef686b40290e439f39f20ce5e56ffe177eb645be0ef9645",
+    "tests/tether-twins.test.js": "2da497e0e5f382f3865e69b47e4668cd91c5088e22a9c0777cfdde6c824ba785",
+    "tests/tether-twins-quality.test.js": "b7c46cc1c8d1c736998d1e4915f76fece3dbec7c5d10bb14cdeadb31b9fb12de"
+  },
+  "tests": {
+    "command": "node --experimental-test-coverage --test-coverage-include='src/games/tether-twins*.js' --test tests/tether-twins.test.js tests/tether-twins-quality.test.js",
+    "passed": 65,
+    "failed": 0,
+    "lineCoverage": 100,
+    "log": "tether-twins-coverage.txt"
+  },
+  "independentProbes": "A flood fill of every room showed that closing any gate or making any strip solid cuts the pads off, so no plate, relay, pit or strip step can be skipped on foot, and 858 chaos-then-escape trials found no jammed cable. The reviewer's prompt-following pilot (public getState only, delayed and jittered) cleared 594 of 600 rooms at 0.35 s and 60 Hz, with the worst rooms (15 and 18) at 28 of 30, 600 of 600 at 0.25 s, and 199 of 200 and 198 of 200 at 30 and 120 Hz. Flashing strips leave at least about 1.15 s of margin per crossing. Blind play (idle, holds, alternation at eight periods, swaps, reel and pay, random keys) cleared 0 of 222 runs in every room from 3 to 20. A full 20-room run won with exactly one env.end at 30, 60 and 120 Hz, scripted input matched across frame rates, hostile dt and pointer fuzz threw nothing in solo or co-op, a wall-clip fuzz found no robot or cable inside a solid, and broken progress stores were safe. On the final files the relay repro no longer leaves the player on a reel prompt, the pilot cleared 594 of 600 and then 198 of 200 at 0.35 s, and blind play stayed at 0%.",
+  "findings": [
+    {
+      "id": "R1",
+      "severity": "blocking",
+      "status": "fixed",
+      "observation": "Only 3 rooms, with no select or continue. There are now 20 data-driven rooms (teaching 1-7, combination 8-14, mastery 15-20) with plates, gates, tension relays, pits, fences, live strips and a new flashing strip, accurate EN/ZH tips, a room select and env.progress continue, and the 1,151-line file is split into fifteen modules."
+    },
+    {
+      "id": "M1",
+      "severity": "medium",
+      "status": "fixed",
+      "observation": "Review finding: in relay rooms 5, 11, 16 and 20, if a robot stopped on the sweep marker while the cable still passed above the relay, the guide said 'Hold F: reel in until the cable is TAUT' indefinitely although reeling could never latch the relay. The sweep step now completes only once the cable has wrapped the relay; otherwise the guide sends the other robot back to its start to sweep it, in EN and ZH, with a regression test in all four rooms."
+    },
+    {
+      "id": "L1",
+      "severity": "low",
+      "status": "fixed",
+      "observation": "Review finding: 'Both robots touched a live strip. Room reset, 2 cells left' was about 487 px wide. It now reads 'Both robots hit a live strip. Room reset, 2 cells left' (about 454 px)."
+    }
+  ],
+  "openNotes": [
+    "Mastery is mildly harder: faster strip timing and chained mechanics, with clear times rising from about 24 s to about 35 s for a perfect follower.",
+    "The guide can keep saying 'cross the dark strip' after a strip has gone live again; a player can see the strip, and it mainly affects bots.",
+    "Red and blue robots share a sprite and are told apart by colour, backed by prompts that name the colour and an arrow over the active robot.",
+    "The unit test file is 1,192 lines because the brief allows only two test files."
+  ],
+  "browser": {
+    "method": "Official Claude in Chrome extension, local server; real clicks on Start and the language toggle, synthetic in-page keys; only DOM text and the canvas were read.",
+    "servedSha256Prefixes": "e20ef10a 7fc6c178 e508c473 e2a92f9e 784c67c2 005ec3e5 8514892f 4fbc3e13 ee3ffd60 f329e527 afb0b451 804aa186 14bd09f9 b1f4d611 2e79e49e",
+    "observed": [
+      "English: Start opened room 1 of 20 (Spool Test) with both robots, the dotted cable, plate, gate A and both pads visible, the cable meter reading SLACK, and the tip 'A cable across a plate lights it and opens its gate.'",
+      "The guide then said 'Press X to control Blue'; X switched to Blue ('Now controlling Blue') and back to Red, with the status line naming the active robot.",
+      "Chinese 390 px phone frame (388 px inner, no horizontal overflow): room 1 in Chinese with touch buttons 左, 上, 下, 右, 切换, 收线 and 放线, and the one- and two-player choice before start.",
+      "Not covered in the browser: a room clear, a zap and the relay rooms; the reviewer's pilot, relay script and the quality tests cover them."
+    ],
+    "screenshots": ["screenshots/tether-twins-en.png", "screenshots/tether-twins-phone-zh.png"]
+  }
+}
