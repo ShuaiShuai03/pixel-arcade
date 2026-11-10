@@ -256,7 +256,8 @@
       "glider-ridge",
       "clockwork-bridge",
       "wallrunner-relay",
-      "shield-sentinel"
+      "shield-sentinel",
+      "raft-rush"
     ],
     "records": [
       "final-review/snowball-siege.json",
@@ -285,7 +286,8 @@
       "final-review/glider-ridge.json",
       "final-review/clockwork-bridge.json",
       "final-review/wallrunner-relay.json",
-      "final-review/shield-sentinel.json"
+      "final-review/shield-sentinel.json",
+      "final-review/raft-rush.json"
     ]
   }
 }

@@ -1,0 +1,52 @@
+{
+  "game": "raft-rush",
+  "date": "2026-11-10",
+  "reviewedRevision": "646e368 plus the rework in this commit",
+  "owner": "owner-raft",
+  "reviewer": "final-raft",
+  "rounds": 1,
+  "process": "Lean final review at the user's request: the known 3-section shortfall went straight to a retrofit, followed by one independent review round. It passed with no BLOCKING or MEDIUM findings and was released unchanged after one clean-worktree run and the browser check.",
+  "verdict": "pass",
+  "approvedSha256": {
+    "src/games/raft-rush.js": "70a9c5642c57b1a4122292a0892d80c61f2308af32c9cf2b23f66b580cf48ff6",
+    "src/games/raft-rush-levels.js": "cf5f2961fe4c5bef12b8bce1c634adbc8e61351a13b4c2356d0a53b8de1f81c1",
+    "src/games/raft-rush-step.js": "e47a5ffda765f10a8c03c5483f2db7d11b893bbd8269a0d56a129c30c7cb4655",
+    "src/games/raft-rush-draw.js": "8e338c79c0b30cb3792a9625626de344490bb51810e64d3b48b47028be13f8b1",
+    "src/games/raft-rush-menu.js": "2716c90d14683953f2dc83b1c04f73eafb7ef6780baf6047a73aa15f95ad3db2",
+    "tests/raft-rush.test.js": "2b13c596ae045c6454cc1853ec94546426224da1e77ed741575d58d3e00bc49c",
+    "tests/raft-rush-quality.test.js": "530bb3785b0ea43c97cf7e4bf5355f845b8ad1ec2197c6507276ed0ea7feeeb2"
+  },
+  "tests": {
+    "command": "node --experimental-test-coverage --test-coverage-include='src/games/raft-rush*.js' --test tests/raft-rush.test.js tests/raft-rush-quality.test.js",
+    "passed": 77,
+    "failed": 0,
+    "lineCoverage": 99.82,
+    "log": "raft-rush-coverage.txt"
+  },
+  "independentProbes": "The reviewer's own reaction-limited pilot (public getState only, 60 Hz, 5 seeds with reaction jitter) cleared 100 of 100 river runs at 0.25 s and 89 of 100 at 0.35 s: levels 1-16 cleared 79 of 80, mastery levels 17-20 cleared 10 of 20, and every failure was a missed flag the pilot never paddled back for (mastery needs every flag), not hull loss. Forty-two blind patterns, including up/down alternation at 0.5-4 s with and without strokes or brake, cleared at most 16.7% of levels 3-20. The five back-current levels cannot be cleared without paddle strokes. Final states matched at 30, 60 and 120 Hz, a hostile fuzz ended exactly once with no NaN, broken progress stores were safe, no level loses hull in the first 3 s of idle play, and colour is never the only cue.",
+  "findings": [
+    {
+      "id": "R1",
+      "severity": "blocking",
+      "status": "fixed",
+      "observation": "Only 3 sections, with no select or continue, and a key-prompt autopilot. There are now 20 data-driven rivers (teaching 1-8, combination 9-15, mastery 16-20) with currents, whirlpools, weirs, rock gates, back-currents and flags, accurate EN/ZH tips, a river select and env.progress continue; overlays no longer cover the water, the stamina bar has a notch and Ready/Rest text, a Space press during cooldown is buffered, and the 979-line file is split into five modules."
+    }
+  ],
+  "openNotes": [
+    "Mastery levels 17-20 are demanding at 0.35 s because every flag is required; a missed flag costs roughly 12-25 s of paddling back, which the 'Flag missed: paddle back (Left)' prompt guides.",
+    "The brake is helpful but optional, so the 'Brake...' tips on levels 2, 10 and 19 slightly overstate it.",
+    "A Space tap can be lost if a host calls update with a dt smaller than 1/120 s; the shipped host always steps at 1/120 s, so this cannot happen in the app.",
+    "Level 15 is the longest river, about 71-86 s for the reviewer's pilot."
+  ],
+  "browser": {
+    "method": "Official Claude in Chrome extension, local server; real clicks on Start and the language toggle, synthetic in-page keys; only DOM text and the canvas were read.",
+    "servedSha256Prefixes": "70a9c564 cf5f2961 e47a5ffd 8e338c79 2716c90d",
+    "observed": [
+      "English: Start opened level 1 of 20 with flags 0/4 (need 3), the stamina bar with a Ready label, hull boxes and the tip 'Arrows steer. Take 3 of 4 flags, then stop in the dock.' over an unobscured river.",
+      "Steering up overshot the first flag; the status line then read 'Flag missed: paddle back (Left)', the dock showed LOCKED as text, and drifting into the next flag raised the count to 1/4 with hull 3.",
+      "Chinese 390 px phone frame (388 px inner, no horizontal overflow): level 1 in Chinese with touch buttons 上, 下, 左, 右, 划桨 and 减速.",
+      "Not covered in the browser: a dock win and a hull loss; the reviewer's pilot and the quality tests cover them."
+    ],
+    "screenshots": ["screenshots/raft-rush-en.jpg", "screenshots/raft-rush-phone-zh.png"]
+  }
+}

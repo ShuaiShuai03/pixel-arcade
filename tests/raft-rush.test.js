@@ -7,7 +7,7 @@ import {
   currentAt,
   meta,
   PHYSICS,
-  SECTIONS,
+  LEVELS,
 } from '../src/games/raft-rush.js';
 import { harness, input, mockContext, seeded } from './harness.js';
 
@@ -21,16 +21,17 @@ const run = (s, ctl, seconds) => {
   return events;
 };
 const rel = (s) => {
-  const w = currentAt(SECTIONS[s.section], s.x, s.y);
+  const w = currentAt(LEVELS[s.index], s.x, s.y);
   return { x: s.vx - w.vx, y: s.vy - w.vy };
 };
 const place = (s, x, y, vx = 0, vy = 0) => Object.assign(s, { x, y, vx, vy, invulnerable: 0 });
-const inChannel = (sec, s) => {
-  const { cy, half } = sec.centre(Math.min(Math.max(s.x, 0), sec.length));
-  return Math.abs(s.y - cy) <= half + 6 && s.x <= sec.length + 1 && s.x >= -31;
+const inChannel = (level, s) => {
+  const { cy, half } = level.centre(Math.min(Math.max(s.x, 0), level.length));
+  return Math.abs(s.y - cy) <= half + 6 && s.x <= level.length + 1 && s.x >= -31;
 };
+const LAST = LEVELS.length - 1;
 
-test('meta is bilingual and exposes every action to touch', () => {
+test('meta is bilingual, exposes every action to touch and never binds host keys', () => {
   assert.equal(meta.id, 'raft-rush');
   assert.equal(meta.genre, 'sports');
   assert.ok(meta.name.zh === '激流木筏' && meta.description.en && meta.description.zh);
@@ -39,13 +40,16 @@ test('meta is bilingual and exposes every action to touch', () => {
     assert.ok(codes.includes(c), c);
   }
   assert.ok(meta.touchControls.every((c) => c.label.en && c.label.zh));
-  assert.equal(SECTIONS.length, 3);
+  for (const reserved of ['KeyR', 'Escape', 'KeyP']) assert.ok(!codes.includes(reserved));
+  assert.equal(LEVELS.length, 20);
+  assert.match(meta.description.en, /twenty/);
+  assert.match(meta.description.zh, /二十/);
 });
 
 test('invalid or oversized dt never advances state or consumes the paddle press', () => {
   const g = createGame(harness().env),
     before = g.getState();
-  for (const dt of [0, -1, NaN, Infinity, -Infinity, 0.5, 1e9, undefined]) {
+  for (const dt of [0, -1, NaN, Infinity, -Infinity, 0.5, 1e9, undefined, null, '0.016']) {
     g.update(dt, input(['ArrowRight', 'Space'], ['Space']));
     assert.deepEqual(g.getState(), before, String(dt));
   }
@@ -71,16 +75,16 @@ test('state is identical at 30, 60 and 120 Hz for aligned input', () => {
 
 test('drag settles toward the water; paddle force composes additively with the current', () => {
   const rels = [];
-  for (const section of [0, 2]) {
-    const idle = createRaftState(section);
+  for (const index of [0, 14]) {
+    const idle = createRaftState(index);
     run(idle, NONE, 3);
     assert.ok(Math.hypot(rel(idle).x, rel(idle).y) < 2, 'idle raft moves with the water');
-    const paddled = createRaftState(section);
-    place(paddled, 100, SECTIONS[section].centre(100).cy);
+    const paddled = createRaftState(index);
+    place(paddled, 100, LEVELS[index].centre(100).cy);
     run(paddled, { ...NONE, dx: 1 }, 2);
     rels.push(rel(paddled).x);
     assert.ok(rel(paddled).x > 70 && rel(paddled).x < PHYSICS.thrust / PHYSICS.drag + 1);
-    assert.ok(paddled.vx > currentAt(SECTIONS[section], paddled.x, paddled.y).vx + 70);
+    assert.ok(paddled.vx > currentAt(LEVELS[index], paddled.x, paddled.y).vx + 70);
   }
   assert.ok(Math.abs(rels[0] - rels[1]) < 6, 'paddle response does not depend on current speed');
   const diagonal = createRaftState(0);
@@ -94,18 +98,19 @@ test('drag settles toward the water; paddle force composes additively with the c
 });
 
 test('eddies and cross-current fields are additive water motion', () => {
-  const sec = SECTIONS[1],
-    e = sec.eddies[0],
-    base = currentAt({ ...sec, eddies: [] }, e.x + 20, e.y),
-    swirl = currentAt(sec, e.x + 20, e.y);
-  assert.ok(Math.abs(swirl.vy - base.vy) > 5, 'tangential swirl');
-  assert.equal(
-    currentAt({ ...sec, eddies: [] }, e.x + e.r + 5, e.y).vy,
-    currentAt(sec, e.x + e.r + 5, e.y).vy,
-  );
-  assert.deepEqual(currentAt(sec, e.x, e.y).vy, currentAt({ ...sec, eddies: [] }, e.x, e.y).vy);
-  const mid = (sec.fields[0].x0 + sec.fields[0].x1) / 2;
-  assert.equal(currentAt({ ...sec, eddies: [] }, mid, 160).vy, sec.fields[0].vy);
+  const level = LEVELS[5],
+    e = level.eddies[0],
+    bare = { ...level, eddies: [] },
+    swirl = currentAt(level, e.x + 20, e.y);
+  assert.ok(Math.abs(swirl.vy - currentAt(bare, e.x + 20, e.y).vy) > 5, 'tangential swirl');
+  assert.equal(currentAt(bare, e.x + e.r + 5, e.y).vy, currentAt(level, e.x + e.r + 5, e.y).vy);
+  assert.equal(currentAt(level, e.x, e.y).vy, currentAt(bare, e.x, e.y).vy);
+  const side = LEVELS[4],
+    f = side.fields[0];
+  assert.equal(currentAt(side, (f.x0 + f.x1) / 2, 160).vy, f.vy);
+  const weir = LEVELS[3],
+    back = weir.fields[0];
+  assert.ok(currentAt(weir, (back.x0 + back.x1) / 2, 160).vx < 0, 'the weir reverses the water');
 });
 
 test('strong paddle is a finite stroke with stamina cost, cooldown and regeneration', () => {
@@ -125,7 +130,24 @@ test('strong paddle is a finite stroke with stamina cost, cooldown and regenerat
   assert.ok(empty.stamina > 50, 'stamina regenerates');
   const defaultDir = createRaftState(0);
   run(defaultDir, { ...NONE, stroke: true }, 0.3);
-  assert.ok(defaultDir.vx > currentAt(SECTIONS[0], defaultDir.x, defaultDir.y).vx + 40);
+  assert.ok(defaultDir.vx > currentAt(LEVELS[0], defaultDir.x, defaultDir.y).vx + 40);
+});
+
+test('a paddle press during the cooldown or low stamina is buffered, then expires', () => {
+  const s = createRaftState(0);
+  assert.ok(run(s, { ...NONE, stroke: true }, 0.02).includes('move'));
+  run(s, NONE, PHYSICS.strokeBuffer);
+  const early = run(s, { ...NONE, stroke: true }, PHYSICS.strokeCooldown);
+  assert.ok(early.includes('move'), 'the early press fires once the cooldown ends');
+  const late = createRaftState(0);
+  late.stamina = 10;
+  run(late, { ...NONE, stroke: true }, 0.02);
+  const fired = run(late, NONE, PHYSICS.strokeBuffer / 2 + 1.2);
+  assert.ok(!fired.includes('move'), 'a stale press does not fire once the buffer is over');
+  const soon = createRaftState(0);
+  soon.stamina = PHYSICS.strokeCost - 2;
+  run(soon, { ...NONE, stroke: true }, 0.02);
+  assert.ok(run(soon, NONE, 0.2).includes('move'), 'a press waits for stamina inside the buffer');
 });
 
 test('brake pulls the raft toward the water speed faster than drag', () => {
@@ -138,9 +160,29 @@ test('brake pulls the raft toward the water speed faster than drag', () => {
   assert.ok(Math.abs(rel(b).x) < Math.abs(rel(a).x) / 2);
 });
 
-for (const [section, sec] of SECTIONS.entries()) {
-  test(`section ${section + 1}: banks never let a fast raft through and never add energy`, () => {
-    const mid = Math.floor(sec.length / 2);
+test('braking into a fast dock stops sooner than coasting', () => {
+  for (const index of [1, 10, 18, 19]) {
+    const level = LEVELS[index],
+      overshoot = [false, true].map((brake) => {
+        const s = createRaftState(index),
+          y = level.centre(level.dock.x0).cy;
+        s.got = s.got.map(() => true);
+        place(s, level.dock.x0 - 200, y, currentAt(level, level.dock.x0 - 200, y).vx, 0);
+        let farthest = 0;
+        for (let i = 0; i < 120 * 12 && s.phase === 'playing' && s.index === index; i++) {
+          const braking = brake && s.x > level.dock.x0 - 150 && Math.hypot(s.vx, s.vy) > 26;
+          stepRaft(s, { ...NONE, brake: braking });
+          farthest = Math.max(farthest, s.x);
+        }
+        return farthest;
+      });
+    assert.ok(overshoot[1] < overshoot[0] - 10, `level ${index + 1}: ${overshoot}`);
+  }
+});
+
+for (const [index, level] of LEVELS.entries()) {
+  test(`level ${index + 1}: banks never let a fast raft through and never add energy`, () => {
+    const mid = Math.floor(level.length / 2);
     for (const [vx, vy] of [
       [5000, 0],
       [-5000, 0],
@@ -148,23 +190,25 @@ for (const [section, sec] of SECTIONS.entries()) {
       [0, -5000],
       [3500, 3500],
       [-3500, -3500],
-      [4000, -900],
     ]) {
-      const s = createRaftState(section);
-      place(s, mid, sec.centre(mid).cy, vx, vy);
+      const s = createRaftState(index);
+      place(s, mid, level.centre(mid).cy, vx, vy);
       const limit = Math.hypot(vx, vy) + 150;
       for (let i = 0; i < 300; i++) {
         stepRaft(s, NONE);
         if (s.phase !== 'playing') break;
-        assert.ok(inChannel(sec, s), `${vx},${vy} step ${i}: ${s.x.toFixed(1)},${s.y.toFixed(1)}`);
+        assert.ok(
+          inChannel(level, s),
+          `${vx},${vy} step ${i}: ${s.x.toFixed(1)},${s.y.toFixed(1)}`,
+        );
         assert.ok(Math.hypot(s.vx, s.vy) < limit);
       }
     }
   });
 
-  test(`section ${section + 1}: rocks stop a fast raft without overlap`, () => {
-    for (const r of sec.rocks.slice(0, 4)) {
-      const s = createRaftState(section);
+  test(`level ${index + 1}: rocks stop a fast raft without overlap and end walls hold`, () => {
+    for (const r of level.rocks.slice(0, 4)) {
+      const s = createRaftState(index);
       place(s, r.x - 150, r.y, 4000, 0);
       for (let i = 0; i < 60 && s.phase === 'playing'; i++) {
         stepRaft(s, NONE);
@@ -172,14 +216,27 @@ for (const [section, sec] of SECTIONS.entries()) {
         assert.ok(s.x < r.x + 600);
       }
     }
+    const min = PHYSICS.radius - 0.01,
+      max = level.length - PHYSICS.radius + 0.01;
+    for (const [x, vx, dx] of [
+      [level.length - 60, 250, 1],
+      [60, -250, -1],
+    ]) {
+      const s = createRaftState(index);
+      place(s, x, level.centre(x).cy, vx, 0);
+      for (let i = 0; i < 600 && s.phase === 'playing'; i++) {
+        stepRaft(s, { ...NONE, dx, stroke: i % 54 === 0 });
+        assert.ok(s.x >= min && s.x <= max, `x ${s.x} step ${i}`);
+      }
+    }
   });
 }
 
 test('hard hits cost hull once per invulnerability window; gentle bumps do not', () => {
-  const sec = SECTIONS[0],
+  const level = LEVELS[0],
     gentle = createRaftState(0);
-  place(gentle, 400, sec.centre(400).cy, 0, -40);
-  const wall = sec.top[7][1];
+  place(gentle, 400, level.centre(400).cy, 0, -40);
+  const wall = level.top[7][1];
   gentle.y = wall + 14;
   run(gentle, NONE, 0.5);
   assert.equal(gentle.hull, 3);
@@ -196,12 +253,27 @@ test('hard hits cost hull once per invulnerability window; gentle bumps do not',
   assert.ok(hard.invulnerable > 0);
 });
 
+test('mastery rivers break the hull on lighter bumps than the early rivers', () => {
+  const bump = (index, speed) => {
+    const level = LEVELS[index],
+      s = createRaftState(index);
+    place(s, 400, level.top[7][1] + 18, 0, -speed);
+    run(s, NONE, 0.5);
+    return s.hull;
+  };
+  assert.equal(bump(0, 80), 3);
+  assert.equal(bump(19, 80), 2);
+  assert.ok(LEVELS[19].safeImpact < LEVELS[0].safeImpact);
+});
+
 test('hull loss ends the campaign once and freezes the raft; a new game restarts fresh', () => {
   const h = harness(),
-    g = createGame(h.env);
-  for (let i = 0; i < 60 * 60 && g.getState().phase === 'playing'; i++) {
-    const up = Math.floor(i / 90) % 2 === 0;
-    g.update(1 / 60, input([up ? 'ArrowUp' : 'ArrowDown'], i % 45 === 0 ? ['Space'] : []));
+    store = { unlocked: () => 20, unlock() {} },
+    g = createGame({ ...h.env, progress: store });
+  g.update(1 / 60, input([], ['Space']));
+  for (let i = 0; i < 60 * 90 && g.getState().phase === 'playing'; i++) {
+    const dir = Math.floor(i / 50) % 2 ? 'ArrowUp' : 'ArrowDown';
+    g.update(1 / 60, input(['ArrowRight', dir], i % 45 === 0 ? ['Space'] : []));
   }
   const dead = g.getState();
   assert.equal(dead.phase, 'lost');
@@ -223,9 +295,9 @@ test('hull loss ends the campaign once and freezes the raft; a new game restarts
 });
 
 test('each rescue flag counts once', () => {
-  const sec = SECTIONS[0],
+  const level = LEVELS[0],
     s = createRaftState(0),
-    f = sec.flags[0];
+    f = level.flags[0];
   place(s, f.x - 40, f.y);
   const events = run(s, { ...NONE, dx: 1 }, 1);
   assert.equal(events.filter((e) => e === 'coin').length, 1);
@@ -235,59 +307,61 @@ test('each rescue flag counts once', () => {
   run(s, { ...NONE, dx: 1 }, 1);
   assert.equal(s.score, 100);
   const fast = createRaftState(0);
-  place(fast, sec.flags[1].x - 120, sec.flags[1].y, 900, 0);
+  place(fast, level.flags[1].x - 120, level.flags[1].y, 900, 0);
   run(fast, NONE, 0.5);
   assert.ok(fast.got[1], 'fast raft cannot skip over a flag');
 });
 
 test('docking needs enough flags and a real stop inside the marker', () => {
-  const sec = SECTIONS[0],
-    mid = (sec.dock.x0 + sec.dock.x1) / 2,
-    cy = sec.centre(mid).cy;
+  const level = LEVELS[0],
+    mid = (level.dock.x0 + level.dock.x1) / 2,
+    cy = level.centre(mid).cy;
   const fast = createRaftState(0);
   fast.got = fast.got.map(() => true);
-  place(fast, sec.dock.x0 - 20, cy, 100, 0);
+  place(fast, level.dock.x0 - 20, cy, 100, 0);
   run(fast, { ...NONE, dx: 1 }, 0.3);
-  assert.ok(fast.dockTimer === 0 && fast.section === 0, 'passing through at speed does not dock');
+  assert.ok(fast.dockTimer === 0 && fast.index === 0, 'passing through at speed does not dock');
   const noFlags = createRaftState(0);
   place(noFlags, mid, cy);
   run(noFlags, NONE, 3);
-  assert.equal(noFlags.section, 0);
+  assert.equal(noFlags.index, 0);
   const ok = createRaftState(0);
   ok.got = [true, true, true, false];
   ok.hull = 2;
   place(ok, mid, cy);
   const events = run(ok, NONE, 0.5);
-  assert.ok(ok.dockTimer > 0 && ok.section === 0 && !events.includes('coin'));
-  run(ok, NONE, 0.6);
-  assert.equal(ok.section, 1);
+  assert.ok(ok.dockTimer > 0 && ok.index === 0 && !events.includes('coin'));
+  const cleared = run(ok, NONE, 0.6);
+  assert.ok(cleared.includes('clear'));
+  assert.equal(ok.index, 1);
   assert.equal(ok.hull, 3, 'repair on arrival');
-  assert.equal(ok.score, 250 + 2 * 50);
+  assert.equal(ok.score, 250 + 100 + 2 * 50);
   assert.equal(ok.got.some(Boolean), false);
-  assert.ok(ok.banner > 0 && ok.x < 100);
+  assert.ok(ok.tip > 0 && ok.x < 100);
 });
 
-test('final dock wins exactly once through the public API', () => {
-  const h = harness(),
-    g = createGame(h.env);
-  const sec = SECTIONS[2],
-    mid = (sec.dock.x0 + sec.dock.x1) / 2;
-  const s = createRaftState(2);
+test('the last dock wins exactly once and the win freezes the state', () => {
+  const level = LEVELS[LAST],
+    mid = (level.dock.x0 + level.dock.x1) / 2,
+    s = createRaftState(LAST);
   s.got = s.got.map(() => true);
-  place(s, mid, sec.centre(mid).cy);
-  run(s, NONE, 1);
+  place(s, mid, level.centre(mid).cy);
+  const events = run(s, NONE, 1.5);
   assert.equal(s.phase, 'won');
-  assert.ok(g.getState().phase === 'playing');
+  assert.equal(events.filter((e) => e === 'win').length, 1);
+  const frozen = JSON.stringify(s);
+  assert.deepEqual(stepRaft(s, { ...NONE, dx: 1, stroke: true }), []);
+  assert.equal(JSON.stringify(s), frozen);
 });
 
-test('status is a bilingual one-line string with a key prompt', () => {
+test('status is a bilingual one-line string with a goal', () => {
   const st = createGame(harness().env).getState().status;
-  assert.match(st.en, /^Section 1\/3 · Flags 0\/4 \(need 3\) · Hull 3 · .+/);
-  assert.match(st.zh, /^第 1\/3 段 · 旗帜 0\/4（需 3）· 船体 3 · .+/);
+  assert.match(st.en, /^Level 1\/20 · Flags 0\/4 \(need 3\) · Hull 3 · .+/);
+  assert.match(st.zh, /^第 1\/20 关 · 旗帜 0\/4（需 3）· 船体 3 · .+/);
   assert.equal(typeof st.en, 'string');
 });
 
-test('draw smoke in both languages across sections and end states', () => {
+test('draw smoke in both languages across levels and end states', () => {
   for (const lang of ['en', 'zh']) {
     const h = harness({ lang }),
       g = createGame(h.env);
@@ -295,9 +369,14 @@ test('draw smoke in both languages across sections and end states', () => {
       g.update(1 / 60, input(['ArrowRight'], i === 50 ? ['Space'] : []));
     g.draw(mockContext());
   }
-  const h = harness();
-  const g = createGame(h.env);
-  for (let i = 0; i < 60 * 40; i++)
+  for (const index of [0, 5, 9, LAST]) {
+    const s = createRaftState(index);
+    s.got = s.got.map(() => true);
+    s.hull = 1;
+    run(s, { ...NONE, dx: 1 }, 1);
+  }
+  const g = createGame(harness().env);
+  for (let i = 0; i < 60 * 90; i++)
     g.update(1 / 60, input(['ArrowUp'], i % 40 === 0 ? ['Space'] : []));
   g.draw(mockContext());
 });
@@ -317,47 +396,24 @@ test('seeded random play stays finite, inside the channel and bounded', () => {
       g.update(1 / 60, input(held, rnd() < 0.03 ? ['Space'] : []));
       const s = g.getState();
       assert.ok(Object.values(s.player).every(Number.isFinite));
-      assert.ok(inChannel(SECTIONS[s.section], { x: s.player.x, y: s.player.y }));
+      assert.ok(inChannel(LEVELS[s.level - 1], { x: s.player.x, y: s.player.y }));
     }
     assert.ok(h.ends.length <= 1);
   }
 });
 
-for (const [section, sec] of SECTIONS.entries()) {
-  test(`section ${section + 1}: end walls hold at speed and with repeated strokes`, () => {
-    const min = PHYSICS.radius - 0.01,
-      max = sec.length - PHYSICS.radius + 0.01;
-    for (const [x, vx, dx] of [
-      [sec.length - 60, 250, 1],
-      [sec.length - 400, 5000, 1],
-      [60, -250, -1],
-      [400, -5000, -1],
-    ]) {
-      const s = createRaftState(section);
-      place(s, x, sec.centre(x).cy, vx, 0);
-      for (let i = 0; i < 1200 && s.phase === 'playing'; i++) {
-        stepRaft(s, { ...NONE, dx, stroke: i % 54 === 0 });
-        assert.ok(s.x >= min && s.x <= max, `x ${s.x} step ${i}`);
-      }
-    }
-  });
-}
-
-test('public input holding Right with repeated strokes never leaves the river', () => {
+test('holding Right with repeated strokes never leaves the river, and Left stays on screen', () => {
   const g = createGame(harness().env);
   for (let i = 0; i < 120 * 90; i++) {
     g.update(1 / 120, input(['ArrowRight'], i % 54 === 0 ? ['Space'] : []));
     const s = g.getState();
-    assert.ok(s.player.x <= SECTIONS[s.section].length);
+    assert.ok(s.player.x <= LEVELS[s.level - 1].length);
     assert.ok(s.player.x >= PHYSICS.radius - 0.01);
   }
-});
-
-test('the raft stays fully on screen at the upstream end', () => {
-  const g = createGame(harness().env);
+  const back = createGame(harness().env);
   for (let i = 0; i < 120 * 20; i++) {
-    g.update(1 / 120, input(['ArrowLeft'], i % 54 === 0 ? ['Space'] : []));
-    const s = g.getState();
+    back.update(1 / 120, input(['ArrowLeft'], i % 54 === 0 ? ['Space'] : []));
+    const s = back.getState();
     assert.ok(s.player.x - s.player.r - s.camera.x >= -0.01);
   }
 });

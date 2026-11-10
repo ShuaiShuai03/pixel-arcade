@@ -1,0 +1,100 @@
+✔ twenty data-driven rivers on a teaching, combination and mastery curve with frozen data (0.877958ms)
+✔ tips describe what each river actually does (0.257292ms)
+✔ a scripted legal pilot clears every river with hull to spare (375.644208ms)
+✔ reaction-limited pilots (0.25 s and 0.35 s) clear every river at 30, 60 and 120 Hz with margin (2160.115167ms)
+✔ the full campaign is won in one run with exactly one end and a frozen win (375.323833ms)
+✔ strokes pay off in the back-currents and the dock stays locked without flags (231.601709ms)
+✔ a pilot with no delay correction loses more hull on mastery rivers than on mid rivers (1243.783708ms)
+✔ idle, mash, hold, alternating and random-key play win at most 25% of any river from river 3 (11350.146083ms)
+✔ an idle player is safe and can read the opening: no hull is lost, nothing covers the raft (41.515917ms)
+✔ river select: shown only with progress, clamped to unlocked rivers, keys and taps both work (0.683666ms)
+✔ clearing a river unlocks the next one; a win and a loss unlock nothing more (13.671916ms)
+✔ broken or hostile progress stores never stop the game and are clamped (13.360834ms)
+✔ a pilot run gives the same result when replayed and the same hits at every frame rate (115.095459ms)
+✔ hostile dt and pointer values are ignored in the menu and in play (0.349625ms)
+✔ losing ends once in English and Chinese and the terminal state is frozen (28.396917ms)
+✔ every opening frame shows its tip, fits the canvas and is localized (10.611083ms)
+✔ the river select, hud, goal line and every moving state fit in both languages (470.140541ms)
+✔ the raft always stays between the HUD bands during legal and random play (76.6525ms)
+✔ meta is bilingual, exposes every action to touch and never binds host keys (0.689625ms)
+✔ invalid or oversized dt never advances state or consumes the paddle press (1.703083ms)
+✔ state is identical at 30, 60 and 120 Hz for aligned input (21.99675ms)
+✔ drag settles toward the water; paddle force composes additively with the current (7.614458ms)
+✔ eddies and cross-current fields are additive water motion (0.1225ms)
+✔ strong paddle is a finite stroke with stamina cost, cooldown and regeneration (1.737125ms)
+✔ a paddle press during the cooldown or low stamina is buffered, then expires (1.405667ms)
+✔ brake pulls the raft toward the water speed faster than drag (0.749084ms)
+✔ braking into a fast dock stops sooner than coasting (26.086792ms)
+✔ level 1: banks never let a fast raft through and never add energy (10.582833ms)
+✔ level 1: rocks stop a fast raft without overlap and end walls hold (4.969958ms)
+✔ level 2: banks never let a fast raft through and never add energy (5.605417ms)
+✔ level 2: rocks stop a fast raft without overlap and end walls hold (4.043875ms)
+✔ level 3: banks never let a fast raft through and never add energy (5.733417ms)
+✔ level 3: rocks stop a fast raft without overlap and end walls hold (5.107334ms)
+✔ level 4: banks never let a fast raft through and never add energy (5.298292ms)
+✔ level 4: rocks stop a fast raft without overlap and end walls hold (4.169459ms)
+✔ level 5: banks never let a fast raft through and never add energy (5.743667ms)
+✔ level 5: rocks stop a fast raft without overlap and end walls hold (4.464416ms)
+✔ level 6: banks never let a fast raft through and never add energy (5.709708ms)
+✔ level 6: rocks stop a fast raft without overlap and end walls hold (4.482667ms)
+✔ level 7: banks never let a fast raft through and never add energy (6.158916ms)
+✔ level 7: rocks stop a fast raft without overlap and end walls hold (5.466625ms)
+✔ level 8: banks never let a fast raft through and never add energy (6.005584ms)
+✔ level 8: rocks stop a fast raft without overlap and end walls hold (5.058167ms)
+✔ level 9: banks never let a fast raft through and never add energy (7.038958ms)
+✔ level 9: rocks stop a fast raft without overlap and end walls hold (5.888541ms)
+✔ level 10: banks never let a fast raft through and never add energy (6.504625ms)
+✔ level 10: rocks stop a fast raft without overlap and end walls hold (8.272292ms)
+✔ level 11: banks never let a fast raft through and never add energy (6.587541ms)
+✔ level 11: rocks stop a fast raft without overlap and end walls hold (5.426041ms)
+✔ level 12: banks never let a fast raft through and never add energy (6.620375ms)
+✔ level 12: rocks stop a fast raft without overlap and end walls hold (6.014709ms)
+✔ level 13: banks never let a fast raft through and never add energy (6.789958ms)
+✔ level 13: rocks stop a fast raft without overlap and end walls hold (6.343709ms)
+✔ level 14: banks never let a fast raft through and never add energy (6.431208ms)
+✔ level 14: rocks stop a fast raft without overlap and end walls hold (6.143666ms)
+✔ level 15: banks never let a fast raft through and never add energy (6.265833ms)
+✔ level 15: rocks stop a fast raft without overlap and end walls hold (5.484917ms)
+✔ level 16: banks never let a fast raft through and never add energy (7.40725ms)
+✔ level 16: rocks stop a fast raft without overlap and end walls hold (6.690791ms)
+✔ level 17: banks never let a fast raft through and never add energy (7.585584ms)
+✔ level 17: rocks stop a fast raft without overlap and end walls hold (6.247542ms)
+✔ level 18: banks never let a fast raft through and never add energy (7.227625ms)
+✔ level 18: rocks stop a fast raft without overlap and end walls hold (6.340042ms)
+✔ level 19: banks never let a fast raft through and never add energy (7.117208ms)
+✔ level 19: rocks stop a fast raft without overlap and end walls hold (6.424167ms)
+✔ level 20: banks never let a fast raft through and never add energy (7.821667ms)
+✔ level 20: rocks stop a fast raft without overlap and end walls hold (7.088959ms)
+✔ hard hits cost hull once per invulnerability window; gentle bumps do not (0.420666ms)
+✔ mastery rivers break the hull on lighter bumps than the early rivers (0.3555ms)
+✔ hull loss ends the campaign once and freezes the raft; a new game restarts fresh (4.043167ms)
+✔ each rescue flag counts once (0.685708ms)
+✔ docking needs enough flags and a real stop inside the marker (1.287208ms)
+✔ the last dock wins exactly once and the win freezes the state (0.438958ms)
+✔ status is a bilingual one-line string with a goal (0.087083ms)
+✔ draw smoke in both languages across levels and end states (48.136958ms)
+✔ seeded random play stays finite, inside the channel and bounded (77.753292ms)
+✔ holding Right with repeated strokes never leaves the river, and Left stays on screen (54.822458ms)
+ℹ tests 77
+ℹ suites 0
+ℹ pass 77
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 16562.044458
+ℹ start of coverage report
+ℹ ----------------------------------------------------------------------
+ℹ file                  | line % | branch % | funcs % | uncovered lines
+ℹ ----------------------------------------------------------------------
+ℹ src                   |        |          |         | 
+ℹ  games                |        |          |         | 
+ℹ   raft-rush-draw.js   |  99.28 |    98.92 |  100.00 | 396-398
+ℹ   raft-rush-levels.js | 100.00 |   100.00 |  100.00 | 
+ℹ   raft-rush-menu.js   | 100.00 |   100.00 |  100.00 | 
+ℹ   raft-rush-step.js   | 100.00 |    97.59 |  100.00 | 
+ℹ   raft-rush.js        | 100.00 |   100.00 |  100.00 | 
+ℹ ----------------------------------------------------------------------
+ℹ all files             |  99.82 |    99.05 |  100.00 | 
+ℹ ----------------------------------------------------------------------
+ℹ end of coverage report
