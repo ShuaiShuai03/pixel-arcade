@@ -1,0 +1,53 @@
+{
+  "game": "echo-hunter",
+  "date": "2026-11-10",
+  "reviewedRevision": "e7d9f55d (accepted build) plus the fixes in this commit",
+  "owner": "owner-echo and owner-echo2",
+  "reviewer": "final-echo",
+  "rounds": 1,
+  "process": "Lean final review at the user's request. The game already had 20 caverns, so it went straight to one independent review round. It passed; its MEDIUM hidden-bite finding and two LOW items were fixed and verified by a separate verification agent re-running the reviewer's own pilot, replay-diagnostic, blind, correctness, progress and text-fit scripts plus one clean-worktree run, then by the browser check, without a second review round.",
+  "verdict": "pass",
+  "approvedSha256": {
+    "src/games/echo-hunter.js": "c8cee00c9cd3d0b91a6e58533d555ce36f5cb6a80dc7cf2b04ef23e139932afb",
+    "tests/echo-hunter.test.js": "81bf4b9d1d07f209819f7dfc148cbe5b859bf7ea96c0169c05d85b8183c3f8c6",
+    "tests/echo-hunter-quality.test.js": "e67c92619a428e7843fb8d9bbeee476b0be1d569202e8f2da10c05efd5f17451"
+  },
+  "tests": {
+    "command": "node --experimental-test-coverage --test-coverage-include='src/games/echo-hunter*.js' --test tests/echo-hunter.test.js tests/echo-hunter-quality.test.js",
+    "passed": 86,
+    "failed": 0,
+    "lineCoverage": 99.37,
+    "log": "echo-hunter-coverage.txt"
+  },
+  "independentProbes": "On the final files the reviewer's reaction-limited bot (public getState only, outlines, tremor and prompts seen late, 60 Hz, 6 seeds per cavern) cleared 119 of 120 cavern runs at 0.35 s and 116 of 120 at 0.25 s, the misses being bot timeouts rather than losses. In the reviewer's cavern 19 replay the returning crawler now registers on the tremor ring at full strength with a danger prompt before it settles, and the owner's sloppy-bot sweep found no bite with less than 0.60 s of warning. Blind patterns (idle, mash, ping spam with net mashing, random keys, hold and alternate at 0.5-3 s) cleared at most 2.8% of caverns 3-20. Final states matched across 30, 60 and 120 Hz, hostile dt, pointer and key fuzz threw nothing, a win and a loss each ended exactly once and froze, every broken progress store was safe, and EN and ZH text fits.",
+  "findings": [
+    {
+      "id": "M1",
+      "severity": "medium",
+      "status": "fixed",
+      "observation": "Review finding: a crawler returning home after a bite was excluded from the tremor ring and danger prompt, and on arriving could bite again within 0.05-0.1 s with no warning. Recoiling crawlers now count for the tremor, and a crawler that reaches home settles for 0.6 s before it can bite, with a quality test requiring warning before every bite."
+    },
+    {
+      "id": "L1",
+      "severity": "low",
+      "status": "fixed",
+      "observation": "Review findings: a throwing progress store crashed the game at start or at a clear, and X pressed during the net cooldown was dropped silently. Both store calls are now guarded as in Shield Sentinel, and X during the cooldown shows 'Net recharging' (网冷却中)."
+    }
+  ],
+  "openNotes": [
+    "For disciplined play the mastery caverns are mainly longer; difficulty rises sharply for players who ignore the noise meter and tremor.",
+    "Caverns are long for the bot (mean 40-150 s); humans are likely faster.",
+    "The source is a single file of about 2,400 lines, over the repository's 800-line soft ceiling."
+  ],
+  "browser": {
+    "method": "Official Claude in Chrome extension, local server; real clicks on Start and the language toggle, synthetic in-page keys; only DOM text and the canvas were read.",
+    "servedSha256Prefixes": "c8cee00c",
+    "observed": [
+      "English: Start opened cavern 1 of 20 with HP, beacons, the sonar, noise and net meters, the lamp circle and the prompt 'Space pings: rings leave beetle outlines'.",
+      "Pressing X with nothing located showed 'Net missed', and a second X during the cooldown showed 'Net recharging' instead of being dropped.",
+      "Chinese 390 px phone frame (388 px inner, no horizontal overflow): cavern 1 in Chinese with touch buttons 左, 上, 下, 右, 声呐 and 捕网.",
+      "Not covered in the browser: a beetle catch, a crawler bite and a cavern clear; the reviewer's bots, the verification run and the quality tests cover them."
+    ],
+    "screenshots": ["screenshots/echo-hunter-en.png", "screenshots/echo-hunter-phone-zh.png"]
+  }
+}

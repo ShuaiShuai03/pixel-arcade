@@ -42,6 +42,7 @@ function mover(kind, x, y, extra = {}) {
     path: [],
     startle: 0,
     frozen: 0,
+    settle: 0,
     calm: 0,
     ...extra,
   };
@@ -1244,7 +1245,7 @@ test('echo hunter: a nearby threat is felt as a tremor with a bearing but no pos
   assert.equal(snapshot(w).rumble, null);
   w.threats[0].x = w.p.x + 40;
   w.threats[0].state = 'recoil';
-  assert.equal(snapshot(w).rumble, null, 'a recoiling threat is no danger');
+  assert.ok(snapshot(w).rumble, 'a crawler scuttling home is still felt as a tremor');
   const ctx = recorder();
   w.threats[0].state = 'patrol';
   drawWorld(ctx, w, harness().env);
@@ -1959,6 +1960,46 @@ test('echo hunter: clearing a cavern saves the next one through the host, and th
   const h = harness();
   h.env.progress = { unlocked: () => 1 };
   assert.equal(createGame(h.env).getState().cavern, 1);
+});
+
+test('echo hunter: a crawler back from a bite cannot bite at once, and its tremor is felt while it returns', () => {
+  const w = quiet();
+  const t = mover('threat', w.p.x + 6, w.p.y, { state: 'recoil', path: [at(14, 9)] });
+  w.threats = [t];
+  assert.ok(snapshot(w).rumble, 'the scuttling crawler is felt before it arrives');
+  t.path = [];
+  stepWorld(w, 1 / 60, idle);
+  assert.equal(t.state, 'patrol');
+  assert.ok(t.settle > 0, 'it settles for a moment after arriving');
+  run(w, E.SETTLE_TIME - 0.1);
+  assert.equal(w.hp, E.MAX_HP, 'no bite while it settles');
+  assert.ok(snapshot(w).rumble, 'the tremor stays up while it settles');
+  run(w, 0.3);
+  assert.equal(w.hp, E.MAX_HP - 1, 'it bites once the settle time has passed');
+});
+
+test('echo hunter: a net press during the cooldown says the net is recharging, in both languages', () => {
+  const w = quiet();
+  stepWorld(w, 1 / 60, tap('KeyX'));
+  run(w, E.NET_TIME);
+  stepWorld(w, 1 / 60, tap('KeyX'));
+  assert.deepEqual(w.msg, { en: 'Net recharging', zh: '网冷却中' });
+  assert.equal(snapshot(w).player.netActive, false, 'no swing while recharging');
+});
+
+test('echo hunter: a progress store whose read throws starts at cavern 1', () => {
+  const h = harness();
+  h.env.progress = {
+    unlocked() {
+      throw new Error('store offline');
+    },
+    unlock() {
+      throw new Error('store offline');
+    },
+  };
+  const g = createGame(h.env);
+  assert.equal(g.getState().cavern, 1);
+  assert.equal(g.getState().select, null);
 });
 
 test('echo hunter: the first four caverns each state one lesson, bilingual, then hand over to play', () => {

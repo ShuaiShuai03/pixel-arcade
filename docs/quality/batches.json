@@ -267,7 +267,8 @@
       "mimic-vault",
       "comet-catcher",
       "orbit-gardener",
-      "conveyor-chef"
+      "conveyor-chef",
+      "echo-hunter"
     ],
     "records": [
       "final-review/snowball-siege.json",
@@ -307,7 +308,8 @@
       "final-review/mimic-vault.json",
       "final-review/comet-catcher.json",
       "final-review/orbit-gardener.json",
-      "final-review/conveyor-chef.json"
+      "final-review/conveyor-chef.json",
+      "final-review/echo-hunter.json"
     ]
   }
 }

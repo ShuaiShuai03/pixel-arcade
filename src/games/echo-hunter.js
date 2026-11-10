@@ -64,6 +64,7 @@ export const ALARM_DRAIN = 8;
 export const ALARM_PER_PING = 1.5;
 export const ROUSED_MULT = 2.5;
 const SEARCH_TIME = 2.5;
+export const SETTLE_TIME = 0.6; // a crawler back on patrol cannot bite for this long, while its tremor is felt
 const RECOIL_MULT = 1.6; // a threat that touched the player scuttles home this much faster
 const PROMPT_HOLD = 0.55;
 const MSG_TIME = 1.8;
@@ -1175,6 +1176,7 @@ function makeMover(spec, id, kind, random) {
     path: [],
     startle: 0,
     frozen: 0,
+    settle: 0,
   };
 }
 
@@ -1311,6 +1313,7 @@ function sendBack(w, e, state = 'return') {
 }
 
 function moveThreat(w, e, dt) {
+  if (e.settle > 0) e.settle -= dt;
   if (e.state === 'patrol') return patrol(e, dt);
   e.hx = e.hy = 0;
   if (e.state === 'search') {
@@ -1318,6 +1321,7 @@ function moveThreat(w, e, dt) {
     if (e.wait <= 0) sendBack(w, e);
     return;
   }
+  const recoiled = e.state === 'recoil';
   if (e.path.length) {
     const alertMult = isRoused(w) ? ROUSED_MULT : ALERT_MULT,
       speed = e.speed * ({ alert: alertMult, recoil: RECOIL_MULT }[e.state] ?? 1);
@@ -1327,7 +1331,10 @@ function moveThreat(w, e, dt) {
   if (e.state === 'alert') {
     e.state = 'search';
     e.wait = SEARCH_TIME;
-  } else e.state = 'patrol';
+  } else {
+    e.state = 'patrol';
+    if (recoiled) e.settle = SETTLE_TIME;
+  }
 }
 
 export const isRoused = (w) => w.alarm >= ALARM_MAX;
@@ -1414,7 +1421,7 @@ function growRing(w) {
 
 function swingNet(w) {
   const p = w.p;
-  if (p.netCd > 0) return;
+  if (p.netCd > 0) return say(w, 'Net recharging', '网冷却中');
   p.netT = NET_TIME;
   p.netCd = NET_CD;
   p.netHit = false;
@@ -1463,7 +1470,7 @@ function threatContact(w) {
   const p = w.p;
   if (p.inv > 0) return;
   const t = w.threats.find(
-    (e) => e.state !== 'recoil' && Math.hypot(e.x - p.x, e.y - p.y) < CONTACT_R,
+    (e) => e.state !== 'recoil' && !(e.settle > 0) && Math.hypot(e.x - p.x, e.y - p.y) < CONTACT_R,
   );
   if (!t) return;
   w.hp -= 1;
@@ -1683,7 +1690,7 @@ export function rumbleOf(w) {
   let best = null;
   for (const t of w.threats) {
     const d = Math.hypot(t.x - p.x, t.y - p.y);
-    if (t.state !== 'recoil' && felt(w, t.x, t.y) && (!best || d < best.d)) best = { d, t };
+    if (felt(w, t.x, t.y) && (!best || d < best.d)) best = { d, t };
   }
   if (!best) return null;
   // Only what the tremor draws: a bearing in 16 sectors and one of three strengths, never a distance.
@@ -1983,8 +1990,21 @@ const SOUND_FOR = {
 
 // The highest cavern the host has saved for this player (1-based); a missing or odd value means 1.
 function reachedLevel(env) {
-  const saved = Math.floor(Number(env.progress?.unlocked?.()));
-  return Number.isFinite(saved) ? clamp(saved, 1, CAVERNS.length) : 1;
+  try {
+    const saved = Math.floor(Number(env.progress?.unlocked?.()));
+    return Number.isFinite(saved) ? clamp(saved, 1, CAVERNS.length) : 1;
+  } catch {
+    return 1;
+  }
+}
+
+// Progress is a convenience: a broken store must not stop the game.
+function saveReached(env, level) {
+  try {
+    env.progress?.unlock?.(level);
+  } catch {
+    // ignored on purpose
+  }
 }
 
 export function createGame(env) {
@@ -1992,7 +2012,7 @@ export function createGame(env) {
     w = createWorld(env.random, {
       start: reached - 1,
       select: reached > 1,
-      unlock: (level) => env.progress?.unlock?.(level),
+      unlock: (level) => saveReached(env, level),
     });
   let ended = false;
   return {

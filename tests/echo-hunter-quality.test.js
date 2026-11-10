@@ -313,12 +313,19 @@ export function playPolicy({
   watch = null,
   lang = 'en',
   saved = null,
+  brokenStore = false,
 }) {
   const policy = build(jitter ? 0.5 : 0.25);
   const h = harness({ seed, lang });
   // A saved game that reached `level` opens the chooser; Space continues there. The run is over when
   // that cavern is cleared (or the game ends).
   if (level > 1 || saved) h.env.progress = { unlocked: () => level, unlock: (n) => saved?.push(n) };
+  if (brokenStore) {
+    const fail = () => {
+      throw new Error('store offline');
+    };
+    h.env.progress = { unlocked: fail, unlock: fail };
+  }
   const g = createGame(h.env);
   if (level > 1) g.update(1 / 60, input([], ['Space']));
   const rnd = seeded(seed * 7 + 3);
@@ -464,11 +471,17 @@ test('quality: a lane-memorising or raster-sweeping blind net-spammer clears no 
 });
 
 // Caverns with crawlers worth probing for tremor warnings, early to late.
-const HUNTED = ['first-rumble', 'first-echo', 'crossed-tunnels', 'deep-hollow', 'last-beacon'].map(
-  (id) => E.CAVERNS.findIndex((c) => c.id === id),
-);
+const HUNTED = [
+  'first-rumble',
+  'first-echo',
+  'crossed-tunnels',
+  'deep-hollow',
+  'whisper-maze',
+  'roused-depths',
+  'last-beacon',
+].map((id) => E.CAVERNS.findIndex((c) => c.id === id));
 
-test('quality: every hit follows at least 0.6 s of visible tremor warning', () => {
+test('quality: every bite, including one from a crawler back from an earlier bite, follows at least 0.6 s of tremor or prompt warning', () => {
   let hits = 0,
     shortest = Infinity;
   for (const start of HUNTED)
@@ -493,19 +506,12 @@ test('quality: every hit follows at least 0.6 s of visible tremor warning', () =
             a = pol(hist[Math.max(0, hist.length - 1 - 15)]);
             if (mode === 'spam') a = { ...a, pressed: ['Space'] };
           }
-          const hp = w.hp,
-            // A crawler that already bit and is scuttling home is not announced; walking into it from
-            // behind is a second bite from the same crawler, not a surprise from the dark.
-            fleeing = w.threats.some(
-              (t) => t.state === 'recoil' && Math.hypot(t.x - w.p.x, t.y - w.p.y) < 40,
-            );
+          const hp = w.hp;
           E.stepWorld(w, 1 / 60, input(a.held, a.pressed));
-          warn = s.rumble ? warn + 1 / 60 : 0;
+          warn = s.rumble || s.prompt.key.startsWith('danger_') ? warn + 1 / 60 : 0;
           if (w.hp < hp) {
-            if (!fleeing) {
-              hits++;
-              shortest = Math.min(shortest, warn);
-            }
+            hits++;
+            shortest = Math.min(shortest, warn);
             warn = 0;
           }
         }
@@ -675,6 +681,12 @@ test('quality: the whole campaign is clearable, ends once, freezes afterwards an
   assert.equal(again.score, 0);
   assert.equal(again.cavern, 1);
   assert.equal(again.hp, E.MAX_HP);
+});
+
+test('quality: a progress store that throws on read and on save never stops a cavern clear', () => {
+  const r = playPolicy({ hz: 60, seed: 1, level: 1, maxSeconds: 300, brokenStore: true });
+  assert.equal(r.cleared, true);
+  assert.equal(r.g.getState().cavern, 2);
 });
 
 test('quality: the twenty cavern shapes all differ and the curve adds hunters and tightens the budget', () => {
