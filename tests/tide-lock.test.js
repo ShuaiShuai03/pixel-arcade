@@ -40,12 +40,37 @@ import {
   decodeSteps,
   encodeSteps,
 } from '../src/games/tide-lock.js';
+import { drawDigit, drawGame, drawPadlock, drawState } from '../src/games/tide-lock-draw.js';
 import { harness, input, mockContext, seeded } from './harness.js';
 
 const STEP = RULES.step;
 const pressed = (...codes) => input([], codes);
 
-function open(level = 1, { seed = 1, lang = 'en', progress = true } = {}) {
+// The game with the planner's own line in place of the shown one. From lock 15 on the shown line
+// names the goal only, so this is the player that is told every step: it proves each lock can be
+// played step by step and that the hidden guidance is sound. Only newState, advance and snapshotOf
+// are used; no state is changed that createGame would not change.
+function plannerGame(env) {
+  const s = newState(env);
+  let ended = false;
+  return {
+    update(dt, inp) {
+      advance(s, dt, inp, env.sound);
+      if (s.phase === 'playing' || ended) return;
+      ended = true;
+      env.sound(s.phase === 'won' ? 'win' : 'lose');
+      env.end({ won: s.phase === 'won', score: s.score, message: s.phase });
+    },
+    draw: (ctx) => drawGame(ctx, s, env),
+    getState() {
+      const line = s.line;
+      const prompt = { en: line.en, zh: line.zh, kind: line.kind, press: line.press || null };
+      return { ...snapshotOf(s), prompt: { ...prompt, key: line.key } };
+    },
+  };
+}
+
+function open(level = 1, { seed = 1, lang = 'en', progress = true, planner = false } = {}) {
   const h = harness({ seed, lang });
   const calls = { unlock: [] };
   if (progress) {
@@ -58,7 +83,7 @@ function open(level = 1, { seed = 1, lang = 'en', progress = true } = {}) {
       },
     };
   }
-  const g = createGame(h.env);
+  const g = planner ? plannerGame(h.env) : createGame(h.env);
   if (level > 1 && progress) g.update(1 / 60, pressed('Space'));
   return { g, h, calls };
 }
@@ -565,7 +590,7 @@ test('the authored solution of each lock finishes it, survives a round trip and 
     assert.ok(rollout(newWorld(c), c.solution), `lock ${level}: the authored solution fails`);
     assert.deepEqual(decodeSteps(encodeSteps(c.solution)), c.solution);
     // pressed through the real keys, one prompt at a time, it clears the lock with every hull
-    const { g } = open(level);
+    const { g } = open(level, { planner: true });
     const first = g.getState().prompt;
     assert.ok(first.kind === 'press' || first.kind === 'watch');
     const st = followPrompt(g, level);
@@ -872,7 +897,7 @@ test('clearing a lock scores, unlocks the next, shows the cleared line and moves
 });
 
 test('the final lock ends the game once with a win, scores the whole run and then freezes', () => {
-  const { g, h, calls } = open(LEVEL_COUNT);
+  const { g, h, calls } = open(LEVEL_COUNT, { planner: true });
   const st = followPrompt(g, LEVEL_COUNT);
   assert.equal(st.phase, 'won');
   assert.equal(h.ends.length, 1);
@@ -1049,10 +1074,10 @@ test('the end screens, the cleared hold, tide, spill, pump and aground warnings 
     wait(g, 30);
     g.draw(ctx);
   }
-  const won = open(LEVEL_COUNT);
+  const won = open(LEVEL_COUNT, { planner: true });
   followPrompt(won.g, LEVEL_COUNT);
   won.g.draw(ctx);
-  const lang = open(LEVEL_COUNT, { lang: 'zh' });
+  const lang = open(LEVEL_COUNT, { lang: 'zh', planner: true });
   followPrompt(lang.g, LEVEL_COUNT);
   lang.g.draw(ctx);
   assert.deepEqual(bad, []);
@@ -1269,7 +1294,7 @@ test('a timed wait half done is checked with only its remaining time, so a good 
 
 test('a plan that stands still on a wait is replaced, and a tide left alone for a minute is followed on', () => {
   for (const level of [16, 20, 22]) {
-    const { g } = open(level);
+    const { g } = open(level, { planner: true });
     wait(g, 70); // the tide moves on while nobody acts
     const decide = (st) => (st.prompt.kind === 'press' ? [st.prompt.press] : []);
     let last = null;
@@ -1323,4 +1348,345 @@ test('the prompt owns up to a missing hint without resetting for the player, the
   }
   const st = g.getState();
   assert.ok(st.stuck || st.prompt.key === 'giveup' || keys.length > 0 || st.phase !== 'playing');
+});
+
+// ---------------------------------------------------------------------------------------------
+// Goal-only prompts, the progress store, the clear hold, labels and markers
+// ---------------------------------------------------------------------------------------------
+const NAMES_A_CONTROL = /\b[VGP]\d\b|\bSpace\b|\bpress\b|\bselect\b|\bopen\b|\bclose\b|\bX\b|[←→]/i;
+
+test('from lock 15 the prompt states the goal and names no control, key or action, in both languages', () => {
+  const seen = new Set();
+  for (let level = RULES.goalFrom; level <= LEVEL_COUNT; level++)
+    for (const lang of ['en', 'zh']) {
+      const { g } = open(level, { lang });
+      const st0 = g.getState();
+      assert.equal(st0.assist, false);
+      for (let i = 0; i < 40; i++) {
+        const st = g.getState();
+        const p = st.prompt;
+        seen.add(p.key.split(':')[0]);
+        if (/^(stuck|stranded|giveup)$/.test(p.key)) {
+          // the only lines that still name a key: the reset, once the water is gone
+          assert.equal(p.press, 'Enter');
+          break;
+        }
+        assert.equal(p.kind, 'watch', `lock ${level}: ${p.key}`);
+        assert.equal(p.press, null);
+        assert.equal(st.guide.control, null);
+        assert.ok(!NAMES_A_CONTROL.test(p.en) && !/[阀闸泵]\d|空格|[←→]|按 X/.test(p.zh), p.en);
+        if (p.key === 'aground') continue;
+        assert.match(p.en, /^(Lift|Lower) boat \d to the /);
+        assert.match(p.zh, /^把\d号船[升降]到/);
+        assert.deepEqual(st.line, { en: p.en, zh: p.zh });
+        g.update(1 / 60, i % 5 === 0 ? pressed('ArrowRight', 'Space') : input());
+        wait(g, 0.25);
+      }
+    }
+  assert.ok(seen.has('goal'));
+  // up to lock 14 the line still names the next move
+  for (let level = 1; level < RULES.goalFrom; level++) {
+    const { g } = open(level);
+    assert.equal(g.getState().prompt.kind, 'press', `lock ${level}`);
+    assert.equal(g.getState().assist, false);
+  }
+});
+
+test('the goal stays on one boat until it is docked', () => {
+  // the planner game is told every step; a second, public game gets the same keys
+  const guide = open(22, { planner: true });
+  const pub = open(22);
+  const goals = [];
+  for (let t = 0; t < 400; t += 1 / 30) {
+    const hint = guide.g.getState();
+    if (hint.phase !== 'playing') break;
+    const keys = hint.prompt.kind === 'press' && (t * 30) % 4 < 1 ? [hint.prompt.press] : [];
+    guide.g.update(1 / 30, input([], keys));
+    pub.g.update(1 / 30, input([], keys));
+    const st = pub.g.getState();
+    if (st.prompt.key.startsWith('goal:')) goals.push({ key: st.prompt.key, docked: st.docked });
+  }
+  assert.ok(goals.length > 100);
+  // once a docking has been seen for a few frames, the goal does not change until the next docking
+  let since = 0;
+  for (let i = 1; i < goals.length; i++) {
+    since = goals[i].docked === goals[i - 1].docked ? since + 1 : 0;
+    if (since > 6)
+      assert.equal(goals[i].key, goals[i - 1].key, 'the goal changed with no boat docked');
+  }
+  assert.ok(goals.at(-1).docked >= 1);
+  assert.ok(new Set(goals.map((g) => g.key)).size >= 2, 'the goal moves on to the next boat');
+});
+
+test('a goal-only lock gives its steps once no boat has moved for a long while, and the next lock starts goal-only again', () => {
+  const { g } = open(RULES.goalFrom);
+  wait(g, RULES.assistTime - 5);
+  assert.equal(g.getState().assist, false);
+  assert.equal(g.getState().prompt.kind, 'watch');
+  wait(g, 8);
+  const st = g.getState();
+  assert.equal(st.assist, true);
+  assert.equal(st.prompt.kind, 'press');
+  assert.ok(st.prompt.press);
+  const done = followPrompt(g, RULES.goalFrom);
+  assert.ok(done.level > RULES.goalFrom, 'the hinted lock is cleared');
+  assert.equal(done.lives, RULES.lives);
+  assert.equal(done.assist, false);
+});
+
+test('a progress store that throws never stops the game', () => {
+  const h = harness({ seed: 1 });
+  h.env.progress = {
+    unlocked: () => {
+      throw new Error('storage unavailable');
+    },
+    unlock: () => {
+      throw new Error('storage full');
+    },
+  };
+  const g = createGame(h.env);
+  assert.equal(g.getState().level, 1);
+  assert.equal(g.getState().menu, null);
+  const st = followPrompt(g, 1);
+  assert.equal(st.level, 2, 'the lock is cleared although the save failed');
+  assert.equal(st.phase, 'playing');
+  assert.ok(st.score >= RULES.scoreClear);
+  assert.equal(h.ends.length, 0);
+  // the last lock too: a failing save must not stop the win
+  const last = open(LEVEL_COUNT, { planner: true });
+  const env = harness({ seed: 2 });
+  env.env.progress = { unlocked: () => LEVEL_COUNT, unlock: () => Promise.reject(new Error('x')) };
+  env.env.progress.unlock = () => {
+    throw new Error('storage full');
+  };
+  const g2 = plannerGame(env.env);
+  g2.update(1 / 60, pressed('Space'));
+  const won = followPrompt(g2, LEVEL_COUNT);
+  assert.equal(won.phase, 'won');
+  assert.equal(env.ends.length, 1);
+  void last;
+});
+
+test('keys pressed during the clear hold are kept and played on the next lock', () => {
+  const clearLock = (g, level) => {
+    for (let t = 0; t < 120; t += 1 / 60) {
+      const st = g.getState();
+      if (st.pending || st.level !== level) return st;
+      const p = st.prompt;
+      g.update(1 / 60, p.kind === 'press' ? pressed(p.press) : input());
+    }
+    throw new Error('lock not cleared');
+  };
+  const { g, h } = open(3, { planner: true });
+  assert.ok(clearLock(g, 3).pending);
+  const before = h.sounds.length;
+  g.update(1 / 60, pressed('ArrowRight'));
+  g.update(1 / 60, input());
+  g.update(1 / 60, pressed('ArrowRight'));
+  g.update(1 / 60, pressed('Space'));
+  g.update(1 / 60, pressed('Enter', 'KeyR'));
+  assert.ok(h.sounds.slice(before).filter((s) => s === 'move').length >= 3, 'feedback in the hold');
+  assert.equal(g.getState().stats.resets, 0, 'Enter is not kept');
+  wait(g, 3);
+  const st = g.getState();
+  assert.equal(st.level, 4);
+  assert.equal(st.pending, false);
+  assert.equal(st.selected.kind, 'valve');
+  assert.equal(st.selected.index, 2, 'two ArrowRight presses were played');
+  assert.equal(st.valves[2].open, true, 'the Space was played on the selected valve');
+  assert.equal(st.stats.resets, 0);
+});
+
+test('only a few presses are kept from the clear hold', () => {
+  const { g } = open(3, { planner: true });
+  for (let t = 0; t < 120 && !g.getState().pending; t += 1 / 60) {
+    const p = g.getState().prompt;
+    g.update(1 / 60, p.kind === 'press' ? pressed(p.press) : input());
+  }
+  assert.ok(g.getState().pending);
+  for (let i = 0; i < 30; i++) g.update(1 / 60, pressed('ArrowRight'));
+  wait(g, 3);
+  const st = g.getState();
+  assert.equal(st.level, 4);
+  assert.equal(st.selected.index, st.valves.length - 1, 'clamped at the last valve');
+});
+
+test('the frame that starts a chosen lock keeps its time: the clock is the same at 30, 60 and 120 Hz', () => {
+  const times = [30, 60, 120].map((hz) => {
+    const { g } = open(5, { progress: true });
+    // open() already started the lock with one 1/60 frame; start again from a fresh menu instead
+    const h = harness({ seed: 1 });
+    let unlocked = 5;
+    h.env.progress = {
+      unlocked: () => unlocked,
+      unlock: (n) => (unlocked = Math.max(unlocked, n)),
+    };
+    const fresh = createGame(h.env);
+    void g;
+    fresh.update(1 / hz, pressed('Space'));
+    for (let i = 1; i < hz; i++) fresh.update(1 / hz, input());
+    return fresh.getState().time;
+  });
+  assert.ok(Math.abs(times[0] - times[1]) < RULES.step + 1e-9, `${times}`);
+  assert.ok(Math.abs(times[1] - times[2]) < RULES.step + 1e-9, `${times}`);
+  assert.ok(times[0] > 0.9, `${times}`);
+});
+
+test('control labels are localised, and the state of a valve or gate is shown by shape as well as colour', () => {
+  for (const c of LEVELS) {
+    c.valves.forEach((v) => assert.match(v.labelZh, v.pump ? /^泵\d$/ : /^阀\d$/));
+    c.gates.forEach((gt) => assert.match(gt.labelZh, /^闸\d$/));
+  }
+  const { g } = open(2, { lang: 'zh' });
+  const st = g.getState();
+  assert.equal(st.valves[0].labelZh, '阀1');
+  assert.equal(st.gates[0].labelZh, '闸1');
+  const texts = [];
+  const rects = [];
+  const ctx = new Proxy(
+    {},
+    {
+      get: (t, p) => {
+        if (p === 'fillText') return (text) => texts.push(String(text));
+        if (p === 'fillRect') return (...a) => rects.push(a.join(','));
+        return () => ({ width: 10 });
+      },
+      set: () => true,
+    },
+  );
+  g.draw(ctx);
+  assert.ok(texts.includes('阀1') && texts.includes('闸1'), texts.join('|'));
+  assert.ok(
+    !texts.some((t) => /\b[VG]\d/.test(t)),
+    'Latin control labels in the Chinese interface',
+  );
+  assert.ok(
+    texts.some((t) => /^\d\.\d米/.test(t)),
+    'metres are written in Chinese',
+  );
+  assert.ok(!texts.some((t) => /\d\.\dm/.test(t)));
+  const en = open(2, { lang: 'en' });
+  const enTexts = [];
+  en.g.draw(
+    new Proxy(
+      {},
+      {
+        get: (t, p) => (p === 'fillText' ? (x) => enTexts.push(String(x)) : () => ({ width: 10 })),
+        set: () => true,
+      },
+    ),
+  );
+  assert.ok(enTexts.includes('V1') && enTexts.some((t) => /^\d\.\dm/.test(t)));
+
+  // an open mark is one solid block, a shut one is a frame with a dark middle
+  const solid = [];
+  const frame = [];
+  const rec = (list) => ({ fillRect: (...a) => list.push(a.join(',')), set fillStyle(v) {} });
+  drawState(rec(solid), true, 5, 5, 8, 10, '#53e08a');
+  drawState(rec(frame), false, 5, 5, 8, 10, '#ff5a4d');
+  assert.equal(solid.length, 1);
+  assert.equal(frame.length, 2);
+  // the deck draws a different set of rectangles for an open and for a shut valve
+  const a = open(1);
+  const b = open(1);
+  tap(b.g, 'Space');
+  const ra = [];
+  const rb = [];
+  const spy = (list) =>
+    new Proxy(
+      {},
+      {
+        get: (t, p) =>
+          p === 'fillRect' ? (...x) => list.push(x.join(',')) : () => ({ width: 10 }),
+        set: () => true,
+      },
+    );
+  a.g.draw(spy(ra));
+  b.g.draw(spy(rb));
+  assert.notDeepEqual(ra, rb);
+});
+
+test('boats carry a number on the flag and on the berth, and the menu padlocks locked locks', () => {
+  const digits = [1, 2, 3].map((d) => {
+    const list = [];
+    drawDigit(
+      { fillRect: (...a) => list.push(a.slice(0, 2).join(',')), set fillStyle(v) {} },
+      d,
+      0,
+      0,
+      '#000',
+    );
+    return list.join(';');
+  });
+  assert.equal(new Set(digits).size, 3, 'three different digits');
+  const countRects = (g) => {
+    let n = 0;
+    g.draw(
+      new Proxy(
+        {},
+        { get: (t, p) => (p === 'fillRect' ? () => n++ : () => ({ width: 10 })), set: () => true },
+      ),
+    );
+    return n;
+  };
+  const locked = open(3, { progress: true }).g;
+  const menu = createGame(
+    (() => {
+      const h = harness({ seed: 1 });
+      h.env.progress = { unlocked: () => 3, unlock() {} };
+      return h.env;
+    })(),
+  );
+  assert.ok(menu.getState().menu);
+  const open22 = createGame(
+    (() => {
+      const h = harness({ seed: 1 });
+      h.env.progress = { unlocked: () => LEVEL_COUNT, unlock() {} };
+      return h.env;
+    })(),
+  );
+  // 19 locked cells carry a padlock of five blocks each that the fully open menu does not draw
+  assert.equal(countRects(menu) - countRects(open22), 19 * 5 - 0);
+  void locked;
+  const pad = [];
+  drawPadlock({ fillRect: (...a) => pad.push(a), set fillStyle(v) {} }, 0, 0);
+  assert.equal(pad.length, 5);
+  // a three-boat lock draws the numbers 1 to 3 on its boats and berths
+  const three = LEVELS.findIndex((c) => c.boats.length === 3) + 1;
+  const small = countRects(open(three).g);
+  const one = countRects(open(1).g);
+  assert.ok(small > one);
+});
+
+test('the tips of the teaching locks give principles rather than the order of play, and the late tips name no key', () => {
+  for (const level of [6, 7]) assert.doesNotMatch(LEVELS[level - 1].tip[0], /\bthen\b/i);
+  for (let level = RULES.goalFrom; level <= LEVEL_COUNT; level++) {
+    assert.doesNotMatch(
+      LEVELS[level - 1].tip[0],
+      /\bSpace\b|\bpress\b|\bselect\b|\bV\d\b|\bG\d\b/i,
+    );
+    assert.doesNotMatch(LEVELS[level - 1].tip[1], /空格|[阀闸]\d|按 X/);
+  }
+});
+
+test('a goal-only lock reports a grounded boat as a problem, not as a move to make', () => {
+  const lock = LEVELS.findIndex((c) => c.name[0] === 'Deep Barge') + 1;
+  const { g } = open(lock);
+  const drain = g.getState().valves.find((v) => v.b < 0).id;
+  for (let n = 0; n < 8 && g.getState().selected.index !== drain; n++) tap(g, 'ArrowRight');
+  assert.equal(g.getState().selected.index, drain);
+  tap(g, 'Space');
+  let found = null;
+  for (let t = 0; t < 60 && !found; t += 1 / 60) {
+    g.update(1 / 60, input());
+    const st = g.getState();
+    if (st.prompt.key === 'aground') found = st;
+    if (st.phase !== 'playing') break;
+  }
+  assert.ok(found, 'no aground line');
+  assert.equal(found.prompt.kind, 'watch');
+  assert.equal(found.prompt.press, null);
+  assert.equal(found.guide.control, null);
+  assert.match(found.prompt.en, /Aground/);
+  assert.match(found.prompt.zh, /搁浅/);
 });

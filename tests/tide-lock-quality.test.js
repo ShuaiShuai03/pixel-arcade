@@ -1,6 +1,15 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { createGame, LEVELS, LEVEL_COUNT, RULES, textWidth } from '../src/games/tide-lock.js';
+import {
+  LEVELS,
+  LEVEL_COUNT,
+  RULES,
+  advance,
+  createGame,
+  newState,
+  snapshotOf,
+  textWidth,
+} from '../src/games/tide-lock.js';
 import { harness, input, seeded } from './harness.js';
 
 // ---------------------------------------------------------------------------------------------
@@ -15,11 +24,33 @@ const LAST_THIRD = Math.ceil((LEVEL_COUNT * 2) / 3 + 1e-9);
 const WIN = (st, level) => st.level > level || st.phase === 'won';
 const KEYS = ['ArrowLeft', 'ArrowRight', 'KeyX', 'Space', 'Enter'];
 
-function begin(level, seed = 1, lang = 'en') {
+// The game with the planner's own line added to the snapshot as `hint`. From lock 15 on the shown
+// prompt names the goal only, so the follower below, which is told every step, reads `hint`: it
+// stands for a player who knows the solution and proves each lock is fair to play step by step.
+// Only newState, advance and snapshotOf are used.
+function plannerGame(env) {
+  const s = newState(env);
+  let ended = false;
+  return {
+    update(dt, inp) {
+      advance(s, dt, inp, env.sound);
+      if (s.phase === 'playing' || ended) return;
+      ended = true;
+      env.sound(s.phase === 'won' ? 'win' : 'lose');
+      env.end({ won: s.phase === 'won', score: s.score, message: s.phase });
+    },
+    getState() {
+      const { en, zh, kind, press, key } = s.line;
+      return { ...snapshotOf(s), hint: { en, zh, kind, press: press || null, key } };
+    },
+  };
+}
+
+function begin(level, seed = 1, lang = 'en', { hinted = true } = {}) {
   const h = harness({ seed, lang });
   let unlocked = level;
   h.env.progress = { unlocked: () => unlocked, unlock: (n) => (unlocked = Math.max(unlocked, n)) };
-  const g = createGame(h.env);
+  const g = hinted ? plannerGame(h.env) : createGame(h.env);
   if (level > 1) g.update(1 / 60, input([], ['Space']));
   return { g, h };
 }
@@ -32,10 +63,10 @@ function follower(lagOf) {
   let lastPress = -9;
   let hintless = null;
   return (st, t) => {
-    hist.push({ t, p: st.prompt });
+    hist.push({ t, p: st.hint });
     if (hist.length > 600) hist.shift();
     // a literal player who has stared at "No hint yet" for 20 s presses Enter, as the line says
-    if (st.prompt.key === 'nohint') hintless ??= t;
+    if (st.hint.key === 'nohint') hintless ??= t;
     else hintless = null;
     if (hintless !== null && t - hintless >= 20) {
       hintless = null;
@@ -191,6 +222,22 @@ function labelOf(st, guide) {
   return guide.kind === 'valve' ? st.valves[guide.index ?? guide.i].label : st.gates[guide.i].label;
 }
 
+// From RULES.goalFrom on the shown line states the goal or the problem: it never names a control, a
+// key, an arrow or an action, and nothing is highlighted but the water mark.
+const NAMES_A_CONTROL = /\b[VGP]\d\b|\bSpace\b|\bpress\b|\bselect\b|\bopen\b|\bclose\b|\bX\b|[←→]/i;
+const NAMES_A_CONTROL_ZH = /[阀闸泵]\d|空格|[←→]|按 X|打开|关闭|选择/;
+const GOAL_KEYS = /^(goal:\d|aground|clear|docked|stuck|stranded|giveup|menu)$/;
+function checkGoalPrompt(st) {
+  const p = st.prompt;
+  assert.match(p.key, GOAL_KEYS, `lock ${st.level}: unexpected key ${p.key}`);
+  if (/^(stuck|stranded|giveup)$/.test(p.key)) return;
+  assert.equal(p.kind, 'watch');
+  assert.equal(p.press, null);
+  assert.equal(st.guide.control, null);
+  assert.ok(!NAMES_A_CONTROL.test(p.en), `lock ${st.level}: "${p.en}" names a control`);
+  assert.ok(!NAMES_A_CONTROL_ZH.test(p.zh), `lock ${st.level}: "${p.zh}" names a control`);
+}
+
 function checkPrompt(st, lang) {
   const p = st.prompt;
   assert.ok(p.en && p.zh, 'a prompt without both languages');
@@ -200,8 +247,10 @@ function checkPrompt(st, lang) {
   assert.ok(st.status[lang].endsWith(p.line ?? st.line[lang]));
   assert.ok(p.en.length * 8.4 <= 440, `"${p.en}" is too wide`);
   assert.ok(textWidth(p.zh, 14) <= 440, `"${p.zh}" is too wide`);
-  const bare = p.en.replace(/\b[VGP]\d+\b|\b(?:Lock|Basin|Step|Dock) \d\b/g, '');
+  const bare = p.en.replace(/\b[VGP]\d+\b|\b(?:Lock|Basin|Step|Dock|boat) \d\b/g, '');
   assert.ok(!/\d/.test(bare), `digits in the prompt "${p.en}" would flicker`);
+  assert.ok(!/\b[VGP]\d/.test(p.zh), `Latin control label in "${p.zh}"`);
+  if (st.level >= RULES.goalFrom) return checkGoalPrompt(st);
   if (p.kind === 'watch') return assert.equal(p.press, null);
   assert.ok(PRESS_KEYS.has(p.press), `unknown key ${p.press}`);
   if (['stuck', 'stranded', 'giveup'].includes(p.key)) {
@@ -229,7 +278,7 @@ function checkPrompt(st, lang) {
   }
   const target = kind === 'v' ? st.valves[Number(index)] : st.gates[Number(index)];
   assert.ok(
-    p.en.includes(target.label) && p.zh.includes(target.label),
+    p.en.includes(target.label) && p.zh.includes(target.labelZh),
     `"${p.en}" misses ${target.label}`,
   );
   if (verb !== 'pick') {
@@ -397,7 +446,7 @@ function smartPlayer() {
 }
 
 function playPolicy(level, make, seed, { hz = 30, seconds = 120 } = {}) {
-  const { g, h } = begin(level, seed);
+  const { g, h } = begin(level, seed, 'en', { hinted: false });
   const decide = make(seed, g);
   for (let f = 0; f < seconds * hz; f++) {
     // the screen is only looked at twice a second to see whether the lock is over
@@ -431,10 +480,276 @@ test('quality: from lock 3 on, idling, mashing, timed toggling, sweeping and ran
   console.log(`crude policies, wins per lock:\n  ${table.join('\n  ')}`);
 });
 
+// Board-reading player for Tide Lock. It sees only getState() (the water, the valves, the gates, the
+// boats and the goal line), `lag` seconds late, and presses public keys. It ignores prompt.press.
+// It plays like a careful person who knows how locks work: serve the boat that is closest to ready,
+// level its chamber against the far side of the gate from the lowest source above (or the highest
+// sink below, so the water is saved), shut the valves, open the gate, and wait for the tide when a
+// boat needs more water than the sea has.
+function boardReader() {
+  let lastSea = null;
+  const NEAR = 0.22; // the gate opens within 0.3 m; stop a little before it
+
+  return function decide(o) {
+    if (o.phase !== 'playing' || o.pending || o.menu) return null;
+    const pk = o.prompt?.key;
+    if (o.stuck || pk === 'stuck' || pk === 'stranded' || pk === 'giveup') return 'Enter';
+    const { nodes, valves, gates, boats } = o;
+    const lvl = (i) => nodes[i].level;
+    const dep = (i) => nodes[i].depth;
+    const live = boats.filter((b) => !b.docked);
+    const seaNode = nodes.find((n) => n.sea);
+    const seaFalling = lastSea !== null && seaNode && seaNode.level < lastSea - 1e-9;
+    lastSea = seaNode ? seaNode.level : null;
+    if (!live.length || live.some((b) => b.crossing)) return null;
+
+    const atNode = (n) => live.filter((b) => b.node === n).length;
+    const minDepth = (n) => {
+      let m = 0;
+      for (const b of live) if (b.node === n || b.to === n) m = Math.max(m, b.draught + 0.05);
+      return m;
+    };
+
+    // --- pick the boat to serve: the one whose gate needs the least change in the water
+    const tasks = [];
+    for (const b of live) {
+      const dir = Math.sign(b.to - b.node);
+      const a = dir > 0 ? b.node : b.node - 1;
+      const gate = gates.find((g) => g.a === a && g.b === a + 1);
+      if (!gate) continue;
+      const n1 = b.node;
+      const n2 = dir > 0 ? a + 1 : a;
+      const full = atNode(n2) >= (nodes[n2].capacity ?? 9);
+      // a boat already inside a one-boat chamber goes first: nobody else fits
+      const cost = full
+        ? Infinity
+        : Math.abs(lvl(n1) - lvl(n2)) - (nodes[n1].capacity <= 1 ? 5 : 0);
+      tasks.push({ b, gate, n1, n2, cost });
+    }
+    tasks.sort((p, q) => p.cost - q.cost || p.b.id - q.b.id);
+    const task = tasks.find((t) => Number.isFinite(t.cost)) ?? tasks[0];
+    if (!task) return null;
+    const { b, gate, n1, n2 } = task;
+
+    // --- the chamber whose level we change: one too shallow for the boat, else the smaller side
+    const sides = [n1, n2].filter((n) => !nodes[n].sea);
+    if (!sides.length) return null;
+    const shallow = sides.find((n) => dep(n) < b.draught + 0.05);
+    let m = sides[0];
+    if (sides.length === 2) m = nodes[n1].area < nodes[n2].area ? n1 : n2;
+    if (shallow !== undefined) m = shallow;
+    const other = m === n1 ? n2 : n1;
+    const need = nodes[m].floor + b.draught + 0.12;
+    const T = shallow !== undefined ? Math.max(lvl(other), need) : lvl(other);
+    const diff = T - lvl(m);
+    const raise = diff > 0;
+
+    // where would m settle if it were joined to o2?
+    const settle = (o2) => {
+      if (nodes[o2].sea) return lvl(o2);
+      const am = nodes[m].area;
+      const ao = nodes[o2].area;
+      const vol = am * (lvl(m) - nodes[m].floor) + ao * (lvl(o2) - nodes[o2].floor);
+      return (vol + am * nodes[m].floor + ao * nodes[o2].floor) / (am + ao);
+    };
+    const joins = (n) =>
+      valves
+        .filter((v) => !v.pump && v.b >= 0 && (v.a === n || v.b === n))
+        .map((v) => ({ v, o2: v.a === n ? v.b : v.a }));
+
+    // the valves that raise `n` from the lowest source above it; a source too poor to give the boat
+    // its depth is fed in turn, and when none is above `n` the neighbours are asked to be fed
+    const feedFor = (n, seen) => {
+      const sources = joins(n).filter(
+        ({ o2 }) =>
+          !seen.has(o2) &&
+          lvl(o2) > lvl(n) + 0.04 &&
+          (nodes[o2].sea || dep(o2) > minDepth(o2) + 0.03),
+      );
+      sources.sort((p, q) => lvl(p.o2) - lvl(q.o2));
+      const pick = sources.find(({ v }) => v.open) ?? sources[0];
+      if (pick) {
+        const out = [pick.v];
+        if (!nodes[pick.o2].sea && settle(pick.o2) < need)
+          out.push(...feedFor(pick.o2, new Set([...seen, n])));
+        return out;
+      }
+      for (const { v, o2 } of joins(n)) {
+        if (seen.has(o2) || nodes[o2].sea) continue;
+        const sub = feedFor(o2, new Set([...seen, n]));
+        if (sub.length) return [v, ...sub];
+      }
+      return [];
+    };
+
+    // --- which valves should be open to bring m to T
+    let want = [];
+    const holdUntil = shallow !== undefined ? need + 0.05 : T;
+    if (Math.abs(diff) > NEAR || (shallow !== undefined && lvl(m) < holdUntil)) {
+      if (raise) {
+        want = feedFor(m, new Set());
+        const first = want[0];
+        if (first && !nodes[first.a === m ? first.b : first.a].sea) {
+          const o2 = first.a === m ? first.b : first.a;
+          if (dep(o2) <= minDepth(o2) + 0.02) want = [];
+        }
+      } else {
+        const opts = joins(m).filter(({ o2 }) => lvl(o2) < lvl(m) - 0.04);
+        const ok = opts.filter(({ o2 }) =>
+          nodes[o2].sea
+            ? dep(o2) >= minDepth(m) + (seaFalling ? 0.3 : 0)
+            : lvl(o2) < nodes[o2].top - 0.3,
+        );
+        // lower into a chamber before the sea (it keeps the water); the valve is shut as soon as the
+        // gate can open, so a sink below the target does no harm
+        const pool = ok;
+        pool.sort(
+          (p, q) => Number(nodes[p.o2].sea) - Number(nodes[q.o2].sea) || lvl(q.o2) - lvl(p.o2),
+        );
+        const pick = pool.find(({ v }) => v.open) ?? pool[0];
+        if (pick) {
+          want = [pick.v];
+          const o2 = pick.o2;
+          if (!nodes[o2].sea && lvl(o2) >= nodes[o2].top - 0.2) want = [];
+        }
+      }
+    } else {
+      // near enough: keep a sea feed open to trap the tide while it is still rising
+      const sea = joins(m).find(({ v, o2 }) => nodes[o2].sea && v.open && raise && diff > 0.04);
+      if (sea) want = [sea.v];
+    }
+    // look ahead along the route: a chamber the boat must reach but that is still too shallow for it
+    // is fed from the chamber being filled (so the tide, when it is high, fills both at once)
+    if (want.length) {
+      const dir = Math.sign(b.to - n1);
+      const fed = new Set([m, ...want.map((v) => (v.a === m ? v.b : v.a))]);
+      for (let q = n2 + dir; dir && q * dir <= b.to * dir; q += dir) {
+        if (nodes[q].sea || lvl(q) >= nodes[q].floor + b.draught + 0.1) continue;
+        const feed = joins(q).find(({ o2 }) => fed.has(o2) && lvl(o2) > lvl(q) + 0.04);
+        if (feed) want.push(feed.v);
+      }
+    }
+    const wantIds = new Set(want.map((v) => v.id));
+
+    // --- toggles needed, in order of priority
+    const gateOpenNow = gates.some((g) => g.open && g.progress > 0);
+    const toggles = [];
+    for (const v of valves)
+      if (v.open && !wantIds.has(v.id)) toggles.push({ kind: 'valve', i: v.id, pri: 0 });
+    for (const v of want)
+      if (!v.open && !gateOpenNow) toggles.push({ kind: 'valve', i: v.id, pri: 1 });
+    if (Math.abs(diff) <= NEAR && !gate.open) {
+      const good = gate.level && dep(n1) >= b.draught + 0.03 && dep(n2) >= b.draught + 0.03;
+      if (good) toggles.push({ kind: 'gate', i: gate.id, pri: 2 });
+    }
+    if (!toggles.length) return null;
+    toggles.sort((p, q) => p.pri - q.pri);
+    const target = toggles[0];
+    const sel = o.selected;
+    if (target.kind === 'gate') {
+      if (sel.kind === 'gate') return sel.index === target.i ? 'Space' : 'KeyX';
+      return 'KeyX';
+    }
+    if (sel.kind === 'valve') {
+      if (sel.index === target.i) return 'Space';
+      return target.i > sel.index ? 'ArrowRight' : 'ArrowLeft';
+    }
+    const v = valves[target.i];
+    const centre = (v.b >= 0 ? v.a + v.b : v.a * 2) / 2;
+    const gc = gates[sel.index].a + 0.5;
+    return centre >= gc ? 'ArrowRight' : 'ArrowLeft';
+  };
+}
+
+// Plays one lock like a person who reads the board: the reader sees the snapshot `lag` seconds late
+// and may press a key only every lag + 0.1 s (plus a little jitter), so a stale view is never acted
+// on twice. It reports how the lock went.
+function boardRun(level, { lag, hz, seed }) {
+  const { g } = begin(level, seed, 'en', { hinted: false });
+  const rnd = seeded(seed * 31 + level);
+  const decide = boardReader();
+  const lagFrames = Math.round(lag * hz);
+  const seen = [];
+  let minMargin = Infinity;
+  let presses = 0;
+  let nextAt = 0;
+  let st = g.getState();
+  for (let f = 0; f < 300 * hz; f++) {
+    st = g.getState();
+    seen.push(st);
+    if (seen.length > lagFrames + 1) seen.shift();
+    if (st.phase !== 'playing' || st.level !== level) break;
+    for (const b of st.boats)
+      if (!b.docked && !b.crossing) minMargin = Math.min(minMargin, b.depth - b.draught);
+    const t = f / hz;
+    let keys = [];
+    if (t >= nextAt) {
+      const key = decide(seen[0]);
+      if (key) {
+        keys = [key];
+        presses++;
+        nextAt = t + lag + 0.1 + rnd() * 0.1;
+      }
+    }
+    g.update(1 / hz, input([], keys));
+  }
+  st = g.getState();
+  return {
+    cleared: WIN(st, level),
+    presses,
+    minMargin,
+    hulls: st.stats.hulls,
+    resets: st.stats.resets,
+  };
+}
+
+const TIERS = [
+  ['teaching', 1, 7],
+  ['combination', 8, 14],
+  ['mastery', 15, 22],
+];
+
+test('quality: a player who reads the board (no prompt keys, 0.35 s lag) clears every lock in at least 75% of runs, and the mastery locks cost more', () => {
+  const runs = [
+    { lag: 0.35, hz: 60, seed: 1 },
+    { lag: 0.35, hz: 60, seed: 2 },
+    { lag: 0.35, hz: 30, seed: 3 },
+    { lag: 0.25, hz: 60, seed: 4 },
+  ];
+  const table = [];
+  const tier = Object.fromEntries(
+    TIERS.map(([name]) => [name, { presses: [], margins: [], hulls: 0 }]),
+  );
+  for (let level = 1; level <= LEVEL_COUNT; level++) {
+    const results = runs.map((r) => boardRun(level, r));
+    const wins = results.filter((r) => r.cleared);
+    table.push(`${level}:${wins.length}`);
+    assert.ok(
+      wins.length / runs.length >= 0.75,
+      `lock ${level}: ${wins.length}/${runs.length} (${table.join(' ')})`,
+    );
+    const [name] = TIERS.find(([, lo, hi]) => level >= lo && level <= hi);
+    for (const r of wins) {
+      tier[name].presses.push(r.presses);
+      tier[name].margins.push(r.minMargin);
+      tier[name].hulls += r.hulls;
+    }
+  }
+  const mean = (list) => list.reduce((a, v) => a + v, 0) / list.length;
+  const line = TIERS.map(
+    ([name]) =>
+      `${name}: ${mean(tier[name].presses).toFixed(1)} presses, margin ${mean(tier[name].margins).toFixed(2)} m, ${tier[name].hulls} hulls`,
+  ).join('; ');
+  console.log(`board reader per lock wins: ${table.join(' ')}\n  ${line}`);
+  const { teaching, mastery } = tier;
+  assert.ok(mean(mastery.presses) > 2 * mean(teaching.presses), line);
+  assert.ok(mean(mastery.margins) < mean(teaching.margins), line);
+});
+
 // A second, stronger screen reader (it closes valves that are not serving, raises shallow chambers
 // from any higher valve or the pump, and rotates boats): it plays one lock for `limit` seconds.
 function readerWins(level, limit = 50, supplierFirst = false) {
-  const { g } = begin(level, 1);
+  const { g } = begin(level, 1, 'en', { hinted: false });
   let t = 0;
   const done = () => {
     const st = g.getState();

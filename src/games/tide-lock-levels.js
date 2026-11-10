@@ -107,8 +107,8 @@ export const LEVEL_DEFS = [
   {
     name: ['Full Lock', '完整船闸'],
     tip: [
-      'Drain the lock to the sea, let the boat in, shut the sea valve, then fill from the pool. The pool bed is high.',
-      '先把船闸排到海平面，让船进入，关上海阀，再用上游池注水。池底较高。',
+      'A lock is a staircase of water: a gate opens only when the chamber is level with that side. The pool bed is high.',
+      '船闸是水的台阶：闸室与哪一侧水位齐平，就能打开哪一侧的闸门。上游池的池底较高。',
     ],
     warn: [
       'The pool has drained into the sea. Reset the lock.',
@@ -126,8 +126,8 @@ export const LEVEL_DEFS = [
   {
     name: ['Outbound', '出海'],
     tip: [
-      'The boat is in the pool. Fill the empty lock, bring it in, shut the pool valve, then drain to the sea.',
-      '船在上游池。给空船闸注水，船进入后关闭池阀，再排向大海。',
+      'The boat starts in the pool and must reach the sea: the same staircase, walked downhill. Do not let the pool drain away.',
+      '船从上游池出发要驶向大海：还是同一道水的台阶，只是向下走。别让上游池的水流光。',
     ],
     warn: [
       'The pool has drained into the sea. Reset the lock.',
@@ -363,14 +363,14 @@ export const LEVEL_DEFS = [
   {
     name: ['Convoy', '船队'],
     tip: [
-      'Three boats and one lock for one. The order barely matters; the water does.',
-      '三艘船，一座单船闸。顺序影响不大，水才是关键。',
+      'Three boats and a lock that holds two. Pair them up: the water, not the order, is the problem.',
+      '三艘船，一座一次能容两艘船的船闸。让它们结伴通过：难点是水，不是顺序。',
     ],
     warn: ['The pool ran low. Reset the lock.', '上游池水位太低了，请重置本座船闸。'],
     par: 300,
     nodes: [
       S('Sea', '大海', 1.1),
-      P('Lock', '船闸', 1.5, 3.6, 0, 5.4, 1),
+      P('Lock', '船闸', 1.5, 3.6, 0, 5.4, 2),
       P('Pool', '上游池', 5, 3.6, 1.4),
       P('Basin', '节水池', 4, 1.6),
     ],
@@ -698,23 +698,8 @@ export const SOLUTIONS = [
     ['w', 1, 1],
     ['g', 0],
     ['v', 0, 0],
-    ['v', 3, 1],
-    ['v', 1, 1],
-    ['w', 16384, 0],
-    ['t', 1.5],
-    ['v', 3, 0],
-    ['g', 1],
-    ['v', 1, 0],
-    ['v', 0, 1],
-    ['w', 1, 1],
-    ['g', 0],
-    ['v', 0, 0],
-    ['v', 3, 1],
-    ['w', 16384, 1],
-    ['v', 3, 0],
     ['v', 1, 1],
     ['w', 2, 1],
-    ['v', 1, 0],
     ['g', 1],
   ],
   [

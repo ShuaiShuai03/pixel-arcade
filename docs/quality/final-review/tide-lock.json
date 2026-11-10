@@ -1,0 +1,76 @@
+{
+  "game": "tide-lock",
+  "date": "2026-11-10",
+  "reviewedRevision": "3de9ca34 (accepted build) plus the fixes in this commit",
+  "owner": "owner-tide",
+  "reviewer": "tide-fair, tide-robust and tide-present (parallel split review)",
+  "rounds": 1,
+  "process": "Lean final review at the user's request, with the review split across three parallel reviewers (fairness, robustness, presentation) as the user asked. The game already had 22 locks. Four MEDIUM findings and three LOW items were fixed and verified by a separate verification agent re-running the reviewers' unchanged probes against the repository files, plus the owner's new board-reading bot and one clean-worktree run, then by the browser check, without a second review round.",
+  "verdict": "pass",
+  "approvedSha256": {
+    "src/games/tide-lock.js": "bb1bfe9bda29f24f526c06d38ac60919a262716e87aed197de576a05a347150d",
+    "src/games/tide-lock-draw.js": "91406515d45a594fea9d6c2958d66a0dcd0fd605bfce6a8a96357c7f81db2394",
+    "src/games/tide-lock-levels.js": "efe6b675c712c68c5a27417342818408aa89fd8b5e3d8eb6973c80ce1e130f57",
+    "src/games/tide-lock-plan.js": "3979bb788a8da932815a9218ae347881ca07832cb5c56cecbb0e1abfd446e3d2",
+    "src/games/tide-lock-world.js": "a4f116a851414674e28cdc5d2fb4320edbccc284a74cabe4fbb7c61fa0b345fb",
+    "tests/tide-lock.test.js": "4832ce397bb53bad5d803bc640cf7dfbb6832228ac714283e08586a61a72b955",
+    "tests/tide-lock-quality.test.js": "e02f2e822aaef56b1040383a26a7dd140751774df11043004f365ef377e3f58a"
+  },
+  "tests": {
+    "command": "node --experimental-test-coverage --test-coverage-include='src/games/tide-lock*.js' --test tests/tide-lock.test.js tests/tide-lock-quality.test.js",
+    "passed": 85,
+    "failed": 0,
+    "lineCoverage": 98.72,
+    "log": "tide-lock-coverage.txt"
+  },
+  "independentProbes": "On the final files a board-reading bot that uses only the public state, ignores the prompt's press and acts with a 0.25 s or 0.35 s lag cleared all 22 locks with no lost hulls or resets; mastery locks needed about 33 presses against about 10 on teaching locks, with a worst depth margin of 0.1 m. From lock 15 the prompt states only the goal (kind 'watch', no press) until no boat has moved for 75 s, where the review had found the prompt naming every press on mastery locks; the reviewer's prompt-following bot still clears 22/22 through that idle assist. Blind policies reached at most 8% (lock 4), play matched across 30, 60 and 120 Hz, hostile input, endings, every broken progress store and the soft-lock sweep all passed, and 167 EN and ZH strings fit with no Latin in Chinese.",
+  "findings": [
+    {
+      "id": "M1",
+      "severity": "medium",
+      "status": "fixed",
+      "observation": "Fairness finding: the prompt named the next press on every lock, so following it solved mastery locks 15-22. Locks 1-14 keep step prompts; from lock 15 the line states the goal (for example 'Lift boat 2 to the Pool') and stays on one boat until it docks; the lock 6 and 7 tips teach principles rather than the order of play; the convoy lock was re-planned to hold two boats. If no boat moves for 75 s the steps return for that lock only, so a stuck player is never left without help."
+    },
+    {
+      "id": "M2",
+      "severity": "medium",
+      "status": "fixed",
+      "observation": "Robustness findings: a throwing progress store crashed reading or saving unlocks, and presses during the 2.2 s clear hold were dropped. Store calls are wrapped as in the other games, and up to eight key presses are queued and replayed on the next lock with a move sound."
+    },
+    {
+      "id": "M3",
+      "severity": "medium",
+      "status": "fixed",
+      "observation": "Presentation finding: open and shut valves and gates differed by colour only. Deck buttons, pipe indicators and wall gate marks now draw solid for open and hollow for shut."
+    },
+    {
+      "id": "M4",
+      "severity": "medium",
+      "status": "fixed",
+      "observation": "Presentation finding: Chinese text showed 'm' for metres and Latin V1/G1 labels. It now uses 米 and 阀1, 闸1 and 泵1 in prompts and on the deck."
+    },
+    {
+      "id": "L1",
+      "severity": "low",
+      "status": "fixed",
+      "observation": "The menu-start frame now carries its time step, so play matches across frame rates; locked levels on the picker show a padlock; boats and berth pennants carry a pixel number."
+    }
+  ],
+  "openNotes": [
+    "Mastery locks need about three times the presses of teaching locks and have a smaller depth margin, but by the board-reading bot they are no harder than the combination tier.",
+    "The idle assist after 75 s was added by the owner beyond the findings; the coordinator kept it because the game has no paid hint and a stuck player would otherwise get no help.",
+    "Line coverage is 98.72% (tide-lock-world.js 95.22%), below the 100% recorded for most games; the uncovered lines are defensive branches.",
+    "The board-reading bot is one heuristic player and was verified on seed 1 at both lags; the owner reported identical results on three seeds."
+  ],
+  "browser": {
+    "method": "Official Claude in Chrome extension, local server; real clicks on Start and the language toggle, synthetic in-page keys driven by the status line; only DOM text and the canvas were read.",
+    "servedSha256Prefixes": "bb1bfe9b 91406515 efe6b675 3979bb78 a4f116a8",
+    "observed": [
+      "English: Start opened lock 1 of 22 (First Step) with the pond, basin, depth readouts, the numbered boat and hollow shut markers on the V1 and G1 deck buttons.",
+      "Win: following the prompts opened V1, selected gate G1 with X, opened it and sailed the boat to its berth ('All boats are docked!', 'Lock cleared!'), and lock 2 (Downstream) opened with the boat and its berth pennant both numbered 1.",
+      "Chinese 390 px phone frame (388 px inner, no horizontal overflow): lock 2 with the prompt '空格：打开阀1（池塘注入水池）', depths in 米, the deck labels 闸1 and 阀1 and touch buttons 阀门-, 阀门+, 闸门, 开关 and 重置.",
+      "Not covered in the browser: the goal-only prompts from lock 15, a grounded hull and the final lock; the probes and quality tests cover them."
+    ],
+    "screenshots": ["screenshots/tide-lock-en.png", "screenshots/tide-lock-phone-zh.png"]
+  }
+}

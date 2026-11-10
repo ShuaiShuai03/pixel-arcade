@@ -227,7 +227,7 @@
     "required": true,
     "startsAfterAllGamesDeveloped": true,
     "maxActiveGames": 3,
-    "status": "in_progress",
+    "status": "complete",
     "requiredGameCount": 50,
     "passedGames": [
       "snowball-siege",
@@ -278,7 +278,8 @@
       "weightworks",
       "pixel-parkour",
       "phase-tiles",
-      "circuit-weaver"
+      "circuit-weaver",
+      "tide-lock"
     ],
     "records": [
       "final-review/snowball-siege.json",
@@ -329,7 +330,9 @@
       "final-review/weightworks.json",
       "final-review/pixel-parkour.json",
       "final-review/phase-tiles.json",
-      "final-review/circuit-weaver.json"
-    ]
+      "final-review/circuit-weaver.json",
+      "final-review/tide-lock.json"
+    ],
+    "completedOn": "2026-11-10"
   }
 }

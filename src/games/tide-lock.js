@@ -40,8 +40,8 @@ export const meta = {
   players: '1',
   touch: true,
   description: {
-    en: 'Sail every cargo boat to its dock through 22 canal locks. Water only runs downhill through an open valve, at a speed set by the height difference, and a wide chamber drops less than a narrow one for the same volume. A gate opens only when the water on both sides is level, and a boat sails through only if both sides are at least as deep as its draught. Left and Right pick a valve, X picks a gate, Space opens or closes the selected one, and Enter resets the lock (press it twice once the water is moving; there is no undo, because the water and the tide cannot be rewound). You can also tap a valve or a gate, and tap it again to operate it. Water that leaves through the sea, a drain or over a wall is gone: in the later locks a reservoir holds just enough, so waste it and the line at the top tells you to reset. A boat left aground for three seconds damages the hull, again every three seconds until it floats, and three hulls are your whole fleet. The line at the top always names the next move, and a yellow mark shows the water level to wait for.',
-    zh: '通过 22 座运河船闸，把每艘货船送到自己的码头。开着的阀门只会让水从高处流向低处，速度取决于水位差；同样体积的水，宽的水池下降得比窄的少。只有两侧水位齐平时闸门才能打开，且两侧水深都不小于船的吃水，船才能驶过。左右键选择阀门，X 键选择闸门，空格键开关所选的一个，回车键重置本座船闸（水开始流动后需连按两次；不能撤销，因为水和潮汐无法倒流）。也可以直接点按阀门或闸门，再点一次即可操作。流入大海、排水口或溢出墙头的水就没有了：后面的船闸里水库的水刚好够用，浪费之后顶部的提示会让你重置。船搁浅三秒会损坏船体，之后每三秒再损坏一次，直到浮起，三条船体就是你的全部船队。顶部一行始终提示下一步，黄色标记显示该等待的水位。',
+    en: 'Sail every cargo boat to its dock through 22 canal locks. Water only runs downhill through an open valve, at a speed set by the height difference, and a wide chamber drops less than a narrow one for the same volume. A gate opens only when the water on both sides is level, and a boat sails through only if both sides are at least as deep as its draught. Left and Right pick a valve, X picks a gate, Space opens or closes the selected one, and Enter resets the lock (press it twice once the water is moving; there is no undo, because the water and the tide cannot be rewound). You can also tap a valve or a gate, and tap it again to operate it. Water that leaves through the sea, a drain or over a wall is gone: in the later locks a reservoir holds just enough, so waste it and the line at the top tells you to reset. A boat left aground for three seconds damages the hull, again every three seconds until it floats, and three hulls are your whole fleet. In the first locks the line at the top names the next move; from lock 15 it only states the goal, and a yellow mark shows the water level the boat in hand needs. If no boat has moved for 75 seconds, the line gives the steps again.',
+    zh: '通过 22 座运河船闸，把每艘货船送到自己的码头。开着的阀门只会让水从高处流向低处，速度取决于水位差；同样体积的水，宽的水池下降得比窄的少。只有两侧水位齐平时闸门才能打开，且两侧水深都不小于船的吃水，船才能驶过。左右键选择阀门，X 键选择闸门，空格键开关所选的一个，回车键重置本座船闸（水开始流动后需连按两次；不能撤销，因为水和潮汐无法倒流）。也可以直接点按阀门或闸门，再点一次即可操作。流入大海、排水口或溢出墙头的水就没有了：后面的船闸里水库的水刚好够用，浪费之后顶部的提示会让你重置。船搁浅三秒会损坏船体，之后每三秒再损坏一次，直到浮起，三条船体就是你的全部船队。前面的船闸里顶部一行会提示下一步；从第 15 座起它只说明目标，黄色标记显示当前这艘船需要的水位。如果 75 秒内没有船移动，顶部一行会重新给出步骤。',
   },
   keys: [
     { label: { en: 'Select a valve', zh: '选择阀门' }, keys: 'Left / Right' },
@@ -167,7 +167,9 @@ function controlPrompt(s, target, action, close = false) {
   const c = s.w.c;
   const sel = s.sel;
   const isValve = target.kind === 'valve';
-  const label = isValve ? c.valves[target.i].label : c.gates[target.i].label;
+  const part = isValve ? c.valves[target.i] : c.gates[target.i];
+  const label = part.label;
+  const zhLabel = part.labelZh;
   const here = sel.kind === target.kind && sel.i === target.i;
   if (here) {
     if (isValve) {
@@ -176,27 +178,24 @@ function controlPrompt(s, target, action, close = false) {
         ? {
             key: `close:v${target.i}`,
             press: 'Space',
-            ...tw(`Space: close ${label} to hold the level`, `空格：关闭 ${label}，保持水位`),
+            ...tw(`Space: close ${label} to hold the level`, `空格：关闭${zhLabel}，保持水位`),
           }
         : {
             key: `open:v${target.i}`,
             press: 'Space',
-            ...tw(`Space: open ${label} (${fx.en})`, `空格：打开 ${label}（${fx.zh}）`),
+            ...tw(`Space: open ${label} (${fx.en})`, `空格：打开${zhLabel}（${fx.zh}）`),
           };
     }
     return close
       ? {
           key: `close:g${target.i}`,
           press: 'Space',
-          ...tw(`Space: close gate ${label}`, `空格：关闭闸门 ${label}`),
+          ...tw(`Space: close gate ${label}`, `空格：关闭${zhLabel}`),
         }
       : {
           key: `open:g${target.i}`,
           press: 'Space',
-          ...tw(
-            `Space: open gate ${label}, the boat sails on`,
-            `空格：打开闸门 ${label}，船只驶过`,
-          ),
+          ...tw(`Space: open gate ${label}, the boat sails on`, `空格：打开${zhLabel}，船只驶过`),
         };
   }
   const where = `${sel.kind[0]}${sel.i}`;
@@ -204,7 +203,7 @@ function controlPrompt(s, target, action, close = false) {
     return {
       key: `pick:g${target.i}:${where}`,
       press: 'KeyX',
-      ...tw(`Press X to select gate ${label}`, `按 X 选择闸门 ${label}`),
+      ...tw(`Press X to select gate ${label}`, `按 X 选择${zhLabel}`),
     };
   const gx = sel.kind === 'gate' ? c.gates[sel.i].x : 0;
   const dir =
@@ -214,7 +213,7 @@ function controlPrompt(s, target, action, close = false) {
   return {
     key: `pick:v${target.i}:${where}`,
     press,
-    ...tw(`${verb[0]} ${label} (${arrow})`, `${verb[1]} ${label}（${arrow}）`),
+    ...tw(`${verb[0]} ${label} (${arrow})`, `${verb[1]}${zhLabel}（${arrow}）`),
   };
 }
 
@@ -497,7 +496,72 @@ function advanceSearch(s) {
   else s.search = again({});
 }
 
+// What the screen and getState() show. Up to lock 14 it is the planner's own line. From lock
+// `R.goalFrom` on it states the goal or the problem, never the next control, key or action; the
+// yellow water mark for the boat in hand stays.
+const OWN_KEYS = new Set(['clear', 'docked', 'stuck', 'stranded', 'giveup', 'menu']);
+
+// The boat the plan opens a gate for next, else the first afloat.
+function plannedBoat(s) {
+  const w = s.w;
+  const j = firstGate(s, s.plan?.i ?? 0);
+  const next =
+    j < 0
+      ? -1
+      : s.c.boats.findIndex((cb, k) => !w.boats[k].docked && cb.route[w.boats[k].step] === j);
+  return next >= 0 ? next : w.boats.findIndex((b) => !b.docked);
+}
+
+// The goal stays on one boat until it is docked, so the line does not flicker as the plan changes.
+function goalBoat(s) {
+  if (s.goalBoat < 0 || s.w.boats[s.goalBoat].docked) s.goalBoat = plannedBoat(s);
+  return s.goalBoat;
+}
+
+function goalLine(s) {
+  const k = goalBoat(s);
+  const boat = s.c.boats[k];
+  const up = s.c.nodes[boat.to].h0 > s.c.nodes[boat.from].h0;
+  const name = s.c.nodes[boat.to].name;
+  return {
+    key: `goal:${k}`,
+    kind: 'watch',
+    ...tw(
+      `${up ? 'Lift' : 'Lower'} boat ${k + 1} to the ${name[0]}`,
+      `把${k + 1}号船${up ? '升' : '降'}到${name[1]}`,
+    ),
+  };
+}
+
+// A player who gets no boat to move for a long while is not left to guess: the lock then gives its
+// steps as the early locks do, until the lock is left.
+const goalOnly = (s) => s.c.index + 1 >= R.goalFrom && !s.assist;
+
+const planServes = (s) => !s.rescue && plannedBoat(s) === s.goalBoat;
+
+function publicLine(s) {
+  const line = s.line;
+  if (!line || s.menu || !goalOnly(s) || OWN_KEYS.has(line.key)) return line;
+  const plain = s.rescue
+    ? {
+        key: 'aground',
+        kind: 'watch',
+        warn: true,
+        ...tw('Aground! Fix the water level, or Enter resets', '搁浅了！调整水位，或按回车重置'),
+      }
+    : goalLine(s);
+  // the water mark belongs to the boat the plan is serving, so it shows only while that is the goal
+  const mark = planServes(s) ? (line.guide?.mark ?? null) : null;
+  return { ...line, ...plain, press: null, guide: { ctrl: null, mark } };
+}
+
 function think(s, forced = false) {
+  thinkStep(s, forced);
+  if (!s.menu && (s.ticks - s.boatTick) * STEP >= R.assistTime) s.assist = true;
+  s.shown = publicLine(s);
+}
+
+function thinkStep(s, forced) {
   const w = s.w;
   if (s.menu) {
     s.line = {
@@ -530,6 +594,7 @@ function think(s, forced = false) {
   if (prog !== s.lastProg) {
     s.lastProg = prog;
     s.progressTick = s.ticks;
+    s.boatTick = s.ticks;
   }
   if (!s.stuck && provenHopeless(w)) giveUp(s);
   if (!s.search && !s.stuck && !s.nohint) {
@@ -621,6 +686,9 @@ export function loadLock(s, index) {
   s.lost = false;
   s.rescueTick = -1e9;
   s.progressTick = 0;
+  s.boatTick = s.ticks;
+  s.assist = false;
+  s.goalBoat = -1;
   s.lastProg = 0;
   s.retryTick = 0;
   s.actTick = -1e9;
@@ -628,6 +696,24 @@ export function loadLock(s, index) {
   s.v0 = totalVolume(s.w);
   s.layout = controlLayout(s.c);
   think(s, true);
+}
+
+// The progress store is a convenience: a store that throws must not stop the game.
+function readUnlocked(progress) {
+  try {
+    const raw = Number(progress?.unlocked?.());
+    return Number.isNaN(raw) ? 1 : clamp(Math.floor(raw), 1, LEVEL_COUNT);
+  } catch {
+    return 1;
+  }
+}
+
+function saveUnlocked(progress, level) {
+  try {
+    progress?.unlock?.(level);
+  } catch {
+    // the lock is cleared all the same; only the saved place is lost
+  }
 }
 
 export function newState(env = {}) {
@@ -641,10 +727,10 @@ export function newState(env = {}) {
     best: Array(LEVEL_COUNT).fill(0),
     msg: null,
     progress: env.progress || null,
+    queued: [],
     stats: { cleared: 0, resets: 0, hulls: 0, spilled: 0 },
   };
-  const raw = Number(s.progress?.unlocked?.());
-  const unlocked = Number.isNaN(raw) ? 1 : clamp(Math.floor(raw), 1, LEVEL_COUNT);
+  const unlocked = readUnlocked(s.progress);
   loadLock(s, 0);
   if (unlocked > 1) {
     s.menu = { sel: unlocked, unlocked };
@@ -792,6 +878,27 @@ function act(s, input, emit) {
   }
 }
 
+// Keys pressed while a cleared lock waits are kept (a few, in order) and played on the next lock.
+const QUEUED_CODES = ['ArrowLeft', 'KeyA', 'ArrowRight', 'KeyD', 'KeyX', 'Space'];
+
+function queuePresses(s, input, emit) {
+  const codes = QUEUED_CODES.filter((code) => input.pressed(code));
+  if (!codes.length || s.queued.length >= R.queueMax) return;
+  s.queued.push(codes);
+  emit('move');
+}
+
+function replayQueued(s, emit) {
+  const queue = s.queued;
+  s.queued = [];
+  for (const codes of queue)
+    act(
+      s,
+      { pressed: (...wanted) => wanted.some((code) => codes.includes(code)), pointer: null },
+      emit,
+    );
+}
+
 function menuInput(s, input, emit) {
   const m = s.menu;
   const cols = R.menuCols;
@@ -824,7 +931,7 @@ function clearLock(s, emit) {
   const gained = R.scoreClear + s.lives * R.scoreHull + left;
   s.best[s.level] = Math.max(s.best[s.level], gained);
   s.score = s.best.reduce((a, v) => a + v, 0);
-  s.progress?.unlock?.(Math.min(LEVEL_COUNT, s.level + 2));
+  saveUnlocked(s.progress, Math.min(LEVEL_COUNT, s.level + 2));
   s.stats.cleared++;
   emit('coin');
   if (s.level === LEVEL_COUNT - 1) {
@@ -859,7 +966,10 @@ function tick(s, emit) {
     s.clearT += STEP;
     s.ticks++;
     s.msg && (s.msg.time -= STEP);
-    if (s.clearT >= R.clearHold) loadLock(s, s.level + 1);
+    if (s.clearT >= R.clearHold) {
+      loadLock(s, s.level + 1);
+      replayQueued(s, emit);
+    }
     return;
   }
   const spilledBefore = w.led.spilled;
@@ -896,9 +1006,10 @@ export function advance(s, dt, input, emit = () => {}) {
   if (s.phase !== 'playing' || !Number.isFinite(dt) || dt <= 0 || dt > R.maxDt) return false;
   if (s.menu) {
     menuInput(s, input, emit);
-    return true;
-  }
-  if (!s.pending) act(s, input, emit);
+    // the frame that starts a lock still counts its time, so every frame rate keeps one clock
+    if (s.menu) return true;
+  } else if (s.pending) queuePresses(s, input, emit);
+  else act(s, input, emit);
   s.acc += dt;
   const steps = Math.floor(s.acc / STEP + 1e-6);
   s.acc = Math.max(0, s.acc - steps * STEP);
@@ -946,7 +1057,7 @@ export function createGame(env) {
 export function snapshotOf(s) {
   const w = s.w;
   const c = s.c;
-  const line = s.line || { en: '', zh: '', kind: 'watch', press: null, key: '' };
+  const line = s.shown || { en: '', zh: '', kind: 'watch', press: null, key: '' };
   const label = (lang) =>
     s.menu
       ? line[lang]
@@ -970,6 +1081,7 @@ export function snapshotOf(s) {
     searching: Boolean(s.search),
     nohint: Boolean(isHintless(s)),
     pending: s.pending,
+    assist: s.assist,
     menu: s.menu ? { ...s.menu } : null,
     selected: { kind: s.sel.kind, index: s.sel.i },
     prompt: { en: line.en, zh: line.zh, kind: line.kind, press: line.press || null, key: line.key },
@@ -995,6 +1107,7 @@ export function snapshotOf(s) {
     valves: c.valves.map((v, k) => ({
       id: k,
       label: v.label,
+      labelZh: v.labelZh,
       a: v.a,
       b: v.b,
       pump: v.pump,
@@ -1007,6 +1120,7 @@ export function snapshotOf(s) {
     gates: c.gates.map((g, j) => ({
       id: j,
       label: g.label,
+      labelZh: g.labelZh,
       a: g.a,
       b: g.b,
       open: w.gates[j].open,

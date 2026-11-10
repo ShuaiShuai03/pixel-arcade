@@ -63,6 +63,30 @@ export const box = (ctx, color, x, y, w, h) => {
   ctx.fillRect(Math.round(x), Math.round(y), Math.round(w), Math.round(h));
 };
 export const yOf = (level) => GROUND - level * PX;
+
+// Boats are told apart by number as well as colour: a 3 x 5 pixel digit on the flag and the berth.
+const DIGITS = {
+  1: '010110010010111',
+  2: '111001111100111',
+  3: '111001111001111',
+  4: '101101111001001',
+  5: '111100111001111',
+  6: '111100111101111',
+  7: '111001001001001',
+  8: '111101111101111',
+  9: '111101111001111',
+};
+export function drawDigit(ctx, digit, x, y, color) {
+  const bits = DIGITS[digit] || DIGITS[1];
+  for (let i = 0; i < bits.length; i++)
+    if (bits[i] === '1') box(ctx, color, x + (i % 3), y + Math.floor(i / 3), 1, 1);
+}
+
+// Open is a solid mark, shut is an empty frame, so the state does not rest on green against red.
+export function drawState(ctx, open, x, y, w, h, color, inner = '#161c27') {
+  box(ctx, color, x, y, w, h);
+  if (!open) box(ctx, inner, x + 2, y + 2, w - 4, h - 4);
+}
 export const BOAT_COLORS = ['#e4572e', '#f2c14e', '#7bd389'];
 export const WATER = 'rgba(58,144,226,0.62)';
 
@@ -121,15 +145,16 @@ export function drawBoat(ctx, s, k) {
   box(ctx, '#f4efe0', x - 5, ys - 15, 9, 7);
   box(ctx, '#2b4a6b', x - 3, ys - 13, 3, 3);
   box(ctx, '#caa56a', x + 4, ys - 11, 6, 3);
-  box(ctx, color, x - 1, ys - 21, 1, 6);
-  box(ctx, color, x, ys - 21, 4, 2);
+  box(ctx, '#d9d2c0', x - 1, ys - 27, 1, 12);
+  box(ctx, color, x, ys - 27, 7, 9);
+  drawDigit(ctx, k + 1, x + 2, ys - 25, '#1b1b1b');
   if (b.ground > 0.2) {
-    box(ctx, '#ff4d4d', x - 13, ys - 24, 26, 3);
+    box(ctx, '#ff4d4d', x - 13, ys - 31, 26, 3);
     box(
       ctx,
       '#ffffff',
       x - 13,
-      ys - 24,
+      ys - 31,
       Math.round(26 * clamp(1 - b.ground / R.groundGrace, 0, 1)),
       3,
     );
@@ -174,7 +199,8 @@ export function drawWalls(ctx, s) {
       for (let y = topY + 10; y < topY + 8 + door; y += 5)
         box(ctx, '#5f3d1b', x + 1, y, GAP - 2, 1);
     }
-    box(ctx, w.gates[gj].open ? '#53e08a' : '#ff5a4d', x + 3, topY + 3, 6, 3);
+    const gateOpen = w.gates[gj].open;
+    drawState(ctx, gateOpen, x + 3, topY + 2, 6, 5, gateOpen ? '#53e08a' : '#ff5a4d', '#3a404c');
   }
 }
 
@@ -216,7 +242,7 @@ export function drawPipes(ctx, s) {
     }
     box(ctx, v.pump ? '#8a6bd1' : '#7b8596', x0, y - 3, x1 - x0, 6);
     box(ctx, open ? '#2e86de' : '#2b303b', x0 + 1, y - 2, x1 - x0 - 2, 4);
-    box(ctx, open ? '#53e08a' : '#ff5a4d', lay.sx - 4, y - 7, 8, 14);
+    drawState(ctx, open, lay.sx - 4, y - 7, 8, 14, open ? '#53e08a' : '#ff5a4d');
     if (open && Math.abs(w.flows[k]) > 1e-6) {
       const dir = w.flows[k] > 0 ? 1 : -1;
       const len = x1 - x0;
@@ -242,10 +268,11 @@ export function drawSpill(ctx, s) {
 export function drawPennants(ctx, s) {
   s.c.boats.forEach((b, k) => {
     const n = s.c.nodes[b.to];
-    const x = n.x + n.w - 8 - k * 7;
+    const x = n.x + n.w - 10 - k * 9;
     const y = yOf(n.top) + 4;
-    box(ctx, '#d9d2c0', x, y, 1, 14);
-    box(ctx, BOAT_COLORS[k % BOAT_COLORS.length], x + 1, y, 6, 4);
+    box(ctx, '#d9d2c0', x, y, 1, 16);
+    box(ctx, BOAT_COLORS[k % BOAT_COLORS.length], x + 1, y, 7, 9);
+    drawDigit(ctx, k + 1, x + 3, y + 2, '#1b1b1b');
   });
 }
 
@@ -258,7 +285,7 @@ export function drawDeck(ctx, s, env) {
     const name = env.t(...n.name);
     text(ctx, name, n.x + n.w / 2, GROUND + 14, '#9fb0ec', 11, 'center');
   });
-  const guide = s.line?.guide?.ctrl;
+  const guide = s.shown?.guide?.ctrl;
   const button = (kind, i, label, on, p, extra) => {
     const sel = s.sel.kind === kind && s.sel.i === i;
     const pulse = guide && guide.kind === kind && guide.i === i && (s.ticks >> 4) % 2 === 0;
@@ -266,14 +293,24 @@ export function drawDeck(ctx, s, env) {
     if (pulse) box(ctx, '#ffffff', p.x - DECK_W / 2 - 2, p.y - 13, DECK_W + 4, 26);
     box(ctx, on ? '#1f6b46' : '#5a2a2a', p.x - DECK_W / 2, p.y - 11, DECK_W, 22);
     box(ctx, on ? '#53e08a' : '#ff6b5e', p.x - DECK_W / 2, p.y - 11, 4, 22);
-    text(ctx, label, p.x + 2, p.y - 7, '#ffffff', 12, 'center');
+    drawState(ctx, on, p.x - DECK_W / 2 + 6, p.y - 5, 8, 10, on ? '#53e08a' : '#ff6b5e', '#5a2a2a');
+    text(ctx, label, p.x + 4, p.y - 7, '#ffffff', 12, 'center');
     if (extra) box(ctx, extra, p.x + DECK_W / 2 - 9, p.y - 8, 5, 5);
   };
   c.gates.forEach((g, j) => {
     const lvlOk = gateLevel(s.w, j);
-    button('gate', j, g.label, s.w.gates[j].open, lay.gates[j], lvlOk ? '#53e08a' : '#ffb347');
+    button(
+      'gate',
+      j,
+      env.t(g.label, g.labelZh),
+      s.w.gates[j].open,
+      lay.gates[j],
+      lvlOk ? '#53e08a' : '#ffb347',
+    );
   });
-  c.valves.forEach((v, k) => button('valve', k, v.label, s.w.vopen[k], lay.valves[k], null));
+  c.valves.forEach((v, k) =>
+    button('valve', k, env.t(v.label, v.labelZh), s.w.vopen[k], lay.valves[k], null),
+  );
 }
 
 export function drawHud(ctx, s, env) {
@@ -297,18 +334,26 @@ export function drawHud(ctx, s, env) {
     box(ctx, '#b99aff', 331, 6, Math.round(62 * clamp(s.w.energy / c.energy, 0, 1)), 6);
     text(ctx, env.t('Pump', '水泵'), 326, 3, '#b99aff', 11, 'right');
   }
-  const line = s.line;
+  const line = s.shown;
   const color = line.warn ? '#ff8f8f' : line.kind === 'press' ? '#ffe066' : '#bfe6ff';
   text(ctx, env.t(line.en, line.zh), 240, 19, color, 14, 'center');
 }
 
-export function drawReadouts(ctx, s) {
+export function drawReadouts(ctx, s, env) {
   const w = s.w;
   s.c.nodes.forEach((n, i) => {
     const lv = levelOf(w, i);
     const arrow =
       n.sea && n.amp > 0 ? (Math.cos(TWO_PI * (w.time / n.period + n.phase)) >= 0 ? '▲' : '▼') : '';
-    text(ctx, `${lv.toFixed(1)}m${arrow}`, n.x + n.w / 2, 44, '#e8f6ff', 12, 'center');
+    text(
+      ctx,
+      `${lv.toFixed(1)}${env.t('m', '米')}${arrow}`,
+      n.x + n.w / 2,
+      44,
+      '#e8f6ff',
+      12,
+      'center',
+    );
   });
 }
 
@@ -388,6 +433,14 @@ export function drawEnd(ctx, s, env) {
   );
 }
 
+export function drawPadlock(ctx, x, y) {
+  box(ctx, '#9aa3bd', x + 1, y, 6, 2);
+  box(ctx, '#9aa3bd', x + 1, y + 2, 2, 3);
+  box(ctx, '#9aa3bd', x + 5, y + 2, 2, 3);
+  box(ctx, '#c9a227', x, y + 5, 8, 7);
+  box(ctx, '#3a2f08', x + 3, y + 7, 2, 3);
+}
+
 export function drawMenu(ctx, s, env) {
   background(ctx, '#070b1f');
   text(ctx, env.t('TIDE LOCK', '潮汐船闸'), 240, 14, '#ffe066', 16, 'center');
@@ -398,7 +451,8 @@ export function drawMenu(ctx, s, env) {
     const open = i <= unlocked;
     box(ctx, i === sel ? '#ffe066' : '#3a4258', x - 2, y - 2, 56, 38);
     box(ctx, open ? '#262c3e' : '#14171f', x, y, 52, 34);
-    text(ctx, String(i), x + 26, y + 10, open ? '#ffffff' : '#555d75', 14, 'center');
+    text(ctx, String(i), x + (open ? 26 : 22), y + 10, open ? '#ffffff' : '#7a8299', 14, 'center');
+    if (!open) drawPadlock(ctx, x + 38, y + 9);
   }
   const c = LEVELS[sel - 1];
   text(ctx, `${sel}/${LEVEL_COUNT}  ${env.t(...c.name)}`, 240, 262, '#ffffff', 14, 'center');
@@ -426,11 +480,11 @@ export function drawGame(ctx, s, env) {
   drawWalls(ctx, s);
   drawPennants(ctx, s);
   drawSpill(ctx, s);
-  const mark = s.line?.guide?.mark;
+  const mark = s.shown?.guide?.mark;
   if (mark && !s.pending) dashedMark(ctx, c.nodes[mark.node], mark.level, s.ticks);
   drawDeck(ctx, s, env);
   drawPipes(ctx, s);
-  drawReadouts(ctx, s);
+  drawReadouts(ctx, s, env);
   drawHud(ctx, s, env);
   drawBanner(ctx, s, env);
   if (s.phase !== 'playing') drawEnd(ctx, s, env);

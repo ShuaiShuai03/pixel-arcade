@@ -49,6 +49,9 @@ export const RULES = Object.freeze({
   scoreHull: 50,
   scorePar: 2,
   menuCols: 6,
+  goalFrom: 15, // from this lock on the prompt names the goal, never the next control or action
+  assistTime: 75, // seconds with no boat moving after which a goal-only lock gives the steps
+  queueMax: 8, // presses kept from the clear hold and replayed on the next lock
   resetArmTicks: 360,
   freshTime: 3,
 });
@@ -111,6 +114,7 @@ export function compileLevel(def, index) {
   valves.forEach((v, id) => {
     v.id = id;
     v.label = v.pump ? `P${++pn}` : `V${++vn}`;
+    v.labelZh = v.pump ? `泵${pn}` : `阀${vn}`;
   });
   const gates = def.gates
     .map(([a, b]) => ({ a, b, x: wallX(a, b), sill: Math.max(nodes[a].fl, nodes[b].fl) }))
@@ -118,6 +122,7 @@ export function compileLevel(def, index) {
   gates.forEach((g, id) => {
     g.id = id;
     g.label = `G${id + 1}`;
+    g.labelZh = `闸${id + 1}`;
   });
   const boats = def.boats.map((b, id) => {
     const dir = Math.sign(b.to - b.from);

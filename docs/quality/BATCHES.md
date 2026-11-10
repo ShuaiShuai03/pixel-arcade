@@ -4,7 +4,7 @@ At the user's direction, at most **three games** may be under development and ac
 
 ## All 50 games initially accepted
 
-Phase Tiles completed batch 18 and the 50-game target, Pixel Parkour included. The [required final review](#required-final-review) of every game is under way, three games at a time.
+Phase Tiles completed batch 18 and the 50-game target, Pixel Parkour included. The [required final review](#required-final-review) is complete: all 50 games passed on 2026-11-10, each with a record of its reviewed revision, tests, browser evidence, findings, fixes and open notes. A pass records what was verified; it does not claim the games are free of bugs.
 
 | Game              | Final review                                                                                                          |
 | ----------------- | --------------------------------------------------------------------------------------------------------------------- |
@@ -57,6 +57,7 @@ Phase Tiles completed batch 18 and the 50-game target, Pixel Parkour included. T
 | Pixel Parkour     | Passed in one round with no changes: vendored web build verified ([record](final-review/pixel-parkour.json))          |
 | Phase Tiles       | Passed in one round: 26 boards, opt-in hints, exact mastery ([record](final-review/phase-tiles.json))                 |
 | Circuit Weaver    | Passed in one round: 24 boards, per-move paid hints from board 8 ([record](final-review/circuit-weaver.json))         |
+| Tide Lock         | Passed in one round: 22 locks, goal-only prompts from lock 15 ([record](final-review/tide-lock.json))                 |
 
 ## Completed batch 18
 
