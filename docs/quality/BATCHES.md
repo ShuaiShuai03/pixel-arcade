@@ -43,6 +43,7 @@ Phase Tiles completed batch 18 and the 50-game target, Pixel Parkour included. T
 | Magnet Marauder  | Passed in one round: 25 chambers, harder mastery, guarded progress ([record](final-review/magnet-marauder.json))      |
 | Frost Forge      | Passed in one round: 22 workshops, tighter mastery clocks, guarded progress ([record](final-review/frost-forge.json)) |
 | Mimic Vault      | Passed in one round: 22 rooms, tighter mastery caps, guarded progress ([record](final-review/mimic-vault.json))       |
+| Comet Catcher    | Passed in one round: 22 contracts, narrowing cones, shape cues ([record](final-review/comet-catcher.json))            |
 
 ## Completed batch 18
 

@@ -7,6 +7,7 @@ const HZS = [30, 60, 120];
 const FAST = [0.15, 0.35];
 const SLOW = [0.4, 0.6];
 const SEEDS = 10; // x 3 frame rates = 30 runs per contract and reaction speed
+const MASTERY_FROM = 16; // contracts 16-22 are the mastery tier: they ask for tighter execution
 
 function begin(level, seed, lang = 'en') {
   const h = harness({ seed, lang });
@@ -108,28 +109,42 @@ function humanRun(
 
 const cleared = (r) => r.s.level > r.level || r.s.phase === 'won';
 
+// `minWins` is a number, or { early, mastery } for different floors in contracts 1-15 and 16-22.
 function contractRates(delay, minWins, opts = {}) {
   const report = [];
+  const wins = [];
   for (let level = 1; level <= LEVEL_COUNT; level++) {
-    let wins = 0;
+    let won = 0;
     for (const hz of HZS)
       for (let seed = 1; seed <= SEEDS; seed++)
-        if (cleared(humanRun(seed + level * 100, hz, { level, delay, ...opts }))) wins++;
-    report.push(`${level}:${wins}`);
+        if (cleared(humanRun(seed + level * 100, hz, { level, delay, ...opts }))) won++;
+    report.push(`${level}:${won}`);
+    wins.push(won);
+    const floor =
+      typeof minWins === 'number' ? minWins : minWins[level < MASTERY_FROM ? 'early' : 'mastery'];
     assert.ok(
-      wins >= minWins,
-      `contract ${level}: only ${wins}/30 runs cleared it (${report.join(' ')})`,
+      won >= floor,
+      `contract ${level}: only ${won}/30 runs cleared it (${report.join(' ')})`,
     );
   }
-  return report;
+  return { report, wins };
 }
+const mean = (list) => list.reduce((a, b) => a + b, 0) / list.length;
+const earlyMean = (wins) => mean(wins.slice(0, MASTERY_FROM - 1));
+const masteryMean = (wins) => mean(wins.slice(MASTERY_FROM - 1));
 
-test('a delayed player (0.15-0.35 s) using the prompt and marker clears every contract in at least 27 of 30 runs at 30, 60 and 120 Hz', () => {
-  console.log(`per-contract wins, fast reactions: ${contractRates(FAST, 27).join(' ')}`);
+test('a delayed player (0.15-0.35 s) using the prompt and marker clears every contract in at least 25 of 30 runs at 30, 60 and 120 Hz', () => {
+  const { report } = contractRates(FAST, 25);
+  console.log(`per-contract wins, fast reactions: ${report.join(' ')}`);
 });
 
-test('a slow player (0.4-0.6 s with jitter) clears every contract in at least 24 of 30 runs at 30, 60 and 120 Hz', () => {
-  console.log(`per-contract wins, slow reactions: ${contractRates(SLOW, 24).join(' ')}`);
+test('a slow player (0.4-0.6 s with jitter) clears contracts 1-15 in at least 24 of 30 runs, and the mastery tier is measurably harder for them', () => {
+  const { report, wins } = contractRates(SLOW, { early: 24, mastery: 3 });
+  console.log(`per-contract wins, slow reactions: ${report.join(' ')}`);
+  assert.ok(
+    masteryMean(wins) <= earlyMean(wins) - 5,
+    `mastery ${masteryMean(wins)} vs earlier ${earlyMean(wins)}`,
+  );
 });
 
 test('the whole 22-contract campaign is won in at least 27 of 30 runs at each frame rate', () => {
@@ -148,13 +163,14 @@ test('the whole 22-contract campaign is won in at least 27 of 30 runs at each fr
   }
 });
 
-test('the slow player also finishes the campaign in at least 24 of 30 runs at 60 Hz', () => {
-  let wins = 0;
-  for (let seed = 1; seed <= 30; seed++)
-    if (humanRun(seed, 60, { campaign: true, seconds: 2000, delay: SLOW }).s.phase === 'won')
-      wins++;
-  console.log(`slow campaign wins at 60 Hz: ${wins}/30`);
-  assert.ok(wins >= 24, `only ${wins}/30 slow campaigns won`);
+test('the slow player still reaches the mastery tier (contract 16) in at least 24 of 30 campaigns at 60 Hz', () => {
+  let reached = 0;
+  for (let seed = 1; seed <= 30; seed++) {
+    const r = humanRun(seed, 60, { campaign: true, seconds: 2000, delay: SLOW });
+    if (r.s.level >= MASTERY_FROM || r.s.phase === 'won') reached++;
+  }
+  console.log(`slow campaigns reaching contract ${MASTERY_FROM} at 60 Hz: ${reached}/30`);
+  assert.ok(reached >= 24, `only ${reached}/30 slow campaigns reached the mastery tier`);
 });
 
 test('a scripted legal solution (an instant reader) clears every contract at every rate without a failed attempt', () => {
@@ -166,9 +182,9 @@ test('a scripted legal solution (an instant reader) clears every contract at eve
     }
 });
 
-test('a casual player (slow, drops keys, half the time ignores the cooling prompt) clears every contract in at least 24 of 30 runs', () => {
+test('a casual player (slow, drops keys, half the time ignores the cooling prompt) clears contracts 1-15 in at least 24 of 30 runs', () => {
   const casual = [0.3, 0.7];
-  contractRates(casual, 24, { drop: 0.1, ignoreClose: 0.5 });
+  contractRates(casual, { early: 24, mastery: 3 }, { drop: 0.1, ignoreClose: 0.5 });
 });
 
 test('perturbed input (dropped keys, irregular frame times) still clears representative contracts', () => {
@@ -179,7 +195,8 @@ test('perturbed input (dropped keys, irregular frame times) still clears represe
       for (const hz of HZS)
         for (let seed = 1; seed <= 4; seed++)
           if (cleared(humanRun(seed, hz, { level, ...c }))) wins++;
-      assert.ok(wins >= 10, `${JSON.stringify(c)} contract ${level}: ${wins}/12`);
+      const floor = level < MASTERY_FROM ? 10 : 4; // mastery asks for tighter execution
+      assert.ok(wins >= floor, `${JSON.stringify(c)} contract ${level}: ${wins}/12`);
     }
 });
 

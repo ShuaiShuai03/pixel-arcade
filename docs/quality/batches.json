@@ -264,7 +264,8 @@
       "tether-twins",
       "magnet-marauder",
       "frost-forge",
-      "mimic-vault"
+      "mimic-vault",
+      "comet-catcher"
     ],
     "records": [
       "final-review/snowball-siege.json",
@@ -301,7 +302,8 @@
       "final-review/tether-twins.json",
       "final-review/magnet-marauder.json",
       "final-review/frost-forge.json",
-      "final-review/mimic-vault.json"
+      "final-review/mimic-vault.json",
+      "final-review/comet-catcher.json"
     ]
   }
 }

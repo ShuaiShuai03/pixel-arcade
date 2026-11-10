@@ -9,8 +9,8 @@ export const meta = {
   players: '1',
   touch: true,
   description: {
-    en: 'Slide a catching net along the observatory roof and tilt it to meet falling comets face-on: a comet is caught only if it arrives within 30 degrees of the net axis and slower than 215 px/s relative to the net. The net holds a limited load and warns before it is full, so press X over a bin to unload. Hot comets must cool before a bin accepts them: press Space to close the net, which cools three times as fast as an open one. Each contract needs a set number of comets in the right bins. Clear all 22 contracts; progress is saved.',
-    zh: '在天文台屋顶上移动并倾斜接网，让网口正对坠落的彗星：只有与网轴夹角不超过 30 度、相对速度不超过 215 像素/秒的彗星才能被接住。接网容量有限，快满时会预警，请在收集箱上方按 X 卸货。热彗星必须冷却后才会被收集箱接收：按空格合上接网，冷却速度是敞开时的三倍。每份合同要求把规定数量的彗星送进正确的收集箱。完成全部 22 份合同，进度会被保存。',
+    en: 'Slide a catching net along the observatory roof and tilt it to meet falling comets face-on: a comet is caught only if its approach, seen from the net, is within the cone angle of the net axis (30 degrees at first, tighter in later contracts, shown as Cone on screen) and its speed into the net is at most 215 px/s. The net holds a limited load and warns before it is full, so press X over a bin to unload. Hot comets must cool before a bin accepts them: press Space to close the net, which cools three times as fast as an open one. Each contract needs a set number of comets in the right bins. Clear all 22 contracts; progress is saved.',
+    zh: '在天文台屋顶上移动并倾斜接网，让网口正对坠落的彗星：只有从网口看来与网轴的夹角不超过夹角上限（起初为 30 度，后期合同更小，屏幕上标为“夹角”）、且撞向接网的速度不超过 215 像素/秒的彗星才能被接住。接网容量有限，快满时会预警，请在收集箱上方按 X 卸货。热彗星必须冷却后才会被收集箱接收：按空格合上接网，冷却速度是敞开时的三倍。每份合同要求把规定数量的彗星送进正确的收集箱。完成全部 22 份合同，进度会被保存。',
   },
   keys: [
     { label: { en: 'Slide the net', zh: '移动接网' }, keys: 'A D / Left Right' },
@@ -82,6 +82,7 @@ const RAD = Math.PI / 180;
 const DEG = 180 / Math.PI;
 const MENU_COLS = 11;
 const COLOR_FILL = ['#58d8ff', '#ff5fd2', '#ffd447'];
+const PLANE_REACH = 28; // a tilted mouth plane lies at most this far below the net line
 const LIFT = 0.001; // a bounced comet sits just above the mesh plane
 const clamp = (n, lo, hi) => Math.max(lo, Math.min(hi, n));
 
@@ -126,7 +127,16 @@ function shower(
   });
 }
 
-const L = (name, tip, cap, wind, bins, spec) => ({ name, tip, cap, wind, bins, spec });
+// `cone` is the widest angle between net axis and comet that the level's net still catches.
+const L = (name, tip, cap, wind, bins, spec, cone = R.cone) => ({
+  name,
+  tip,
+  cap,
+  wind,
+  bins,
+  spec,
+  cone,
+});
 const SLANT = [120, -120];
 const LEVEL_DEFS = [
   L(
@@ -269,25 +279,28 @@ const LEVEL_DEFS = [
     0,
     [bin(240, 8)],
     {
-      xs: [140, 330, 200, 280, 120, 360, 220, 300, 160, 340, 290],
+      xs: [140, 230, 150, 250, 340, 250, 170, 270, 190, 290],
       size: [1, 2],
-      vx: [0, 120, -120],
-      gap: 2.4,
+      vx: [0, 90, -90],
+      vy: [40],
+      gap: 1.3,
     },
+    28,
   ),
   L(
     ['Storm Front', '风暴锋面'],
     ['[Arrows] Storm and fire: cool before you sort', '[方向键] 风暴加火焰：先降温再分拣'],
     6,
-    40,
+    45,
     [bin(130, 3, { colors: [0] }), bin(350, 3, { colors: [1] })],
     {
-      xs: [180, 330, 260, 140, 350, 220, 300, 160, 340],
+      xs: [180, 330, 260, 140, 350, 220, 300, 160],
       color: [0, 1, 1, 0],
       vx: [30, 40, 20, 0],
-      heat: [20, 80],
-      gap: 4,
+      heat: [20, 100],
+      gap: 1.6,
     },
+    26,
   ),
   L(
     ['Sorting Office', '分拣中心'],
@@ -299,22 +312,25 @@ const LEVEL_DEFS = [
       xs: [300, 180, 250, 330, 160, 240, 310, 170, 260, 320, 150, 230],
       color: [0, 1, 2],
       vx: [120, -120, 0],
-      gap: 3.2,
+      vy: [30, 50],
+      gap: 1.8,
     },
+    24,
   ),
   L(
     ['Furnace Night', '熔炉之夜'],
     ['[Arrows] Heavy and hot: carry it closed', '[方向键] 又重又烫：合上接网搬运'],
     5,
-    -30,
+    -35,
     [bin(160, 3, { sizes: [1, 2] }), bin(320, 2, { sizes: [3] })],
     {
       xs: [250, 170, 300, 200, 330, 230, 180, 310],
       size: [3, 1, 2, 3, 1, 2],
-      vx: [-50, -60, -40],
-      heat: [100, 70],
-      gap: 4.2,
+      vx: [-45, -50, -35],
+      heat: [110, 95],
+      gap: 3.6,
     },
+    22,
   ),
   L(
     ['Long Exposure', '长时间曝光'],
@@ -326,38 +342,42 @@ const LEVEL_DEFS = [
       xs: [250, 330, 190, 300, 140, 360, 220, 280, 170, 340, 210, 310],
       color: [0, 1, 2],
       vx: [40, 30, 10],
-      heat: [20, 85],
-      gap: 3.8,
+      heat: [20, 100],
+      gap: 3.4,
     },
+    20,
   ),
   L(
     ['Meteor Rush', '流星疾冲'],
     ['[Arrows] Fast and dense: keep sliding', '[方向键] 又快又密：不停地移动'],
     6,
-    30,
+    25,
     [bin(160, 5, { sizes: [1] }), bin(320, 4, { sizes: [2, 3] })],
     {
-      xs: [120, 320, 220, 360, 160, 300, 200, 340, 140, 280, 240, 380],
+      xs: [120, 210, 300, 220, 310, 400, 310, 220, 130, 220, 310, 400],
       size: [1, 2, 1, 3],
-      vx: [70, -70, 70, -70],
-      vy: [20, 50],
-      gap: 3,
+      vx: [75, -75, 75, -75],
+      vy: [50],
+      heat: [20, 20, 95],
+      gap: 2.4,
     },
+    18,
   ),
   L(
     ['Grand Observatory', '大天文台'],
     ['[Arrows] The grand contract: use everything', '[方向键] 终极合同：运用你学到的一切'],
     8,
     -35,
-    [bin(100, 4, { colors: [0] }), bin(240, 4, { colors: [1] }), bin(380, 4, { colors: [2] })],
+    [bin(100, 5, { colors: [0] }), bin(240, 5, { colors: [1] }), bin(380, 4, { colors: [2] })],
     {
-      xs: [270, 190, 330, 150, 300, 220, 340, 170, 290, 210, 320, 160, 280, 200, 350, 180],
+      xs: [270, 190, 330, 150, 300, 220, 340, 170, 290, 210, 320, 160, 280, 200, 350, 180, 250],
       color: [0, 1, 2],
       size: [1, 2, 1],
       vx: [-40, -30, -10],
-      heat: [20, 85, 20, 20],
-      gap: 3.6,
+      heat: [20, 95, 20, 20],
+      gap: 2.7,
     },
+    16,
   ),
 ];
 
@@ -373,6 +393,7 @@ function buildLevel(def) {
     tip: def.tip,
     cap: def.cap,
     wind: def.wind,
+    cone: def.cone,
     bins: Object.freeze(def.bins.map((b) => Object.freeze(b))),
     sched: Object.freeze(sched.map((c) => Object.freeze(c))),
   });
@@ -404,12 +425,12 @@ export function mouthCrossing(p0, p1, net0, net1) {
 }
 
 // The stated catch rule, from the comet velocity relative to the net.
-export function judgeCatch(relVx, relVy, tilt) {
+export function judgeCatch(relVx, relVy, tilt, cone = R.cone) {
   const n = poseOf(0, tilt);
   const approach = -(relVx * n.nx + relVy * n.ny);
   const speed = Math.hypot(relVx, relVy);
   const angle = approach > 0 ? Math.acos(clamp(approach / speed, -1, 1)) * DEG : 180;
-  if (angle > R.cone) return { ok: false, reason: 'angle', angle, approach };
+  if (angle > cone) return { ok: false, reason: 'angle', angle, approach };
   if (approach > R.absorb) return { ok: false, reason: 'fast', angle, approach };
   return { ok: true, reason: 'ok', angle, approach };
 }
@@ -454,6 +475,7 @@ function loadLevel(s, index) {
   s.lost = 0;
   s.trip = false;
   s.freeze = 0;
+  s.queued = { space: 0, unload: 0 };
   s.menu = null;
   s.msg = null;
   s.line = null;
@@ -462,6 +484,23 @@ function loadLevel(s, index) {
   say(s, lv.tip[0], lv.tip[1], R.introTime);
   think(s);
   updateLine(s);
+}
+
+// Saved progress is a convenience: a missing, hostile or throwing store must not stop the game.
+function readUnlocked(progress) {
+  try {
+    const n = Math.floor(Number(progress?.unlocked?.()));
+    return Number.isFinite(n) ? clamp(n, 1, LEVEL_COUNT) : 1;
+  } catch {
+    return 1;
+  }
+}
+function saveUnlocked(progress, level) {
+  try {
+    progress?.unlock?.(level);
+  } catch {
+    // Progress is a convenience: a broken store must not stop the game.
+  }
 }
 
 export function newState(env = {}) {
@@ -475,8 +514,7 @@ export function newState(env = {}) {
     best: Array(LEVEL_COUNT).fill(0),
     stats: { caught: 0, delivered: 0, lost: 0, bounced: 0, spilled: 0, unloads: 0, fails: 0 },
   };
-  const raw = Number(s.progress?.unlocked?.());
-  const unlocked = Number.isFinite(raw) ? clamp(Math.floor(raw), 1, LEVEL_COUNT) : 1;
+  const unlocked = readUnlocked(s.progress);
   loadLevel(s, 0);
   if (unlocked > 1) {
     s.menu = { sel: unlocked, unlocked };
@@ -503,7 +541,7 @@ const PROMPTS = {
   cool: ['Stand still: cooling, then press X', '站着别动：降温后按 X'],
   unload: ['[X] Unload into this bin', '[X] 向这个收集箱卸货'],
   level: ['[Arrows] Level the net before it spills', '[方向键] 摆正接网，免得货物洒出'],
-  menu: ['[Arrows] Pick a contract, then press Space', '[方向键] 选择合同，然后按空格'],
+  menu: ['[Arrows] Pick a contract, then Space or Enter', '[方向键] 选择合同，然后按空格或回车'],
 };
 
 function wantedList(s) {
@@ -516,8 +554,12 @@ function wantedList(s) {
   }
   const entries = [];
   for (const c of s.comets) {
-    if (c.fate !== 'air' || c.spent || c.y >= R.netY - 4) continue;
-    const p = predictCrossing(c, lv.wind);
+    if (c.fate !== 'air' || c.spent) continue;
+    // A comet stays the target until it actually crosses the (possibly tilted) mouth plane, so the
+    // marker never sends the net sliding away in the instant before the catch.
+    const below = c.y >= R.netY;
+    if (below && (c.y >= R.netY + PLANE_REACH || Math.abs(c.x - s.net.x) > R.half + 4)) continue;
+    const p = below ? { t: 0, x: c.x, vx: c.vx, vy: c.vy } : predictCrossing(c, lv.wind);
     if (p)
       entries.push({
         at: s.clock + p.t,
@@ -756,7 +798,7 @@ function stepComets(s, prevNet, emit) {
         continue;
       }
     } else if (cross) {
-      const verdict = judgeCatch(rvx, rvy, net.tilt);
+      const verdict = judgeCatch(rvx, rvy, net.tilt, lv.cone);
       let reason = verdict.reason;
       if (verdict.ok) {
         if (!net.open) reason = 'closed';
@@ -851,7 +893,7 @@ function clearLevel(s, emit) {
   const bonus = R.clearScore + (s.lost === 0 ? R.cleanScore : 0);
   s.best[s.level] = Math.max(s.best[s.level], s.gained + bonus);
   s.score = s.best.reduce((a, b) => a + b, 0);
-  s.progress?.unlock?.(Math.min(LEVEL_COUNT, s.level + 2));
+  saveUnlocked(s.progress, Math.min(LEVEL_COUNT, s.level + 2));
   s.tries = R.tries;
   emit('coin');
   if (s.level === LEVEL_COUNT - 1) {
@@ -871,6 +913,12 @@ function unload(s, emit) {
   const net = s.net;
   const b = lv.bins.findIndex((bn) => Math.abs(bn.x - net.x) <= R.reach);
   if (b < 0) return say(s, '[Arrows] Move over a bin first', '[方向键] 先移到收集箱上方');
+  if (!net.items.length)
+    return say(
+      s,
+      '[Arrows] The net is empty: catch a comet first',
+      '[方向键] 接网是空的：先接一颗彗星',
+    );
   const mine = net.items.filter((i) => accepts(lv.bins[b], i));
   if (!mine.length)
     return say(s, '[Arrows] This bin takes other comets', '[方向键] 这个箱子收的是别的彗星');
@@ -894,12 +942,22 @@ function unload(s, emit) {
   if (lv.bins.every((bn, i) => s.delivered[i] >= bn.need)) clearLevel(s, emit);
 }
 
+// Presses made during the contract-cleared freeze are kept and applied the moment it ends.
+const QUEUE_MAX = 2;
 function act(s, input, emit) {
-  if (input.pressed('Space')) {
+  const q = s.queued;
+  const space = q.space + (input.pressed('Space') ? 1 : 0);
+  const unloadKey = q.unload + (input.pressed('KeyX') ? 1 : 0);
+  if (s.freeze > 0) {
+    s.queued = { space: Math.min(QUEUE_MAX, space), unload: Math.min(QUEUE_MAX, unloadKey) };
+    return;
+  }
+  s.queued = { space: 0, unload: 0 };
+  if (space % 2 === 1) {
     s.net.open = !s.net.open;
     emit('move');
   }
-  if (input.pressed('KeyX')) unload(s, emit);
+  if (unloadKey > 0) unload(s, emit);
 }
 
 function menuInput(s, input, emit) {
@@ -959,7 +1017,7 @@ export function advance(s, dt, input, emit = () => {}) {
     menuInput(s, input, emit);
     return true;
   }
-  if (s.freeze <= 0) act(s, input, emit);
+  act(s, input, emit);
   const keys = keysOf(input);
   s.acc += dt;
   const steps = Math.floor(s.acc / STEP + 1e-6);
@@ -1043,6 +1101,7 @@ export function snapshotOf(s) {
     levelName: { en: lv.name[0], zh: lv.name[1] },
     tries: s.tries,
     wind: lv.wind,
+    cone: lv.cone,
     net: {
       x: net.x,
       y: R.netY,
@@ -1089,6 +1148,14 @@ export function snapshotOf(s) {
 const box = (ctx, color, x, y, w, h) => {
   ctx.fillStyle = color;
   ctx.fillRect(Math.round(x), Math.round(y), Math.round(w), Math.round(h));
+};
+// Heat tiers also differ in shape: warm gets bars above and below, scorching a full frame.
+const frame = (ctx, color, x, y, w, h, t, scorch) => {
+  box(ctx, color, x, y, w, t);
+  box(ctx, color, x, y + h - t, w, t);
+  if (!scorch) return;
+  box(ctx, color, x, y, t, h);
+  box(ctx, color, x + w - t, y, t, h);
 };
 const heatColor = (h) => (h > R.scorchHeat ? '#ff4b2b' : h > R.safeHeat ? '#ff9a3c' : '#d8f4ff');
 
@@ -1165,6 +1232,20 @@ function drawGlyph(ctx, color, x, y, fill) {
   }
 }
 
+// A 7 px version of the bin marks, so loads in the net show their colour by shape too.
+function drawMini(ctx, color, x, y, fill) {
+  if (color === 0) box(ctx, fill, x + 1, y + 1, 5, 5);
+  else if (color === 1) {
+    box(ctx, fill, x + 3, y, 1, 2);
+    box(ctx, fill, x + 2, y + 2, 3, 2);
+    box(ctx, fill, x, y + 4, 7, 3);
+  } else {
+    box(ctx, fill, x + 3, y, 1, 7);
+    box(ctx, fill, x, y + 3, 7, 1);
+    box(ctx, fill, x + 2, y + 2, 3, 3);
+  }
+}
+
 function drawComet(ctx, c) {
   const speed = Math.hypot(c.vx, c.vy) || 1;
   const r = radiusOf(c);
@@ -1186,10 +1267,8 @@ function drawComet(ctx, c) {
   box(ctx, COLOR_FILL[c.color], c.x - r, c.y - r, r * 2, r * 2);
   box(ctx, '#16204a', c.x - r + 3, c.y - r + 3, r * 2 - 6, r * 2 - 6);
   drawGlyph(ctx, c.color, c.x - 5, c.y - 5, COLOR_FILL[c.color]);
-  if (c.heat > R.safeHeat) {
-    box(ctx, hotFill, c.x - r, c.y - r, r * 2, 2);
-    box(ctx, hotFill, c.x - r, c.y + r - 2, r * 2, 2);
-  }
+  if (c.heat > R.safeHeat)
+    frame(ctx, hotFill, c.x - r, c.y - r, r * 2, r * 2, 2, c.heat > R.scorchHeat);
   ctx.globalAlpha = 1;
 }
 
@@ -1207,9 +1286,16 @@ function drawGuide(ctx, s) {
   const x = g.x;
   // The roof radar shows a comet that has not appeared yet as a dim blip.
   const color = g.early ? '#3f9a66' : '#7dff9c';
-  box(ctx, color, x - 20, R.netY - 28, 40, 2);
-  box(ctx, color, x - 20, R.netY - 28, 2, 6);
-  box(ctx, color, x + 18, R.netY - 28, 2, 6);
+  // A solid bracket marks a comet in view; the radar blip is dashed with short ticks.
+  if (g.early) {
+    for (let k = 0; k < 40; k += 8) box(ctx, color, x - 20 + k, R.netY - 28, 4, 2);
+    box(ctx, color, x - 20, R.netY - 28, 2, 3);
+    box(ctx, color, x + 18, R.netY - 28, 2, 3);
+  } else {
+    box(ctx, color, x - 20, R.netY - 28, 40, 2);
+    box(ctx, color, x - 20, R.netY - 28, 2, 6);
+    box(ctx, color, x + 18, R.netY - 28, 2, 6);
+  }
   const a = g.tilt * RAD;
   for (let k = -3; k <= 3; k++)
     box(ctx, color, x + Math.cos(a) * k * 6 - 1, R.netY - 40 + Math.sin(a) * k * 6, 3, 3);
@@ -1239,8 +1325,9 @@ function drawNet(ctx, s) {
   }
   net.items.forEach((it, k) => {
     const p = at(-R.half + 12 + (k % 5) * 10, sag * 0.8 - 4 - Math.floor(k / 5) * 8);
-    box(ctx, COLOR_FILL[it.color], p.x - 3, p.y - 3, 7, 7);
-    if (it.heat > R.safeHeat) box(ctx, heatColor(it.heat), p.x - 1, p.y - 1, 3, 3);
+    drawMini(ctx, it.color, p.x - 3, p.y - 3, COLOR_FILL[it.color]);
+    if (it.heat > R.safeHeat)
+      frame(ctx, heatColor(it.heat), p.x - 4, p.y - 4, 9, 9, 1, it.heat > R.scorchHeat);
   });
   for (const e of [-R.half, R.half]) {
     const p = at(e, 0);
@@ -1283,7 +1370,7 @@ function drawHud(ctx, s, env) {
   );
   text(
     ctx,
-    `${env.t('Heat', '热度')} ${heat}`,
+    `${env.t('Heat', '热度')} ${heat}${heat > R.scorchHeat ? '!' : ''}`,
     130,
     302,
     heat > R.safeHeat ? '#ff9a3c' : '#cfd6ea',
@@ -1297,7 +1384,17 @@ function drawHud(ctx, s, env) {
     '#cfd6ea',
     14,
   );
+  text(ctx, `${env.t('Cone', '夹角')} ${lv.cone}°`, 306, 302, '#cfd6ea', 14);
   text(ctx, `${env.t('Tries', '机会')} ${s.tries}`, 474, 302, '#cfd6ea', 14, 'right');
+}
+
+// A padlock, so locked contracts are marked by shape and not only by a dimmer tile.
+function drawLock(ctx, x, y) {
+  box(ctx, '#7a839f', x + 2, y, 6, 2);
+  box(ctx, '#7a839f', x + 2, y, 2, 5);
+  box(ctx, '#7a839f', x + 6, y, 2, 5);
+  box(ctx, '#7a839f', x, y + 5, 10, 8);
+  box(ctx, '#14171f', x + 4, y + 7, 2, 4);
 }
 
 function drawMenu(ctx, s, env) {
@@ -1310,7 +1407,8 @@ function drawMenu(ctx, s, env) {
     const open = i <= unlocked;
     box(ctx, i === sel ? '#ffe066' : '#3a4258', x - 2, y - 2, 36, 36);
     box(ctx, open ? '#262c3e' : '#14171f', x, y, 32, 32);
-    text(ctx, String(i), x + 16, y + 9, open ? '#ffffff' : '#555d75', 14, 'center');
+    text(ctx, String(i), x + 16, open ? y + 9 : y + 3, open ? '#ffffff' : '#7a839f', 14, 'center');
+    if (!open) drawLock(ctx, x + 11, y + 18);
   }
   const lv = LEVELS[sel - 1];
   text(ctx, `${sel}/${LEVEL_COUNT}  ${env.t(...lv.name)}`, 240, 170, '#ffffff', 16, 'center');
@@ -1318,7 +1416,8 @@ function drawMenu(ctx, s, env) {
   text(ctx, env.t(...PROMPTS.menu), 240, 270, '#cfd6ea', 14, 'center');
 }
 
-function drawGame(ctx, s, env) {
+// Exported so tests can draw prepared states; the host only uses createGame().draw.
+export function drawGame(ctx, s, env) {
   if (s.menu) return drawMenu(ctx, s, env);
   drawSky(ctx, s);
   drawRoof(ctx, s);

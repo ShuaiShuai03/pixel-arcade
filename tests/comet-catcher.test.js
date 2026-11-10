@@ -5,6 +5,7 @@ import {
   createGame,
   newState,
   advance,
+  drawGame,
   snapshotOf,
   mouthCrossing,
   judgeCatch,
@@ -1331,4 +1332,323 @@ test('R9: the reviewer cases (tilt -34, -52 and +40, and a level net on contract
       assert.ok(Math.hypot(after.x - before.x, after.y - before.y) < 3.5, `tilt ${tilt}: jumped`);
     assert.equal(s.comets.length, 0);
   }
+});
+
+// --- Final review fixes ---
+
+const COLOR_FILL = ['#58d8ff', '#ff5fd2', '#ffd447'];
+
+test('a progress store that throws never crashes opening, playing or clearing a contract', () => {
+  const throwing = (which) => ({
+    unlocked: () => {
+      if (which.includes('read')) throw new Error('storage unavailable');
+      return 1;
+    },
+    unlock: () => {
+      if (which.includes('write')) throw new Error('quota exceeded');
+    },
+  });
+  const h = harness();
+  h.env.progress = throwing(['read', 'write']);
+  const g = createGame(h.env);
+  assert.equal(g.getState().menu, null, 'a failed read starts at contract 1');
+  assert.doesNotThrow(() => playLevel(g, 1, (x) => x.level === 2));
+  assert.equal(g.getState().level, 2, 'a failed save does not stop the campaign');
+  const w = harness();
+  w.env.progress = throwing(['write']);
+  const gw = createGame(w.env);
+  assert.doesNotThrow(() => playLevel(gw, 1, (x) => x.level === 2));
+  assert.equal(gw.getState().level, 2);
+  for (const bad of [() => 'nope', () => null, () => undefined, () => ({})]) {
+    const hb = harness();
+    hb.env.progress = { unlocked: bad, unlock: () => {} };
+    assert.equal(createGame(hb.env).getState().menu, null);
+  }
+});
+
+test('X with an empty net says so in both languages, over a bin or elsewhere keeps its own messages', () => {
+  const s = quiet();
+  assert.equal(s.net.items.length, 0);
+  advance(s, 1 / 60, input([], ['KeyX']), noop);
+  assert.match(s.msg.en, /net is empty/);
+  assert.doesNotMatch(s.msg.en, /other comets/);
+  assert.match(s.msg.zh, /接网是空的/);
+  const away = quiet();
+  away.net.x = 100;
+  advance(away, 1 / 60, input([], ['KeyX']), noop);
+  assert.match(away.msg.en, /over a bin/);
+  const wrong = quiet();
+  wrong.level = 8;
+  wrong.net.items.push({ id: 1, size: 1, mass: 1, color: 1, heat: 20 });
+  wrong.net.x = 130;
+  advance(wrong, 1 / 60, input([], ['KeyX']), noop);
+  assert.match(wrong.msg.en, /other comets/);
+});
+
+test('presses during the contract-cleared freeze are kept and applied when it ends', () => {
+  const s = quiet();
+  s.freeze = RULES.freeze;
+  advance(s, 1 / 60, input([], ['Space']), noop);
+  assert.equal(s.net.open, true, 'nothing happens during the freeze');
+  advance(s, 1 / 60, input([], ['KeyX']), noop);
+  frames(s, 1);
+  assert.equal(s.net.open, false, 'the Space press was kept');
+  assert.match(s.msg.en, /net is empty/, 'the X press was kept and used');
+  // Two Space presses cancel out, and the queue is capped at two of each key.
+  const t = quiet();
+  t.freeze = RULES.freeze;
+  for (let i = 0; i < 5; i++) advance(t, 1 / 60, input([], ['Space']), noop);
+  frames(t, 1);
+  assert.equal(t.net.open, true);
+  // Presses made after the freeze are not queued.
+  advance(t, 1 / 60, input([], ['Space']), noop);
+  assert.equal(t.net.open, false);
+  frames(t, 0.1);
+  assert.equal(t.net.open, false);
+});
+
+test('mastery contracts demand more execution: tighter cones, denser comets and more fire', () => {
+  const cones = LEVELS.map((lv) => lv.cone);
+  assert.ok(cones.slice(0, 15).every((c) => c === RULES.cone));
+  const mastery = cones.slice(15);
+  assert.ok(mastery.every((c, i) => c < RULES.cone && (i === 0 || c <= mastery[i - 1])));
+  assert.equal(mastery.at(-1), 16);
+  const gap = (lv) => {
+    const at = lv.sched.map((c) => c.arrive).sort((a, b) => a - b);
+    return (at.at(-1) - at[0]) / (at.length - 1);
+  };
+  const mean = (list) => list.reduce((a, b) => a + b, 0) / list.length;
+  const early = mean(LEVELS.slice(0, 15).map(gap));
+  assert.ok(mean(LEVELS.slice(15).map(gap)) <= early * 0.8, 'comets arrive closer together');
+  assert.ok(Math.min(...LEVELS.slice(15).map(gap)) <= 2, 'one contract is a dense rain');
+  const scorching = LEVELS.slice(15).filter((lv) =>
+    lv.sched.some((c) => c.heat > RULES.scorchHeat),
+  );
+  assert.ok(scorching.length >= 4);
+  for (const [i, lv] of LEVELS.entries()) assert.equal(snapshotOf(newStateAt(i)).cone, lv.cone);
+});
+
+function newStateAt(index) {
+  const s = newState();
+  s.level = index;
+  return s;
+}
+
+test('the catch cone is per contract: judgeCatch and the simulation both use it', () => {
+  const at = (deg, cone) =>
+    judgeCatch(
+      -Math.sin((deg * Math.PI) / 180) * 150,
+      Math.cos((deg * Math.PI) / 180) * 150,
+      0,
+      cone,
+    );
+  assert.ok(at(20, undefined).ok && at(20, 30).ok);
+  assert.equal(at(20, 16).reason, 'angle');
+  assert.ok(at(15, 16).ok);
+  const run = (level, deg) => {
+    const s = newStateAt(level - 1);
+    s.clock = -1e4;
+    s.net.open = true;
+    const vy = 150;
+    s.comets.push({
+      id: 7,
+      x: 240 - Math.tan((deg * Math.PI) / 180) * 0,
+      y: RULES.netY - 4,
+      vx: Math.tan((deg * Math.PI) / 180) * vy,
+      vy,
+      size: 1,
+      mass: 1,
+      color: 0,
+      heat: 20,
+      fate: 'air',
+      spent: false,
+      spilled: false,
+      age: 0,
+    });
+    frames(s, 0.04);
+    return s.stats.caught;
+  };
+  assert.equal(run(1, 20), 1, 'a 30 degree cone catches a 20 degree approach');
+  assert.equal(run(22, 20), 0, 'the 16 degree cone of the last contract does not');
+  assert.equal(run(22, 10), 1);
+  const g = createGame(progressEnv(22, harness()).h.env);
+  g.update(1 / 60, input([], ['Space']));
+  assert.match(
+    drawAndCollect(g)
+      .texts.map((t) => t.str)
+      .join('|'),
+    /Cone 16°/,
+  );
+  const zh = harness({ lang: 'zh' });
+  progressEnv(22, zh);
+  const gz = createGame(zh.env);
+  gz.update(1 / 60, input([], ['Space']));
+  assert.match(
+    drawAndCollect(gz)
+      .texts.map((t) => t.str)
+      .join('|'),
+    /夹角 16°/,
+  );
+});
+
+test('the description states the real catch rule: a cone angle and the speed into the net', () => {
+  assert.match(meta.description.en, /speed into the net is at most 215 px\/s/);
+  assert.doesNotMatch(meta.description.en, /relative to the net/);
+  assert.match(meta.description.zh, /撞向接网的速度不超过 215 像素\/秒/);
+  assert.equal(RULES.absorb, 215);
+  // A comet at 29 degrees whose total speed is above 215 is caught: only the normal part counts.
+  const a = (29 * Math.PI) / 180;
+  const v = judgeCatch(-240 * Math.sin(a), 240 * Math.cos(a), 0);
+  assert.ok(v.ok && v.approach <= RULES.absorb);
+});
+
+test('net loads differ by shape as well as colour, and heat tiers differ by shape', () => {
+  const shapes = COLOR_FILL.map((fill, color) => {
+    const st = newState();
+    st.net.items.push({ id: 1, size: 1, mass: 1, color, heat: 20 });
+    return rectsOf(st)
+      .filter((r) => r.color === fill)
+      .map((r) => `${r.w}x${r.h}`);
+  });
+  assert.deepEqual(shapes[0], ['5x5']);
+  assert.deepEqual(shapes[1], ['1x2', '3x2', '7x3']);
+  assert.deepEqual(shapes[2], ['1x7', '7x1', '3x3']);
+  const tier = (heat, color) => {
+    const st = newState();
+    st.net.items.push({ id: 1, size: 1, mass: 1, color: 0, heat });
+    return rectsOf(st).filter((r) => r.color === color && (r.w === 9 || r.h === 9)).length;
+  };
+  assert.equal(tier(20, '#ff9a3c') + tier(20, '#ff4b2b'), 0);
+  assert.equal(tier(60, '#ff9a3c'), 2, 'warm: bars above and below');
+  assert.equal(tier(90, '#ff4b2b'), 4, 'scorching: a full frame');
+  const comet = (heat) => {
+    const st = newState();
+    st.comets.push({
+      id: 3,
+      x: 200,
+      y: 150,
+      vx: 0,
+      vy: 60,
+      size: 2,
+      mass: 2,
+      color: 1,
+      heat,
+      fate: 'air',
+      spent: false,
+      spilled: false,
+      age: 0,
+    });
+    const rects = rectsOf(st);
+    return {
+      warm: rects.filter((r) => r.color === '#ff9a3c' && r.w === 20 && r.h === 2).length,
+      side: rects.filter((r) => r.color === '#ff4b2b' && r.w === 2 && r.h === 20).length,
+    };
+  };
+  assert.deepEqual(comet(60), { warm: 2, side: 0 });
+  assert.deepEqual(comet(95), { warm: 0, side: 2 });
+  const hudHeat = (heat) => {
+    const st = newState();
+    st.net.items.push({ id: 1, size: 1, mass: 1, color: 0, heat });
+    return textsOf(st).join('|');
+  };
+  assert.match(hudHeat(90), /Heat 90!/);
+  assert.doesNotMatch(hudHeat(60), /Heat 60!/);
+});
+
+function drawPrepared(st, lang = 'en') {
+  const texts = [];
+  const rects = [];
+  const state = {};
+  const ctx = new Proxy(
+    {
+      measureText: (v) => ({ width: String(v).length * 8.4 }),
+      canvas: { width: 480, height: 320 },
+    },
+    {
+      get: (target, p) => {
+        if (p === 'fillText') return (str) => texts.push(str);
+        if (p === 'fillRect')
+          return (x, y, w, h) => rects.push({ x, y, w, h, color: state.fillStyle });
+        return p in state ? state[p] : p in target ? target[p] : () => {};
+      },
+      set: (target, p, v) => ((state[p] = v), true),
+    },
+  );
+  drawGame(ctx, st, harness({ lang }).env);
+  return { texts, rects };
+}
+const rectsOf = (st) => drawPrepared(st).rects;
+const textsOf = (st) => drawPrepared(st).texts;
+
+test('the radar blip is dashed, a comet in view is solid, and locked contracts carry a padlock', () => {
+  const early = newState();
+  const dashed = rectsOf(early).filter((r) => r.color === '#3f9a66');
+  assert.ok(
+    dashed.length >= 5 && dashed.every((r) => r.w <= 4 || r.h <= 3),
+    'dashes and short ticks',
+  );
+  assert.equal(rectsOf(early).filter((r) => r.color === '#7dff9c' && r.w === 40).length, 0);
+  const live = quiet();
+  live.comets.push({
+    id: 5,
+    x: 240,
+    y: 120,
+    vx: 0,
+    vy: 50,
+    size: 1,
+    mass: 1,
+    color: 0,
+    heat: 20,
+    fate: 'air',
+    spent: false,
+    spilled: false,
+    age: 0,
+  });
+  frames(live, 0.1);
+  assert.equal(live.plan.guide.early, false);
+  assert.ok(rectsOf(live).some((r) => r.color === '#7dff9c' && r.w === 40 && r.h === 2));
+
+  const locks = drawPrepared(menuState(5)).rects.filter(
+    (r) => r.color === '#7a839f' && r.w === 10 && r.h === 8,
+  );
+  assert.equal(locks.length, LEVEL_COUNT - 5);
+  assert.match(textsOf(menuState(5)).join('|'), /Space or Enter/);
+  assert.match(drawPrepared(menuState(5), 'zh').texts.join('|'), /空格或回车/);
+});
+
+function menuState(unlocked) {
+  const h = harness();
+  progressEnv(unlocked, h);
+  return newState(h.env);
+}
+
+test('the guide keeps the comet it is about to catch until it crosses the mouth plane', () => {
+  const comet = (x) => ({
+    id: 9,
+    x,
+    y: RULES.netY + 2,
+    vx: 0,
+    vy: 20,
+    size: 1,
+    mass: 1,
+    color: 0,
+    heat: 20,
+    fate: 'air',
+    spent: false,
+    spilled: false,
+    age: 0,
+  });
+  const near = quiet();
+  near.comets.push(comet(250));
+  frames(near, 0.05);
+  assert.equal(near.plan.guide.kind, 'catch');
+  assert.ok(Math.abs(near.plan.guide.x - 250) < 1);
+  const far = quiet();
+  far.comets.push(comet(420));
+  frames(far, 0.05);
+  assert.equal(far.plan.guide.kind, 'idle', 'a comet beside the mouth is no longer a target');
+  const deep = quiet();
+  deep.comets.push({ ...comet(250), y: RULES.netY + 60 });
+  frames(deep, 0.05);
+  assert.equal(deep.plan.guide.kind, 'idle');
 });

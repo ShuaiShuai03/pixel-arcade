@@ -1,0 +1,93 @@
+per-contract wins, fast reactions: 1:30 2:30 3:30 4:30 5:30 6:30 7:30 8:30 9:30 10:30 11:30 12:30 13:30 14:30 15:30 16:30 17:30 18:30 19:27 20:30 21:30 22:29
+per-contract wins, slow reactions: 1:30 2:30 3:30 4:30 5:30 6:30 7:30 8:27 9:30 10:30 11:30 12:30 13:30 14:30 15:30 16:18 17:9 18:9 19:6 20:4 21:30 22:12
+campaign wins at 30 Hz: 27/30
+campaign wins at 60 Hz: 28/30
+campaign wins at 120 Hz: 28/30
+slow campaigns reaching contract 16 at 60 Hz: 28/30
+crude policy random: 0/22
+crude policy mash: 0/22
+crude policy spam: 0/22
+never tilting clears 7/22 contracts
+✔ a delayed player (0.15-0.35 s) using the prompt and marker clears every contract in at least 25 of 30 runs at 30, 60 and 120 Hz (2856.10475ms)
+✔ a slow player (0.4-0.6 s with jitter) clears contracts 1-15 in at least 24 of 30 runs, and the mastery tier is measurably harder for them (3761.974042ms)
+✔ the whole 22-contract campaign is won in at least 27 of 30 runs at each frame rate (7251.374458ms)
+✔ the slow player still reaches the mastery tier (contract 16) in at least 24 of 30 campaigns at 60 Hz (1682.39525ms)
+✔ a scripted legal solution (an instant reader) clears every contract at every rate without a failed attempt (187.014333ms)
+✔ a casual player (slow, drops keys, half the time ignores the cooling prompt) clears contracts 1-15 in at least 24 of 30 runs (3670.560625ms)
+✔ perturbed input (dropped keys, irregular frame times) still clears representative contracts (1374.54325ms)
+✔ prompts name keys, are held at least half a second, rarely flip back and never cost an attempt (133.081041ms)
+✔ crude policies fail: random keys, mashing Space and X, never tilting, spamming the action keys (679.583542ms)
+✔ the drawn top line names a key, holds at least half a second without input and fits the canvas (661.536417ms)
+✔ meta follows the contract, is bilingual and the touch layout covers every key (1.09625ms)
+✔ there are 22 authored contracts that teach, combine and then master the ideas (0.339292ms)
+✔ every comet launches on screen, lands in exactly one bin, is absorbable when aligned and leaves slack (0.375958ms)
+✔ invalid, zero, negative, huge and non-numeric frame times are inert and never consume a press (0.894791ms)
+✔ the same aligned input gives identical full state at 30, 60 and 120 Hz (20.943166ms)
+✔ the net slides at its stated speed, is clamped to the roof and tilts at its stated rate (6.207417ms)
+✔ comets fly ballistic paths under gravity and wind and the marker predicts the crossing (4.051833ms)
+✔ the closed-form prediction equals the swept simulation of a free fall (0.737ms)
+✔ the catch rule: the angle must be within 30 degrees of the net axis and the relative speed absorbable (0.262375ms)
+✔ swept crossing never tunnels, at any step length, and respects the mouth width and direction (0.4515ms)
+✔ an aligned catch moves the comet into the net exactly once and the contract is cleared by delivery (5.471ms)
+✔ score counts each delivered comet once; replaying a contract cannot farm points (17.926625ms)
+✔ capacity: the net warns at 75 percent, refuses a comet that does not fit and bounces it away (33.08925ms)
+✔ white box: a full net bounces a fitting-angle comet with less energy and marks it spent (0.298959ms)
+✔ white box: a closed net is a lid, a slow-enough aligned comet is caught and a too fast one bounces (0.204875ms)
+✔ white box: a comet that misses the mouth falls to the roof and is counted lost once (0.221708ms)
+✔ cooling: a load cools by 10 per second open and 30 closed, never below ambient, and bins refuse hot loads (1.924375ms)
+✔ unloading needs a bin below the net and a bin that takes the comet (32.2955ms)
+✔ an open net tilted past the angle of repose spills its load, which cannot score twice (0.570708ms)
+✔ a load hotter than the scorch limit burns the net and a burnt net fails the attempt (1.184417ms)
+✔ failing: too many lost comets, running out of time, three failures end the game once (40.248042ms)
+✔ the infeasible and timeout paths report different reasons (0.106083ms)
+✔ winning the last contract ends the game once with a win and freezes it; a new instance starts fresh (22.490458ms)
+✔ progress: hosts without it still play; clearing unlocks the next contract and never lowers it (4.132875ms)
+✔ select screen: it opens when more than one contract is unlocked, moves, clamps and starts the contract (0.546083ms)
+✔ getState returns copies, exposes no cheat controls and keeps the HUD bands (0.785542ms)
+✔ prompts follow the situation: open, close for cooling, carry, cool, unload, level the net (1.442042ms)
+✔ the guide and tilt target are consistent with the marker: aligned catches use the stated rule (4.348042ms)
+✔ long seeded chaos stays finite and bounded (55.722917ms)
+✔ drawing: every phase renders in both languages with 14-16 px text that fits the canvas (57.7215ms)
+✔ layout: comets and the net sit between the HUD bands, actors are at least 16 px and states look different (15.775667ms)
+✔ drawing works with the plain mock context in every contract, hot, full, closed and tilted (25.634541ms)
+✔ the wind pennant and streaks are drawn only where there is wind, and the chosen language reaches the HUD (0.263041ms)
+✔ every comet is caught and delivered at most once: totals add up over a whole heavy contract (7.88325ms)
+✔ R1: the English and Chinese descriptions both state the real closed-net cooling ratio of three (0.104208ms)
+✔ R2: a bounced comet that falls back bounces off the net again, never through it, and then rolls off (5.694625ms)
+✔ R3: every marker the guide asks for is drawn, including the bin arrow, at the position the guide gives (29.369583ms)
+✔ R4: an early marker for a comet that has not appeared yet is flagged as radar and drawn dimmer (0.1615ms)
+✔ R6: a non-integer, non-finite or out-of-range unlocked value never throws (0.371459ms)
+✔ R7: the lose sound plays once per failed attempt, "1 try left" is singular and the cool prompt names a key (22.902792ms)
+✔ R8: a countdown shows once the 20 second timeout is running and is drawn in both languages (16.686375ms)
+✔ R9: a comet rolling off the net slides downhill, never jumps and never gains energy (131.856625ms)
+✔ R9: with a slanted approach and a moving net energy still never rises and nothing teleports (82.95ms)
+✔ R9: a comet at rest on a level lid settles into dust; one on a slope that cannot slide off settles after a few seconds (0.725667ms)
+✔ R9: the reviewer cases (tilt -34, -52 and +40, and a level net on contract 1) leave over the low rim without a jump (1.245667ms)
+✔ a progress store that throws never crashes opening, playing or clearing a contract (2.371542ms)
+✔ X with an empty net says so in both languages, over a bin or elsewhere keeps its own messages (0.08225ms)
+✔ presses during the contract-cleared freeze are kept and applied when it ends (0.199875ms)
+✔ mastery contracts demand more execution: tighter cones, denser comets and more fire (0.233708ms)
+✔ the catch cone is per contract: judgeCatch and the simulation both use it (0.197666ms)
+✔ the description states the real catch rule: a cone angle and the speed into the net (0.04575ms)
+✔ net loads differ by shape as well as colour, and heat tiers differ by shape (0.702375ms)
+✔ the radar blip is dashed, a comet in view is solid, and locked contracts carry a padlock (0.27025ms)
+✔ the guide keeps the comet it is about to catch until it crosses the mouth plane (0.075875ms)
+ℹ tests 64
+ℹ suites 0
+ℹ pass 64
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 22326.452667
+ℹ start of coverage report
+ℹ -------------------------------------------------------------------
+ℹ file               | line % | branch % | funcs % | uncovered lines
+ℹ -------------------------------------------------------------------
+ℹ src                |        |          |         | 
+ℹ  games             |        |          |         | 
+ℹ   comet-catcher.js | 100.00 |    98.33 |   99.13 | 
+ℹ -------------------------------------------------------------------
+ℹ all files          | 100.00 |    98.33 |   99.13 | 
+ℹ -------------------------------------------------------------------
+ℹ end of coverage report

@@ -1,0 +1,70 @@
+{
+  "game": "comet-catcher",
+  "date": "2026-11-10",
+  "reviewedRevision": "8faca7b8 (accepted build) plus the fixes in this commit",
+  "owner": "owner-comet",
+  "reviewer": "comet-fair, comet-robust and comet-present (parallel split review)",
+  "rounds": 1,
+  "process": "Lean final review at the user's request, with the review split across three parallel reviewers (fairness, robustness, presentation) as the user asked. The game already had 22 contracts. Its MEDIUM findings and cheap LOW items were fixed and verified by a separate verification agent re-running the reviewers' own probes and one clean-worktree run, then by the browser check, without a second review round.",
+  "verdict": "pass",
+  "approvedSha256": {
+    "src/games/comet-catcher.js": "7b1f0c9cdc826c530fb72011f5ced53599b16546703fa38d88abb5cc01c4b1a8",
+    "tests/comet-catcher.test.js": "5c245d914b7fc8d2dd0532a82d9501513ab3fd837872e152376cb15304904e54",
+    "tests/comet-catcher-quality.test.js": "13912f1b35699129b9f843cd67061287fc9590756da0816b3d5e2f0395a79676"
+  },
+  "tests": {
+    "command": "node --experimental-test-coverage --test-coverage-include='src/games/comet-catcher*.js' --test tests/comet-catcher.test.js tests/comet-catcher-quality.test.js",
+    "passed": 64,
+    "failed": 0,
+    "lineCoverage": 100,
+    "log": "comet-catcher-coverage.txt"
+  },
+  "independentProbes": "On the final files the fairness reviewer's reaction-limited bot (public getState only, guide and comets seen late, 60 Hz, 5 seeds) cleared every contract at 0.25 s and 0.35 s, and its sloppy variant cleared the mastery contracts too. Mastery now costs more: lowest net integrity falls to about 5.8-6.4 on contracts 17, 19 and 20 against 7.2-8 before, and the owner's slow human model (0.4-0.6 s) wins mastery contracts 4-30 times in 30 against 27-30 on contracts 1-15. Blind bots (idle, mash, random, holds and tilts) cleared no contract. Final states matched across 30, 60 and 120 Hz, hostile dt and input values produced no throws or NaN, each run ended exactly once and froze, every broken progress store was safe, presses during the contract-fulfilled pause are applied, a static check found every contract completable, and EN and ZH text fits with no untranslated strings.",
+  "findings": [
+    {
+      "id": "M1",
+      "severity": "medium",
+      "status": "fixed",
+      "observation": "Robustness finding: newState and clearLevel called env.progress without try/catch, so a throwing store crashed the game at start or at a contract clear. Both are now guarded as in Shield Sentinel."
+    },
+    {
+      "id": "M2",
+      "severity": "medium",
+      "status": "fixed",
+      "observation": "Fairness finding: mastery contracts were only longer, with no failures and no tighter catch margins. Contracts 16-22 now have shorter gaps between comets, more scorching comets, less slack in comet counts and a per-contract catch cone narrowing from 28 to 16 degrees, shown as 'Cone N°' on the HUD; the guide marker also no longer jumps to the next comet before the current one is caught."
+    },
+    {
+      "id": "M3",
+      "severity": "medium",
+      "status": "fixed",
+      "observation": "Presentation findings: X over a bin with an empty net said 'This bin takes other comets', and the description described a total-speed limit the game does not enforce. An empty net now reads 'The net is empty: catch a comet first' (接网是空的：先接一颗彗星), and the description says the speed into the net is at most 215 px/s."
+    },
+    {
+      "id": "M4",
+      "severity": "medium",
+      "status": "fixed",
+      "observation": "Presentation finding: net items, heat tiers and the radar blip relied on colour alone. Net items now use their bin's shape, warm and scorching comets and items carry bars or a frame with 'Heat N!' on the HUD, and the radar blip has a dashed bracket."
+    },
+    {
+      "id": "L1",
+      "severity": "low",
+      "status": "fixed",
+      "observation": "Presses during the 0.8 s 'Contract fulfilled!' pause are now queued and applied, locked menu tiles carry a padlock, and the menu prompt mentions Space or Enter."
+    }
+  ],
+  "openNotes": [
+    "A precise bot still clears every mastery contract; failing a sloppy 8 px / 4 degree bot would need tolerances judged unfair to people, so mastery pressure shows as net damage and slow-player losses.",
+    "The source is a single file of about 1,400 lines, over the repository's 800-line soft ceiling."
+  ],
+  "browser": {
+    "method": "Official Claude in Chrome extension, local server; real clicks on Start and the language toggle, synthetic in-page keys; only DOM text and the canvas were read.",
+    "servedSha256Prefixes": "7b1f0c9c",
+    "observed": [
+      "With progress saved from earlier testing, Start opened the contract select with contracts 8-22 carrying padlocks and the prompt '[Arrows] Pick a contract, then Space or Enter'.",
+      "Contract 7 (Blazing Trail) showed the net, the bin, Load, Heat, Net, 'Cone 30°' and Tries on the HUD; a hot comet carried a frame, X on a hot load said 'Too hot to unload: close the net, wait', and missed comets cost a try ('Too many lost: 2 tries left').",
+      "Chinese 390 px phone frame (388 px inner, no horizontal overflow): the contract select in Chinese with padlocks and touch buttons 左, 右, 左倾, 右倾, 开/合 and 卸货.",
+      "Not covered in the browser: a contract win and the mastery contracts; the reviewers' probes, the verification run and the quality tests cover them."
+    ],
+    "screenshots": ["screenshots/comet-catcher-en.png", "screenshots/comet-catcher-phone-zh.png"]
+  }
+}
