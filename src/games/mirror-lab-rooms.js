@@ -221,7 +221,7 @@ export const ROOM_DEFS = [
   ),
   room(
     ['Twin Prisms', '双分光镜'],
-    ['Two splitters and one guarded crystal', '两面分光镜，外加一颗被守护的水晶'],
+    ['Three splitters and one guarded crystal', '三面分光镜，外加一颗被守护的水晶'],
     [
       '..........',
       '.........#',

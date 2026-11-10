@@ -34,9 +34,11 @@ function open(level, { seed = 1, lang = 'en' } = {}) {
   return { g, h };
 }
 
-// What a person does for the line they read: an arrow, Space, X, Z, or nothing.
+// What a person does for the line they read: an arrow, Space, X, Z, H or nothing. A room that has
+// stopped handing out moves shows its goal and the H key; a follower asks for the hint there.
 function keyFor(line, lang) {
   if (lang === 'zh') {
+    if (/\[H\] 提示/.test(line)) return 'KeyH';
     const move = /^光标向(.)移/.exec(line);
     if (move) return ZH_ARROW[move[1]];
     if (/^按空格/.test(line)) return 'Space';
@@ -44,6 +46,7 @@ function keyFor(line, lang) {
     if (/按 Z/.test(line)) return 'KeyZ';
     return null;
   }
+  if (/\[H\] hint/.test(line)) return 'KeyH';
   const move = /^Move cursor ([←→↑↓])/.exec(line);
   if (move) return EN_ARROW[move[1]];
   if (/^Press Space/.test(line)) return 'Space';
@@ -227,6 +230,15 @@ test('the prompt names its move, and the text, the arrow and the highlighted cel
         onFrame: (st) => {
           const h = st.hint;
           const key = keyFor(st.line[lang], lang);
+          if (h.kind === 'hidden') {
+            assert.ok(level > TUTORIALS && st.line[lang].includes('[H]'), `room ${level}`);
+            assert.equal(key, 'KeyH');
+            assert.equal(h.kind, 'hidden');
+            assert.equal(h.x, null);
+            assert.equal(st.optimal, null);
+            checked++;
+            return;
+          }
           assert.equal(key, h.key, `room ${level}: "${st.line[lang]}" vs ${h.key}`);
           if (h.kind === 'move') {
             assert.ok(h.x !== null && (h.x !== st.cursor.x || h.y !== st.cursor.y));
@@ -715,6 +727,7 @@ test('touch targets stay large on a 390 px wide phone and every action has a tou
     'KeyX',
     'KeyZ',
     'KeyQ',
+    'KeyH',
   ])
     assert.ok(codes.includes(code), code);
   assert.ok(meta.touchControls.every((c) => c.side === 'left' || c.side === 'right'));
@@ -733,6 +746,7 @@ test('a phone player can finish a room with taps alone: tap to select, tap again
         input([], [], { x: ox + x * RULES.cell + 18, y: oy + y * RULES.cell + 18, clicked: true }),
       );
     for (let n = 0; n < 40 && !g.getState().solved; n++) {
+      if (!g.getState().hint.shown) g.update(1 / 60, input([], ['KeyH'])); // the touch Hint button
       const h = g.getState().hint;
       tap(h.x, h.y);
     }

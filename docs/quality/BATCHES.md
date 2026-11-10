@@ -51,6 +51,7 @@ Phase Tiles completed batch 18 and the 50-game target, Pixel Parkour included. T
 | Firefly Trail    | Passed in one round: 24 meadows, warned trail cuts ([record](final-review/firefly-trail.json))                        |
 | Tilt Lab         | Passed in one round: 22 labs, hidden route on mastery ([record](final-review/tilt-lab.json))                          |
 | Stacksmith       | Passed in one round: 22 jobs, outline-only mastery ([record](final-review/stacksmith.json))                           |
+| Mirror Lab       | Passed in one round: 22 rooms, opt-in hints from room 6 ([record](final-review/mirror-lab.json))                      |
 
 ## Completed batch 18
 

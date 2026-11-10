@@ -12,6 +12,7 @@ import {
   solveRoom,
   advise,
   adviceLine,
+  goalLine,
   reflect,
   gridOrigin,
   cellAt,
@@ -105,6 +106,7 @@ test('meta describes the game in both languages with working touch controls', ()
     'KeyX',
     'KeyZ',
     'KeyQ',
+    'KeyH',
   ])
     assert.ok(codes.includes(code), code);
   for (const c of meta.touchControls) assert.ok(c.label.en && /[一-鿿]/.test(c.label.zh));
@@ -397,6 +399,7 @@ test('advise names a nearest useful switch and recovers after a wrong turn', () 
 test('the prompt line, its arrow and the highlighted cell agree in both languages', () => {
   for (const lang of ['en', 'zh']) {
     const { g } = open(9, { lang });
+    press(g, 'KeyH');
     for (let n = 0; n < 40; n++) {
       const st = g.getState();
       const h = st.hint;
@@ -430,6 +433,78 @@ test('the hint recovers after undo and after a restart', () => {
   press(g, 'KeyQ');
   assert.equal(g.getState().moves, 0);
   assert.equal(g.getState().hint.kind, 'move');
+});
+
+test('the next-move hint is free in the first rooms and opt-in, at a cost, from room 6', () => {
+  assert.equal(RULES.hintFreeRooms, TUTORIAL_ROOMS);
+  const early = open(TUTORIAL_ROOMS).g.getState();
+  assert.equal(early.hint.shown, true);
+  assert.equal(early.optimal, OPTIMAL[TUTORIAL_ROOMS - 1]);
+  const { g } = open(TUTORIAL_ROOMS + 1);
+  let st = g.getState();
+  assert.equal(st.hint.kind, 'hidden');
+  assert.equal(st.hint.shown, false);
+  assert.equal(st.hint.x, null);
+  assert.equal(st.hint.key, null);
+  assert.equal(st.optimal, null, 'the solution length is not published unasked');
+  assert.deepEqual(st.line, { en: goalLine(ROOMS[5])[0], zh: goalLine(ROOMS[5])[1] });
+  assert.ok(st.line.en.includes('[H] hint') && st.line.zh.includes('[H] 提示'));
+  assert.doesNotMatch(st.line.en, /Move cursor|Press /);
+  press(g, 'KeyH');
+  st = g.getState();
+  assert.equal(st.hint.shown, true);
+  assert.notEqual(st.hint.x, null);
+  assert.equal(st.optimal, OPTIMAL[TUTORIAL_ROOMS]);
+  assert.equal(st.hints, 1);
+  assert.match(st.message.en, /Hint: -12 points/);
+  assert.match(st.line.en, /^Move cursor|^Press /);
+  press(g, 'KeyH');
+  assert.equal(g.getState().hints, 1, 'asking again while the hint is up costs nothing');
+  // The hint covers the next move only: a turn, an undo or a reset hides it again.
+  walkTo(g, st.hint.x, st.hint.y);
+  press(g, g.getState().hint.key);
+  assert.equal(g.getState().hint.shown, false);
+  press(g, 'KeyH');
+  press(g, 'KeyZ');
+  assert.equal(g.getState().hint.shown, false);
+  assert.equal(g.getState().hints, 2);
+  press(g, 'KeyH');
+  press(g, 'KeyQ');
+  assert.equal(g.getState().hint.shown, false);
+  assert.equal(g.getState().hints, 3, 'a reset keeps the count of the run');
+});
+
+test('a hint costs score in the room that used it and the cost never goes below the floor', () => {
+  const free = open(6);
+  playPlan(free.g, ROOMS[5]);
+  idle(free.g, 2);
+  assert.equal(free.g.getState().score, 100);
+  const hinted = open(6);
+  press(hinted.g, 'KeyH');
+  playPlan(hinted.g, ROOMS[5]);
+  idle(hinted.g, 2);
+  assert.equal(hinted.g.getState().score, 100 - RULES.hintPenalty);
+  const lavish = open(6);
+  for (let n = 0; n < 20; n++) {
+    press(lavish.g, 'KeyH');
+    press(lavish.g, 'KeyQ');
+  }
+  playPlan(lavish.g, ROOMS[5]);
+  idle(lavish.g, 2);
+  assert.equal(lavish.g.getState().score, RULES.minRoomScore, 'a reset does not wipe the bill');
+});
+
+test('the default prompt states the goal of the room in both languages', () => {
+  const ordered = goalLine(ROOMS[10]);
+  assert.match(ordered[0], /^Light 1-3 in order/);
+  assert.match(ordered[1], /^按顺序点亮 1-3/);
+  const crystals = goalLine(ROOMS[6]);
+  assert.match(crystals[0], /^Light the sensor, keep crystals dark/);
+  assert.match(crystals[1], /别照亮水晶/);
+  ROOMS.forEach((room) => {
+    const [en, zh] = goalLine(room);
+    assert.ok(en.length <= 55 && [...zh].length <= 40, `room ${room.name.en}`);
+  });
 });
 
 // --- controls --------------------------------------------------------------------------------
@@ -600,13 +675,23 @@ test('a cleared room waits for the beam to settle, banks its score and moves on 
   assert.match(st.line.en, /Room clear/);
   assert.match(st.status.zh, /过关/);
   assert.ok(h.sounds.includes('win'));
-  press(g, 'ArrowRight');
-  assert.equal(g.getState().cursor.x, st.cursor.x, 'input is frozen while the room is clear');
+  press(g, 'KeyZ', 'KeyQ', 'KeyX');
+  assert.equal(g.getState().cleared, true, 'only a move or Space skips the pause');
+  assert.equal(g.getState().moves, st.moves);
   press(g, 'Space');
   st = g.getState();
   assert.equal(st.level, 2);
   assert.equal(st.cleared, false);
   assert.equal(st.moves, 0);
+  // An arrow press during the pause skips it and already moves the cursor in the next room.
+  const arrow = open(1);
+  playPlan(arrow.g, ROOMS[0]);
+  idle(arrow.g, 1.2);
+  assert.equal(arrow.g.getState().cleared, true);
+  press(arrow.g, 'ArrowRight');
+  const moved = arrow.g.getState();
+  assert.equal(moved.level, 2);
+  assert.equal(moved.cursor.x, ROOMS[1].emitters[0].x + 1);
   // Automatic advance.
   const second = open(1);
   playPlan(second.g, ROOMS[0]);
@@ -646,6 +731,9 @@ test('running out of turns in a budget room is a loss that freezes the game', ()
   press(g, 'Space');
   assert.equal(g.getState().moves, room.budget, 'no turn beyond the budget');
   assert.match(g.getState().message.en, /No turns left/);
+  idle(g, 2);
+  st = g.getState();
+  assert.equal(st.phase, 'playing', 'the undo window is still open');
   idle(g, 3);
   st = g.getState();
   assert.equal(st.phase, 'lost');
@@ -660,6 +748,51 @@ test('running out of turns in a budget room is a loss that freezes the game', ()
   press(g, 'KeyZ', 'ArrowRight', 'Space', 'KeyQ');
   idle(g, 1);
   assert.equal(JSON.stringify(g.getState()), frozen);
+  assert.equal(ENDS(h), 1);
+});
+
+test('after the last affordable turn the player keeps an undo window with a visible countdown', () => {
+  const spend = () => {
+    const run = open(13);
+    const t = plan(ROOMS[12])[0];
+    walkTo(run.g, t.x, t.y);
+    for (let n = 0; n < ROOMS[12].budget; n++) press(run.g, t.key);
+    return run;
+  };
+  const { g, h } = spend();
+  assert.equal(g.getState().grace, null, 'the beam is still running');
+  idle(g, 0.8);
+  let st = g.getState();
+  assert.ok(st.grace > 2.5 && st.grace <= RULES.undoGrace);
+  assert.equal(st.line.en, 'Out of turns: press Z to undo (3)');
+  assert.equal(st.line.zh, '次数用完：按 Z 撤销（3）');
+  assert.match(st.status.en, /press Z to undo/);
+  const seen = new Set();
+  for (let n = 0; n < 60 * 3; n++) {
+    g.update(1 / 60, input());
+    seen.add(g.getState().line.en);
+  }
+  assert.ok(seen.has('Out of turns: press Z to undo (2)'), 'the number counts down');
+  g.draw(mockContext());
+  // A press late in the old, shorter window still saves the room.
+  const late = spend();
+  idle(late.g, 2);
+  assert.equal(late.g.getState().phase, 'playing');
+  press(late.g, 'KeyZ');
+  st = late.g.getState();
+  assert.equal(st.moves, ROOMS[12].budget - 1);
+  assert.equal(st.grace, null);
+  idle(late.g, 6);
+  assert.equal(late.g.getState().phase, 'playing');
+  assert.equal(ENDS(late.h), 0);
+  // A reset also closes the window.
+  const reset = spend();
+  idle(reset.g, 2);
+  press(reset.g, 'KeyQ');
+  idle(reset.g, 6);
+  assert.equal(reset.g.getState().phase, 'playing');
+  assert.equal(ENDS(reset.h), 0);
+  assert.equal(g.getState().phase, 'lost', 'left alone, the window closes in a loss');
   assert.equal(ENDS(h), 1);
 });
 
@@ -711,11 +844,12 @@ test('room select opens when progress is saved and starts the chosen room', () =
   const m = createGame(h.env);
   st = m.getState();
   assert.deepEqual(st.menu, { sel: 6, unlocked: 6 });
-  assert.match(st.line.en, /Choose a room/);
-  assert.match(st.line.zh, /选择房间/);
+  assert.match(st.line.en, new RegExp(`^Room 6: ${ROOMS[5].name.en} · arrows`));
+  assert.match(st.line.zh, /第 6 间：/);
   assert.equal(st.status.en, st.line.en);
   press(m, 'ArrowLeft');
   assert.equal(m.getState().menu.sel, 5);
+  assert.match(m.getState().line.en, new RegExp(`^Room 5: ${ROOMS[4].name.en}`));
   press(m, 'ArrowRight', 'ArrowRight');
   assert.equal(m.getState().menu.sel, 6, 'clamped at the last unlocked room');
   press(m, 'ArrowUp');
@@ -885,6 +1019,7 @@ test('every room draws in both languages and every state without errors', () => 
       g.draw(ctx);
       idle(g, 0.05);
       g.draw(ctx);
+      press(g, 'KeyH');
       const hint = g.getState().hint;
       walkTo(g, hint.x, hint.y);
       press(g, g.getState().hint.key);
@@ -916,6 +1051,9 @@ test('menu, clear, loss and win screens draw in both languages', () => {
     for (let n = 0; n < ROOMS[12].budget; n++) press(lost.g, 'Space');
     idle(lost.g, 2);
     lost.g.draw(mockContext());
+    idle(lost.g, 3);
+    assert.equal(lost.g.getState().phase, 'lost');
+    lost.g.draw(mockContext());
     const won = open(ROOM_COUNT, { lang });
     playPlan(won.g, ROOMS[ROOM_COUNT - 1]);
     idle(won.g, 2);
@@ -927,6 +1065,7 @@ test('menu, clear, loss and win screens draw in both languages', () => {
 test('crystals flash and sensors spark while the beam plays; sparks stay bounded', () => {
   const { g, h } = open(7);
   const room = ROOMS[6];
+  const messages = new Set();
   // Turn every switch once so a crystal is hit at some point, then watch the beam run.
   for (const ci of room.toggles) {
     walkTo(g, ci % room.w, Math.floor(ci / room.w));
@@ -934,8 +1073,10 @@ test('crystals flash and sensors spark while the beam plays; sparks stay bounded
     for (let n = 0; n < 90; n++) {
       g.update(1 / 60, input());
       if (n % 9 === 0) g.draw(mockContext());
+      messages.add(g.getState().message?.en);
     }
   }
+  assert.ok(messages.has('Beam hit a crystal'), 'a crystal hit says so');
   assert.ok(h.sounds.includes('hit') || h.sounds.includes('coin'));
   const ctx = mockContext();
   g.draw(ctx);

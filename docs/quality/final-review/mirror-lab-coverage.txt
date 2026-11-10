@@ -1,0 +1,104 @@
+✔ a literal prompt follower clears every room from the start at 30, 60 and 120 Hz in both languages (615.454792ms)
+✔ followers with fast (0.15-0.35 s) and slow (0.4-0.6 s) reactions clear every room from the start in every run (1143.311041ms)
+✔ a follower clears every room from at least 10 random scrambles, with no livelock and never a lost room (980.204708ms)
+✔ a follower never loses a budget room, even after wasting turns, because the prompt asks for an undo (196.857875ms)
+✔ the prompt names its move, and the text, the arrow and the highlighted cell always agree (36.502958ms)
+✔ the prompt only changes when the player acts or a room changes, so it never flickers, and it fits the canvas (47.093334ms)
+✔ English and Chinese runs play out identically (34.868167ms)
+✔ idle never wins a room (4.85025ms)
+✔ from room 3 on, mashing, random keys, X and undo spam and rotate-everything sweeps each win at most a quarter of runs (19291.066ms)
+ℹ mashSpaceFast      wins of 40 in rooms 3-22: 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+ℹ mashSpaceSlow      wins of 40 in rooms 3-22: 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+ℹ randomKeys         wins of 40 in rooms 3-22: 1 3 2 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+ℹ quickRandom        wins of 40 in rooms 3-22: 9 10 9 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+ℹ xAndUndo           wins of 40 in rooms 3-22: 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+ℹ rotateAllRows      wins of 40 in rooms 3-22: 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+ℹ rotateAllColumns   wins of 40 in rooms 3-22: 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+ℹ rotateAllBackwards wins of 40 in rooms 3-22: 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+✔ the blind "turn whichever mirror lights more sensors" heuristic beats at most half the rooms and none of the last third (255.021625ms)
+ℹ firstGain beat rooms: 1
+ℹ firstGainSafe beat rooms: 1
+ℹ bestGain beat rooms: 1
+ℹ bestGainSafe beat rooms: 1
+✔ the optimal turn counts form a difficulty curve with no room needing fewer than the first (0.161916ms)
+ℹ optimal turns per room: 1 2 2 2 2 4 4 4 5 5 5 6 6 5 6 6 6 7 8 8 9 10
+ℹ ordered rooms 6, budget rooms 8
+✔ a batch-literal follower (press the arrow exactly N times, then re-read) clears every room, from the start and from scrambles (72.089084ms)
+✔ rooms 1 to 5 are the recorded tutorials; from room 6 on every room has at least 9 switches, all of them live (0.114167ms)
+✔ the informed random turner (random real switch, walk, turn, look for a second) wins at most 10 of 40 on every room from room 6 (6252.415917ms)
+ℹ informed random turner, rooms 6-22, wins of 40: 5 4 3 3 0 0 0 0 4 0 0 0 0 0 0 0 0
+✔ the beam-aware hill climber beats at most half the rooms and none of rooms 16 to 22 (2091.309125ms)
+ℹ beam-aware hill climber wins of 40 per room: 40 40 40 40 40 1 7 0 7 1 3 9 4 3 2 0 0 0 0 0 0 0
+✔ touch targets stay large on a 390 px wide phone and every action has a touch route (0.154375ms)
+✔ a phone player can finish a room with taps alone: tap to select, tap again to turn (1.0275ms)
+✔ meta describes the game in both languages with working touch controls (0.680584ms)
+✔ there are at least 20 rooms, each within the bench size, bilingual and with the recorded optimum (42.280583ms)
+✔ the rooms teach distinct ideas: ordered sensors, crystals, shutters, splitters, locks, decoys and budgets (0.435084ms)
+✔ the difficulty curve rises: later thirds need more turns than earlier thirds (0.090333ms)
+✔ the reflection table is right for every mirror type and every incoming direction (0.062833ms)
+✔ a beam bends exactly as the mirror orientation says, from all four directions (0.394625ms)
+✔ walls, the emitter, closed shutters and the bench edge stop the beam (0.082041ms)
+✔ a sensor behind a wall can never register, in any setting of the bench (0.072167ms)
+✔ a sensor passes the beam on, so one beam can light a whole row of them (0.484084ms)
+✔ a crystal absorbs the beam, counts as lit and spoils the room (0.078083ms)
+✔ a splitter passes the beam on and reflects a second one (0.091667ms)
+✔ tracing terminates on loops and reports them (7.348042ms)
+✔ ordered sensors register only for a beam that has already passed the lower numbers (0.204334ms)
+✔ rowsAt shows the current setting of every mirror, splitter and shutter (0.132334ms)
+✔ parseRoom rejects malformed rooms (0.365334ms)
+✔ every room is solvable and a scripted shortest solution clears it in the game (11.251959ms)
+✔ solution paths satisfy an independent replay of the board at every step (0.244916ms)
+✔ advise names a nearest useful switch and recovers after a wrong turn (0.090541ms)
+✔ the prompt line, its arrow and the highlighted cell agree in both languages (0.462417ms)
+✔ the hint recovers after undo and after a restart (0.228167ms)
+✔ the next-move hint is free in the first rooms and opt-in, at a cost, from room 6 (0.370125ms)
+✔ a hint costs score in the room that used it and the cost never goes below the floor (1.670334ms)
+✔ the default prompt states the goal of the room in both languages (0.173083ms)
+✔ arrows and WASD move the cursor one cell, clamp at the edges and ignore ambiguous presses (0.17475ms)
+✔ Space turns the mirror under the cursor, X flips only shutters, locked and empty cells refuse (0.352583ms)
+✔ tapping a cell selects it and tapping it again turns it (0.200291ms)
+✔ undo restores the exact previous state and an empty history reports it (0.18275ms)
+✔ Q restarts the room, keeps the score and counts the restart (0.117667ms)
+✔ invalid, zero or negative time never reads input, never moves the beam and never ends the game (0.117ms)
+✔ getState returns copies that cannot change the game (0.102167ms)
+✔ a cleared room waits for the beam to settle, banks its score and moves on by itself or on Space (0.647959ms)
+✔ extra turns cost score and the score never goes below the floor (0.2135ms)
+✔ running out of turns in a budget room is a loss that freezes the game (0.503708ms)
+✔ after the last affordable turn the player keeps an undo window with a visible countdown (3.113917ms)
+✔ the last turn of a budget may still win the room (0.439333ms)
+✔ clearing the last room wins the game once with the full score and then freezes (0.79525ms)
+✔ a full run from room 1 reaches the win with a perfect score (8.124542ms)
+✔ room select opens when progress is saved and starts the chosen room (0.312709ms)
+✔ room select by tap: the first tap selects, the second starts, locked rooms and gaps are ignored (0.133042ms)
+✔ progress is read safely: no store, junk values and a throwing store all start at room 1 (0.308875ms)
+✔ clearing a room unlocks the next one but never beyond the last (0.83625ms)
+✔ the same timed key schedule gives the identical result at 30, 60 and 120 Hz (2.303833ms)
+✔ uneven frame times keep the game finite and bounded (6.403125ms)
+✔ the undo history and turn counter stay bounded however long a player mashes (9.81475ms)
+✔ every room draws in both languages and every state without errors (124.472875ms)
+✔ menu, clear, loss and win screens draw in both languages (2.24075ms)
+✔ crystals flash and sensors spark while the beam plays; sparks stay bounded (11.232ms)
+✔ the prompt number is the length of the first leg along its arrow, from every cell of every room (1.165167ms)
+✔ the rooms are deeply frozen and their records carry only what the game uses (0.0935ms)
+✔ a saved progress of Infinity or a huge number opens room select at the last room (0.12225ms)
+✔ the status line counts only the sensors the beam has reached on screen (0.146833ms)
+ℹ tests 68
+ℹ suites 0
+ℹ pass 68
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 31082.597916
+ℹ start of coverage report
+ℹ ----------------------------------------------------------------------
+ℹ file                  | line % | branch % | funcs % | uncovered lines
+ℹ ----------------------------------------------------------------------
+ℹ src                   |        |          |         | 
+ℹ  games                |        |          |         | 
+ℹ   mirror-lab-rooms.js | 100.00 |   100.00 |  100.00 | 
+ℹ   mirror-lab.js       | 100.00 |    99.60 |  100.00 | 
+ℹ ----------------------------------------------------------------------
+ℹ all files             | 100.00 |    99.61 |  100.00 | 
+ℹ ----------------------------------------------------------------------
+ℹ end of coverage report

@@ -28,6 +28,9 @@ export const RULES = Object.freeze({
   extraMovePenalty: 8,
   minRoomScore: 20,
   menuCols: 6,
+  hintFreeRooms: 5, // rooms 1 to 5 always show the next move; later rooms need the H key
+  hintPenalty: 12, // score taken for each hint asked for in a room
+  undoGrace: 3, // seconds to undo after the last affordable turn leaves the room unsolved
 });
 const R = RULES;
 const STEP = R.step;
@@ -259,7 +262,6 @@ const NOUN = {
   shutter: ['shutter', '光闸'],
 };
 const PLAIN = {
-  menu: ['Choose a room: arrows, then Space', '选择房间：方向键，再按空格'],
   watch: ['Hold still: watch the beam', '别动，看光束走完'],
   cleared: ['Room clear! Next room coming', '过关！即将进入下一间'],
   won: ['Every room is clear. Well done!', '全部房间已通关，做得好！'],
@@ -280,6 +282,19 @@ export function adviceLine(adv) {
   return [`Press Space to turn the ${en}`, `按空格转动${zh}`];
 }
 
+// What the default prompt says in the rooms that do not hand out the next move: the goal only.
+export function goalLine(room) {
+  const n = room.sensors;
+  let en = room.ordered ? `Light 1-${n} in order` : `Light all ${n} sensors`;
+  let zh = room.ordered ? `按顺序点亮 1-${n}` : `点亮全部 ${n} 个传感器`;
+  if (n === 1) [en, zh] = ['Light the sensor', '点亮传感器'];
+  if (room.cells.some((c) => c.k === 'crystal')) {
+    en += ', keep crystals dark';
+    zh += '，别照亮水晶';
+  }
+  return [`${en}  [H] hint -${R.hintPenalty}`, `${zh}  [H] 提示 -${R.hintPenalty}`];
+}
+
 // --- Room list ------------------------------------------------------------------------------
 const deepFreeze = (value) => {
   if (value && typeof value === 'object' && !Object.isFrozen(value))
@@ -298,8 +313,8 @@ export const meta = {
   players: '1',
   touch: true,
   description: {
-    en: `A laser fires across a dark optical bench. Move the cursor over a mirror and turn it so the beam bends, bounces and lights every numbered sensor. Walls and closed shutters stop the beam, splitters send out a second beam, crystals must stay dark, and some rooms light sensors only in number order or allow a limited number of turns. Undo freely and a glowing hint names the next move. Clear all ${ROOM_COUNT} rooms; progress is saved.`,
-    zh: `一束激光射过漆黑的光学实验台。把光标移到镜子上并转动它，让光束拐弯、反射，点亮每一个编号传感器。墙和关闭的光闸会挡住光束，分光镜会分出第二束光，水晶必须保持黑暗；有些房间要求按编号顺序点亮，或限制转动次数。可以随时撤销，发光提示会告诉你下一步。完成全部 ${ROOM_COUNT} 个房间，进度会被保存。`,
+    en: `A laser fires across a dark optical bench. Move the cursor over a mirror and turn it so the beam bends, bounces and lights every numbered sensor. Walls and closed shutters stop the beam, splitters send out a second beam, crystals must stay dark, and some rooms light sensors only in number order or allow a limited number of turns. Undo freely. The first ${R.hintFreeRooms} rooms glow the next move for you; after that the goal is yours to work out, and the H key buys a hint for ${R.hintPenalty} points. Spend your last turn on a bad board and you still get a few seconds to undo. Clear all ${ROOM_COUNT} rooms; progress is saved.`,
+    zh: `一束激光射过漆黑的光学实验台。把光标移到镜子上并转动它，让光束拐弯、反射，点亮每一个编号传感器。墙和关闭的光闸会挡住光束，分光镜会分出第二束光，水晶必须保持黑暗；有些房间要求按编号顺序点亮，或限制转动次数。可以随时撤销。前 ${R.hintFreeRooms} 个房间会用发光提示告诉你下一步；之后要靠自己思考，按 H 键可花 ${R.hintPenalty} 分换一次提示。用掉最后一次转动后若局面不对，还有几秒钟可以撤销。完成全部 ${ROOM_COUNT} 个房间，进度会被保存。`,
   },
   keys: [
     { label: { en: 'Move the cursor', zh: '移动光标' }, keys: 'Arrows / WASD' },
@@ -310,6 +325,13 @@ export const meta = {
     { label: { en: 'Flip a shutter', zh: '切换光闸' }, keys: 'X' },
     { label: { en: 'Undo the last turn', zh: '撤销上一步' }, keys: 'Z' },
     { label: { en: 'Reset this room', zh: '重置本房间' }, keys: 'Q' },
+    {
+      label: {
+        en: `Ask for a hint (room ${R.hintFreeRooms + 1} on, -${R.hintPenalty} points)`,
+        zh: `请求提示（第 ${R.hintFreeRooms + 1} 间起，扣 ${R.hintPenalty} 分）`,
+      },
+      keys: 'H',
+    },
     {
       label: {
         en: 'Tap a cell to select it, tap again to turn it',
@@ -327,6 +349,7 @@ export const meta = {
     ['KeyX', 'Shutter', '光闸', 'right'],
     ['KeyZ', 'Undo', '撤销', 'right'],
     ['KeyQ', 'Reset', '重置', 'right'],
+    ['KeyH', 'Hint', '提示', 'right'],
   ]),
 };
 
@@ -354,6 +377,7 @@ export function menuCellAt(px, py) {
 // --- Game state -----------------------------------------------------------------------------
 const clamp = (n, lo, hi) => Math.max(lo, Math.min(hi, n));
 const DIR_CODES = ['ArrowRight', 'ArrowDown', 'ArrowLeft', 'ArrowUp'];
+const MOVE_CODES = [...DIR_CODES, 'KeyW', 'KeyA', 'KeyS', 'KeyD'];
 
 function readUnlocked(progress) {
   try {
@@ -383,19 +407,37 @@ function retrace(s) {
   s.resolved = false;
   s.chimed = s.trace.lit.map(() => false);
   s.crystalSeen = s.trace.crystals.map(() => false);
+  s.grace = null;
 }
+
+const hintShown = (s) => s.index < R.hintFreeRooms || s.hintOn;
+const graceSeconds = (s) => Math.ceil(s.grace);
+const graceLine = (s) => [
+  `Out of turns: press Z to undo (${graceSeconds(s)})`,
+  `次数用完：按 Z 撤销（${graceSeconds(s)}）`,
+];
+const menuLine = (s) => {
+  const name = ROOMS[s.menu.sel - 1].name;
+  return [
+    `Room ${s.menu.sel}: ${name.en} · arrows, then Space`,
+    `第 ${s.menu.sel} 间：${name.zh} · 方向键，再按空格`,
+  ];
+};
 
 function refresh(s) {
   const cursor = { x: s.cx, y: s.cy };
   let adv = { kind: 'none' };
   let words;
-  if (s.menu) words = PLAIN.menu;
+  if (s.menu) words = menuLine(s);
   else if (s.phase === 'won') words = PLAIN.won;
   else if (s.phase === 'lost') words = PLAIN.lost;
   else if (s.cleared) words = PLAIN.cleared;
   else {
-    adv = advise(s.room, s.bits, cursor, movesLeftOf(s), s.history.length > 0);
-    words = adviceLine(adv);
+    const shown = hintShown(s);
+    if (shown) adv = advise(s.room, s.bits, cursor, movesLeftOf(s), s.history.length > 0);
+    else adv = { kind: 'hidden' };
+    if (s.grace !== null) words = graceLine(s);
+    else words = shown ? adviceLine(adv) : goalLine(s.room);
   }
   s.line = { en: words[0], zh: words[1] };
   const key = { move: DIR_CODES[adv.dir], undo: 'KeyZ' }[adv.kind];
@@ -407,6 +449,7 @@ function refresh(s) {
     dir: adv.dir ?? null,
     steps: adv.steps ?? 0,
     key: key ?? act,
+    shown: adv.kind !== 'hidden' && adv.kind !== 'none',
   };
 }
 
@@ -420,6 +463,8 @@ function loadRoom(s, index) {
   s.cy = s.room.emitters[0].y;
   s.cleared = false;
   s.clearT = 0;
+  s.hintOn = false;
+  s.roomHints = 0;
   s.msg = null;
   s.sensorCells = s.room.cells.map((c, i) => (c.k === 'sensor' ? i : -1)).filter((i) => i >= 0);
   retrace(s);
@@ -434,6 +479,7 @@ function newState(env) {
     ended: false,
     restarts: 0,
     undos: 0,
+    hints: 0,
     sparks: [],
     clock: 0,
     acc: 0,
@@ -456,7 +502,8 @@ function finish(s, env, won, message) {
 
 function clearRoom(s, env) {
   const extra = Math.max(0, s.moves - solveRoom(s.room).optimal);
-  s.score += Math.max(R.minRoomScore, R.clearScore - R.extraMovePenalty * extra);
+  const cost = R.extraMovePenalty * extra + R.hintPenalty * s.roomHints;
+  s.score += Math.max(R.minRoomScore, R.clearScore - cost);
   saveUnlocked(s.progress, Math.min(ROOM_COUNT, s.index + 2));
   s.cleared = true;
   env.sound('win');
@@ -518,9 +565,23 @@ function stepSim(s, env) {
   }
   s.settle += STEP;
   if (s.resolved || s.settle < R.settle) return;
-  s.resolved = true;
-  if (s.trace.solved) clearRoom(s, env);
-  else if (movesLeftOf(s) <= 0) loseRoom(s, env);
+  judgeRoom(s, env);
+}
+
+// A settled board is cleared, left alone while turns remain, or (with none left) given a few
+// seconds to be undone before the room is lost.
+function judgeRoom(s, env) {
+  if (s.trace.solved || movesLeftOf(s) > 0) {
+    s.resolved = true;
+    if (s.trace.solved) clearRoom(s, env);
+    return;
+  }
+  const before = s.grace === null ? null : graceSeconds(s);
+  s.grace = s.grace === null ? R.undoGrace : s.grace - STEP;
+  if (s.grace <= 0) {
+    s.resolved = true;
+    loseRoom(s, env);
+  } else if (graceSeconds(s) !== before) refresh(s);
 }
 
 function revealEffects(s, env) {
@@ -539,6 +600,7 @@ function revealEffects(s, env) {
     env.sound('hit');
     const p = centreOf(s, c.x, c.y);
     spark(s, p.x, p.y, '#ff5c8a');
+    say(s, 'Beam hit a crystal', '光束照到了水晶');
   });
 }
 
@@ -561,6 +623,7 @@ function turnUnderCursor(s, env, shutterOnly) {
   s.history.push({ bits: s.bits, moves: s.moves, x: s.cx, y: s.cy });
   if (s.history.length > R.historyMax) s.history.shift();
   s.bits ^= 1 << ti;
+  s.hintOn = false;
   s.moves = Math.min(R.movesMax, s.moves + 1);
   env.sound('move');
   retrace(s);
@@ -578,16 +641,28 @@ function undoTurn(s, env) {
   s.cx = last.x;
   s.cy = last.y;
   s.undos++;
+  s.hintOn = false;
   env.sound('move');
   retrace(s);
   refresh(s);
 }
 
+function requestHint(s, env) {
+  if (hintShown(s)) return;
+  s.hintOn = true;
+  s.hints++;
+  s.roomHints++;
+  say(s, `Hint: -${R.hintPenalty} points`, `提示：扣 ${R.hintPenalty} 分`);
+  env.sound('coin');
+  refresh(s);
+}
+
 function restartRoom(s, env) {
-  const { index } = s;
+  const { index, roomHints } = s;
   const restarts = s.restarts + 1;
   loadRoom(s, index);
   s.restarts = restarts;
+  s.roomHints = roomHints;
   say(s, 'Room reset', '房间已重置');
   env.sound('move');
 }
@@ -621,6 +696,7 @@ function playInput(s, env, input) {
   }
   moveCursor(s, env, input);
   if (input.pressed('KeyQ')) return restartRoom(s, env);
+  if (input.pressed('KeyH')) requestHint(s, env);
   if (input.pressed('KeyZ')) undoTurn(s, env);
   if (input.pressed('Space')) turnUnderCursor(s, env, false);
   if (input.pressed('KeyX')) turnUnderCursor(s, env, true);
@@ -644,6 +720,7 @@ function menuInput(s, env, input) {
       m.sel = hit;
     }
   }
+  refresh(s);
   if (go || input.pressed('Space', 'Enter')) {
     loadRoom(s, m.sel - 1);
     s.menu = null;
@@ -655,7 +732,11 @@ function menuInput(s, env, input) {
 function frameInput(s, env, input) {
   if (s.menu) return menuInput(s, env, input);
   if (s.cleared) {
-    if (input.pressed('Space', 'Enter') && s.phase === 'playing') loadRoom(s, s.index + 1);
+    // Any press during the clear pause skips it; a cursor key also moves in the new room.
+    if (s.phase === 'playing' && input.pressed('Space', 'Enter', ...MOVE_CODES)) {
+      loadRoom(s, s.index + 1);
+      moveCursor(s, env, input);
+    }
     return undefined;
   }
   return playInput(s, env, input);
@@ -837,20 +918,38 @@ function drawMenu(ctx, s, lang) {
     'center',
   );
   text(ctx, s.line[lang], 240, 48, C.hint, 12, 'center');
-  for (let n = 1; n <= ROOM_COUNT; n++) {
-    const x = MENU.x + ((n - 1) % R.menuCols) * MENU.w;
-    const y = MENU.y + Math.floor((n - 1) / R.menuCols) * MENU.h;
-    const open = n <= s.menu.unlocked;
-    rect(
+  for (let n = 1; n <= ROOM_COUNT; n++) drawMenuTile(ctx, s.menu, n);
+  if (s.menu.unlocked < ROOM_COUNT)
+    text(
       ctx,
-      x + 3,
-      y + 3,
-      MENU.w - 6,
-      MENU.h - 6,
-      n === s.menu.sel ? C.hint : open ? '#24366a' : '#141c34',
+      lang === 'zh' ? '挂锁：先通关前面的房间' : 'Padlock: clear earlier rooms to open it',
+      240,
+      262,
+      C.dim,
+      10,
+      'center',
     );
-    rect(ctx, x + 6, y + 6, MENU.w - 12, MENU.h - 12, open ? '#0f1830' : '#0b1124');
-    text(ctx, String(n), x + MENU.w / 2, y + 14, open ? C.text : '#3a4668', 14, 'center');
+}
+
+// A selected tile gets a gold frame and a pointer; a locked tile gets a padlock beside its number.
+function drawMenuTile(ctx, menu, n) {
+  const x = MENU.x + ((n - 1) % R.menuCols) * MENU.w;
+  const y = MENU.y + Math.floor((n - 1) / R.menuCols) * MENU.h;
+  const open = n <= menu.unlocked;
+  const selected = n === menu.sel;
+  rect(ctx, x + 3, y + 3, MENU.w - 6, MENU.h - 6, selected ? C.hint : open ? '#24366a' : '#141c34');
+  rect(ctx, x + 6, y + 6, MENU.w - 12, MENU.h - 12, open ? '#0f1830' : '#0b1124');
+  const numberX = selected ? x + 38 : open ? x + 32 : x + 22;
+  text(ctx, String(n), numberX, y + 14, open ? C.text : '#5a6890', 14, 'center');
+  if (selected)
+    for (let r = 0; r < 7; r++)
+      rect(ctx, x + 10, y + 15 + r * 2, (r < 4 ? r + 1 : 7 - r) * 2, 2, C.hint);
+  if (!open) {
+    rect(ctx, x + 38, y + 21, 12, 10, '#8090bc');
+    rect(ctx, x + 40, y + 14, 2, 7, '#8090bc');
+    rect(ctx, x + 46, y + 14, 2, 7, '#8090bc');
+    rect(ctx, x + 40, y + 14, 8, 2, '#8090bc');
+    rect(ctx, x + 43, y + 24, 2, 4, '#0b1124');
   }
 }
 
@@ -873,7 +972,9 @@ function drawHud(ctx, s, lang) {
   const note = s.msg || room.tip;
   text(ctx, note[lang], 8, 23, s.msg ? C.bad : C.dim, 10);
   text(ctx, `${lang === 'zh' ? '点亮' : 'Lit'} ${shown}/${total}`, 472, 23, C.lit, 10, 'right');
-  text(ctx, s.line[lang], 240, 298, C.hint, 12, 'center');
+  text(ctx, s.line[lang], 240, 298, s.grace === null ? C.hint : C.bad, 12, 'center');
+  if (s.grace !== null && s.phase === 'playing')
+    rect(ctx, 140, 316, 200 * (s.grace / R.undoGrace), 3, C.bad);
 }
 
 function drawPlay(ctx, s, lang) {
@@ -936,7 +1037,7 @@ export function createGame(env) {
         moves: s.moves,
         budget: s.room.budget,
         movesLeft: s.room.budget === null ? null : s.room.budget - s.moves,
-        optimal: solveRoom(s.room).optimal,
+        optimal: hintShown(s) ? solveRoom(s.room).optimal : null,
         sensors: s.room.sensors,
         lit: s.trace.lit.map((t) => t >= 0),
         litShown: s.trace.lit.filter((t) => t >= 0 && s.tr >= t).length,
@@ -945,6 +1046,8 @@ export function createGame(env) {
         cleared: s.cleared,
         beam: { progress: s.tr, length: s.trace.maxT + 1, looped: s.trace.looped },
         undos: s.undos,
+        hints: s.hints,
+        grace: s.grace === null ? null : Math.max(0, s.grace),
         restarts: s.restarts,
         menu: s.menu ? { ...s.menu } : null,
         message: s.msg ? { en: s.msg.en, zh: s.msg.zh } : null,

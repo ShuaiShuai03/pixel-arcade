@@ -1,0 +1,65 @@
+{
+  "game": "mirror-lab",
+  "date": "2026-11-10",
+  "reviewedRevision": "f3999576 (accepted build) plus the fixes in this commit",
+  "owner": "owner-mirror",
+  "reviewer": "mirror-fair, mirror-robust and mirror-present (parallel split review)",
+  "rounds": 1,
+  "process": "Lean final review at the user's request, with the review split across three parallel reviewers (fairness, robustness, presentation) as the user asked. The game already had 22 rooms. Three MEDIUM findings and the cheap LOW items were fixed and verified by a separate verification agent re-running the reviewers' probes (with a one-line change so the followers request the now opt-in hint, confirmed by diff to import the repository files) and one clean-worktree run, then by the browser check, without a second review round.",
+  "verdict": "pass",
+  "approvedSha256": {
+    "src/games/mirror-lab.js": "f1749dc407026fde51b27c46ab729f30cd8018a0ff8e3d7fd32196c9467d4752",
+    "src/games/mirror-lab-rooms.js": "5271361bdb15a39bb718b0b86ea7ffc67bf5ae5d3934f6a8c6c68079215565a4",
+    "tests/mirror-lab.test.js": "35a2519475346d5fcac5fc5d258ca6745e5680903fcd7811279d39dc5f6828bb",
+    "tests/mirror-lab-quality.test.js": "3fbb559d99aa7f618d27df88fea3a13fb617b6cb5523a1992d4e8053729a38cc"
+  },
+  "tests": {
+    "command": "node --experimental-test-coverage --test-coverage-include='src/games/mirror-lab*.js' --test tests/mirror-lab.test.js tests/mirror-lab-quality.test.js",
+    "passed": 68,
+    "failed": 0,
+    "lineCoverage": 100,
+    "log": "mirror-lab-coverage.txt"
+  },
+  "independentProbes": "The game's own solver confirms that rooms 6-22 each have exactly one solved setting, with solution density falling from about 0.2% to 0.02%, and that every optimal turn count fits its budget. On the final files a reaction-limited bot that buys the opt-in hint cleared all 22 rooms at 0.25 s and 0.35 s, but in later rooms it needed 4-10 hints per room and finished with 20-52 points instead of 100, where the review had found the always-on hint solving every room for free. Blind strategies cleared 0% of rooms 3-22, the undo grace window accepted Z at 0.25-2 s with the loss arriving 3.7 s after the last turn, determinism, fuzz, ending and progress checks passed, and EN and ZH text fits with no untranslated strings.",
+  "findings": [
+    {
+      "id": "M1",
+      "severity": "medium",
+      "status": "fixed",
+      "observation": "Fairness finding: the HUD always showed the exact next move and getState exposed the solution, so following it solved every room optimally and mastery was trivial. Rooms 1-5 keep the step hint; from room 6 the line states the goal ('Light 1-3 in order [H] hint -12'), H (or the Hint touch button) reveals the next move for 12 points, and getState exposes the solution only while the hint is shown."
+    },
+    {
+      "id": "M2",
+      "severity": "medium",
+      "status": "fixed",
+      "observation": "Robustness finding: when the last affordable turn left a room unsolved the loss came about 0.7 s later while the line said 'press Z to undo'. The room now waits 3 s with a countdown ('Out of turns: press Z to undo (3)') and a shrinking bar before it is lost."
+    },
+    {
+      "id": "M3",
+      "severity": "medium",
+      "status": "fixed",
+      "observation": "Presentation finding: the room picker marked the selected and locked rooms by colour alone. The selected room has a pointer arrow and gold frame, locked rooms a padlock with a legend, and the status line names the selected room."
+    },
+    {
+      "id": "L1",
+      "severity": "low",
+      "status": "fixed",
+      "observation": "The Twin Prisms tip now says three splitters, a crystal hit shows 'Beam hit a crystal', arrow, Space or Enter skip the clear pause instead of being dropped, and a one-sensor goal reads 'Light the sensor'."
+    }
+  ],
+  "openNotes": [
+    "A player can still buy every hint; the cost is score, not progress.",
+    "The source is a single file of about 1,050 lines, over the repository's 800-line soft ceiling."
+  ],
+  "browser": {
+    "method": "Official Claude in Chrome extension, local server; real clicks on Start and the language toggle, synthetic in-page keys; only DOM text and the canvas were read.",
+    "servedSha256Prefixes": "f1749dc4 5271361b",
+    "observed": [
+      "With progress saved from earlier testing, Start opened the room picker with a pointer arrow on the selected room and the status 'Room 22: Grand Bench · arrows, then Space'; the description explained the opt-in H hint and the undo grace.",
+      "Room 11 (Count to Three) opened with the goal line 'Light 1-3 in order [H] hint -12'; pressing H showed 'Move cursor → 1 to the glowing mirror' and 'Hint: -12 points'.",
+      "Chinese 390 px phone frame (388 px inner, no horizontal overflow): the room picker in Chinese with touch buttons 左, 右, 上, 下, 转动, 光闸, 撤销, 重置 and 提示.",
+      "Not covered in the browser: a solve, a crystal hit and the undo countdown; the probes and quality tests cover them."
+    ],
+    "screenshots": ["screenshots/mirror-lab-en.png", "screenshots/mirror-lab-phone-zh.png"]
+  }
+}
