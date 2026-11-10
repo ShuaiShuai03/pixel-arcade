@@ -1,0 +1,62 @@
+{
+  "game": "burrow-rescue",
+  "date": "2026-11-10",
+  "reviewedRevision": "2124ed5 plus the rework in this commit",
+  "owner": "owner-burrow",
+  "reviewer": "final-burrow",
+  "rounds": 1,
+  "process": "Lean final review at the user's request: the known 3-sector shortfall went straight to a retrofit, followed by one independent review round. It passed; two cheap LOW fixes (level 20 shown as cleared, stuck-miner hint priority) were verified by re-running the reviewer's own pilot, blind and correctness scripts, one clean-worktree run and the browser check, without a second review round.",
+  "verdict": "pass",
+  "approvedSha256": {
+    "src/games/burrow-rescue.js": "e4669bace8027300790735a09cd885b4e8ba378bcdda3a5cbe3071867827601f",
+    "src/games/burrow-rescue-draw.js": "f9c6fbbe588c218ab85d11310b3c8ce133fef236658fc39f873b984e542d5767",
+    "src/games/burrow-rescue-levels.js": "602a3529c9f052be6ca442db1084c4aa2dcccccfe536d11dc6857d65634584f0",
+    "src/games/burrow-rescue-map.js": "f51fca42c9e4966628d2aa8b9cd350bf9791f36f2b636676f237c45579d3c2cf",
+    "src/games/burrow-rescue-menu.js": "29f68e79e016389206304cfc3a3cc83b6539aac07d1e45404c49cabf4d868b51",
+    "src/games/burrow-rescue-sim.js": "c90ac65c746a85ba1725518fc853d9ec9c729c57833e9e924accef307ee67cc0",
+    "src/games/burrow-rescue-view.js": "f1c9b5e78e36f4240cc700891f5bec5dff40785494f967a322fe00fc8713cbca",
+    "tests/burrow-rescue.test.js": "319cbb4d270158dc206d4b02c686f7820d8fb6191e0940c94a1d905e8b913047",
+    "tests/burrow-rescue-quality.test.js": "92569dce4ac7c9cf0a3050c754046eefe135dee74b23bbe84b73a96df668d59a"
+  },
+  "tests": {
+    "command": "node --experimental-test-coverage --test-coverage-include='src/games/burrow-rescue*.js' --test tests/burrow-rescue.test.js tests/burrow-rescue-quality.test.js",
+    "passed": 75,
+    "failed": 0,
+    "lineCoverage": 100,
+    "log": "burrow-rescue-coverage.txt"
+  },
+  "independentProbes": "The reviewer's own bot (public getState only, cracks, air and stuck miners seen 0.25 s or 0.35 s late) cleared 60 of 60 levels at each delay with no lives lost when it braced before risky digs, and 20 of 20 at 30 and 120 Hz; a hasty variant that only braces once a crack shows cleared 48 of 48 at 0.25 s and 46 of 48 at 0.35 s, and a careless digger that never places beams cleared levels 5-10 but lost every mastery level. Blind play (idle, mash, random and hold-plus-alternate patterns at 0.1-2 s periods) cleared 0 of 4,980 runs per level. Final states matched at 30, 60 and 120 Hz on levels 1, 7, 12, 16 and 20, a hostile fuzz ended at most once with no NaN, broken progress stores were safe, and no soft-lock was found. On the final files the same pilot cleared 60 of 60 at 0.35 s, blind play stayed at 0%, and the correctness script passed.",
+  "findings": [
+    {
+      "id": "R1",
+      "severity": "blocking",
+      "status": "fixed",
+      "observation": "Only 3 sectors, with no select or continue. There are now 20 data-driven mines (teaching 1-5, mid 6-10, combination 11-15, mastery 16-20) with rock layers, loose soil, air tanks, beams and per-level crack fuses from 4 s to 2.5 s shown on screen, accurate EN/ZH tips, a level select and env.progress continue, and the 1,108-line file is split into seven modules."
+    },
+    {
+      "id": "L1",
+      "severity": "low",
+      "status": "fixed",
+      "observation": "Review findings: clearing level 20 saved progress as 20, so the select screen never marked it cleared, and after a cave-in the 'Miner stuck: dig a path to them' hint was hidden behind 'Space: dig' when facing earth. Winning level 20 now saves 21 (the state and cursor stay capped at 20, with a completed flag), and the stuck-miner hint takes priority in EN and ZH."
+    }
+  ],
+  "openNotes": [
+    "Mastery is harder mainly through planning: longer tunnels, fewer beams and more restock trips. A careful planner clears it without hits, while careless digging loses every mastery level.",
+    "There is no time pressure: surface air refills for free and there is no level timer, so the shorter mastery fuses matter only after a mistaken dig.",
+    "The level banner covers the top two rows for about 2 s at the start of each level."
+  ],
+  "browser": {
+    "method": "Official Claude in Chrome extension, local server; real clicks on Start and the language toggle, synthetic in-page keys driven only by the status-line prompt; only DOM text and the canvas were read.",
+    "servedSha256Prefixes": "e4669bac f9c6fbbe 602a3529 f51fca42 29f68e79 c90ac65c f1c9b5e7",
+    "observed": [
+      "English: Start opened level 1 of 20 with the lift, the stranded miner, air, beams and lives visible and the prompt 'Space: dig'.",
+      "Win: following only the prompts (Space: dig, X: wake the miner, Lead the miners to the lift) cleared level 1 with 'Level clear! Next mine' and opened level 2 of 20 with score 1180.",
+      "Chinese 390 px phone frame (388 px inner, no horizontal overflow): the level select showed level 1 as 已通关 and level 2 unlocked, with touch buttons 左, 上, 下, 右, 挖掘 and 支架 / 带人.",
+      "Not covered in the browser: a cave-in, a loss and the level 20 cleared marker; the reviewer's scripts and the quality tests cover them."
+    ],
+    "screenshots": [
+      "screenshots/burrow-rescue-win-en.png",
+      "screenshots/burrow-rescue-phone-zh.png"
+    ]
+  }
+}

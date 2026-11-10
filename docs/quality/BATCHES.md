@@ -36,6 +36,7 @@ Phase Tiles completed batch 18 and the 50-game target, Pixel Parkour included. T
 | Glider Ridge     | Passed in one round: 20 courses, thermals and gates ([record](final-review/glider-ridge.json))                    |
 | Shield Sentinel  | Passed in one round: 20 levels, five Guardians, labelled telegraphs ([record](final-review/shield-sentinel.json)) |
 | Raft Rush        | Passed in one round with no changes: 20 rivers, flags and back-currents ([record](final-review/raft-rush.json))   |
+| Burrow Rescue    | Passed in one round: 20 mines, beams and air planning ([record](final-review/burrow-rescue.json))                 |
 
 ## Completed batch 18
 

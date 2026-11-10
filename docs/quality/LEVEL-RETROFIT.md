@@ -14,7 +14,7 @@ Effort: S = level data only, M = data plus some mechanics or tests, L = structur
 | wallrunner-relay |             20 | `COURSES`        |   S    | done (final review) |
 | clockwork-bridge |             20 | `LEVELS`         |   S    | done (final review) |
 | glider-ridge     |             20 | `COURSES`        |   S    | done (final review) |
-| burrow-rescue    |              3 | `SECTORS`        |   S    | queued              |
+| burrow-rescue    |             20 | `LEVELS`         |   S    | done (final review) |
 | raft-rush        |             20 | `LEVELS`         |   S    | done (final review) |
 | shield-sentinel  |             20 | `LEVELS`         |   S    | done (final review) |
 | dash-duelist     |              3 | `RIVALS`         |   S    | queued              |

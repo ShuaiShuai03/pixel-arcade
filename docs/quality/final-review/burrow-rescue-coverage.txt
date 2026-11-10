@@ -1,0 +1,100 @@
+✔ twenty frozen, distinct, bilingual levels with legal maps and tips that fit (6.540208ms)
+✔ every level opens with a readable banner: name and tip, in both languages, inside the canvas (3.377042ms)
+✔ difficulty rises across the four tiers: more digging, more time, and sloppy play stops working (3443.774083ms)
+✔ level 1 First Shaft: the reaction-limited player clears it and the clear is saved (8.421166ms)
+✔ level 2 Winding Shaft: the reaction-limited player clears it and the clear is saved (19.960708ms)
+✔ level 3 Thin Air: the reaction-limited player clears it and the clear is saved (16.801209ms)
+✔ level 4 Two Friends: the reaction-limited player clears it and the clear is saved (28.823584ms)
+✔ level 5 Shallow Seam: the reaction-limited player clears it and the clear is saved (35.297625ms)
+✔ level 6 Stone Wall: the reaction-limited player clears it and the clear is saved (74.038875ms)
+✔ level 7 Loose Ground: the reaction-limited player clears it and the clear is saved (64.383167ms)
+✔ level 8 Collapsed Gallery: the reaction-limited player clears it and the clear is saved (81.488333ms)
+✔ level 9 Granite Shelf: the reaction-limited player clears it and the clear is saved (55.313042ms)
+✔ level 10 Rubble Gallery: the reaction-limited player clears it and the clear is saved (52.544875ms)
+✔ level 11 Three Chambers: the reaction-limited player clears it and the clear is saved (172.184458ms)
+✔ level 12 Rock Corridor: the reaction-limited player clears it and the clear is saved (84.322458ms)
+✔ level 13 Tank Trail: the reaction-limited player clears it and the clear is saved (254.238541ms)
+✔ level 14 Loose Corridor: the reaction-limited player clears it and the clear is saved (171.934958ms)
+✔ level 15 Deep Haul: the reaction-limited player clears it and the clear is saved (140.791209ms)
+✔ level 16 Beam Budget: the reaction-limited player clears it and the clear is saved (220.272458ms)
+✔ level 17 Fault Line: the reaction-limited player clears it and the clear is saved (150.629041ms)
+✔ level 18 Narrow Seams: the reaction-limited player clears it and the clear is saved (285.600292ms)
+✔ level 19 Last Air: the reaction-limited player clears it and the clear is saved (295.142625ms)
+✔ level 20 Bedrock Run: the reaction-limited player clears it and the clear is saved (379.301458ms)
+✔ a 0.25 s and a 0.35 s reaction-limited player clear every level at 30, 60 and 120 Hz (15081.265667ms)
+✔ the whole campaign is winnable in one run from level 1, saving every clear (3169.969583ms)
+✔ idle, mashing and timed hold-and-alternate patterns win at most 25% of any level from 3 (9157.868042ms)
+✔ an idle player loses nothing on any level, and the opening shows the player and the lift (265.159959ms)
+✔ aligned scripted input is identical at 30, 60 and 120 Hz on several levels (77.587458ms)
+✔ hostile dt values change nothing and hostile pointers never start or move the select (0.986416ms)
+✔ broken, missing and junk progress stores are survived and clamped (10.603791ms)
+✔ select screen: keyboard, taps, locked levels, continue and a readable layout (0.568709ms)
+✔ winning ends exactly once in English and Chinese and then the state is frozen (687.791875ms)
+✔ losing ends exactly once in English and Chinese, names the level, and freezes (95.32425ms)
+✔ every action has a keyboard and a touch route, and no reserved key is bound (0.189208ms)
+✔ a new instance after a loss starts fresh and a clear raises only the saved level (16.519667ms)
+✔ the final level shows CLEARED after a win, and the stuck-miner hint outranks the dig hint (338.339208ms)
+✔ meta is bilingual, has complete touch controls and distinct mines (2.0005ms)
+✔ invalid, zero, negative, NaN and huge dt never advance state or consume input (1.142709ms)
+✔ a press during a sub-step dt is latched until the next simulation step (0.461375ms)
+✔ held keys never repeat discrete actions (7.262542ms)
+✔ buffered presses expire instead of firing late (1.379625ms)
+✔ movement is tile stepping: 20 ticks per tile, reversal works, opposite keys cancel (3.895792ms)
+✔ digging removes earth only, costs oxygen and respects rock (1.674958ms)
+✔ oxygen drains underground, shares with followers, refills at the surface and from tanks (207.627833ms)
+✔ running out of air costs a life, hauls you up with partial air, and three failures end the game (689.967875ms)
+✔ low air prompt appears before any damage and names the way out (145.988208ms)
+✔ an unsupported 4-tile span cracks for 4 seconds, then falls; damage only after the warning (11.100709ms)
+✔ standing in a cracking span: warning first, prompt names X, damage only when the timer ends (14.829125ms)
+✔ a beam splits the span and cancels the warning; the same tunnel then stays up (14.556ms)
+✔ leaving the span before the timer ends avoids damage but the tunnel still falls (11.325708ms)
+✔ without beams the prompt says so, a long span says leave, and the lift restocks beams (11.542709ms)
+✔ loose soil needs a beam every 2 tiles while plain earth allows 3 (20.389208ms)
+✔ miners stay put until woken, only wake when adjacent, and follow along dug tunnels only (17.776875ms)
+✔ miners board only when you stand on the lift, then score and clear the sector (27.4705ms)
+✔ a cave-in that hoists you away strands a follower, and digging the rubble frees them (98.651291ms)
+✔ the three original mines clear through public input at 30, 60 and 120 Hz with identical state (411.972833ms)
+✔ clearing a mine scores, advances, saves progress and starts the next level fresh (36.663375ms)
+✔ every original mine is also beatable by the human-like bot at every frame rate (5025.6335ms)
+✔ perturbing every input boundary by 1-2 ticks does not break the legal route (898.253584ms)
+✔ the routes never trigger a warning or damage when beams are used as the prompts say (183.265ms)
+✔ player and miners are 24 px sprites that match their colliders; text is 12-16 px (2.003959ms)
+✔ camera keeps the player and the objective inside the playfield, clear of the HUD bands (335.327666ms)
+✔ status is a bilingual string with sector, miners, oxygen and a short prompt (1.250125ms)
+✔ drawing handles warnings, followers, stuck miners, effects, hurt flashes and terminal states in both languages (1268.894667ms)
+✔ seeded random play stays finite, bounded and on legal tiles (732.681625ms)
+✔ presentation: lives stay inside the canvas, the lift is labelled and flashes on boarding, the banner fades (41.104291ms)
+✔ X braces first inside a cracking span even when a miner waits beside it (prompt matches action) (6.818041ms)
+✔ the beam prompt is only shown when a beam on your tile prevents the crack (5.261083ms)
+✔ tunnelling prompts do not flicker between two wordings of the same instruction (13.837583ms)
+✔ a delayed-reaction player never sees the dig prompt flip back and forth within half a second (172.680083ms)
+✔ low air outranks a crack that is somewhere else, and the surface says to wait for air (263.270084ms)
+✔ a cave-in hurts whoever is still inside the span until their step completes (26.450791ms)
+✔ rules and the final score are pinned to literal numbers (54.856084ms)
+✔ the life-loss explanation survives a beam restock on the lift (205.847375ms)
+✔ event messages reach the status string in both languages, then fall back to the prompt (309.363583ms)
+ℹ tests 75
+ℹ suites 0
+ℹ pass 75
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 35017.9725
+ℹ start of coverage report
+ℹ --------------------------------------------------------------------------
+ℹ file                      | line % | branch % | funcs % | uncovered lines
+ℹ --------------------------------------------------------------------------
+ℹ src                       |        |          |         | 
+ℹ  games                    |        |          |         | 
+ℹ   burrow-rescue-draw.js   | 100.00 |    94.70 |  100.00 | 
+ℹ   burrow-rescue-levels.js | 100.00 |   100.00 |  100.00 | 
+ℹ   burrow-rescue-map.js    | 100.00 |   100.00 |  100.00 | 
+ℹ   burrow-rescue-menu.js   | 100.00 |   100.00 |  100.00 | 
+ℹ   burrow-rescue-sim.js    | 100.00 |    99.42 |   97.06 | 
+ℹ   burrow-rescue-view.js   | 100.00 |    98.72 |  100.00 | 
+ℹ   burrow-rescue.js        | 100.00 |   100.00 |  100.00 | 
+ℹ --------------------------------------------------------------------------
+ℹ all files                 | 100.00 |    98.35 |   99.14 | 
+ℹ --------------------------------------------------------------------------
+ℹ end of coverage report

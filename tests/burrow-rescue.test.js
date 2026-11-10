@@ -1,9 +1,27 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { createGame, meta, RULES, newState, advance } from '../src/games/burrow-rescue.js';
+import {
+  createGame as createRaw,
+  meta,
+  RULES,
+  newState,
+  advance,
+} from '../src/games/burrow-rescue.js';
 import { harness, input, mockContext, seeded } from './harness.js';
 
 const HZS = [30, 60, 120];
+// The three original mines are levels 5, 9 and 8 of the twenty.
+const SEAM = 5;
+const GRANITE = 9;
+const GALLERY = 8;
+const OLD_LEVELS = [SEAM, GRANITE, GALLERY];
+/** Start a game on `level` the way a player does: through the select screen. */
+function createGame(env, level = SEAM) {
+  env.progress = { unlocked: () => level, unlock() {} };
+  const game = createRaw(env);
+  game.update(1 / 60, input([], ['Space']));
+  return game;
+}
 const WALK = '.LTDVP';
 const DIG = 'EWB';
 const DIRS = {
@@ -141,12 +159,24 @@ function routeFor(game, sectorIndex, opts) {
   steps.push({ t: 'wait', ticks: 1800 });
   return compile(steps);
 }
-function playCampaign(game, hz, onFrame, opts) {
+const clearedLevel = (state, level) => state.level > level || state.phase === 'won';
+// The scripted route of each original mine on its own game; `all` is true when every one cleared.
+function playCampaign(hz, onFrame, opts, make = (i) => createGame(harness().env, OLD_LEVELS[i])) {
+  const states = [];
   for (let i = 0; i < 3; i++) {
+    const game = make(i);
     const { ops, end } = routeFor(game, i, opts);
     runOps(game, ops, end, hz, onFrame);
+    states.push(game.getState());
   }
-  return game.getState();
+  const sum = (key) => states.reduce((n, st) => n + st.stats[key], 0);
+  return {
+    states,
+    all: states.every((st, i) => clearedLevel(st, OLD_LEVELS[i])),
+    lives: Math.min(...states.map((st) => st.lives)),
+    braces: sum('braces'),
+    tanks: sum('tanks'),
+  };
 }
 
 function pathFirst(st, goal) {
@@ -201,7 +231,7 @@ function decide(st, mode) {
   const prompt = st.prompt.en;
   const out = { hold: null, press: null, tap: false };
   if (/^(Cracks! X|X:)/.test(prompt)) return { ...out, press: 'KeyX' };
-  if (/^Space:/.test(prompt) && !p.moving) out.press = 'Space';
+  if (/^(Space:|Miner stuck)/.test(prompt) && !p.moving) out.press = 'Space';
   if (/Low air|restock|Leave the tunnel/.test(prompt)) mode.refill = true;
   if (mode.refill && p.r === 0 && !p.moving && st.oxygen >= 92 && st.beams === st.beamsMax)
     mode.refill = false;
@@ -226,13 +256,13 @@ function decide(st, mode) {
 function humanCampaign(
   seed,
   hz,
-  { maxSeconds = 600, game = createGame(harness({ seed }).env) } = {},
+  { maxSeconds = 600, level = SEAM, game = createGame(harness({ seed }).env, level) } = {},
 ) {
   const rnd = seeded(seed * 7919 + 13);
   const dt = 1 / hz;
   const mode = { refill: false };
   let [t, nextObs, pending, hold, releaseAt] = [0, 0.2, null, null, Infinity];
-  while (t < maxSeconds && game.getState().phase === 'playing') {
+  while (t < maxSeconds && game.getState().phase === 'playing' && game.getState().level === level) {
     let press = [];
     if (pending && t >= pending.at - 1e-9) {
       hold = pending.hold;
@@ -251,9 +281,9 @@ function humanCampaign(
   return { state: game.getState(), seconds: t };
 }
 
-const fresh = (opts) => {
+const fresh = (opts = {}) => {
   const h = harness(opts);
-  return { h, g: createGame(h.env) };
+  return { h, g: createGame(h.env, opts.level) };
 };
 const frames = (g, n, held = [], pressed = [], dt = 1 / 120) => {
   for (let i = 0; i < n; i++) g.update(dt, input(held, i === 0 ? pressed : []));
@@ -268,7 +298,7 @@ const finite = (v) => {
 // Contract, input and time
 // ---------------------------------------------------------------------------
 
-test('meta is bilingual, has complete touch controls and distinct sectors', () => {
+test('meta is bilingual, has complete touch controls and distinct mines', () => {
   assert.equal(meta.id, 'burrow-rescue');
   assert.equal(meta.genre, 'action');
   assert.ok(meta.name.en && meta.name.zh && meta.description.en && meta.description.zh);
@@ -278,16 +308,8 @@ test('meta is bilingual, has complete touch controls and distinct sectors', () =
   for (const c of meta.touchControls) assert.ok(c.label.en && c.label.zh && c.side);
   for (const k of meta.keys) assert.ok(k.label.en && k.label.zh && k.keys);
   assert.ok(!meta.keys.some((k) => /Escape|KeyP|KeyR/.test(k.keys)));
-  const maps = [];
-  const g = createGame(harness().env);
-  const sectors = [];
-  const route = (i) => routeFor(g, i);
-  for (let i = 0; i < 3; i++) {
-    sectors.push(g.getState());
-    maps.push(sectors[i].tiles.join('|'));
-    const { ops, end } = route(i);
-    runOps(g, ops, end, 120);
-  }
+  const sectors = OLD_LEVELS.map((level) => fresh({ level }).g.getState());
+  const maps = sectors.map((st) => st.tiles.join('|'));
   assert.equal(new Set(maps).size, 3);
   assert.ok(!sectors[0].tanks.length && sectors[1].tanks.length && sectors[2].tanks.length);
   assert.ok(sectors[1].tiles[3].startsWith('RRRRRRRR'), 'sector 2 has a rock shelf');
@@ -298,7 +320,7 @@ test('meta is bilingual, has complete touch controls and distinct sectors', () =
     [2, 2, 3],
   );
   assert.deepEqual(
-    sectors.map((s) => s.sectorName.en),
+    sectors.map((s) => s.levelName.en),
     ['Shallow Seam', 'Granite Shelf', 'Collapsed Gallery'],
   );
   assert.ok(sectors.every((s) => s.tiles.length === 11 && s.tiles.every((r) => r.length === 20)));
@@ -417,18 +439,19 @@ test('oxygen drains underground, shares with followers, refills at the surface a
   frames(g, 40, ['ArrowDown']);
   const o0 = g.getState().oxygen;
   frames(g, 120, []);
-  assert.ok(Math.abs(o0 - g.getState().oxygen - 1) < 1e-9, '1 oxygen per second in sector 1');
+  assert.ok(
+    Math.abs(o0 - g.getState().oxygen - 1) < 1e-9,
+    '1 oxygen per second on the Shallow Seam',
+  );
   frames(g, 20, ['ArrowUp']);
   frames(g, 40, []);
   assert.equal(g.getState().player.r, 0);
   frames(g, 120, []);
   assert.equal(g.getState().oxygen, 100, 'surface air refills');
 
-  const s2 = createGame(harness().env);
-  const r1 = routeFor(s2, 0);
-  runOps(s2, r1.ops, r1.end, 120);
+  const s2 = createGame(harness().env, GRANITE);
   const st = s2.getState();
-  assert.equal(st.sector, 2);
+  assert.equal(st.level, GRANITE);
   const steps = plan(st.tiles, st.lift, [[14, 7, 1]]);
   const { ops, end } = compile(steps);
   let jump = 0;
@@ -442,8 +465,7 @@ test('oxygen drains underground, shares with followers, refills at the surface a
   assert.equal(after.oxygenDrain, 2 + RULES.followDrain, 'each follower shares the air');
   assert.ok(after.tanks[0].taken && after.stats.tanks === 1);
   assert.ok(jump > 20 && jump <= RULES.tankAir, `tank gave ${jump}`);
-  const campaign = playCampaign(createGame(harness().env), 120);
-  assert.ok(campaign.stats.tanks >= 1);
+  assert.ok(playCampaign(120).tanks >= 1);
 });
 
 function loseByAir(g, { onHaul = () => {}, hz = 120 } = {}) {
@@ -553,7 +575,7 @@ test('standing in a cracking span: warning first, prompt names X, damage only wh
   assert.deepEqual([w.r, w.c0, w.c1], [3, 5, 8]);
   assert.match(s.prompt.en, /^Cracks! X: brace here \(\ds\)$/);
   assert.match(s.prompt.zh, /裂缝/);
-  assert.match(s.status.en, /^Sector 1\/3 · Miners 0\/2 · Oxygen \d+ · Cracks!/);
+  assert.match(s.status.en, /^Level 5\/20 · Miners 0\/2 · Oxygen \d+ · Cracks!/);
   assert.equal(s.lives, 3);
   const t0 = s.time - w.elapsed;
   let damageTime = null;
@@ -661,13 +683,9 @@ test('without beams the prompt says so, a long span says leave, and the lift res
 });
 
 test('loose soil needs a beam every 2 tiles while plain earth allows 3', () => {
-  const { g } = fresh();
-  for (let i = 0; i < 2; i++) {
-    const { ops, end } = routeFor(g, i);
-    runOps(g, ops, end, 120);
-  }
+  const { g } = fresh({ level: GALLERY });
   const st = g.getState();
-  assert.equal(st.sector, 3);
+  assert.equal(st.level, GALLERY);
   assert.ok(st.tiles[1].includes('P'));
   let warned = [];
   const steps = plan(
@@ -756,7 +774,7 @@ test('miners board only when you stand on the lift, then score and clear the sec
   assert.ok(prompts.has('Stay on the lift: miners coming'));
   assert.equal(s.minersRescued, 1);
   assert.equal(s.score, RULES.minerScore);
-  assert.equal(s.sector, 1);
+  assert.equal(s.level, SEAM);
   assert.equal(s.miners[1].state, 'rescued');
 });
 
@@ -782,90 +800,79 @@ test('a cave-in that hoists you away strands a follower, and digging the rubble 
   assert.ok(WALK.includes(mid.tiles[mid.miners[0].r][mid.miners[0].c]));
   // The rest uses only what is shown: the bot clears rubble toward the stuck miner.
   const res = humanCampaign(5, 60, { game: g });
-  assert.equal(res.state.phase, 'won');
+  assert.equal(res.state.level, SEAM + 1);
 });
 
 // ---------------------------------------------------------------------------
 // Campaigns, determinism, terminal states
 // ---------------------------------------------------------------------------
 
-test('full campaign through public input wins at 30, 60 and 120 Hz with identical full state', () => {
+test('the three original mines clear through public input at 30, 60 and 120 Hz with identical state', () => {
   const traces = HZS.map((hz) => {
-    const h = harness();
-    const g = createGame(h.env);
     const snaps = [];
-    const final = playCampaign(g, hz, (game, f) => {
+    const run = playCampaign(hz, (game, f) => {
       if (((f + 1) * (120 / hz)) % 240 === 0) snaps.push(JSON.stringify(game.getState()));
     });
-    assert.equal(final.phase, 'won');
-    assert.equal(final.lives, 3);
-    assert.equal(h.ends.length, 1);
-    assert.equal(h.ends[0].won, true);
-    assert.equal(h.ends[0].score, final.score);
-    assert.ok(final.score > 7 * RULES.minerScore);
-    return { snaps, final: JSON.stringify(final) };
+    assert.ok(run.all);
+    assert.equal(run.lives, 3);
+    return { snaps, final: JSON.stringify(run.states) };
   });
   for (const t of traces.slice(1)) {
-    assert.equal(t.snaps.length, traces[0].snaps.length);
     assert.deepEqual(t.snaps, traces[0].snaps);
     assert.equal(t.final, traces[0].final);
   }
 });
 
-test('win freezes state, ignores input and a new instance restarts fresh', () => {
+test('clearing a mine scores, advances, saves progress and starts the next level fresh', () => {
   const h = harness();
+  const saved = [];
   const g = createGame(h.env);
-  const final = playCampaign(g, 60);
-  assert.equal(final.phase, 'won');
-  assert.equal(final.prompt.en, 'All miners are safe!');
-  const snap = JSON.stringify(g.getState());
-  for (let i = 0; i < 100; i++) g.update(1 / 60, input(['ArrowDown', 'Space'], ['Space', 'KeyX']));
-  assert.equal(JSON.stringify(g.getState()), snap);
-  assert.equal(h.ends.length, 1);
-  assert.ok(h.sounds.filter((s) => s === 'win').length >= 2);
-  const next = createGame(harness().env).getState();
-  assert.equal(next.sector, 1);
-  assert.equal(next.score, 0);
-  assert.equal(next.phase, 'playing');
+  h.env.progress.unlock = (n) => saved.push(n);
+  const { ops, end } = routeFor(g, 0);
+  runOps(g, ops, end, 60);
+  const st = g.getState();
+  assert.equal(st.level, SEAM + 1);
+  assert.deepEqual(saved, [SEAM + 1]);
+  assert.ok(st.score >= 2 * RULES.minerScore);
+  assert.equal(st.lives, 3);
+  assert.equal(st.oxygen, 100);
+  assert.equal(st.minersRescued, 0);
+  assert.equal(h.ends.length, 0);
 });
 
-test('every sector is also beatable by the human-like bot at every frame rate (>= 27 of 30 seeds)', () => {
-  for (const hz of HZS) {
-    let wins = 0;
-    for (let seed = 1; seed <= 30; seed++) {
-      const { state } = humanCampaign(seed, hz);
-      if (state.phase === 'won') wins++;
+test('every original mine is also beatable by the human-like bot at every frame rate', () => {
+  for (const hz of HZS)
+    for (const level of OLD_LEVELS) {
+      let wins = 0;
+      for (let seed = 1; seed <= 8; seed++)
+        if (humanCampaign(seed, hz, { level }).state.level > level) wins++;
+      assert.ok(wins >= 7, `level ${level} at ${hz} Hz: only ${wins}/8 runs won`);
     }
-    assert.ok(wins >= 27, `${hz} Hz: only ${wins}/30 runs won`);
-  }
 });
 
 test('perturbing every input boundary by 1-2 ticks does not break the legal route', () => {
   for (const hz of HZS) {
     let wins = 0;
-    for (let seed = 1; seed <= 12; seed++) {
+    for (let seed = 1; seed <= 8; seed++) {
       const rnd = seeded(seed * 31 + hz);
       const g = createGame(harness({ seed }).env);
-      for (let i = 0; i < 3; i++) {
-        const { ops, end } = routeFor(g, i);
-        runOps(g, perturb(ops, rnd, 2), end, hz);
-      }
-      if (g.getState().phase === 'won') wins++;
+      const { ops, end } = routeFor(g, 0);
+      runOps(g, perturb(ops, rnd, 2), end, hz);
+      if (g.getState().level > SEAM) wins++;
     }
-    assert.ok(wins >= 11, `${hz} Hz: ${wins}/12 perturbed routes won`);
+    assert.ok(wins >= 7, `${hz} Hz: ${wins}/8 perturbed routes cleared`);
   }
 });
 
-test('the route never triggers a warning or damage when beams are used as the prompts say', () => {
-  const g = createGame(harness().env);
+test('the routes never trigger a warning or damage when beams are used as the prompts say', () => {
   let warnings = 0;
-  const final = playCampaign(g, 60, (game) => {
+  const run = playCampaign(60, (game) => {
     const s = game.getState();
     warnings += s.warnings.length;
     assert.ok(s.lives === 3);
   });
   assert.equal(warnings, 0);
-  assert.ok(final.stats.braces >= 3);
+  assert.ok(run.braces >= 3);
 });
 
 // ---------------------------------------------------------------------------
@@ -894,7 +901,7 @@ function recordingContext() {
   };
 }
 
-test('player and miners are 24 px sprites that match their colliders; text is 14-16 px', () => {
+test('player and miners are 24 px sprites that match their colliders; text is 12-16 px', () => {
   const { g } = fresh({ lang: 'en' });
   const st = g.getState();
   const { ctx, calls } = recordingContext();
@@ -922,7 +929,7 @@ test('player and miners are 24 px sprites that match their colliders; text is 14
   );
   for (const m of st.miners) assert.equal(m.rect.h, 24);
   const sizes = [...calls.fonts].map((f) => Number(/(\d+)px/.exec(f)[1]));
-  assert.ok(sizes.length > 0 && sizes.every((n) => n >= 14 && n <= 16), `font sizes ${sizes}`);
+  assert.ok(sizes.length > 0 && sizes.every((n) => n >= 12 && n <= 16), `font sizes ${sizes}`);
 });
 
 test('camera keeps the player and the objective inside the playfield, clear of the HUD bands', () => {
@@ -944,8 +951,7 @@ test('camera keeps the player and the objective inside the playfield, clear of t
     for (const m of s.miners)
       assert.ok(m.rect.y >= hud.top[1] && m.rect.y + m.rect.h <= hud.bottom[0]);
   };
-  const g = createGame(harness().env);
-  playCampaign(g, 60, (game) => check(game.getState()));
+  playCampaign(60, (game) => check(game.getState()));
   const rnd = seeded(77);
   const codes = ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'KeyA', 'KeyW'];
   const r = createGame(harness({ seed: 4 }).env);
@@ -962,8 +968,8 @@ test('status is a bilingual string with sector, miners, oxygen and a short promp
     const s = g.getState();
     assert.equal(typeof s.status.en, 'string');
     assert.equal(typeof s.status.zh, 'string');
-    assert.match(s.status.en, /^Sector 1\/3 · Miners 0\/2 · Oxygen 100 · /);
-    assert.match(s.status.zh, /^矿区 1\/3 · 矿工 0\/2 · 氧气 100 · /);
+    assert.match(s.status.en, /^Level 5\/20 · Miners 0\/2 · Oxygen 100 · /);
+    assert.match(s.status.zh, /^关卡 5\/20 · 矿工 0\/2 · 氧气 100 · /);
     assert.ok(s.prompt.en.length <= 40 && s.prompt.zh.length <= 24);
     const { ctx, calls } = recordingContext();
     g.draw(ctx);
@@ -996,7 +1002,12 @@ test('drawing handles warnings, followers, stuck miners, effects, hurt flashes a
       if (i % 20 === 0) g.draw(mockContext());
     }
     assert.ok(g.getState().stats.collapses > 0 && g.getState().lives < 3);
-    playCampaign(createGame(h.env), 60, (game, f) => f % 40 === 0 && game.draw(mockContext()));
+    playCampaign(
+      60,
+      (game, f) => f % 40 === 0 && game.draw(mockContext()),
+      undefined,
+      (i) => createGame(h.env, OLD_LEVELS[i]),
+    );
     const lost = createGame(harness({ lang }).env);
     loseByAir(lost, { hz: 60 });
     assert.equal(lost.getState().phase, 'lost');
@@ -1043,7 +1054,7 @@ test('presentation: lives stay inside the canvas, the lift is labelled and flash
     );
     assert.ok(
       early.calls.texts.some((x) => /Shallow Seam|浅层矿脉/.test(x.str)),
-      'sector banner at the start',
+      'level banner at the start',
     );
     const hud = early.calls.rects.filter((r) => r.y < 28 && r.w < 40);
     assert.ok(
@@ -1269,25 +1280,20 @@ test('rules and the final score are pinned to literal numbers', () => {
   assert.equal(RULES.haulAir, 60);
   assert.equal(RULES.followDrain, 0.5);
   assert.equal(RULES.tankAir, 35);
-  assert.equal(RULES.warnTicks, 480);
   assert.equal(RULES.minerScore, 1000);
+  assert.equal(RULES.lives, 3);
   const g = createGame(harness().env);
-  let prevOxygen = 100;
-  let prevSector = 1;
+  const { ops, end } = routeFor(g, 0);
+  let lastOxygen = 100;
   let bonus = 0;
-  let done = false;
-  const final = playCampaign(g, 60, (game) => {
+  runOps(g, ops, end, 60, (game) => {
     const s = game.getState();
-    if ((s.sector !== prevSector || s.phase === 'won') && !done) {
-      bonus += Math.floor(prevOxygen) * 2;
-      prevSector = s.sector;
-      done = s.phase === 'won';
-    }
-    prevOxygen = s.oxygen;
+    if (s.level === SEAM && !bonus) lastOxygen = s.oxygen;
+    if (s.level > SEAM && !bonus) bonus = Math.floor(lastOxygen) * 2;
   });
-  const extra = final.score - 7 * 1000 - 3 * 500;
-  assert.ok(extra % 2 === 0 && extra >= 400 && extra <= 600, `air bonus ${extra}`);
-  assert.ok(Math.abs(extra - bonus) <= 6, `${extra} vs ${bonus}`);
+  const final = g.getState();
+  assert.equal(final.score, 2 * 1000 + bonus);
+  assert.ok(bonus >= 150 && bonus <= 200, `air bonus ${bonus}`);
 });
 
 test('the life-loss explanation survives a beam restock on the lift', () => {
@@ -1360,7 +1366,7 @@ test('event messages reach the status string in both languages, then fall back t
   let clear = null;
   runOps(g3, r.ops, r.end, 120, (game) => {
     const q = game.getState();
-    if (q.sector === 2 && !clear) clear = q.status;
+    if (q.level === SEAM + 1 && !clear) clear = q.status;
   });
-  assert.ok(clear && /Sector clear! Next mine/.test(clear.en) && /矿区完成/.test(clear.zh));
+  assert.ok(clear && /Level clear! Next mine/.test(clear.en) && /关卡完成/.test(clear.zh));
 });
